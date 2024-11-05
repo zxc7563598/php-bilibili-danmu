@@ -19,6 +19,8 @@ use Webman\Route;
 use support\Request;
 use Workerman\Worker;
 
+Route::get('/',[app\controller\IndexController::class, 'main']);
+
 Route::post('/reload-bilibili', function (Request $request) {
     // 预定义的 API 密钥（可以从配置文件或环境变量中读取）
     $validApiKey = getenv('SECURE_API_KEY');
@@ -29,21 +31,19 @@ Route::post('/reload-bilibili', function (Request $request) {
     if ($api_key !== md5($validApiKey . $timestamp)) {
         return response('Unauthorized', 401);
     }
-
     $socketFile = runtime_path() . '/bilibili.sock'; // 套接字文件路径，确保有权限访问
-
     if (!file_exists($socketFile)) {
         return response('Unix socket not found', 404);
     }
-
     $socket = stream_socket_client("unix://$socketFile", $errno, $errstr);
     if (!$socket) {
         return response("Error connecting to Unix socket: $errstr ($errno)", 500);
     }
-
     // 发送 reload 命令
     fwrite($socket, 'reload');
     $response = fread($socket, 1024);
     fclose($socket);
-    return response('ok');
+    return response($response);
 });
+
+Route::disableDefaultRoute(); // 关闭默认路由
