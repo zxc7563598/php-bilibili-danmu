@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "028366924494e7622184ccc651f1c0ca",
+    "content-hash": "fa3383137996f23282408b84144b83a2",
     "packages": [
         {
             "name": "carbonphp/carbon-doctrine-types",
@@ -139,16 +139,16 @@
         },
         {
             "name": "hejunjie/bililive",
-            "version": "v0.0.1",
+            "version": "v0.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zxc7563598/php-bilibili-danmu-core.git",
-                "reference": "7e46f3e8fc9f70fc0630881ca54883f029db911f"
+                "reference": "f30828ed9d80dd0b907b164e6a4b2dc3f59648d1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zxc7563598/php-bilibili-danmu-core/zipball/7e46f3e8fc9f70fc0630881ca54883f029db911f",
-                "reference": "7e46f3e8fc9f70fc0630881ca54883f029db911f",
+                "url": "https://api.github.com/repos/zxc7563598/php-bilibili-danmu-core/zipball/f30828ed9d80dd0b907b164e6a4b2dc3f59648d1",
+                "reference": "f30828ed9d80dd0b907b164e6a4b2dc3f59648d1",
                 "shasum": ""
             },
             "require": {
@@ -180,9 +180,9 @@
             ],
             "support": {
                 "issues": "https://github.com/zxc7563598/php-bilibili-danmu-core/issues",
-                "source": "https://github.com/zxc7563598/php-bilibili-danmu-core/tree/v0.0.1"
+                "source": "https://github.com/zxc7563598/php-bilibili-danmu-core/tree/v0.0.2"
             },
-            "time": "2024-10-28T09:40:59+00:00"
+            "time": "2024-11-05T07:52:05+00:00"
         },
         {
             "name": "hejunjie/tools",
@@ -1487,12 +1487,12 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.2"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }
