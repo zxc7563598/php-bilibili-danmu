@@ -6,23 +6,13 @@ use support\Request;
 
 class IndexController
 {
-    public function index(Request $request)
+    public function main(Request $request)
     {
-        static $readme;
-        if (!$readme) {
-            $readme = file_get_contents(base_path('README.md'));
-        }
-        return $readme;
-    }
+        // 获取登录信息配置
+        $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie'));
+        // 获取直播间信息配置
+        $room_id = intval(readFileContent(runtime_path() . '/tmp/connect'));
 
-    public function view(Request $request)
-    {
-        return view('index/view', ['name' => 'webman']);
+        return view('main/console', ['name' => 'webman']);
     }
-
-    public function json(Request $request)
-    {
-        return json(['code' => 0, 'msg' => 'ok']);
-    }
-
 }
