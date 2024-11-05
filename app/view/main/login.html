@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue with Axios in HTML</title>
+    <script src="/js/vue.3.5.12.js"></script>
+    <script src="/axios.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <p>url: {{ url }}</p>fullUrl
+        <p>qrcode_key: {{ qrcode_key }}</p>
+    </div>
+
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    data: 123,
+                    url: '<?php echo $url ?>',
+                    qrcode_key: '<?php echo $qrcode_key ?>'
+                };
+            },
+            methods: {
+                fetchData() {
+                    console.log('live_info', JSON.parse(this.live_info));
+                }
+            }
+        });
+        app.mount('#app');
+    </script>
+</body>
+
+</html>
