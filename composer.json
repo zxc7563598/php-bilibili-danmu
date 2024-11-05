@@ -28,7 +28,7 @@
     "workerman/webman-framework": "^1.5.0",
     "monolog/monolog": "^2.0",
     "hejunjie/tools": "^1.0",
-    "hejunjie/bililive": "^0.0.1",
+    "hejunjie/bililive": "^0.0.2",
     "vlucas/phpdotenv": "^5.6",
     "nesbot/carbon": "^3.8"
   },
