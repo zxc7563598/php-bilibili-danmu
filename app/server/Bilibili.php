@@ -50,17 +50,6 @@ class Bilibili
         $unixWorker->listen();
     }
 
-    /**
-     * 读取文件信息
-     * 
-     * @param string $path 文件路径
-     * 
-     * @return null|string 
-     */
-    private function readFileContent(string $path): ?string
-    {
-        return (file_exists($path) && is_readable($path)) ? Tools\FileUtils::readFile($path) : null;
-    }
 
     /**
      * 连接到 WebSocket 服务器
@@ -71,8 +60,8 @@ class Bilibili
      */
     private function connectToWebSocket()
     {
-        $this->cookie = $this->readFileContent(runtime_path() . '/tmp/cookie');
-        $this->roomId = $this->readFileContent(runtime_path() . '/tmp/connect');
+        $this->cookie = strval(readFileContent(runtime_path() . '/tmp/cookie'));
+        $this->roomId = intval(readFileContent(runtime_path() . '/tmp/connect'));
         if ($this->cookie && $this->roomId) {
             // 获取真实房间号和WebSocket连接信息
             $realRoomId = Bililive\Live::getRealRoomId($this->roomId, $this->cookie);
