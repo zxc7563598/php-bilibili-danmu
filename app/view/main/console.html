@@ -1,14 +1,47 @@
-<!doctype html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" href="/favicon.ico"/>
-    <title>webman</title>
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue with Axios in HTML</title>
+    <script src="/js/vue.3.5.12.js"></script>
+    <script src="/axios.min.js"></script>
 </head>
+
 <body>
-123123
+    <div id="app">
+        <h1>Vue with Axios Example</h1>
+        <p>Data: {{ data }}</p>
+        <button @click="fetchData">Fetch Data</button>
+    </div>
+
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    data: 123,
+                    user_info: '<?php echo json_encode($user_info) ?>',
+                    live_info: '<?php echo json_encode($live_info) ?>'
+                };
+            },
+            methods: {
+                fetchData() {
+                    console.log('live_info', JSON.parse(this.live_info));
+                    console.log('user_info', JSON.parse(this.user_info));
+                    // 使用 axios 发送 GET 请求
+                    // axios.get('https://jsonplaceholder.typicode.com/todos/1')
+                    //     .then(response => {
+                    //         this.data = response.data;
+                    //     })
+                    //     .catch(error => {
+                    //         console.error('Error fetching data:', error);
+                    //     });
+                }
+            }
+        });
+        app.mount('#app');
+    </script>
 </body>
+
 </html>

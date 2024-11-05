@@ -20,6 +20,8 @@ use support\Request;
 use Workerman\Worker;
 
 Route::get('/',[app\controller\IndexController::class, 'main']);
+Route::get('/login',[app\controller\IndexController::class, 'login']);
+
 
 Route::post('/reload-bilibili', function (Request $request) {
     // 预定义的 API 密钥（可以从配置文件或环境变量中读取）
