@@ -362,16 +362,16 @@
         },
         {
             "name": "hejunjie/tools",
-            "version": "v1.0.2",
+            "version": "v1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zxc7563598/php-tools.git",
-                "reference": "5de0807fb6d8aedba318f04c7aa50c7834e21c7f"
+                "reference": "0d4a7b5fe039976b4e3abaa13ce36d4d67626d0c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zxc7563598/php-tools/zipball/5de0807fb6d8aedba318f04c7aa50c7834e21c7f",
-                "reference": "5de0807fb6d8aedba318f04c7aa50c7834e21c7f",
+                "url": "https://api.github.com/repos/zxc7563598/php-tools/zipball/0d4a7b5fe039976b4e3abaa13ce36d4d67626d0c",
+                "reference": "0d4a7b5fe039976b4e3abaa13ce36d4d67626d0c",
                 "shasum": ""
             },
             "require": {
@@ -401,9 +401,9 @@
             ],
             "support": {
                 "issues": "https://github.com/zxc7563598/php-tools/issues",
-                "source": "https://github.com/zxc7563598/php-tools/tree/v1.0.2"
+                "source": "https://github.com/zxc7563598/php-tools/tree/v1.0.3"
             },
-            "time": "2024-10-19T10:37:24+00:00"
+            "time": "2024-11-06T08:13:54+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -1663,12 +1663,12 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.2"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }
