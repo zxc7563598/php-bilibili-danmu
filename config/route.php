@@ -19,8 +19,19 @@ use Webman\Route;
 use support\Request;
 use Workerman\Worker;
 
-Route::get('/',[app\controller\IndexController::class, 'main']);
-Route::get('/login',[app\controller\IndexController::class, 'login']);
+Route::get('/', [app\controller\PageController::class, 'main']);
+Route::get('/login', [app\controller\PageController::class, 'login']);
+
+Route::group('/api', function () {
+    Route::any('/login-check', [app\controller\ApiController::class, 'loginCheck']);
+    Route::any('/login-out', [app\controller\ApiController::class, 'loginOut']);
+    Route::any('/get-user-info', [app\controller\ApiController::class, 'getUserInfo']);
+    Route::any('/get-real-room-info', [app\controller\ApiController::class, 'getRealRoomInfo']);
+    Route::any('/connect-out', [app\controller\ApiController::class, 'connectOut']);
+})->middleware([
+    app\middleware\SignatureMiddleware::class
+]);
+
 
 
 Route::post('/reload-bilibili', function (Request $request) {
