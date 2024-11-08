@@ -44,6 +44,9 @@ return [
         ]
     ],
     'bilibili' => [
-        'handler'  => app\server\Bilibili::class
+        'handler'  => process\Bilibili::class
+    ],
+    'task'  => [
+        'handler'  => process\Task::class
     ],
 ];
