@@ -13,6 +13,7 @@
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
+use app\queue\SendMessage;
 use Carbon\Carbon;
 use Hejunjie\Tools;
 use Webman\Route;
@@ -31,8 +32,6 @@ Route::group('/api', function () {
 })->middleware([
     app\middleware\SignatureMiddleware::class
 ]);
-
-
 
 Route::post('/reload-bilibili', function (Request $request) {
     // 预定义的 API 密钥（可以从配置文件或环境变量中读取）
