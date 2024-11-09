@@ -52,54 +52,6 @@
             }
         }
 
-
-        .switch-container {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-        }
-
-        .switch-input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .switch-label {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            border-radius: 24px;
-            transition: 0.4s;
-        }
-
-        .switch-label:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 2px;
-            bottom: 2px;
-            background-color: white;
-            border-radius: 50%;
-            transition: 0.4s;
-        }
-
-        .switch-input:checked+.switch-label {
-            background-color: #48c774;
-            /* Bulma 绿色 */
-        }
-
-        .switch-input:checked+.switch-label:before {
-            transform: translateX(26px);
-        }
-
-
         .button-group {
             display: inline-flex;
             border: 1px solid #e4e4e4;
@@ -117,13 +69,35 @@
         }
 
         .toggle-button.is-active {
-            background-color: #fff;
+            background-color: var(--bulma-scheme-main);
             /* Bulma 绿色 */
             color: var(--bulma-success);
         }
 
         a {
             color: var(--bulma-success);
+        }
+
+        .fixed-save-button {
+            width: 6rem;
+            height: 6rem;
+            position: fixed;
+            bottom: 20px;
+            /* 距离页面底部 20px */
+            right: 20px;
+            /* 距离页面右侧 20px */
+            border-radius: 50%;
+            /* 让按钮变成圆形 */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.2s, transform 0.2s;
+            color: #fff;
+        }
+
+        .fixed-save-button:hover {
+            background-color: var(--bulma-success-45);
+            /* Bulma 主色调 hover 效果 */
+            transform: translateY(-2px);
+            /* 按钮轻微上移的效果 */
         }
     </style>
 </head>
@@ -219,8 +193,6 @@
                     </div>
                 </div>
             </div>
-
-
             <div class="columns is-multiline">
                 <div class="column is-full-touch is-half-desktop">
                     <!-- 定时广告 -->
@@ -1002,6 +974,10 @@
                 </footer>
             </div>
         </div>
+        <!-- 固定在右下角的圆形按钮 -->
+        <button class="button is-success is-large fixed-save-button" @click="setConfig">
+            保存
+        </button>
     </div>
 
     </div>
@@ -1103,6 +1079,7 @@
             },
             created() {
                 this.getUserInfo()
+                this.getConfig()
             },
             methods: {
                 // 配置按钮切换
@@ -1260,6 +1237,51 @@
                             this.showNotification(response.data.msg, 'error');
                         }
                     });
+                },
+                // 获取配置信息
+                getConfig() {
+                    let data = {}
+                    let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
+                    axios.post('/api/get-config', data, {
+                        headers: { 'X-Signature': signature }
+                    }).then(response => {
+                        if (response.data.code == 0) {
+                            this.config.timing = response.data.data.timing;
+                            this.config.present = response.data.data.present;
+                            this.config.enter = response.data.data.enter;
+                            this.config.follow = response.data.data.follow;
+                            this.config.share = response.data.data.share;
+                            this.config.autoresponders.opens = response.data.data.autoresponders.opens;
+                            this.config.autoresponders.status = response.data.data.autoresponders.status;
+                            this.config.autoresponders.type = response.data.data.autoresponders.type;
+                            this.config.autoresponders.content = response.data.data.autoresponders.content;
+                        } else {
+                            this.showNotification(response.data.msg, 'error');
+                        }
+                    });
+                },
+                // 存储配置信息
+                setConfig() {
+                    console.log(this.config)
+                    let data = {
+                        timing: this.config.timing,
+                        present: this.config.present,
+                        enter: this.config.enter,
+                        follow: this.config.follow,
+                        share: this.config.share,
+                        autoresponders: this.config.autoresponders
+                    }
+                    let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
+                    axios.post('/api/set-config', data, {
+                        headers: { 'X-Signature': signature }
+                    }).then(response => {
+                        if (response.data.code == 0) {
+                            this.showNotification('保存成功', 'success');
+                        } else {
+                            this.showNotification(response.data.msg, 'error');
+                        }
+                    });
+
                 },
                 // 获取直播间信息/连接直播间
                 getRealRoomInfo(room_id = 0) {
