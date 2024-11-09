@@ -69,3 +69,22 @@ function restartWebSocket()
         'timestamp' => $timestamp
     ]);
 }
+
+/**
+ * 获取配置文件多行信息
+ * 
+ * @param string $text 
+ * 
+ * @return array
+ */
+function splitAndFilterLines($text)
+{
+    // 使用 preg_split 按照各种换行符切割字符串
+    $lines = preg_split('/\r\n|\r|\n/', $text);
+    // 使用 array_filter 去除空白行，并使用 trim 去除每行开头和结尾的空白
+    $filteredLines = array_filter(array_map('trim', $lines), function ($line) {
+        return $line !== '';
+    });
+    // 返回有内容的行数组
+    return array_values($filteredLines);
+}

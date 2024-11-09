@@ -60,4 +60,21 @@ Route::post('/reload-bilibili', function (Request $request) {
     return response($response);
 });
 
+
+
+Route::get('/test', function (Request $request) {
+    $timing = readFileContent(runtime_path() . '/tmp/timing.cfg');
+    if ($timing) {
+        $timing = json_decode($timing, true);
+        $content = splitAndFilterLines($timing['content']);
+        if (count($content)) {
+            $text = $content[mt_rand(0, (count($content) - 1))];
+        }
+
+        return response($text);
+    }
+
+    return response('无数据');
+});
+
 Route::disableDefaultRoute(); // 关闭默认路由

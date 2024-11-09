@@ -238,11 +238,11 @@
                                         <div class="field">
                                             <div class="button-group">
                                                 <button type="button" class="button toggle-button"
-                                                    :class="config.timing.status ? 'is-active' : ''"
-                                                    @click="configSwitch('timing-status',true)">不论何时</button>
+                                                    :class="config.timing.status == 0 ? 'is-active' : ''"
+                                                    @click="configSwitch('timing-status',0)">不论何时</button>
                                                 <button type="button" class="button toggle-button"
-                                                    :class="!config.timing.status ? 'is-active' : ''"
-                                                    @click="configSwitch('timing-status',false)">仅在直播中</button>
+                                                    :class="config.timing.status == 1 ? 'is-active' : ''"
+                                                    @click="configSwitch('timing-status',1)">仅在直播中</button>
                                             </div>
                                         </div>
                                     </div>
@@ -320,11 +320,11 @@
                                         <div class="field">
                                             <div class="button-group">
                                                 <button type="button" class="button toggle-button"
-                                                    :class="config.enter.status ? 'is-active' : ''"
-                                                    @click="configSwitch('enter-status',true)">不论何时</button>
+                                                    :class="config.enter.status == 0 ? 'is-active' : ''"
+                                                    @click="configSwitch('enter-status',0)">不论何时</button>
                                                 <button type="button" class="button toggle-button"
-                                                    :class="!config.enter.status ? 'is-active' : ''"
-                                                    @click="configSwitch('enter-status',false)">仅在直播中</button>
+                                                    :class="config.enter.status == 1 ? 'is-active' : ''"
+                                                    @click="configSwitch('enter-status',1)">仅在直播中</button>
                                             </div>
                                         </div>
                                     </div>
@@ -425,11 +425,11 @@
                                         <div class="field">
                                             <div class="button-group">
                                                 <button type="button" class="button toggle-button"
-                                                    :class="config.share.status ? 'is-active' : ''"
-                                                    @click="configSwitch('share-status',true)">不论何时</button>
+                                                    :class="config.share.status == 0 ? 'is-active' : ''"
+                                                    @click="configSwitch('share-status',0)">不论何时</button>
                                                 <button type="button" class="button toggle-button"
-                                                    :class="!config.share.status ? 'is-active' : ''"
-                                                    @click="configSwitch('share-status',false)">仅在直播中</button>
+                                                    :class="config.share.status == 1 ? 'is-active' : ''"
+                                                    @click="configSwitch('share-status',1)">仅在直播中</button>
                                             </div>
                                         </div>
                                     </div>
@@ -575,11 +575,11 @@
                                         <div class="field">
                                             <div class="button-group">
                                                 <button type="button" class="button toggle-button"
-                                                    :class="config.present.status ? 'is-active' : ''"
-                                                    @click="configSwitch('present-status',true)">不论何时</button>
+                                                    :class="config.present.status == 0 ? 'is-active' : ''"
+                                                    @click="configSwitch('present-status',0)">不论何时</button>
                                                 <button type="button" class="button toggle-button"
-                                                    :class="!config.present.status ? 'is-active' : ''"
-                                                    @click="configSwitch('present-status',false)">仅在直播中</button>
+                                                    :class="config.present.status == 1 ? 'is-active' : ''"
+                                                    @click="configSwitch('present-status',1)">仅在直播中</button>
                                             </div>
                                         </div>
                                     </div>
@@ -677,11 +677,11 @@
                                         <div class="field">
                                             <div class="button-group">
                                                 <button type="button" class="button toggle-button"
-                                                    :class="config.follow.status ? 'is-active' : ''"
-                                                    @click="configSwitch('follow-status',true)">不论何时</button>
+                                                    :class="config.follow.status == 0 ? 'is-active' : ''"
+                                                    @click="configSwitch('follow-status',0)">不论何时</button>
                                                 <button type="button" class="button toggle-button"
-                                                    :class="!config.follow.status ? 'is-active' : ''"
-                                                    @click="configSwitch('follow-status',false)">仅在直播中</button>
+                                                    :class="config.follow.status == 1 ? 'is-active' : ''"
+                                                    @click="configSwitch('follow-status',1)">仅在直播中</button>
                                             </div>
                                         </div>
                                     </div>
@@ -766,11 +766,11 @@
                                         <div class="field">
                                             <div class="button-group">
                                                 <button type="button" class="button toggle-button"
-                                                    :class="config.autoresponders.status ? 'is-active' : ''"
-                                                    @click="configSwitch('autoresponders-status',true)">不论何时</button>
+                                                    :class="config.autoresponders.status == 0 ? 'is-active' : ''"
+                                                    @click="configSwitch('autoresponders-status',0)">不论何时</button>
                                                 <button type="button" class="button toggle-button"
-                                                    :class="!config.autoresponders.status ? 'is-active' : ''"
-                                                    @click="configSwitch('autoresponders-status',false)">仅在直播中</button>
+                                                    :class="config.autoresponders.status == 1 ? 'is-active' : ''"
+                                                    @click="configSwitch('autoresponders-status',1)">仅在直播中</button>
                                             </div>
                                         </div>
                                     </div>
@@ -1016,31 +1016,31 @@
                         timing: { // 定时广告
                             opens: false, // 是否开启
                             intervals: null, // 间隔时间
-                            status: false, // 状态
+                            status: 0, // 状态
                             content: null // 内容
                         },
                         present: { // 礼物答谢
                             opens: false,
                             price: null, // 起始感谢金额
-                            status: false, // 状态
+                            status: 0, // 状态
                             type: 0, // 类型：0=全部答谢，1=仅答谢牌子，2=仅答谢航海
                             content: null // 内容
                         },
                         enter: { // 进房欢迎
                             opens: false,
-                            status: false, // 状态
+                            status: 0, // 状态
                             type: 0, // 类型：0=全部欢迎，1=仅欢迎牌子，2=仅欢迎航海
                             content: null // 内容
                         },
                         follow: { // 感谢关注
                             opens: false,
-                            status: false, // 状态
+                            status: 0, // 状态
                             type: 0, // 类型：0=全部感谢，1=仅感谢牌子，2=仅感谢航海
                             content: null // 内容
                         },
                         share: { // 感谢分享
                             opens: false,
-                            status: false, // 状态
+                            status: 0, // 状态
                             type: 0, // 类型：0=全部感谢，1=仅感谢牌子，2=仅感谢航海
                             content: null // 内容
                         },
@@ -1051,7 +1051,7 @@
                                 text: '', // 内容
                             },
                             opens: false,
-                            status: false, // 状态
+                            status: 0, // 状态
                             type: 0, // 类型：0=全部响应，1=仅响应牌子，2=仅响应航海
                             content: [
                                 {
@@ -1262,7 +1262,6 @@
                 },
                 // 存储配置信息
                 setConfig() {
-                    console.log(this.config)
                     let data = {
                         timing: this.config.timing,
                         present: this.config.present,

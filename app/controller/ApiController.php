@@ -112,7 +112,7 @@ class ApiController
             $timing = [
                 'opens' => false, // 是否开启
                 'intervals' => null, // 间隔时间
-                'status' => false, // 状态
+                'status' => 0, // 状态
                 'content' => null // 内容
             ];
             Tools\FileUtils::fileDelete(runtime_path() . '/tmp/timing.cfg');
@@ -127,7 +127,7 @@ class ApiController
             $present = [
                 'opens' => false, // 是否开启
                 'price' => null, // 起始感谢金额
-                'status' => false, // 状态 
+                'status' => 0, // 状态 
                 'type' => 0, // 状态 0=全部答谢，1=仅答谢牌子，2=仅答谢航海
                 'content' => null // 内容
             ];
@@ -142,7 +142,7 @@ class ApiController
         if (!$enter) {
             $enter = [
                 'opens' => false, // 是否开启
-                'status' => false, // 状态
+                'status' => 0, // 状态
                 'type' => 0, // 类型：0=全部欢迎，1=仅欢迎牌子，2=仅欢迎航海
                 'content' => null // 内容
             ];
@@ -157,7 +157,7 @@ class ApiController
         if (!$follow) {
             $follow = [
                 'opens' => false, // 是否开启
-                'status' => false, // 状态
+                'status' => 0, // 状态
                 'type' => 0, // 类型：0=全部感谢，1=仅感谢牌子，2=仅感谢航海
                 'content' => null // 内容
             ];
@@ -172,7 +172,7 @@ class ApiController
         if (!$share) {
             $share = [
                 'opens' => false, // 是否开启
-                'status' => false, // 状态
+                'status' => 0, // 状态
                 'type' => 0, // 类型：0=全部感谢，1=仅感谢牌子，2=仅感谢航海
                 'content' => null // 内容
             ];
@@ -187,7 +187,7 @@ class ApiController
         if (!$autoresponders) {
             $autoresponders = [
                 'opens' => false, // 是否开启
-                'status' => false, // 状态
+                'status' => 0, // 状态
                 'type' => 0, // 类型：0=全部响应，1=仅响应牌子，2=仅响应航海
                 'content' => [] // 内容
             ];
@@ -229,27 +229,27 @@ class ApiController
         // 存储数据
         if ($timing) {
             Tools\FileUtils::fileDelete(runtime_path() . '/tmp/timing.cfg');
-            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/timing.cfg', json_encode($timing));
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/timing.cfg', json_encode($timing, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
         }
         if ($present) {
             Tools\FileUtils::fileDelete(runtime_path() . '/tmp/present.cfg');
-            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/present.cfg', json_encode($present));
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/present.cfg', json_encode($present, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
         }
         if ($enter) {
             Tools\FileUtils::fileDelete(runtime_path() . '/tmp/enter.cfg');
-            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/enter.cfg', json_encode($enter));
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/enter.cfg', json_encode($enter, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
         }
         if ($follow) {
             Tools\FileUtils::fileDelete(runtime_path() . '/tmp/follow.cfg');
-            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/follow.cfg', json_encode($follow));
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/follow.cfg', json_encode($follow, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
         }
         if ($share) {
             Tools\FileUtils::fileDelete(runtime_path() . '/tmp/share.cfg');
-            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/share.cfg', json_encode($share));
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/share.cfg', json_encode($share, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
         }
         if ($autoresponders) {
             Tools\FileUtils::fileDelete(runtime_path() . '/tmp/autoresponders.cfg');
-            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/autoresponders.cfg', json_encode($autoresponders));
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/autoresponders.cfg', json_encode($autoresponders, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
         }
         // 返回数据
         return success($request, ['param' => $param]);
