@@ -2,6 +2,7 @@
 
 namespace process;
 
+use app\queue\SendMessage;
 use Carbon\Carbon;
 use Exception;
 use Workerman\Worker;
@@ -20,6 +21,7 @@ class Bilibili
     private string|null $cookie; // 用户cookie
     private int|null $roomId; // 直播间房间号
     private ?int $heartbeatTimer = null; // 心跳
+    private ?int $sendMessageTimer = null; // 消息
 
     public function onWorkerStart()
     {
@@ -49,7 +51,6 @@ class Bilibili
         };
         $unixWorker->listen();
     }
-
 
     /**
      * 连接到 WebSocket 服务器
@@ -160,11 +161,14 @@ class Bilibili
         $this->heartbeatTimer = Timer::add(30, function () use ($con, $roomId) {
             if ($con->getStatus() === AsyncTcpConnection::STATUS_ESTABLISHED) {
                 $con->send(Bililive\WebSocket::buildHeartbeatPayload());
-                // 每隔两次（60秒）发送一次HTTP心跳包
-                if (Carbon::now()->second % 60 === 0) {
+                // 每隔两次发送一次HTTP心跳包
+                if (Carbon::now()->second < 30) {
                     $con->send(Bililive\Live::reportLiveHeartbeat($roomId, $this->cookie));
                 }
             }
+        });
+        $this->sendMessageTimer =  Timer::add(3, function () {
+            SendMessage::processQueue();
         });
     }
 
@@ -218,6 +222,10 @@ class Bilibili
         if ($this->heartbeatTimer !== null) {
             Timer::del($this->heartbeatTimer);
             $this->heartbeatTimer = null;
+        }
+        if ($this->sendMessageTimer !== null) {
+            Timer::del($this->sendMessageTimer);
+            $this->sendMessageTimer = null;
         }
     }
 
