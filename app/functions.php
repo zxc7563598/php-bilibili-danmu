@@ -55,14 +55,30 @@ function readFileContent(string $path): ?string
 }
 
 /**
- * 重启websocket
+ * 重启bilibili
  * 
  * @return void 
  * @throws InvalidTimeZoneException 
  */
-function restartWebSocket()
+function restartBilibili()
 {
     $url = 'http://127.0.0.1:' . getenv('LISTEN') . '/reload-bilibili';
+    $timestamp = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
+    Tools\HttpClient::sendPostRequest($url, [], [
+        'api_key' => md5(getenv('SECURE_API_KEY') . $timestamp),
+        'timestamp' => $timestamp
+    ]);
+}
+
+/**
+ * 重启timing
+ * 
+ * @return void 
+ * @throws InvalidTimeZoneException 
+ */
+function restartTiming()
+{
+    $url = 'http://127.0.0.1:' . getenv('LISTEN') . '/reload-timing';
     $timestamp = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
     Tools\HttpClient::sendPostRequest($url, [], [
         'api_key' => md5(getenv('SECURE_API_KEY') . $timestamp),
