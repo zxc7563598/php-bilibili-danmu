@@ -28,6 +28,8 @@ Route::group('/api', function () {
     Route::any('/login-out', [app\controller\ApiController::class, 'loginOut']);
     Route::any('/get-user-info', [app\controller\ApiController::class, 'getUserInfo']);
     Route::any('/get-real-room-info', [app\controller\ApiController::class, 'getRealRoomInfo']);
+    Route::any('/get-config', [app\controller\ApiController::class, 'getConfig']);
+    Route::any('/set-config', [app\controller\ApiController::class, 'setConfig']);
     Route::any('/connect-out', [app\controller\ApiController::class, 'connectOut']);
 })->middleware([
     app\middleware\SignatureMiddleware::class
