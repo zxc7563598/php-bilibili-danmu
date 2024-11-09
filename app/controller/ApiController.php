@@ -75,7 +75,7 @@ class ApiController
             $is_live = true;
             // 房间连接成功，重启websocket
             if ($live_info['code'] == 0 && $reconnect) {
-                restartWebSocket();
+                restartBilibili();
             }
         }
         // 返回数据
@@ -251,6 +251,8 @@ class ApiController
             Tools\FileUtils::fileDelete(runtime_path() . '/tmp/autoresponders.cfg');
             Tools\FileUtils::writeToFile(runtime_path() . '/tmp/autoresponders.cfg', json_encode($autoresponders, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
         }
+        // 重启定时广告
+        restartTiming();
         // 返回数据
         return success($request, ['param' => $param]);
     }
@@ -293,7 +295,7 @@ class ApiController
         Tools\FileUtils::fileDelete(runtime_path() . '/tmp/cookie.cfg');
         Tools\FileUtils::fileDelete(runtime_path() . '/tmp/connect.cfg');
         // 重启websocket
-        restartWebSocket();
+        restartBilibili();
         // 返回数据
         return success($request);
     }
@@ -309,7 +311,7 @@ class ApiController
         // 删除配置信息
         Tools\FileUtils::fileDelete(runtime_path() . '/tmp/connect.cfg');
         // 重启websocket
-        restartWebSocket();
+        restartBilibili();
         // 返回数据
         return success($request, []);
     }
