@@ -242,7 +242,10 @@
                                                     @click="configSwitch('timing-status',0)">不论何时</button>
                                                 <button type="button" class="button toggle-button"
                                                     :class="config.timing.status == 1 ? 'is-active' : ''"
-                                                    @click="configSwitch('timing-status',1)">仅在直播中</button>
+                                                    @click="configSwitch('timing-status',1)">仅在直播时</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.timing.status == 1 ? 'is-active' : ''"
+                                                    @click="configSwitch('timing-status',1)">仅在非直播时</button>
                                             </div>
                                         </div>
                                     </div>
@@ -324,7 +327,10 @@
                                                     @click="configSwitch('enter-status',0)">不论何时</button>
                                                 <button type="button" class="button toggle-button"
                                                     :class="config.enter.status == 1 ? 'is-active' : ''"
-                                                    @click="configSwitch('enter-status',1)">仅在直播中</button>
+                                                    @click="configSwitch('enter-status',1)">仅在直播时</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.enter.status == 2 ? 'is-active' : ''"
+                                                    @click="configSwitch('enter-status',2)">仅在非直播时</button>
                                             </div>
                                         </div>
                                     </div>
@@ -429,7 +435,10 @@
                                                     @click="configSwitch('share-status',0)">不论何时</button>
                                                 <button type="button" class="button toggle-button"
                                                     :class="config.share.status == 1 ? 'is-active' : ''"
-                                                    @click="configSwitch('share-status',1)">仅在直播中</button>
+                                                    @click="configSwitch('share-status',1)">仅在直播时</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.share.status == 2 ? 'is-active' : ''"
+                                                    @click="configSwitch('share-status',2)">仅在非直播时</button>
                                             </div>
                                         </div>
                                     </div>
@@ -579,7 +588,10 @@
                                                     @click="configSwitch('present-status',0)">不论何时</button>
                                                 <button type="button" class="button toggle-button"
                                                     :class="config.present.status == 1 ? 'is-active' : ''"
-                                                    @click="configSwitch('present-status',1)">仅在直播中</button>
+                                                    @click="configSwitch('present-status',1)">仅在直播时</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.present.status == 2 ? 'is-active' : ''"
+                                                    @click="configSwitch('present-status',2)">仅在非直播时</button>
                                             </div>
                                         </div>
                                     </div>
@@ -681,7 +693,10 @@
                                                     @click="configSwitch('follow-status',0)">不论何时</button>
                                                 <button type="button" class="button toggle-button"
                                                     :class="config.follow.status == 1 ? 'is-active' : ''"
-                                                    @click="configSwitch('follow-status',1)">仅在直播中</button>
+                                                    @click="configSwitch('follow-status',1)">仅在直播时</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.follow.status == 2 ? 'is-active' : ''"
+                                                    @click="configSwitch('follow-status',2)">仅在非直播时</button>
                                             </div>
                                         </div>
                                     </div>
@@ -770,7 +785,10 @@
                                                     @click="configSwitch('autoresponders-status',0)">不论何时</button>
                                                 <button type="button" class="button toggle-button"
                                                     :class="config.autoresponders.status == 1 ? 'is-active' : ''"
-                                                    @click="configSwitch('autoresponders-status',1)">仅在直播中</button>
+                                                    @click="configSwitch('autoresponders-status',1)">仅在直播时</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.autoresponders.status == 2 ? 'is-active' : ''"
+                                                    @click="configSwitch('autoresponders-status',2)">仅在非直播时</button>
                                             </div>
                                         </div>
                                     </div>
