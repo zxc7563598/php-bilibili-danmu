@@ -254,9 +254,9 @@ class Bilibili
                             intval($payload['payload']['data']['price'] / 100),
                             $payload['payload']['data']['num'],
                             $payload['payload']['data']['receiver_uinfo']['uid'],
-                            $payload['payload']['data']['sender_uinfo']['medal']['ruid'],
-                            $payload['payload']['data']['sender_uinfo']['medal']['guard_level'],
-                            $payload['payload']['data']['sender_uinfo']['medal']['level']
+                            isset($payload['payload']['data']['sender_uinfo']['medal']['ruid']) ? $payload['payload']['data']['sender_uinfo']['medal']['ruid'] : null,
+                            isset($payload['payload']['data']['sender_uinfo']['medal']['guard_level']) ? $payload['payload']['data']['sender_uinfo']['medal']['guard_level'] : null,
+                            isset($payload['payload']['data']['sender_uinfo']['medal']['level']) ? $payload['payload']['data']['sender_uinfo']['medal']['level'] : null
                         );
                         break;
                     case 'GUARD_BUY': // 开通大航海
@@ -279,24 +279,24 @@ class Bilibili
                                 Enter::processing(
                                     $payload['payload']['data']['uid'],
                                     $payload['payload']['data']['uname'],
-                                    $payload['payload']['data']['uinfo']['medal']['ruid'],
-                                    $payload['payload']['data']['uinfo']['medal']['guard_level']
+                                    isset($payload['payload']['data']['uinfo']['medal']['ruid']) ? $payload['payload']['data']['uinfo']['medal']['ruid'] : null,
+                                    isset($payload['payload']['data']['uinfo']['medal']['guard_level']) ? $payload['payload']['data']['uinfo']['medal']['guard_level'] : null
                                 );
                                 break;
                             case 2: // 关注
                                 Follow::processing(
                                     $payload['payload']['data']['uid'],
                                     $payload['payload']['data']['uname'],
-                                    $payload['payload']['data']['uinfo']['medal']['ruid'],
-                                    $payload['payload']['data']['uinfo']['medal']['guard_level']
+                                    isset($payload['payload']['data']['uinfo']['medal']['ruid']) ? $payload['payload']['data']['uinfo']['medal']['ruid'] : null,
+                                    isset($payload['payload']['data']['uinfo']['medal']['guard_level']) ? $payload['payload']['data']['uinfo']['medal']['guard_level'] : null
                                 );
                                 break;
                             case 3: // 分享直播间
                                 Share::processing(
                                     $payload['payload']['data']['uid'],
                                     $payload['payload']['data']['uname'],
-                                    $payload['payload']['data']['uinfo']['medal']['ruid'],
-                                    $payload['payload']['data']['uinfo']['medal']['guard_level']
+                                    isset($payload['payload']['data']['uinfo']['medal']['ruid']) ? $payload['payload']['data']['uinfo']['medal']['ruid'] : null,
+                                    isset($payload['payload']['data']['uinfo']['medal']['guard_level']) ? $payload['payload']['data']['uinfo']['medal']['guard_level'] : null
                                 );
                                 break;
                         }
@@ -306,8 +306,8 @@ class Bilibili
                             $payload['payload']['info'][1],
                             $payload['payload']['info'][2][0],
                             $payload['payload']['info'][2][1],
-                            $payload['payload']['info'][3][12],
-                            $payload['payload']['info'][3][10]
+                            isset($payload['payload']['info'][3][12]) ? $payload['payload']['info'][3][12] : null,
+                            isset($payload['payload']['info'][3][10]) ? $payload['payload']['info'][3][10] : null
                         );
                         break;
                 }
