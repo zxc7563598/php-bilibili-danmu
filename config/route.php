@@ -47,7 +47,7 @@ Route::post('/reload-bilibili', function (Request $request) {
     if ($api_key !== md5($validApiKey . $timestamp)) {
         return response('Unauthorized', 401);
     }
-    $socketFile = runtime_path('/bilibili.sock'); // 套接字文件路径，确保有权限访问
+    $socketFile = runtime_path() . '/bilibili.sock'; // 套接字文件路径，确保有权限访问
     if (!file_exists($socketFile)) {
         return response('Unix socket not found', 404);
     }
@@ -72,7 +72,7 @@ Route::post('/reload-timing', function (Request $request) {
     if ($api_key !== md5($validApiKey . $timestamp)) {
         return response('Unauthorized', 401);
     }
-    $socketFile = runtime_path('/timing.sock'); // 套接字文件路径，确保有权限访问
+    $socketFile = runtime_path() . '/timing.sock'; // 套接字文件路径，确保有权限访问
     if (!file_exists($socketFile)) {
         return response('Unix socket not found', 404);
     }
@@ -93,7 +93,7 @@ Route::get('/test', function (Request $request) {
     $param = $request->all();
     $msg = isset($param['msg']) ? $param['msg'] : '';
     // 处理数据
-    $autoresponders = readFileContent(runtime_path('/tmp/autoresponders.cfg'));
+    $autoresponders = readFileContent(runtime_path() . '/tmp/autoresponders.cfg');
     if ($autoresponders) {
         $autoresponders = json_decode($autoresponders, true);
     }

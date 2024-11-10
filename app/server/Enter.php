@@ -31,7 +31,7 @@ class Enter
             'guard_level' => $guard_level
         ]);
         // 获取进房欢迎配置
-        $enter = readFileContent(runtime_path('/tmp/enter.cfg'));
+        $enter = readFileContent(runtime_path() . '/tmp/enter.cfg');
         if ($enter) {
             $enter = json_decode($enter, true);
         }
@@ -41,9 +41,9 @@ class Enter
             $enter_status = intval($enter['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
             $enter_content = $enter['content']; // 内容
             // 确认链接直播间的情况
-            $cookie = strval(readFileContent(runtime_path('/tmp/cookie.cfg')));
-            $room_id = intval(readFileContent(runtime_path('/tmp/connect.cfg')));
-            $room_uid = intval(readFileContent(runtime_path('/tmp/room_uid.cfg')));
+            $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
+            $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
+            $room_uid = intval(readFileContent(runtime_path() . '/tmp/room_uid.cfg'));
             if ($cookie && $room_id) {
                 // 验证牌子
                 $medal = false;
