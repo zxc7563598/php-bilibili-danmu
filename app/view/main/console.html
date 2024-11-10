@@ -244,8 +244,8 @@
                                                     :class="config.timing.status == 1 ? 'is-active' : ''"
                                                     @click="configSwitch('timing-status',1)">仅在直播时</button>
                                                 <button type="button" class="button toggle-button"
-                                                    :class="config.timing.status == 1 ? 'is-active' : ''"
-                                                    @click="configSwitch('timing-status',1)">仅在非直播时</button>
+                                                    :class="config.timing.status == 2 ? 'is-active' : ''"
+                                                    @click="configSwitch('timing-status',2)">仅在非直播时</button>
                                             </div>
                                         </div>
                                     </div>
