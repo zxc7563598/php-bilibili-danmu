@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue with Axios in HTML</title>
+    <script src="/js/vue.3.5.12.js"></script>
+    <script src="/js/axios.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+    <style>
+        /* 确保页面高度为全屏高度 */
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
+        .full-height {
+            min-height: 100vh;
+            /* 使父容器至少有视口的高度 */
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app" style="background-color: var(--bulma-scheme-main);">
+        <div class="full-height is-flex is-justify-content-center is-align-items-center">
+            <div class="card">
+                <div class="card-content">
+                    <p class="title">
+                        登录哔哩哔哩
+                    </p>
+                    <p class="subtitle pt-4">
+                        请使用 <a href="https://app.bilibili.com">哔哩哔哩客户端</a> 扫码登录或扫码下载APP
+                    </p>
+                </div>
+                <div class="card-image pl-6 pr-6 pb-6">
+                    <figure class="image is-square">
+                        <img :src="'http://127.0.0.1:8787/qrcode.png'" />
+                    </figure>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    url: '<?php echo $url ?>',
+                    qrcode_key: '<?php echo $qrcode_key ?>',
+                    secretKey: '<?php echo $secretKey ?>'
+                };
+            },
+            created() {
+                this.intervalId = setInterval(() => {
+                    this.loginCheck();
+                }, 5000);
+            },
+            methods: {
+                loginCheck() {
+                    let data = { qrcode_key: this.qrcode_key }
+                    let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
+                    axios.post('/api/login-check', data, {
+                        headers: { 'X-Signature': signature }
+                    }).then(response => {
+                        if (response.data.data.code == 0) {
+                            window.location.href = '/';
+                        }
+                    });
+                }
+            },
+            beforeDestroy() {
+                clearInterval(this.intervalId);
+            }
+        });
+        app.mount('#app');
+    </script>
+</body>
+
+</html>

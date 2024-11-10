@@ -1,14 +1,1379 @@
-<!doctype html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" href="/favicon.ico"/>
-    <title>webman</title>
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue with Axios in HTML</title>
+    <script src="/js/vue.3.5.12.js"></script>
+    <script src="/js/axios.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style scoped>
+        /* 悬浮通知样式 */
+        .notification-fixed {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        /* 滑入和淡出动画 */
+        .slide-fade-enter-active {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .slide-fade-leave-active {
+            animation: fadeOut 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translate(-50%, -100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translate(-50%, 0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
+        }
+
+        .button-group {
+            display: inline-flex;
+            border: 1px solid #e4e4e4;
+            border-color: var(--bulma-border);
+            /* 边框 */
+            border-radius: 24px;
+            overflow: hidden;
+        }
+
+        .toggle-button {
+            flex: 1;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .toggle-button.is-active {
+            background-color: var(--bulma-scheme-main);
+            /* Bulma 绿色 */
+            color: var(--bulma-success);
+        }
+
+        a {
+            color: var(--bulma-success);
+        }
+
+        .fixed-save-button {
+            width: 6rem;
+            height: 6rem;
+            position: fixed;
+            bottom: 20px;
+            /* 距离页面底部 20px */
+            right: 20px;
+            /* 距离页面右侧 20px */
+            border-radius: 50%;
+            /* 让按钮变成圆形 */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.2s, transform 0.2s;
+            color: #fff;
+        }
+
+        .fixed-save-button:hover {
+            background-color: var(--bulma-success-45);
+            /* Bulma 主色调 hover 效果 */
+            transform: translateY(-2px);
+            /* 按钮轻微上移的效果 */
+        }
+    </style>
 </head>
+
 <body>
-123123
+    <div id="app" style="background-color: var(--bulma-scheme-main);">
+        <div class="container p-4">
+            <!-- 动态通知框 -->
+            <transition name="slide-fade" @after-leave="resetNotification">
+                <div v-if="isNotificationVisible" class="notification notification-fixed" :class="notificationType">
+                    <button class="delete" @click="hideNotification"></button>
+                    {{notificationMessage}}
+                </div>
+            </transition>
+            <div class="columns">
+                <div class="column is-one-third is-full-mobile">
+                    <!-- 左侧内容，占 1/4 宽度 -->
+                    <div class="card">
+                        <div class="card-content">
+                            <div class="content">
+                                <div class="columns">
+                                    <div class="column is-full">
+                                        <p><b>UID：</b> {{ user_info.is_login ? user_info.uid : ' - ' }}</p>
+                                        <p><b>名称：</b> {{ user_info.is_login ? user_info.uname : ' - '}} </p>
+                                    </div>
+                                </div>
+                                <div class="columns">
+                                    <div class="column is-col-min-32">
+                                        <p><b>状态：</b>{{ user_info.is_login ? '已登录' : '未登陆' }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <footer class="card-footer">
+                            <a class="card-footer-item" style="color: var(--bulma-title-color);" href="javascript:;"
+                                @click="loginOut" v-if="user_info.is_login">退出登录</a>
+                            <a class="card-footer-item" style="color: var(--bulma-title-color);" href="/login"
+                                v-else>登录</a>
+                        </footer>
+                    </div>
+                </div>
+                <div class="column is-two-third is-full-mobile">
+                    <!-- 右侧内容，占 3/4 宽度 -->
+                    <div class="card">
+                        <div class="card-content">
+                            <div class="content" v-if="live_info.is_live">
+                                <div class="columns">
+                                    <div class="column is-two-third is-full-mobile">
+                                        <p><b>房间：</b>{{live_info.room_id}}
+                                        </p>
+                                        <p><b>标题：</b>{{live_info.title}}</p>
+                                    </div>
+                                    <div class="column is-one-third is-full-mobile">
+                                        <p><b>关注：</b>{{live_info.attention}}</p>
+                                        <p><b>观看：</b>{{live_info.online}}</p>
+                                    </div>
+                                </div>
+                                <div class="columns">
+                                    <div class="column is-col-min-32">
+                                        <p>
+                                            <b>开播时间：</b>
+                                            <span class="tag ml-2"
+                                                :class="live_info.live_status.type">{{live_info.live_status.value}}</span>
+                                            <a class="tag is-info is-light ml-2"
+                                                :href="'https://live.bilibili.com/'+live_info.room_id">点击前往直播间</a>
+                                            <span class="ml-2">{{live_info.live_time ? live_info.live_time :
+                                                '当前暂未开播'}}</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="content" v-else>
+                                <div class="columns">
+                                    <div class="field" style="width: 100%;">
+                                        <label class="label">直播间房间ID</label>
+                                        <div class="control pt-2">
+                                            <input class="input" v-model="room_id" type="text" placeholder="直播间房间ID">
+                                        </div>
+                                        <p class="help pt-2">可以在网页版直播间URL中获得，例如
+                                            <a>https://live.bilibili.com/22384516</a>
+                                            直播间房间ID为 <b>22384516</b>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <footer class="card-footer">
+                            <a href="#" class="card-footer-item" style="color: var(--bulma-title-color);"
+                                @click="connectOut" v-if="live_info.is_live">断开链接</a>
+                            <a href="#" class="card-footer-item" style="color: var(--bulma-title-color);"
+                                @click="getRealRoomInfo(room_id)" v-else>连接直播间</a>
+                        </footer>
+                    </div>
+                </div>
+            </div>
+            <div class="columns is-multiline">
+                <div class="column is-full-touch is-half-desktop">
+                    <!-- 定时广告 -->
+                    <div class="card">
+                        <div class="card-content">
+                            <h5 class="title is-5" style="display: flex;align-items: center;">
+                                定时广告
+                                <div class="button-group" style="margin-left: auto;">
+                                    <button type="button" class="button is-small toggle-button"
+                                        :class="config.timing.opens ? 'is-active' : ''"
+                                        @click="configSwitch('timing',true)">开启</button>
+                                    <button type="button" class="button is-small toggle-button"
+                                        :class="!config.timing.opens ? 'is-active' : ''"
+                                        @click="configSwitch('timing',false)">关闭</button>
+                                </div>
+                            </h5>
+                            <form>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">间隔</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <div class="field has-addons">
+                                                <p class="control" style="flex: 1;">
+                                                    <input class="input" type="number" placeholder="x"
+                                                        v-model="config.timing.intervals">
+                                                </p>
+                                                <p class="control">
+                                                    <a class="button is-static">
+                                                        秒发送1条
+                                                    </a>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">状态</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <div class="button-group">
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.timing.status == 0 ? 'is-active' : ''"
+                                                    @click="configSwitch('timing-status',0)">不论何时</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.timing.status == 1 ? 'is-active' : ''"
+                                                    @click="configSwitch('timing-status',1)">仅在直播时</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.timing.status == 1 ? 'is-active' : ''"
+                                                    @click="configSwitch('timing-status',1)">仅在非直播时</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">内容</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <textarea class="textarea has-fixed-size"
+                                                placeholder="广告内容，例如：喜欢主包点点关注吧（哐哐磕头" rows="10"
+                                                v-model="config.timing.content"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label"></label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <article class="message is-small">
+                                                <div class="message-body">
+                                                    <div class="content is-small">
+                                                        <p>
+                                                            可以设置多条广告信息，通过换行隔开
+                                                        </p>
+                                                        <p>
+                                                            每次发送信息时会从多行信息中随机取一行进行发送
+                                                        </p>
+                                                        <p>
+                                                            通常建议留言发言长度，过长的信息会被分成多条发送，因发言频率限制可能会影响体验
+                                                        </p>
+                                                    </div>
+                                            </article>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- 进房欢迎 -->
+                    <div class="card">
+                        <div class="card-content">
+                            <h5 class="title is-5" style="display: flex;align-items: center;">
+                                进房欢迎
+                                <div class="button-group" style="margin-left: auto;">
+                                    <button type="button" class="button is-small toggle-button"
+                                        :class="config.enter.opens ? 'is-active' : ''"
+                                        @click="configSwitch('enter',true)">开启</button>
+                                    <button type="button" class="button is-small toggle-button"
+                                        :class="!config.enter.opens ? 'is-active' : ''"
+                                        @click="configSwitch('enter',false)">关闭</button>
+                                </div>
+                            </h5>
+                            <article class="message is-small">
+                                <div class="message-body">
+                                    <div class="content is-small">
+                                        <h3>可以使用的动态信息</h3>
+                                        <p>
+                                            这些内容可以加入到句子里，实际发送时会被替换成对应内容
+                                        </p>
+                                        <ul>
+                                            <li><b>名称：</b>@name@</li>
+                                        </ul>
+                                    </div>
+                            </article>
+                            <form>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">状态</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <div class="button-group">
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.enter.status == 0 ? 'is-active' : ''"
+                                                    @click="configSwitch('enter-status',0)">不论何时</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.enter.status == 1 ? 'is-active' : ''"
+                                                    @click="configSwitch('enter-status',1)">仅在直播时</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.enter.status == 2 ? 'is-active' : ''"
+                                                    @click="configSwitch('enter-status',2)">仅在非直播时</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">过滤</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <div class="button-group">
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.enter.type == 0 ? 'is-active' : ''"
+                                                    @click="configSwitch('enter-type',0)">全部欢迎</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.enter.type == 1 ? 'is-active' : ''"
+                                                    @click="configSwitch('enter-type',1)">仅欢迎牌子</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.enter.type == 2 ? 'is-active' : ''"
+                                                    @click="configSwitch('enter-type',2)">仅欢迎航海</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">内容</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <textarea class="textarea has-fixed-size"
+                                                placeholder="欢迎内容，例如：欢迎@name@来到直播间～" rows="10"
+                                                v-model="config.enter.content"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label"></label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <article class="message is-small">
+                                                <div class="message-body">
+                                                    <div class="content is-small">
+                                                        <p>
+                                                            可以设置多条欢迎信息，通过换行隔开
+                                                        </p>
+                                                        <p>
+                                                            每次发送信息时会从多行信息中随机取一行进行发送
+                                                        </p>
+                                                        <p>
+                                                            通常建议留言发言长度，过长的信息会被分成多条发送，因发言频率限制可能会影响体验
+                                                        </p>
+                                                        <p>
+                                                            通常建议仅在进房量极低的情况下开启，大量的欢迎信息可能会影响体验
+                                                        </p>
+                                                    </div>
+                                            </article>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- 感谢分享 -->
+                    <div class="card">
+                        <div class="card-content">
+                            <h5 class="title is-5" style="display: flex;align-items: center;">
+                                感谢分享
+                                <div class="button-group" style="margin-left: auto;">
+                                    <button type="button" class="button is-small toggle-button"
+                                        :class="config.share.opens ? 'is-active' : ''"
+                                        @click="configSwitch('share',true)">开启</button>
+                                    <button type="button" class="button is-small toggle-button"
+                                        :class="!config.share.opens ? 'is-active' : ''"
+                                        @click="configSwitch('share',false)">关闭</button>
+                                </div>
+                            </h5>
+                            <article class="message is-small">
+                                <div class="message-body">
+                                    <div class="content is-small">
+                                        <h3>可以使用的动态信息</h3>
+                                        <p>
+                                            这些内容可以加入到句子里，实际发送时会被替换成对应内容
+                                        </p>
+                                        <ul>
+                                            <li><b>名称：</b>@name@</li>
+                                        </ul>
+                                    </div>
+                            </article>
+                            <form>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">状态</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <div class="button-group">
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.share.status == 0 ? 'is-active' : ''"
+                                                    @click="configSwitch('share-status',0)">不论何时</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.share.status == 1 ? 'is-active' : ''"
+                                                    @click="configSwitch('share-status',1)">仅在直播时</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.share.status == 2 ? 'is-active' : ''"
+                                                    @click="configSwitch('share-status',2)">仅在非直播时</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">过滤</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <div class="button-group">
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.share.type == 0 ? 'is-active' : ''"
+                                                    @click="configSwitch('share-type',0)">全部感谢</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.share.type == 1 ? 'is-active' : ''"
+                                                    @click="configSwitch('share-type',1)">仅感谢牌子</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.share.type == 2 ? 'is-active' : ''"
+                                                    @click="configSwitch('share-type',2)">仅感谢航海</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">内容</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <textarea class="textarea has-fixed-size" placeholder="感谢内容，例如：感谢@name@的分享～"
+                                                rows="10" v-model="config.share.content"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label"></label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <article class="message is-small">
+                                                <div class="message-body">
+                                                    <div class="content is-small">
+                                                        <p>
+                                                            可以设置多条感谢信息，通过换行隔开
+                                                        </p>
+                                                        <p>
+                                                            每次发送信息时会从多行信息中随机取一行进行发送
+                                                        </p>
+                                                        <p>
+                                                            通常建议留言发言长度，过长的信息会被分成多条发送，因发言频率限制可能会影响体验
+                                                        </p>
+                                                    </div>
+                                            </article>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!-- 第二列 -->
+                <div class="column is-full-touch is-half-desktop">
+                    <!-- 礼物答谢 -->
+                    <div class="card">
+                        <div class="card-content">
+                            <h5 class="title is-5" style="display: flex;align-items: center;">
+                                礼物答谢
+                                <div class="button-group" style="margin-left: auto;">
+                                    <button type="button" class="button toggle-button is-small"
+                                        :class="config.present.opens ? 'is-active' : ''"
+                                        @click="configSwitch('present',true)">开启</button>
+                                    <button type="button" class="button toggle-button is-small"
+                                        :class="!config.present.opens ? 'is-active' : ''"
+                                        @click="configSwitch('present',false)">关闭</button>
+                                </div>
+                            </h5>
+                            <article class="message is-small">
+                                <div class="message-body">
+                                    <div class="content is-small">
+                                        <h3>可以使用的动态信息</h3>
+                                        <p>
+                                            这些内容可以加入到句子里，实际发送时会被替换成对应内容
+                                        </p>
+                                        <ul>
+                                            <li><b>送礼人名称：</b>@name@</li>
+                                            <li><b>礼物名称：</b>@giftName@</li>
+                                            <li><b>礼物单价：</b>@price@</li>
+                                            <li><b>赠送数量：</b>@num@</li>
+                                        </ul>
+                                    </div>
+                            </article>
+                            <form>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">起始金额</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <div class="field has-addons">
+                                                <p class="control" style="flex: 1;">
+                                                    <input class="input" type="number" placeholder="x"
+                                                        v-model="config.present.price">
+                                                </p>
+                                                <p class="control">
+                                                    <a class="button is-static">
+                                                        电池
+                                                    </a>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label"></label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <article class="message is-small">
+                                                <div class="message-body">
+                                                    <div class="content is-small">
+                                                        <p>
+                                                            大于等于设置电池数的礼物会被感谢，例如：
+                                                        </p>
+                                                        <p>
+                                                            设置为0时即为不论什么礼物，哪怕是免费的都会感谢
+                                                        </p>
+                                                        <p>
+                                                            设置为100时仅感谢价格在100电池及以上的礼物，低于100电池的赠送将不会被感谢
+                                                        </p>
+                                                    </div>
+                                            </article>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">状态</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <div class="button-group">
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.present.status == 0 ? 'is-active' : ''"
+                                                    @click="configSwitch('present-status',0)">不论何时</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.present.status == 1 ? 'is-active' : ''"
+                                                    @click="configSwitch('present-status',1)">仅在直播时</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.present.status == 2 ? 'is-active' : ''"
+                                                    @click="configSwitch('present-status',2)">仅在非直播时</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">过滤</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <div class="button-group">
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.present.type == 0 ? 'is-active' : ''"
+                                                    @click="configSwitch('present-type',0)">全部答谢</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.present.type == 1 ? 'is-active' : ''"
+                                                    @click="configSwitch('present-type',1)">仅答谢牌子</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.present.type == 2 ? 'is-active' : ''"
+                                                    @click="configSwitch('present-type',2)">仅答谢航海</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">内容</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <textarea class="textarea has-fixed-size"
+                                                placeholder="感谢信息，例如：感谢@name@老板赠送的@num@个@giftName@～" rows="10"
+                                                v-model="config.present.content"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label"></label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <article class="message is-small">
+                                                <div class="message-body">
+                                                    <div class="content is-small">
+                                                        <p>
+                                                            可以设置多条感谢信息，通过换行隔开
+                                                        </p>
+                                                        <p>
+                                                            每次进行感谢时会从多行信息中随机取一行进行发送
+                                                        </p>
+                                                        <p>
+                                                            通常建议留言发言长度，过长的信息会被分成多条发送，因发言频率限制可能会影响体验
+                                                        </p>
+                                                    </div>
+                                            </article>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- 关注感谢 -->
+                    <div class="card">
+                        <div class="card-content">
+                            <h5 class="title is-5" style="display: flex;align-items: center;">
+                                关注感谢
+                                <div class="button-group" style="margin-left: auto;">
+                                    <button type="button" class="button is-small toggle-button"
+                                        :class="config.follow.opens ? 'is-active' : ''"
+                                        @click="configSwitch('follow',true)">开启</button>
+                                    <button type="button" class="button is-small toggle-button"
+                                        :class="!config.follow.opens ? 'is-active' : ''"
+                                        @click="configSwitch('follow',false)">关闭</button>
+                                </div>
+                            </h5>
+                            <article class="message is-small">
+                                <div class="message-body">
+                                    <div class="content is-small">
+                                        <h3>可以使用的动态信息</h3>
+                                        <p>
+                                            这些内容可以加入到句子里，实际发送时会被替换成对应内容
+                                        </p>
+                                        <ul>
+                                            <li><b>名称：</b>@name@</li>
+                                        </ul>
+                                    </div>
+                            </article>
+                            <form>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">状态</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <div class="button-group">
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.follow.status == 0 ? 'is-active' : ''"
+                                                    @click="configSwitch('follow-status',0)">不论何时</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.follow.status == 1 ? 'is-active' : ''"
+                                                    @click="configSwitch('follow-status',1)">仅在直播时</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.follow.status == 2 ? 'is-active' : ''"
+                                                    @click="configSwitch('follow-status',2)">仅在非直播时</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">过滤</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <div class="button-group">
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.follow.type == 0 ? 'is-active' : ''"
+                                                    @click="configSwitch('follow-type',0)">全部欢迎</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.follow.type == 1 ? 'is-active' : ''"
+                                                    @click="configSwitch('follow-type',1)">仅欢迎牌子</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.follow.type == 2 ? 'is-active' : ''"
+                                                    @click="configSwitch('follow-type',2)">仅欢迎航海</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">内容</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <textarea class="textarea has-fixed-size" placeholder="感谢内容，例如：感谢@name@的关注～"
+                                                rows="10" v-model="config.follow.content"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label"></label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <article class="message is-small">
+                                                <div class="message-body">
+                                                    <div class="content is-small">
+                                                        <p>
+                                                            可以设置多条感谢信息，通过换行隔开
+                                                        </p>
+                                                        <p>
+                                                            每次发送信息时会从多行信息中随机取一行进行发送
+                                                        </p>
+                                                        <p>
+                                                            通常建议留言发言长度，过长的信息会被分成多条发送，因发言频率限制可能会影响体验
+                                                        </p>
+                                                    </div>
+                                            </article>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- 自动回复 -->
+                    <div class="card">
+                        <div class="card-content">
+                            <h5 class="title is-5" style="display: flex;align-items: center;">
+                                自动回复
+                                <div class="button-group" style="margin-left: auto;">
+                                    <button type="button" class="button is-small toggle-button"
+                                        :class="config.autoresponders.opens ? 'is-active' : ''"
+                                        @click="configSwitch('autoresponders',true)">开启</button>
+                                    <button type="button" class="button is-small toggle-button"
+                                        :class="!config.autoresponders.opens ? 'is-active' : ''"
+                                        @click="configSwitch('autoresponders',false)">关闭</button>
+                                </div>
+                            </h5>
+                            <form>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">状态</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <div class="button-group">
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.autoresponders.status == 0 ? 'is-active' : ''"
+                                                    @click="configSwitch('autoresponders-status',0)">不论何时</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.autoresponders.status == 1 ? 'is-active' : ''"
+                                                    @click="configSwitch('autoresponders-status',1)">仅在直播时</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.autoresponders.status == 2 ? 'is-active' : ''"
+                                                    @click="configSwitch('autoresponders-status',2)">仅在非直播时</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">过滤</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <div class="button-group">
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.autoresponders.type == 0 ? 'is-active' : ''"
+                                                    @click="configSwitch('autoresponders-type',0)">全部响应</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.autoresponders.type == 1 ? 'is-active' : ''"
+                                                    @click="configSwitch('autoresponders-type',1)">仅响应牌子</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.autoresponders.type == 2 ? 'is-active' : ''"
+                                                    @click="configSwitch('autoresponders-type',2)">仅响应航海</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <table class="table is-fullwidth is-striped">
+                                    <thead>
+                                        <tr>
+                                            <td>关键词</td>
+                                            <td style="width: 5rem;">启动</td>
+                                            <td style="width: 10rem;">配置</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(item,key) in config.autoresponders.content">
+                                            <td>{{item.keywords ? item.keywords : ''}}</td>
+                                            <td>
+                                                <div class="tag is-hoverable is-light"
+                                                    :class="item.enable ? 'is-success' : 'is-danger'"
+                                                    @click="autorespondersEnable(key)">{{item.enable ? '启用' : '停用'}}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="field has-addons">
+                                                    <p class="control">
+                                                        <button class="button is-small" type="button"
+                                                            @click="openModel(key)">
+                                                            <span>修改</span>
+                                                        </button>
+                                                    </p>
+                                                    <p class="control">
+                                                        <button class="button is-small" type="button"
+                                                            @click="deleteAutoresponders(key)">
+                                                            <span>删除</span>
+                                                        </button>
+                                                    </p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <td colspan="3" style="text-align: center;">
+                                            <button class="button is-fullwidth" type="button"
+                                                @click="addAutoresponders">➕</button>
+                                        </td>
+                                    </tbody>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 弹窗结构 -->
+        <div class="modal" :class="{ 'is-active': showModal }">
+            <div class="modal-background" @click="closeModal"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">自动回复</p>
+                    <button class="delete" aria-label="close" @click="closeModal"></button>
+                </header>
+                <section class="modal-card-body">
+                    <article class="message is-small">
+                        <div class="message-body">
+                            <div class="content is-small">
+                                <h3>可以使用的动态信息</h3>
+                                <p>
+                                    这些内容可以加入到句子里，实际发送时会被替换成对应内容
+                                </p>
+                                <ul>
+                                    <li><b>命中的关键词：</b>@keywords@</li>
+                                    <li><b>发送人：</b>@name@</li>
+                                </ul>
+                            </div>
+                    </article>
+                    <form>
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">关键词</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <input class="input" type="text" placeholder="不可以为空，多个词语通过 && 以及 || 来区分"
+                                        v-model="config.autoresponders.edit.keywords">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label"></label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <article class="message is-small">
+                                        <div class="message-body">
+                                            <div class="content is-small">
+                                                <p>
+                                                    关键词：符合条件的用户发送弹幕中包含的关键词才进行回复，可以设置多个关键词
+                                                </p>
+                                                <p>
+                                                    关键词通过 <b>&&</b> 以及 <b>||</b> 来区分。例如：
+                                                </p>
+                                                <ul>
+                                                    <li>希望弹幕中同时包含 ` 原神 ` 跟 ` 垃圾 ` 两个关键词时才进行回复，关键词为：<b>原神&&垃圾</b></li>
+                                                    <li>希望弹幕只要包含 ` 原神 ` 或者 ` 猿神 `
+                                                        任意一个关键词就进行回复，关键词为：<b>原神||猿神</b><br><del>当然，有些大聪明会觉得可以做两条自动回复，你是对的，我也不知道为什么做这个</del>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                    </article>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">安全词</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <input class="input" type="text" placeholder="可以为空，多个词语通过 && 以及 || 来区分"
+                                        v-model="config.autoresponders.edit.safeword">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label"></label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <article class="message is-small">
+                                        <div class="message-body">
+                                            <div class="content is-small">
+                                                <p>
+                                                    当发言中出现安全词后就不再进行回复
+                                                </p>
+                                                <p>
+                                                    与关键词的逻辑相同，可以设置多个词语，通过 <b>&&</b> 以及 <b>||</b> 来区分
+                                                </p>
+                                            </div>
+                                    </article>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">内容</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <textarea class="textarea has-fixed-size" placeholder="感谢内容，例如：感谢@name@的关注～"
+                                        rows="10" v-model="config.autoresponders.edit.text"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label"></label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <article class="message is-small">
+                                        <div class="message-body">
+                                            <div class="content is-small">
+                                                <p>
+                                                    可以设置多条回复信息，通过换行隔开
+                                                </p>
+                                                <p>
+                                                    每次发送信息时会从多行信息中随机取一行进行发送
+                                                </p>
+                                                <p>
+                                                    通常建议留言发言长度，过长的信息会被分成多条发送，因发言频率限制可能会影响体验
+                                                </p>
+                                            </div>
+                                    </article>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </section>
+                <footer class="modal-card-foot">
+                    <button class="button is-success" style="margin-left: auto;" @click="confirmAction">确认</button>
+                </footer>
+            </div>
+        </div>
+        <!-- 固定在右下角的圆形按钮 -->
+        <button class="button is-success is-large fixed-save-button" @click="setConfig">
+            保存
+        </button>
+    </div>
+
+    </div>
+
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    showModal: false,
+                    modalKey: 0,
+                    isNotificationVisible: false,
+                    notificationType: '',
+                    secretKey: '<?php echo $secretKey ?>',
+                    user_info: {
+                        is_login: false,
+                        uid: 0,
+                        uname: '',
+                        face: ''
+                    },
+                    live_info: {
+                        is_live: false,
+                        uid: 0,
+                        room_id: 0,
+                        attention: 0,
+                        online: 0,
+                        live_status: {
+                            type: 'info',
+                            value: '未开播'
+                        },
+                        title: '',
+                        live_time: '',
+                        keyframe: ''
+                    },
+                    room_id: null,
+                    config: {
+                        timing: { // 定时广告
+                            opens: false, // 是否开启
+                            intervals: null, // 间隔时间
+                            status: 0, // 状态
+                            content: null // 内容
+                        },
+                        present: { // 礼物答谢
+                            opens: false,
+                            price: null, // 起始感谢电池数
+                            status: 0, // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
+                            type: 0, // 类型：0=全部答谢，1=仅答谢牌子，2=仅答谢航海
+                            content: null // 内容
+                        },
+                        enter: { // 进房欢迎
+                            opens: false,
+                            status: 0, // 状态
+                            type: 0, // 类型：0=全部欢迎，1=仅欢迎牌子，2=仅欢迎航海
+                            content: null // 内容
+                        },
+                        follow: { // 感谢关注
+                            opens: false,
+                            status: 0, // 状态
+                            type: 0, // 类型：0=全部感谢，1=仅感谢牌子，2=仅感谢航海
+                            content: null // 内容
+                        },
+                        share: { // 感谢分享
+                            opens: false,
+                            status: 0, // 状态
+                            type: 0, // 类型：0=全部感谢，1=仅感谢牌子，2=仅感谢航海
+                            content: null // 内容
+                        },
+                        autoresponders: { // 自动回复
+                            edit: {
+                                keywords: '', // 关键字
+                                safeword: '', // 屏蔽字
+                                text: '', // 内容
+                            },
+                            opens: false,
+                            status: 0, // 状态
+                            type: 0, // 类型：0=全部响应，1=仅响应牌子，2=仅响应航海
+                            content: [
+                                {
+                                    keywords: '机器人', // 关键字
+                                    safeword: '', // 屏蔽字
+                                    text: '你骂谁机器人，你才是机器人', // 内容
+                                    enable: true // 是否启用
+                                },
+                                {
+                                    keywords: '原神', // 关键字
+                                    safeword: '', // 屏蔽字
+                                    text: '原神！启动！', // 内容
+                                    enable: true // 是否启用
+                                },
+                                {
+                                    keywords: '没钱', // 关键字
+                                    safeword: '', // 屏蔽字
+                                    text: '没钱的话就去钓两个富婆去！看什么直播！', // 内容
+                                    enable: true // 是否启用
+                                }
+                            ]
+                        }
+                    }
+                };
+            },
+            created() {
+                this.getUserInfo()
+                this.getConfig()
+            },
+            methods: {
+                // 配置按钮切换
+                configSwitch(type, opens) {
+                    switch (type) {
+                        case 'timing':
+                            this.config.timing.opens = opens
+                            break;
+                        case 'timing-status':
+                            this.config.timing.status = opens
+                            break;
+                        case 'present':
+                            this.config.present.opens = opens
+                            break;
+                        case 'present-status':
+                            this.config.present.status = opens
+                            break;
+                        case 'present-type':
+                            this.config.present.type = opens
+                            break;
+                        case 'enter':
+                            this.config.enter.opens = opens
+                            break;
+                        case 'enter-status':
+                            this.config.enter.status = opens
+                            break;
+                        case 'enter-type':
+                            this.config.enter.type = opens
+                            break;
+                        case 'follow':
+                            this.config.follow.opens = opens
+                            break;
+                        case 'follow-status':
+                            this.config.follow.status = opens
+                            break;
+                        case 'follow-type':
+                            this.config.follow.type = opens
+                            break;
+                        case 'share':
+                            this.config.share.opens = opens
+                            break;
+                        case 'share-status':
+                            this.config.share.status = opens
+                            break;
+                        case 'share-type':
+                            this.config.share.type = opens
+                            break;
+                        case 'autoresponders':
+                            this.config.autoresponders.opens = opens
+                            break;
+                        case 'autoresponders-status':
+                            this.config.autoresponders.status = opens
+                            break;
+                        case 'autoresponders-type':
+                            this.config.autoresponders.type = opens
+                            break;
+                    }
+                },
+                // 切换自动回复是否启用按钮
+                autorespondersEnable(key) {
+                    this.config.autoresponders.content[key].enable = this.config.autoresponders.content[key].enable ? false : true;
+                },
+                // 删除某个自动回复
+                deleteAutoresponders(key) {
+                    this.config.autoresponders.content.splice(key, 1);
+                },
+                // 添加某个自动回复
+                addAutoresponders() {
+                    this.config.autoresponders.content.push({
+                        keywords: '',
+                        safeword: '',
+                        text: '',
+                        enable: true
+                    });
+                    this.openModel((this.config.autoresponders.content.length - 1))
+                },
+                // 打开弹窗
+                openModel(key) {
+                    this.modalKey = key;
+                    if (this.config.autoresponders.content[this.modalKey]) {
+                        this.config.autoresponders.edit.keywords = this.config.autoresponders.content[this.modalKey].keywords;
+                        this.config.autoresponders.edit.safeword = this.config.autoresponders.content[this.modalKey].safeword;
+                        this.config.autoresponders.edit.text = this.config.autoresponders.content[this.modalKey].text;
+                    }
+                    this.showModal = true;
+                },
+                // 关闭弹窗
+                closeModal() {
+                    if (this.config.autoresponders.content[this.modalKey]) {
+                        if (!this.config.autoresponders.content[this.modalKey].keywords || !this.config.autoresponders.content[this.modalKey].text) {
+                            this.deleteAutoresponders(this.modalKey)
+                        }
+                    }
+                    this.showModal = false;
+                },
+                // 确认弹窗
+                confirmAction() {
+                    if (this.config.autoresponders.content[this.modalKey]) {
+                        if (!this.config.autoresponders.edit.keywords) {
+                            this.showNotification('抱歉，关键词不能为空', 'warning')
+                            return false;
+                        }
+                        if (!this.config.autoresponders.edit.text) {
+                            this.showNotification('抱歉，回复内容不能为空', 'warning')
+                            return false;
+                        }
+                        this.config.autoresponders.content[this.modalKey].keywords = this.config.autoresponders.edit.keywords;
+                        this.config.autoresponders.content[this.modalKey].safeword = this.config.autoresponders.edit.safeword;
+                        this.config.autoresponders.content[this.modalKey].text = this.config.autoresponders.edit.text;
+                    }
+                    this.showModal = false;
+                },
+                // 显示通知
+                showNotification(message, type = 'info') {
+                    this.isNotificationVisible = true;
+                    this.notificationMessage = message;
+                    switch (type) {
+                        case 'success':
+                            this.notificationType = 'is-success is-light'
+                            break;
+                        case 'info':
+                            this.notificationType = 'is-light'
+                            break;
+                        case 'error':
+                            this.notificationType = 'is-danger is-light'
+                            break;
+                        case 'warning':
+                            this.notificationType = 'is-warning is-light'
+                            break;
+                    }
+                    setTimeout(this.hideNotification, 3000);
+                },
+                // 隐藏通知
+                hideNotification() {
+                    this.isNotificationVisible = false;
+                },
+                // 防止通知重复
+                resetNotification() {
+                    this.isNotificationVisible = false;
+                },
+                // 获取用户登录信息
+                getUserInfo() {
+                    let data = {}
+                    let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
+                    axios.post('/api/get-user-info', data, {
+                        headers: { 'X-Signature': signature }
+                    }).then(response => {
+                        if (response.data.code == 0) {
+                            this.user_info.is_login = response.data.data.is_login;
+                            this.user_info.uid = response.data.data.data.uid;
+                            this.user_info.uname = response.data.data.data.uname;
+                            this.user_info.face = response.data.data.data.face;
+                            this.getRealRoomInfo(0)
+                        } else {
+                            this.showNotification(response.data.msg, 'error');
+                        }
+                    });
+                },
+                // 获取配置信息
+                getConfig() {
+                    let data = {}
+                    let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
+                    axios.post('/api/get-config', data, {
+                        headers: { 'X-Signature': signature }
+                    }).then(response => {
+                        if (response.data.code == 0) {
+                            this.config.timing = response.data.data.timing;
+                            this.config.present = response.data.data.present;
+                            this.config.enter = response.data.data.enter;
+                            this.config.follow = response.data.data.follow;
+                            this.config.share = response.data.data.share;
+                            this.config.autoresponders.opens = response.data.data.autoresponders.opens;
+                            this.config.autoresponders.status = response.data.data.autoresponders.status;
+                            this.config.autoresponders.type = response.data.data.autoresponders.type;
+                            this.config.autoresponders.content = response.data.data.autoresponders.content;
+                        } else {
+                            this.showNotification(response.data.msg, 'error');
+                        }
+                    });
+                },
+                // 存储配置信息
+                setConfig() {
+                    let data = {
+                        timing: this.config.timing,
+                        present: this.config.present,
+                        enter: this.config.enter,
+                        follow: this.config.follow,
+                        share: this.config.share,
+                        autoresponders: this.config.autoresponders
+                    }
+                    let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
+                    axios.post('/api/set-config', data, {
+                        headers: { 'X-Signature': signature }
+                    }).then(response => {
+                        if (response.data.code == 0) {
+                            this.showNotification('保存成功', 'success');
+                        } else {
+                            this.showNotification(response.data.msg, 'error');
+                        }
+                    });
+
+                },
+                // 获取直播间信息/连接直播间
+                getRealRoomInfo(room_id = 0) {
+                    if (!this.user_info.is_login) {
+                        this.showNotification('未登陆，请登录后再链接房间', 'warning');
+                        return false;
+                    }
+                    let data = { room_id: room_id }
+                    let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
+                    axios.post('/api/get-real-room-info', data, {
+                        headers: { 'X-Signature': signature }
+                    }).then(response => {
+                        if (response.data.code == 0) {
+                            if (response.data.data.code == 0) {
+                                if (room_id > 0) {
+                                    this.showNotification('直播间链接成功', 'success')
+                                }
+                                this.live_info.is_live = response.data.data.is_live;
+                                this.live_info.uid = response.data.data.data.uid;
+                                this.live_info.room_id = response.data.data.data.room_id;
+                                this.live_info.attention = response.data.data.data.attention;
+                                this.live_info.online = response.data.data.data.online;
+                                switch (response.data.data.data.live_status) {
+                                    case 1: // 直播中
+                                        this.live_info.live_status.value = '直播中';
+                                        this.live_info.live_status.type = 'is-link is-light'
+                                        break;
+                                    case 2: // 轮博中
+                                        this.live_info.live_status.value = '轮播中';
+                                        this.live_info.live_status.type = 'is-primary is-light'
+                                        break;
+                                    default:
+                                        this.live_info.live_status.value = '未开播';
+                                        this.live_info.live_status.type = 'is-danger is-light'
+                                        break;
+                                }
+                                this.live_info.title = response.data.data.data.title;
+                                this.live_info.live_time = response.data.data.data.live_time;
+                                this.live_info.keyframe = response.data.data.data.keyframe;
+                            } else {
+                                this.showNotification(response.data.data.msg, 'error');
+                            }
+                        } else {
+                            this.showNotification(response.data.msg, 'error');
+                        }
+                    });
+                },
+                // 退出登录
+                loginOut() {
+                    let data = {}
+                    let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
+                    axios.post('/api/login-out', data, {
+                        headers: { 'X-Signature': signature }
+                    }).then(response => {
+                        if (response.data.code == 0) {
+                            window.location.href = '/';
+                        }
+                    });
+                },
+                // 退出直播间
+                connectOut() {
+                    let data = {}
+                    let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
+                    axios.post('/api/connect-out', data, {
+                        headers: { 'X-Signature': signature }
+                    }).then(response => {
+                        if (response.data.code == 0) {
+                            this.getRealRoomInfo(0)
+                        }
+                    });
+                }
+            }
+        });
+        app.mount('#app');
+    </script>
 </body>
+
 </html>
