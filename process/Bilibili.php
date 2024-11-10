@@ -3,6 +3,11 @@
 namespace process;
 
 use app\queue\SendMessage;
+use app\server\Autoresponders;
+use app\server\Enter;
+use app\server\Follow;
+use app\server\Present;
+use app\server\Share;
 use Carbon\Carbon;
 use Exception;
 use Workerman\Worker;
@@ -12,6 +17,7 @@ use Workerman\Connection\AsyncTcpConnection;
 use Workerman\Protocols\Ws;
 use Hejunjie\Tools;
 use Random\RandomException;
+use support\Redis;
 
 class Bilibili
 {
@@ -37,7 +43,7 @@ class Bilibili
      */
     private function startUnixWorker()
     {
-        $socketFile = runtime_path() . '/bilibili.sock';
+        $socketFile = runtime_path('/bilibili.sock');
         if (file_exists($socketFile)) {
             unlink($socketFile);
         }
@@ -61,8 +67,8 @@ class Bilibili
      */
     private function connectToWebSocket()
     {
-        $this->cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
-        $this->roomId = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
+        $this->cookie = strval(readFileContent(runtime_path('/tmp/cookie.cfg')));
+        $this->roomId = intval(readFileContent(runtime_path('/tmp/connect.cfg')));
         if ($this->cookie && $this->roomId) {
             // 获取真实房间号和WebSocket连接信息
             $realRoomId = Bililive\Live::getRealRoomId($this->roomId, $this->cookie);
@@ -172,6 +178,31 @@ class Bilibili
         });
     }
 
+    private function analysis($payload)
+    {
+        $dir = base_path() . '/runtime/logs/直播间信息记录/';
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+        // 获取当前文件编号
+        $baseFileName = $dir . $payload['payload']['cmd'];
+        $fileExtension = ".log";
+        $currentFile = $baseFileName . $fileExtension;
+        // 检查当前文件是否已存在且行数达到1000
+        if (file_exists($currentFile) && count(file($currentFile)) >= 1000) {
+            // 找到下一个可用的文件编号
+            $i = 1;
+            do {
+                $newFile = $baseFileName . "_" . $i . $fileExtension;
+                $i++;
+            } while (file_exists($newFile) && count(file($newFile)) >= 1000);
+
+            $currentFile = $newFile;
+        }
+        $content = json_encode($payload['payload'], JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION) . "\n";
+        file_put_contents($currentFile, $content, FILE_APPEND);
+    }
+
     /**
      * 接收 WebSocket 消息时的处理
      * @param mixed $data 消息信息
@@ -185,29 +216,84 @@ class Bilibili
         $message = Bililive\WebSocket::parseResponsePayload($data);
         foreach ($message['payload'] as $payload) {
             if (isset($payload['payload']['cmd'])) {
-                $dir = base_path() . '/runtime/logs/直播间信息记录/';
-                if (!is_dir($dir)) {
-                    mkdir($dir, 0777, true);
+                // 记录分析日志
+                $this->analysis($payload);
+                // 处理逻辑
+                switch ($payload['payload']['cmd']) {
+                    case 'LIVE': // 直播开始
+                        Redis::set('bilibili_live_key', $payload['payload']['live_key']);
+                        break;
+                    case 'CUT_OFF': // 直播被超管切断
+                    case 'ROOM_LOCK': // 直播间被封
+                    case 'PREPARING': // 下播
+                        Redis::del('bilibili_live_key');
+                        break;
+                    case 'SEND_GIFT': // 赠送礼物
+                        Present::processing(
+                            $payload['payload']['data']['uid'],
+                            $payload['payload']['data']['uname'],
+                            $payload['payload']['data']['giftId'],
+                            $payload['payload']['data']['giftName'],
+                            intval($payload['payload']['data']['price'] / 100),
+                            $payload['payload']['data']['num'],
+                            $payload['payload']['data']['receiver_uinfo']['uid'],
+                            $payload['payload']['data']['sender_uinfo']['medal']['ruid'],
+                            $payload['payload']['data']['sender_uinfo']['medal']['guard_level'],
+                            $payload['payload']['data']['sender_uinfo']['medal']['level']
+                        );
+                        break;
+                    case 'GUARD_BUY': // 开通大航海
+                        Present::processing(
+                            $payload['payload']['data']['uid'],
+                            $payload['payload']['data']['username'],
+                            $payload['payload']['data']['gift_id'],
+                            $payload['payload']['data']['gift_name'],
+                            $payload['payload']['data']['price'],
+                            $payload['payload']['data']['num'],
+                            0,
+                            0,
+                            $payload['payload']['data']['guard_level'],
+                            0
+                        );
+                        break;
+                    case 'INTERACT_WORD': // 直播间互动
+                        switch (intval($payload['payload']['data']['msg_type'])) {
+                            case 1: // 进入直播间
+                                Enter::processing(
+                                    $payload['payload']['data']['uid'],
+                                    $payload['payload']['data']['uname'],
+                                    $payload['payload']['data']['uinfo']['medal']['ruid'],
+                                    $payload['payload']['data']['uinfo']['medal']['guard_level']
+                                );
+                                break;
+                            case 2: // 关注
+                                Follow::processing(
+                                    $payload['payload']['data']['uid'],
+                                    $payload['payload']['data']['uname'],
+                                    $payload['payload']['data']['uinfo']['medal']['ruid'],
+                                    $payload['payload']['data']['uinfo']['medal']['guard_level']
+                                );
+                                break;
+                            case 3: // 分享直播间
+                                Share::processing(
+                                    $payload['payload']['data']['uid'],
+                                    $payload['payload']['data']['uname'],
+                                    $payload['payload']['data']['uinfo']['medal']['ruid'],
+                                    $payload['payload']['data']['uinfo']['medal']['guard_level']
+                                );
+                                break;
+                        }
+                        break;
+                    case 'DANMU_MSG': // 弹幕信息
+                        Autoresponders::processing(
+                            $payload['payload']['info'][1],
+                            $payload['payload']['info'][2][0],
+                            $payload['payload']['info'][2][1],
+                            $payload['payload']['info'][3][12],
+                            $payload['payload']['info'][3][10]
+                        );
+                        break;
                 }
-                // 获取当前文件编号
-                $baseFileName = $dir . $payload['payload']['cmd'];
-                $fileExtension = ".log";
-                $currentFile = $baseFileName . $fileExtension;
-
-                // 检查当前文件是否已存在且行数达到1000
-                if (file_exists($currentFile) && count(file($currentFile)) >= 1000) {
-                    // 找到下一个可用的文件编号
-                    $i = 1;
-                    do {
-                        $newFile = $baseFileName . "_" . $i . $fileExtension;
-                        $i++;
-                    } while (file_exists($newFile) && count(file($newFile)) >= 1000);
-
-                    $currentFile = $newFile;
-                }
-
-                $content = json_encode($payload['payload'], JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION) . "\n";
-                file_put_contents($currentFile, $content, FILE_APPEND);
             }
         }
     }
@@ -240,8 +326,8 @@ class Bilibili
         // 检查是否超过最大重连次数
         if ($this->reconnectAttempts >= $this->maxReconnectAttempts) {
             echo "已达到最大重连次数，不再尝试连接。\n";
-            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/cookie.cfg');
-            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/connect.cfg');
+            Tools\FileUtils::fileDelete(runtime_path('/tmp/cookie.cfg'));
+            Tools\FileUtils::fileDelete(runtime_path('/tmp/connect.cfg'));
             $this->cookie = null;
             $this->roomId = null;
             return;

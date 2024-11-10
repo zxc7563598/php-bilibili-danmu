@@ -7,7 +7,11 @@ use Workerman\Crontab\Crontab;
 use Workerman\Timer;
 use Workerman\Worker;
 use Hejunjie\Bililive;
+use support\Redis;
 
+/**
+ * 定时广告，优先级10
+ */
 class Timing
 {
     public function onWorkerStart()
@@ -24,7 +28,7 @@ class Timing
      */
     private function startUnixWorker()
     {
-        $socketFile = runtime_path() . '/timing.sock';
+        $socketFile = runtime_path('/timing.sock');
         if (file_exists($socketFile)) {
             unlink($socketFile);
         }
@@ -46,7 +50,7 @@ class Timing
     private function startUp()
     {
         // 获取定时广告配置
-        $timing = readFileContent(runtime_path() . '/tmp/timing.cfg');
+        $timing = readFileContent(runtime_path('/tmp/timing.cfg'));
         if ($timing) {
             $timing = json_decode($timing, true);
         }
@@ -57,22 +61,20 @@ class Timing
             $content = $timing['content']; // 内容
             Timer::add($intervals, function () use ($status, $content) {
                 // 确认链接直播间的情况
-                $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
-                $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
+                $cookie = strval(readFileContent(runtime_path('/tmp/cookie.cfg')));
+                $room_id = intval(readFileContent(runtime_path('/tmp/connect.cfg')));
                 if ($cookie && $room_id) {
                     switch ($status) {
                         case 0: // 不论何时
                             $this->sendMessage($content);
                             break;
                         case 1: // 仅在直播中
-                            $live_info = Bililive\Live::getRealRoomInfo($room_id, $cookie);
-                            if (isset($live_info['data']['live_status']) && $live_info['data']['live_status'] == 1) {
+                            if (Redis::get('bilibili_live_key')) {
                                 $this->sendMessage($content);
                             }
                             break;
                         case 2: // 仅在非直播中
-                            $live_info = Bililive\Live::getRealRoomInfo($room_id, $cookie);
-                            if (isset($live_info['data']['live_status']) && $live_info['data']['live_status'] != 1) {
+                            if (!Redis::get('bilibili_live_key')) {
                                 $this->sendMessage($content);
                             }
                             break;
@@ -84,7 +86,9 @@ class Timing
 
     /**
      * 发送广告信息
-     * @param mixed $content 
+     * 
+     * @param string $content 文本信息
+     * 
      * @return void 
      */
     private function sendMessage(string $content)
