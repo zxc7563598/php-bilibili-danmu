@@ -51,12 +51,12 @@ class Enter
                     case 0: // 全部答谢
                         $medal = true;
                         break;
-                    case 0: // 仅答谢牌子
+                    case 1: // 仅答谢牌子
                         if ($room_uid == $ruid) {
                             $medal = true;
                         }
                         break;
-                    case 0: // 仅答谢航海
+                    case 2: // 仅答谢航海
                         if (($room_uid == $ruid) && ($guard_level > 0)) {
                             $medal = true;
                         }
