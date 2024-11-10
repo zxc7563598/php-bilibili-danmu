@@ -31,7 +31,7 @@ class Follow
             'guard_level' => $guard_level
         ]);
         // 获取感谢关注配置
-        $follow = readFileContent(runtime_path('/tmp/follow.cfg'));
+        $follow = readFileContent(runtime_path() . '/tmp/follow.cfg');
         if ($follow) {
             $follow = json_decode($follow, true);
         }
@@ -41,9 +41,9 @@ class Follow
             $follow_status = intval($follow['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
             $follow_content = $follow['content']; // 内容
             // 确认链接直播间的情况
-            $cookie = strval(readFileContent(runtime_path('/tmp/cookie.cfg')));
-            $room_id = intval(readFileContent(runtime_path('/tmp/connect.cfg')));
-            $room_uid = intval(readFileContent(runtime_path('/tmp/room_uid.cfg')));
+            $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
+            $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
+            $room_uid = intval(readFileContent(runtime_path() . '/tmp/room_uid.cfg'));
             if ($cookie && $room_id) {
                 // 验证牌子
                 $medal = false;

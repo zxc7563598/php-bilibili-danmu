@@ -28,7 +28,7 @@ class Timing
      */
     private function startUnixWorker()
     {
-        $socketFile = runtime_path('/timing.sock');
+        $socketFile = runtime_path() . '/timing.sock';
         if (file_exists($socketFile)) {
             unlink($socketFile);
         }
@@ -50,7 +50,7 @@ class Timing
     private function startUp()
     {
         // 获取定时广告配置
-        $timing = readFileContent(runtime_path('/tmp/timing.cfg'));
+        $timing = readFileContent(runtime_path() . '/tmp/timing.cfg');
         if ($timing) {
             $timing = json_decode($timing, true);
         }
@@ -61,8 +61,8 @@ class Timing
             $content = $timing['content']; // 内容
             Timer::add($intervals, function () use ($status, $content) {
                 // 确认链接直播间的情况
-                $cookie = strval(readFileContent(runtime_path('/tmp/cookie.cfg')));
-                $room_id = intval(readFileContent(runtime_path('/tmp/connect.cfg')));
+                $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
+                $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
                 if ($cookie && $room_id) {
                     switch ($status) {
                         case 0: // 不论何时
