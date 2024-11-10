@@ -31,7 +31,7 @@ class PageController
             ->saveToFile(public_path() . '/qrcode.png');
         // 返回数据
         return view('main/login', [
-            'url' => $request->uri() . '/qrcode.png',
+            'url' => '/qrcode.png',
             'qrcode_key' => $getQrcode['qrcode_key'],
             'secretKey' => getenv('SECURE_API_KEY')
         ]);
