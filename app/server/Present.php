@@ -65,12 +65,12 @@ class Present
                         case 0: // 全部答谢
                             $medal = true;
                             break;
-                        case 0: // 仅答谢牌子
+                        case 1: // 仅答谢牌子
                             if ($anchor_id == $ruid) {
                                 $medal = true;
                             }
                             break;
-                        case 0: // 仅答谢航海
+                        case 2: // 仅答谢航海
                             if (($anchor_id == $ruid) && ($guard_level > 0)) {
                                 $medal = true;
                             }
