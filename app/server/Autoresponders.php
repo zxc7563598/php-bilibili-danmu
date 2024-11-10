@@ -27,6 +27,13 @@ class Autoresponders
     public static function processing($msg, $uid, $uname, $ruid, $guard_level)
     {
         $is_message = false;
+        sublog('逻辑检测', '自动回复', [
+            'msg' => $msg,
+            'uid' => $uid,
+            'uname' => $uname,
+            'ruid' => $ruid,
+            'guard_level' => $guard_level
+        ]);
         // 获取自动回复配置
         $autoresponders = readFileContent(runtime_path('/tmp/autoresponders.cfg'));
         if ($autoresponders) {
@@ -46,69 +53,74 @@ class Autoresponders
                 // 验证是否有需要发送的内容
                 foreach ($autoresponders_content as $item) {
                     if ($item['enable']) {
-                    }
-                    $matcher = new KeywordMatcher($item['keywords']);
-                    $parsedTree = $matcher->parse();
-                    $evaluator = new KeywordEvaluator($parsedTree, $msg);
-                    if ($evaluator->evaluate()) {
-                        // 安全词检测，默认没命中
-                        $safeword = false;
-                        if ($item['safeword']) {
-                            $matcher = new KeywordMatcher($item['safeword']);
-                            $parsedTree = $matcher->parse();
-                            $evaluator = new KeywordEvaluator($parsedTree, $msg);
-                            if ($evaluator->evaluate()) {
-                                $safeword = true;
+                        $matcher = new KeywordMatcher($item['keywords']);
+                        $parsedTree = $matcher->parse();
+                        $evaluator = new KeywordEvaluator($parsedTree, $msg);
+                        if ($evaluator->evaluate()) {
+                            // 安全词检测，默认没命中
+                            $safeword = false;
+                            if ($item['safeword']) {
+                                $matcher = new KeywordMatcher($item['safeword']);
+                                $parsedTree = $matcher->parse();
+                                $evaluator = new KeywordEvaluator($parsedTree, $msg);
+                                if ($evaluator->evaluate()) {
+                                    $safeword = true;
+                                }
                             }
-                        }
-                        // 未命中安全词的触发自动回复
-                        if (!$safeword) {
-                            // 验证牌子
-                            $medal = false;
-                            switch ($autoresponders_type) {
-                                case 0: // 全部答谢
-                                    $medal = true;
-                                    break;
-                                case 0: // 仅答谢牌子
-                                    if ($room_uid == $ruid) {
+                            // 未命中安全词的触发自动回复
+                            if (!$safeword) {
+                                // 验证牌子
+                                $medal = false;
+                                switch ($autoresponders_type) {
+                                    case 0: // 全部答谢
                                         $medal = true;
-                                    }
-                                    break;
-                                case 0: // 仅答谢航海
-                                    if (($room_uid == $ruid) && ($guard_level > 0)) {
-                                        $medal = true;
-                                    }
-                                    break;
-                            }
-                            // 验证时间段
-                            if ($medal) {
-                                switch ($autoresponders_status) {
-                                    case 0: // 不论何时
-                                        $is_message = true;
                                         break;
-                                    case 1: // 仅在直播中
-                                        if (Redis::get('bilibili_live_key')) {
-                                            $is_message = true;
+                                    case 0: // 仅答谢牌子
+                                        if ($room_uid == $ruid) {
+                                            $medal = true;
                                         }
                                         break;
-                                    case 2: // 仅在非直播中
-                                        if (!Redis::get('bilibili_live_key')) {
-                                            $is_message = true;
+                                    case 0: // 仅答谢航海
+                                        if (($room_uid == $ruid) && ($guard_level > 0)) {
+                                            $medal = true;
                                         }
                                         break;
                                 }
+                                // 验证时间段
+                                if ($medal) {
+                                    switch ($autoresponders_status) {
+                                        case 0: // 不论何时
+                                            $is_message = true;
+                                            break;
+                                        case 1: // 仅在直播中
+                                            if (Redis::get('bilibili_live_key')) {
+                                                $is_message = true;
+                                            }
+                                            break;
+                                        case 2: // 仅在非直播中
+                                            if (!Redis::get('bilibili_live_key')) {
+                                                $is_message = true;
+                                            }
+                                            break;
+                                    }
+                                }
+                                $message = $item['text'];
                             }
-                            $message = $item['text'];
+                            break;
                         }
-                        break;
                     }
                 }
             }
             // 如果发送的话
             if ($is_message) {
+                sublog('逻辑检测', '自动回复', '数据匹配成功');
                 self::sendMessage($message, [
                     'name' => $uname
                 ]);
+                sublog('逻辑检测', '自动回复', '----------');
+            } else {
+                sublog('逻辑检测', '自动回复', '数据未匹配');
+                sublog('逻辑检测', '自动回复', '----------');
             }
         }
     }
@@ -133,6 +145,7 @@ class Autoresponders
                 // 加入消息发送队列
                 $text = self::template($content[mt_rand(0, (count($content) - 1))], $args);
                 SendMessage::push($text, 15);
+                sublog('逻辑检测', '自动回复', '发送数据：' . $text);
             }
         }
     }

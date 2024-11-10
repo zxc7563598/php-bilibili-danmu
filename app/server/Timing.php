@@ -100,6 +100,7 @@ class Timing
             if (!empty($text)) {
                 // 加入消息发送队列
                 SendMessage::push($text, 10);
+                sublog('逻辑检测', '定时广告', '发送数据：' . $text);
             }
         }
     }

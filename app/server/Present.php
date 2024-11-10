@@ -30,6 +30,18 @@ class Present
     public static function processing($uid, $uname, $gift_id, $gift_name, $price, $num, $anchor_id, $ruid, $guard_level, $level)
     {
         $is_message = false;
+        sublog('逻辑检测', '礼物答谢', [
+            'uid' => $uid,
+            'uname' => $uname,
+            'gift_id' => $gift_id,
+            'gift_name' => $gift_name,
+            'price' => $price,
+            'num' => $num,
+            'anchor_id' => $anchor_id,
+            'ruid' => $ruid,
+            'guard_level' => $guard_level,
+            'level' => $level
+        ]);
         // 获取礼物答谢配置
         $present = readFileContent(runtime_path('/tmp/present.cfg'));
         if ($present) {
@@ -86,12 +98,17 @@ class Present
             }
             // 如果发送的话
             if ($is_message) {
+                sublog('逻辑检测', '礼物答谢', '数据匹配成功');
                 self::sendMessage($present_content, [
                     'name' => $uname,
                     'giftName' => $gift_name,
                     'price' => $price,
                     'num' => $num
                 ]);
+                sublog('逻辑检测', '礼物答谢', '----------');
+            } else {
+                sublog('逻辑检测', '礼物答谢', '数据未匹配');
+                sublog('逻辑检测', '礼物答谢', '----------');
             }
         }
     }
@@ -116,6 +133,7 @@ class Present
                 // 加入消息发送队列
                 $text = self::template($content[mt_rand(0, (count($content) - 1))], $args);
                 SendMessage::push($text, 20);
+                sublog('逻辑检测', '礼物答谢', '发送数据：' . $text);
             }
         }
     }

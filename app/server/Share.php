@@ -24,6 +24,12 @@ class Share
     public static function processing($uid, $uname, $ruid, $guard_level)
     {
         $is_message = false;
+        sublog('逻辑检测', '感谢分享', [
+            'uid' => $uid,
+            'uname' => $uname,
+            'ruid' => $ruid,
+            'guard_level' => $guard_level
+        ]);
         // 获取感谢分享配置
         $share = readFileContent(runtime_path('/tmp/share.cfg'));
         if ($share) {
@@ -77,9 +83,14 @@ class Share
             }
             // 如果发送的话
             if ($is_message) {
+                sublog('逻辑检测', '感谢分享', '数据匹配成功');
                 self::sendMessage($share_content, [
                     'name' => $uname
                 ]);
+                sublog('逻辑检测', '感谢分享', '----------');
+            } else {
+                sublog('逻辑检测', '感谢分享', '数据未匹配');
+                sublog('逻辑检测', '感谢分享', '----------');
             }
         }
     }
@@ -104,6 +115,7 @@ class Share
                 // 加入消息发送队列
                 $text = self::template($content[mt_rand(0, (count($content) - 1))], $args);
                 SendMessage::push($text, 5);
+                sublog('逻辑检测', '感谢分享', '发送数据：' . $text);
             }
         }
     }

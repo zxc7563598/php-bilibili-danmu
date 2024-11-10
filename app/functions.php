@@ -104,3 +104,23 @@ function splitAndFilterLines($text)
     // 返回有内容的行数组
     return array_values($filteredLines);
 }
+
+/**
+ * 日志信息存储
+ *
+ * @param string $paths 存储路径
+ * @param string $filename 存储名称
+ * @param string $contents 存储内容
+ * 
+ * @return void
+ */
+function sublog($paths, $filename, $contents): void
+{
+    $dir = base_path() . '/runtime/logs/' . Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d') . '/' . $paths . '/';
+    if (!is_dir($dir)) {
+        mkdir($dir, 0777, true);
+    }
+    $file = $dir . $filename . ".log";
+    $content = Carbon::now()->timezone(config('app')['default_timezone'])->format('H:i:s') . "        " . json_encode($contents, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION) . "\r\n";
+    file_put_contents($file, $content, FILE_APPEND);
+}

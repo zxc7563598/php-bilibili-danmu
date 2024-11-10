@@ -24,6 +24,12 @@ class Follow
     public static function processing($uid, $uname, $ruid, $guard_level)
     {
         $is_message = false;
+        sublog('逻辑检测', '感谢关注', [
+            'uid' => $uid,
+            'uname' => $uname,
+            'ruid' => $ruid,
+            'guard_level' => $guard_level
+        ]);
         // 获取感谢关注配置
         $follow = readFileContent(runtime_path('/tmp/follow.cfg'));
         if ($follow) {
@@ -77,9 +83,14 @@ class Follow
             }
             // 如果发送的话
             if ($is_message) {
+                sublog('逻辑检测', '感谢关注', '数据匹配成功');
                 self::sendMessage($follow_content, [
                     'name' => $uname
                 ]);
+                sublog('逻辑检测', '感谢关注', '----------');
+            } else {
+                sublog('逻辑检测', '感谢关注', '数据未匹配');
+                sublog('逻辑检测', '感谢关注', '----------');
             }
         }
     }
@@ -104,6 +115,7 @@ class Follow
                 // 加入消息发送队列
                 $text = self::template($content[mt_rand(0, (count($content) - 1))], $args);
                 SendMessage::push($text, 5);
+                sublog('逻辑检测', '感谢关注', '发送数据：' . $text);
             }
         }
     }
