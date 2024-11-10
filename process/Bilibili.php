@@ -114,14 +114,14 @@ class Bilibili
 
         // 设置连接关闭回调
         $con->onClose = function () {
-            echo "连接已关闭，正在尝试重新连接...\n";
+            echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "连接已关闭，正在尝试重新连接...\n";
             $this->clearTimers();
             $this->scheduleReconnect();
         };
 
         // 设置连接错误回调
         $con->onError = function ($connection, $code, $msg) {
-            echo "Error: $msg (code: $code), 尝试重新连接\n";
+            echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "Error: $msg (code: $code), 尝试重新连接\n";
             $this->clearTimers();
             $this->scheduleReconnect();
         };
@@ -161,7 +161,7 @@ class Bilibili
      */
     private function onConnected(AsyncTcpConnection $con, int $roomId, string $token)
     {
-        echo "已连接到WebSocket,房间号:" . $roomId . "\n";
+        echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "已连接到WebSocket,房间号:" . $roomId . "\n";
         // 发送认证包
         $con->send(Bililive\WebSocket::buildAuthPayload($roomId, $token, $this->cookie));
         $this->heartbeatTimer = Timer::add(30, function () use ($con, $roomId) {
@@ -173,7 +173,7 @@ class Bilibili
                 }
             }
         });
-        $this->sendMessageTimer =  Timer::add(3, function () {
+        $this->sendMessageTimer = Timer::add(3, function () {
             SendMessage::processQueue();
         });
     }
@@ -325,7 +325,7 @@ class Bilibili
         $this->reconnectAttempts++; // 增加重连次数计数器
         // 检查是否超过最大重连次数
         if ($this->reconnectAttempts >= $this->maxReconnectAttempts) {
-            echo "已达到最大重连次数，不再尝试连接。\n";
+            echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "已达到最大重连次数，不再尝试连接。\n";
             Tools\FileUtils::fileDelete(runtime_path() . '/tmp/cookie.cfg');
             Tools\FileUtils::fileDelete(runtime_path() . '/tmp/connect.cfg');
             $this->cookie = null;
