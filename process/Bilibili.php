@@ -27,6 +27,7 @@ class Bilibili
     private string|null $cookie; // 用户cookie
     private int|null $roomId; // 直播间房间号
     private ?int $heartbeatTimer = null; // 心跳
+    private ?int $reconnectTimer = null; // 重连
     private ?int $sendMessageTimer = null; // 消息
 
     public function onWorkerStart()
@@ -52,6 +53,7 @@ class Bilibili
             if ($data === 'reload') {
                 // 启动 websocket
                 $this->connectToWebSocket();
+                echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "已重启Bilibili进程" . "\n";
             }
             $connection->send("已处理Bilibili流程: $data");
         };
@@ -176,6 +178,10 @@ class Bilibili
         $this->sendMessageTimer = Timer::add(3, function () {
             SendMessage::processQueue();
         });
+        if ($this->reconnectTimer !== null) {
+            Timer::del($this->reconnectTimer);
+            $this->reconnectTimer = null;
+        }
     }
 
     private function analysis($payload)
@@ -333,7 +339,7 @@ class Bilibili
             return;
         }
         // 设置重连定时器
-        Timer::add($this->reconnectInterval, function () {
+        $this->reconnectTimer = Timer::add($this->reconnectInterval, function () {
             $this->connectToWebSocket();
         }, [], false);
     }
