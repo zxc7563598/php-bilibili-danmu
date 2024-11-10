@@ -180,10 +180,10 @@ class Bilibili
                 $con->send(Bililive\WebSocket::buildHeartbeatPayload());
                 echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "连续websocket心跳发送" . "\n";
                 // 每隔两次发送一次HTTP心跳包
-                if (Carbon::now()->second < 30) {
-                    $con->send(Bililive\Live::reportLiveHeartbeat($roomId, $this->cookie));
-                    echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "连续http心跳发送" . "\n";
-                }
+                // if (Carbon::now()->second < 30) {
+                //     $con->send(Bililive\Live::reportLiveHeartbeat($roomId, $this->cookie));
+                //     echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "连续http心跳发送" . "\n";
+                // }
             }
         });
         $this->sendMessageTimer = Timer::add(3, function () {
