@@ -118,14 +118,20 @@ class Bilibili
         $con->onClose = function () {
             echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "连接已关闭，正在尝试重新连接...\n";
             $this->clearTimers();
-            $this->scheduleReconnect();
+            // 设置重连定时器
+            $this->reconnectTimer = Timer::add($this->reconnectInterval, function () {
+                $this->scheduleReconnect();
+            }, [], false);
         };
 
         // 设置连接错误回调
         $con->onError = function ($connection, $code, $msg) {
             echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "Error: $msg (code: $code), 尝试重新连接\n";
             $this->clearTimers();
-            $this->scheduleReconnect();
+            // 设置重连定时器
+            $this->reconnectTimer = Timer::add($this->reconnectInterval, function () {
+                $this->scheduleReconnect();
+            }, [], false);
         };
     }
 
@@ -166,12 +172,17 @@ class Bilibili
         echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "已连接到WebSocket,房间号:" . $roomId . "\n";
         // 发送认证包
         $con->send(Bililive\WebSocket::buildAuthPayload($roomId, $token, $this->cookie));
+        echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "认证包发送" . "\n";
+        $con->send(Bililive\WebSocket::buildHeartbeatPayload());
+        echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "首次websocket心跳发送" . "\n";
         $this->heartbeatTimer = Timer::add(30, function () use ($con, $roomId) {
             if ($con->getStatus() === AsyncTcpConnection::STATUS_ESTABLISHED) {
                 $con->send(Bililive\WebSocket::buildHeartbeatPayload());
+                echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "连续websocket心跳发送" . "\n";
                 // 每隔两次发送一次HTTP心跳包
                 if (Carbon::now()->second < 30) {
                     $con->send(Bililive\Live::reportLiveHeartbeat($roomId, $this->cookie));
+                    echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "连续http心跳发送" . "\n";
                 }
             }
         });
@@ -338,9 +349,7 @@ class Bilibili
             $this->roomId = null;
             return;
         }
-        // 设置重连定时器
-        $this->reconnectTimer = Timer::add($this->reconnectInterval, function () {
-            $this->connectToWebSocket();
-        }, [], false);
+        // 重新连接
+        $this->connectToWebSocket();
     }
 }
