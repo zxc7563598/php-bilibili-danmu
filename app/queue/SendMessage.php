@@ -94,7 +94,7 @@ class SendMessage
                 if ($cookie && $room_id) {
                     // BiliLive\Live::sendMsg($room_id, $cookie, $task['message']);
                     sublog('逻辑检测', '信息发送', [
-                        'message' => $task['item'],
+                        'message' => $task['message'],
                         'score' => $task['score'],
                         'timestamp' => Carbon::parse($task['timestamp'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s')
                     ]);
