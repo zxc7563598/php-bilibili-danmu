@@ -24,8 +24,8 @@ class SendMessage
      */
     public static function push(string $message, int $priority = 0): void
     {
-        $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
-        $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
+        $cookie = strval(readFileContent(runtime_path('/tmp/cookie.cfg')));
+        $room_id = intval(readFileContent(runtime_path('/tmp/connect.cfg')));
         if ($cookie && $room_id) {
             // 获取直播间最大发言长度
             $length = Redis::get('bilibili_speak_length');
@@ -89,8 +89,8 @@ class SendMessage
             } else {
                 // 执行任务
                 echo "发送优先级为" . $task['score'] . "的弹幕: " . $task['message'] . PHP_EOL;
-                $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
-                $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
+                $cookie = strval(readFileContent(runtime_path('/tmp/cookie.cfg')));
+                $room_id = intval(readFileContent(runtime_path('/tmp/connect.cfg')));
                 if ($cookie && $room_id) {
                     BiliLive\Live::sendMsg($room_id, $cookie, $task['message']);
                 }
