@@ -28,11 +28,11 @@ class ApiController
     public function getUserInfo(Request $request)
     {
         // 获取登录信息配置
-        $cookie = strval(readFileContent(runtime_path('/tmp/cookie.cfg')));
+        $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
         if ($cookie) {
             $user_info = Bililive\Login::getUserInfo($cookie);
             if (!$user_info['is_login']) {
-                Tools\FileUtils::fileDelete(runtime_path('/tmp/cookie.cfg'));
+                Tools\FileUtils::fileDelete(runtime_path() . '/tmp/cookie.cfg');
             }
         }
         // 返回数据
@@ -62,13 +62,13 @@ class ApiController
         // 如果存在房间号则变更配置房间号
         $reconnect = false;
         if ($room_id > 0) {
-            Tools\FileUtils::fileDelete(runtime_path('/tmp/connect.cfg'));
-            Tools\FileUtils::writeToFile(runtime_path('/tmp/connect.cfg'), $room_id);
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/connect.cfg');
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/connect.cfg', $room_id);
             $reconnect = true;
         }
         // 获取直播间信息配置
-        $cookie = strval(readFileContent(runtime_path('/tmp/cookie.cfg')));
-        $room_id = intval(readFileContent(runtime_path('/tmp/connect.cfg')));
+        $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
+        $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
         $is_live = false;
         if ($room_id && $cookie) {
             $live_info = Bililive\Live::getRealRoomInfo($room_id, $cookie);
@@ -76,8 +76,8 @@ class ApiController
             // 房间连接成功，重启websocket
             if ($live_info['code'] == 0 && $reconnect) {
                 restartBilibili();
-                Tools\FileUtils::fileDelete(runtime_path('/tmp/room_uid.cfg'));
-                Tools\FileUtils::writeToFile(runtime_path('/tmp/room_uid.cfg'), $live_info['data']['uid']);
+                Tools\FileUtils::fileDelete(runtime_path() . '/tmp/room_uid.cfg');
+                Tools\FileUtils::writeToFile(runtime_path() . '/tmp/room_uid.cfg', $live_info['data']['uid']);
             }
         }
         // 返回数据
@@ -106,7 +106,7 @@ class ApiController
     public function getConfig(Request $request)
     {
         // 获取定时广告配置
-        $timing = readFileContent(runtime_path('/tmp/timing.cfg'));
+        $timing = readFileContent(runtime_path() . '/tmp/timing.cfg');
         if ($timing) {
             $timing = json_decode($timing, true);
         }
@@ -117,11 +117,11 @@ class ApiController
                 'status' => 0, // 状态
                 'content' => null // 内容
             ];
-            Tools\FileUtils::fileDelete(runtime_path('/tmp/timing.cfg'));
-            Tools\FileUtils::writeToFile(runtime_path('/tmp/timing.cfg'), json_encode($timing));
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/timing.cfg');
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/timing.cfg', json_encode($timing));
         }
         // 获取礼物答谢配置
-        $present = readFileContent(runtime_path('/tmp/present.cfg'));
+        $present = readFileContent(runtime_path() . '/tmp/present.cfg');
         if ($present) {
             $present = json_decode($present, true);
         }
@@ -133,11 +133,11 @@ class ApiController
                 'type' => 0, // 状态 0=全部答谢，1=仅答谢牌子，2=仅答谢航海
                 'content' => null // 内容
             ];
-            Tools\FileUtils::fileDelete(runtime_path('/tmp/present.cfg'));
-            Tools\FileUtils::writeToFile(runtime_path('/tmp/present.cfg'), json_encode($present));
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/present.cfg');
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/present.cfg', json_encode($present));
         }
         // 获取进房欢迎配置
-        $enter = readFileContent(runtime_path('/tmp/enter.cfg'));
+        $enter = readFileContent(runtime_path() . '/tmp/enter.cfg');
         if ($enter) {
             $enter = json_decode($enter, true);
         }
@@ -148,11 +148,11 @@ class ApiController
                 'type' => 0, // 类型：0=全部欢迎，1=仅欢迎牌子，2=仅欢迎航海
                 'content' => null // 内容
             ];
-            Tools\FileUtils::fileDelete(runtime_path('/tmp/enter.cfg'));
-            Tools\FileUtils::writeToFile(runtime_path('/tmp/enter.cfg'), json_encode($enter));
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/enter.cfg');
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/enter.cfg', json_encode($enter));
         }
         // 获取感谢关注配置
-        $follow = readFileContent(runtime_path('/tmp/follow.cfg'));
+        $follow = readFileContent(runtime_path() . '/tmp/follow.cfg');
         if ($follow) {
             $follow = json_decode($follow, true);
         }
@@ -163,11 +163,11 @@ class ApiController
                 'type' => 0, // 类型：0=全部感谢，1=仅感谢牌子，2=仅感谢航海
                 'content' => null // 内容
             ];
-            Tools\FileUtils::fileDelete(runtime_path('/tmp/follow.cfg'));
-            Tools\FileUtils::writeToFile(runtime_path('/tmp/follow.cfg'), json_encode($follow));
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/follow.cfg');
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/follow.cfg', json_encode($follow));
         }
         // 获取定时广告配置
-        $share = readFileContent(runtime_path('/tmp/share.cfg'));
+        $share = readFileContent(runtime_path() . '/tmp/share.cfg');
         if ($share) {
             $share = json_decode($share, true);
         }
@@ -178,11 +178,11 @@ class ApiController
                 'type' => 0, // 类型：0=全部感谢，1=仅感谢牌子，2=仅感谢航海
                 'content' => null // 内容
             ];
-            Tools\FileUtils::fileDelete(runtime_path('/tmp/share.cfg'));
-            Tools\FileUtils::writeToFile(runtime_path('/tmp/share.cfg'), json_encode($share));
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/share.cfg');
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/share.cfg', json_encode($share));
         }
         // 获取自动回复配置
-        $autoresponders = readFileContent(runtime_path('/tmp/autoresponders.cfg'));
+        $autoresponders = readFileContent(runtime_path() . '/tmp/autoresponders.cfg');
         if ($autoresponders) {
             $autoresponders = json_decode($autoresponders, true);
         }
@@ -193,8 +193,8 @@ class ApiController
                 'type' => 0, // 类型：0=全部响应，1=仅响应牌子，2=仅响应航海
                 'content' => [] // 内容
             ];
-            Tools\FileUtils::fileDelete(runtime_path('/tmp/autoresponders.cfg'));
-            Tools\FileUtils::writeToFile(runtime_path('/tmp/autoresponders.cfg'), json_encode($autoresponders));
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/autoresponders.cfg');
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/autoresponders.cfg', json_encode($autoresponders));
         }
         // 返回数据
         return success($request, [
@@ -230,28 +230,28 @@ class ApiController
         $autoresponders = !empty($param['autoresponders']) ? $param['autoresponders'] : false;
         // 存储数据
         if ($timing) {
-            Tools\FileUtils::fileDelete(runtime_path('/tmp/timing.cfg'));
-            Tools\FileUtils::writeToFile(runtime_path('/tmp/timing.cfg'), json_encode($timing, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/timing.cfg');
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/timing.cfg', json_encode($timing, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
         }
         if ($present) {
-            Tools\FileUtils::fileDelete(runtime_path('/tmp/present.cfg'));
-            Tools\FileUtils::writeToFile(runtime_path('/tmp/present.cfg'), json_encode($present, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/present.cfg');
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/present.cfg', json_encode($present, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
         }
         if ($enter) {
-            Tools\FileUtils::fileDelete(runtime_path('/tmp/enter.cfg'));
-            Tools\FileUtils::writeToFile(runtime_path('/tmp/enter.cfg'), json_encode($enter, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/enter.cfg');
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/enter.cfg', json_encode($enter, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
         }
         if ($follow) {
-            Tools\FileUtils::fileDelete(runtime_path('/tmp/follow.cfg'));
-            Tools\FileUtils::writeToFile(runtime_path('/tmp/follow.cfg'), json_encode($follow, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/follow.cfg');
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/follow.cfg', json_encode($follow, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
         }
         if ($share) {
-            Tools\FileUtils::fileDelete(runtime_path('/tmp/share.cfg'));
-            Tools\FileUtils::writeToFile(runtime_path('/tmp/share.cfg'), json_encode($share, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/share.cfg');
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/share.cfg', json_encode($share, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
         }
         if ($autoresponders) {
-            Tools\FileUtils::fileDelete(runtime_path('/tmp/autoresponders.cfg'));
-            Tools\FileUtils::writeToFile(runtime_path('/tmp/autoresponders.cfg'), json_encode($autoresponders, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/autoresponders.cfg');
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/autoresponders.cfg', json_encode($autoresponders, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
         }
         // 重启定时广告
         restartTiming();
@@ -275,8 +275,8 @@ class ApiController
         $checkQrcode = Bililive\Login::checkQrcode($qrcode_key);
         // 如果登录成功，存储cookie
         if ($checkQrcode['code'] == 0) {
-            Tools\FileUtils::fileDelete(runtime_path('/tmp/cookie.cfg'));
-            Tools\FileUtils::writeToFile(runtime_path('/tmp/cookie.cfg'), $checkQrcode['cookie']);
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/cookie.cfg');
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/cookie.cfg', $checkQrcode['cookie']);
         }
         // 返回数据
         return success($request, [
@@ -294,8 +294,8 @@ class ApiController
     public function loginOut(Request $request)
     {
         // 删除配置信息
-        Tools\FileUtils::fileDelete(runtime_path('/tmp/cookie.cfg'));
-        Tools\FileUtils::fileDelete(runtime_path('/tmp/connect.cfg'));
+        Tools\FileUtils::fileDelete(runtime_path() . '/tmp/cookie.cfg');
+        Tools\FileUtils::fileDelete(runtime_path() . '/tmp/connect.cfg');
         // 重启websocket
         restartBilibili();
         // 返回数据
@@ -311,7 +311,7 @@ class ApiController
     public function connectOut(Request $request)
     {
         // 删除配置信息
-        Tools\FileUtils::fileDelete(runtime_path('/tmp/connect.cfg'));
+        Tools\FileUtils::fileDelete(runtime_path() . '/tmp/connect.cfg');
         // 重启websocket
         restartBilibili();
         // 返回数据

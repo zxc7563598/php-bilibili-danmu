@@ -43,7 +43,7 @@ class Bilibili
      */
     private function startUnixWorker()
     {
-        $socketFile = runtime_path('/bilibili.sock');
+        $socketFile = runtime_path() . '/bilibili.sock';
         if (file_exists($socketFile)) {
             unlink($socketFile);
         }
@@ -67,8 +67,8 @@ class Bilibili
      */
     private function connectToWebSocket()
     {
-        $this->cookie = strval(readFileContent(runtime_path('/tmp/cookie.cfg')));
-        $this->roomId = intval(readFileContent(runtime_path('/tmp/connect.cfg')));
+        $this->cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
+        $this->roomId = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
         if ($this->cookie && $this->roomId) {
             // 获取真实房间号和WebSocket连接信息
             $realRoomId = Bililive\Live::getRealRoomId($this->roomId, $this->cookie);
@@ -326,8 +326,8 @@ class Bilibili
         // 检查是否超过最大重连次数
         if ($this->reconnectAttempts >= $this->maxReconnectAttempts) {
             echo "已达到最大重连次数，不再尝试连接。\n";
-            Tools\FileUtils::fileDelete(runtime_path('/tmp/cookie.cfg'));
-            Tools\FileUtils::fileDelete(runtime_path('/tmp/connect.cfg'));
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/cookie.cfg');
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/connect.cfg');
             $this->cookie = null;
             $this->roomId = null;
             return;

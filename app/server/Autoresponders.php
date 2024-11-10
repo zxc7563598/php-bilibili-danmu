@@ -35,7 +35,7 @@ class Autoresponders
             'guard_level' => $guard_level
         ]);
         // 获取自动回复配置
-        $autoresponders = readFileContent(runtime_path('/tmp/autoresponders.cfg'));
+        $autoresponders = readFileContent(runtime_path() . '/tmp/autoresponders.cfg');
         if ($autoresponders) {
             $autoresponders = json_decode($autoresponders, true);
         }
@@ -46,9 +46,9 @@ class Autoresponders
             $autoresponders_content = $autoresponders['content']; // 内容
             $message = '';
             // 确认链接直播间的情况
-            $cookie = strval(readFileContent(runtime_path('/tmp/cookie.cfg')));
-            $room_id = intval(readFileContent(runtime_path('/tmp/connect.cfg')));
-            $room_uid = intval(readFileContent(runtime_path('/tmp/room_uid.cfg')));
+            $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
+            $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
+            $room_uid = intval(readFileContent(runtime_path() . '/tmp/room_uid.cfg'));
             if ($cookie && $room_id) {
                 // 验证是否有需要发送的内容
                 foreach ($autoresponders_content as $item) {
