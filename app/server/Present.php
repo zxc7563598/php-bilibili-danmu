@@ -43,7 +43,7 @@ class Present
             'level' => $level
         ]);
         // 获取礼物答谢配置
-        $present = readFileContent(runtime_path('/tmp/present.cfg'));
+        $present = readFileContent(runtime_path() . '/tmp/present.cfg');
         if ($present) {
             $present = json_decode($present, true);
         }
@@ -54,8 +54,8 @@ class Present
             $present_status = intval($present['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
             $present_content = $present['content']; // 内容
             // 确认链接直播间的情况
-            $cookie = strval(readFileContent(runtime_path('/tmp/cookie.cfg')));
-            $room_id = intval(readFileContent(runtime_path('/tmp/connect.cfg')));
+            $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
+            $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
             if ($cookie && $room_id) {
                 // 验证是否达到可以感谢的电池数
                 if ($present_price >= $price) {
