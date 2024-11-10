@@ -128,14 +128,14 @@ class Autoresponders
     /**
      * 发送信息
      * 
-     * @param array $content 文本信息
+     * @param string $content 文本信息
      * @param array $args 要替换的模版
      * 
      * @return void 
      * @throws Exception 
      * @throws InvalidTimeZoneException 
      */
-    public static function sendMessage(array $content, array $args)
+    public static function sendMessage(string $content, array $args)
     {
         // 拆分要发送的内容
         $content = splitAndFilterLines($content);
