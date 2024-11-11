@@ -22,8 +22,8 @@ use Webman\Route;
 use support\Request;
 use Workerman\Worker;
 
-Route::get('/', [app\controller\PageController::class, 'main']);
-Route::get('/login', [app\controller\PageController::class, 'login']);
+Route::get('/', [app\controller\PageController::class, 'main'])->middleware([app\middleware\BasicAuthMiddleware::class]);
+Route::get('/login', [app\controller\PageController::class, 'login'])->middleware([app\middleware\BasicAuthMiddleware::class]);
 
 Route::group('/api', function () {
     Route::any('/login-check', [app\controller\ApiController::class, 'loginCheck']);
