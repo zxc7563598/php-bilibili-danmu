@@ -277,6 +277,9 @@ class ApiController
         if ($checkQrcode['code'] == 0) {
             Tools\FileUtils::fileDelete(runtime_path() . '/tmp/cookie.cfg');
             Tools\FileUtils::writeToFile(runtime_path() . '/tmp/cookie.cfg', $checkQrcode['cookie']);
+            // 删除二维码
+            $qrcode = md5($qrcode_key . 'qrcode') . '.png';
+            Tools\FileUtils::fileDelete(public_path() . '/qrcode/' . $qrcode);
         }
         // 返回数据
         return success($request, [
