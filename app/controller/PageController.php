@@ -26,6 +26,10 @@ class PageController
         // 获取登录信息
         $getQrcode = Bililive\Login::getQrcode();
         $qrcode = md5($getQrcode['qrcode_key'] . 'qrcode') . '.png';
+        // 确认目录信息，不存在则创建
+        if (!is_dir(public_path() . '/qrcode')) {
+            mkdir(public_path() . '/qrcode', 0777, true);
+        }
         // 信息存储，并生成二维码
         $code = new Builder();
         $code->build(new PngWriter(), null, null, $getQrcode['url'], new Encoding('UTF-8'), null, 300, 10)
