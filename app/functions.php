@@ -62,7 +62,7 @@ function readFileContent(string $path): ?string
  */
 function restartBilibili()
 {
-    $url = 'http://127.0.0.1:' . getenv('LISTEN') . '/reload-bilibili';
+    $url = getenv('RE_OPEN_HOST') . ':' . getenv('LISTEN') . '/reload-bilibili';
     $timestamp = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
     Tools\HttpClient::sendPostRequest($url, [], [
         'api_key' => md5(getenv('SECURE_API_KEY') . $timestamp),
@@ -78,7 +78,7 @@ function restartBilibili()
  */
 function restartTiming()
 {
-    $url = 'http://127.0.0.1:' . getenv('LISTEN') . '/reload-timing';
+    $url = getenv('RE_OPEN_HOST') . ':' . getenv('LISTEN') . '/reload-timing';
     $timestamp = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
     Tools\HttpClient::sendPostRequest($url, [], [
         'api_key' => md5(getenv('SECURE_API_KEY') . $timestamp),
