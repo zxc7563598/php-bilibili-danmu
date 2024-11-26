@@ -10,6 +10,8 @@ cd $PROJECT_DIR
 echo "Pulling latest code from Git..."
 git pull origin main
 
+sleep 2
+
 # 重启 Webman 服务
 echo "Restarting Webman..."
 php start.php stop
