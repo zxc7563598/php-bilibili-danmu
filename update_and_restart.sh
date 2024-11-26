@@ -12,7 +12,9 @@ git pull origin main
 
 # 重启 Webman 服务
 echo "Restarting Webman..."
-php start.php restart
+php start.php stop
+php start.php start -d
+
 
 # 完成
 echo "Update and restart completed!"
