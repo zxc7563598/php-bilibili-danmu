@@ -234,11 +234,13 @@ class Bilibili
                 switch ($payload['payload']['cmd']) {
                     case 'LIVE': // 直播开始
                         Redis::set('bilibili_live_key', $payload['payload']['live_key']);
+                        Redis::del('bilibili_send_sequence');
                         break;
                     case 'CUT_OFF': // 直播被超管切断
                     case 'ROOM_LOCK': // 直播间被封
                     case 'PREPARING': // 下播
                         Redis::del('bilibili_live_key');
+                        Redis::del('bilibili_send_sequence');
                         break;
                     case 'SEND_GIFT': // 赠送礼物
                         Present::processing(
