@@ -2,15 +2,11 @@
 
 namespace app\controller;
 
-use app\server\Bilibili;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
-use Endroid\QrCode\ErrorCorrectionLevel;
-use Endroid\QrCode\RoundBlockSizeMode;
 use Endroid\QrCode\Writer\PngWriter;
 use support\Request;
 use Hejunjie\Bililive;
-use Hejunjie\Tools;
 
 class PageController
 {
