@@ -3,6 +3,7 @@
 namespace app\server;
 
 use app\queue\SendMessage;
+use Carbon\Carbon;
 use Workerman\Crontab\Crontab;
 use Workerman\Timer;
 use Workerman\Worker;
@@ -36,6 +37,7 @@ class Timing
         $unixWorker->onMessage = function ($connection, $data) {
             if ($data === 'reload') {
                 $this->startUp();
+                echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "已重启定时广告进程" . "\n";
             }
             $connection->send("已重启定时广告进程: $data");
         };
