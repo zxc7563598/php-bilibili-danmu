@@ -334,6 +334,12 @@ class ApiController
         return success($request, []);
     }
 
+    /**
+     * 导出配置文件
+     * 
+     * @return Response 
+     * @throws InvalidTimeZoneException 
+     */
     public function exportConfig(Request $request)
     {
         $path_name = Carbon::now()->timezone(config('app')['default_timezone'])->format('YmdHis') . '.cfg';
