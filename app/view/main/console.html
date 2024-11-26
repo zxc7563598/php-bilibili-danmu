@@ -1019,11 +1019,6 @@
     </div>
 
     <script>
-        window.addEventListener('load', () => {
-            // 隐藏加载动画，显示内容
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('app').style.display = 'block';
-        });
         const app = Vue.createApp({
             data() {
                 return {
@@ -1287,6 +1282,8 @@
                         headers: { 'X-Signature': signature }
                     }).then(response => {
                         if (response.data.code == 0) {
+                            document.getElementById('loading').style.display = 'none';
+                            document.getElementById('app').style.display = 'block';
                             this.config.timing = response.data.data.timing;
                             this.config.present = response.data.data.present;
                             this.config.enter = response.data.data.enter;
