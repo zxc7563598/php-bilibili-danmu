@@ -2,14 +2,8 @@
 
 namespace app\controller;
 
-use app\server\Bilibili;
 use Carbon\Carbon;
 use Carbon\Exceptions\InvalidTimeZoneException;
-use Endroid\QrCode\Builder\Builder;
-use Endroid\QrCode\Encoding\Encoding;
-use Endroid\QrCode\ErrorCorrectionLevel;
-use Endroid\QrCode\RoundBlockSizeMode;
-use Endroid\QrCode\Writer\PngWriter;
 use Exception;
 use support\Request;
 use Hejunjie\Bililive;
