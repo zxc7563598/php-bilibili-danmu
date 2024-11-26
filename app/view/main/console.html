@@ -520,6 +520,14 @@
                             </form>
                         </div>
                     </div>
+
+                    <div class="card">
+                        <div class="card-content">
+                            <button class="button" style="width: 45%;margin: 0 2.5%;">导入配置</button>
+                            <button class="button" style="width: 45%;margin: 0 2.5%;"
+                                @click="exportConfig">导出配置</button>
+                        </div>
+                    </div>
                 </div>
                 <!-- 第二列 -->
                 <div class="column is-full-touch is-half-desktop">
@@ -1039,6 +1047,10 @@
         <button class="button is-success is-large fixed-save-button" @click="setConfig">
             保存
         </button>
+        <!-- 固定在右下角的圆形按钮 -->
+        <button class="button is-success is-large fixed-save-button" @click="setConfig">
+            导出
+        </button>
     </div>
 
     <script>
@@ -1259,6 +1271,18 @@
                             location.reload();
                         }
                     }, 1000);
+                },
+                // 导出配置
+                exportConfig() {
+                    let data = {}
+                    let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
+                    axios.post('/api/export-config', data, {
+                        headers: { 'X-Signature': signature }
+                    }).then(response => {
+                        if (response.data.code == 0) {
+                            window.location.href = window.location.protocol + '//' + response.data.data.url;
+                        }
+                    });
                 },
                 // 确认弹窗
                 confirmAction() {
