@@ -203,8 +203,20 @@ class ApiController
             'enter' => $enter,
             'follow' => $follow,
             'share' => $share,
-            'autoresponders' => $autoresponders
+            'autoresponders' => $autoresponders,
+            'localVersion' => trim(shell_exec('git rev-parse HEAD')),
+            'remoteVersion' => trim(shell_exec('git ls-remote origin -h refs/heads/main | cut -f1'))
         ]);
+    }
+
+    /**
+     * 版本更新
+     * 
+     * @return void 
+     */
+    public function versionUpdate(Request $request)
+    {
+        shell_exec(base_path() . DIRECTORY_SEPARATOR . '/update_and_restart.sh');
     }
 
     /**
