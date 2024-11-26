@@ -8,5 +8,6 @@
 /tests/.phpunit.result.cache
 /public/qrcode.png
 /public/qrcode/
+/public/config/
 .htaccess
 /public/.well-known/

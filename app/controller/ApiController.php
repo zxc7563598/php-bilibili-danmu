@@ -332,4 +332,101 @@ class ApiController
         // 返回数据
         return success($request, []);
     }
+
+    public function exportConfig(Request $request)
+    {
+        $path_name = Carbon::now()->timezone(config('app')['default_timezone'])->format('YmdHis') . '.cfg';
+        // 获取定时广告配置
+        $timing = readFileContent(runtime_path() . '/tmp/timing.cfg');
+        if ($timing) {
+            $timing = json_decode($timing, true);
+        }
+        if (!$timing) {
+            $timing = [
+                'opens' => false, // 是否开启
+                'intervals' => null, // 间隔时间
+                'status' => 0, // 状态
+                'content' => null // 内容
+            ];
+        }
+        // 获取礼物答谢配置
+        $present = readFileContent(runtime_path() . '/tmp/present.cfg');
+        if ($present) {
+            $present = json_decode($present, true);
+        }
+        if (!$present) {
+            $present = [
+                'opens' => false, // 是否开启
+                'price' => null, // 起始感谢金额
+                'status' => 0, // 状态 
+                'type' => 0, // 状态 0=全部答谢，1=仅答谢牌子，2=仅答谢航海
+                'content' => null // 内容
+            ];
+        }
+        // 获取进房欢迎配置
+        $enter = readFileContent(runtime_path() . '/tmp/enter.cfg');
+        if ($enter) {
+            $enter = json_decode($enter, true);
+        }
+        if (!$enter) {
+            $enter = [
+                'opens' => false, // 是否开启
+                'status' => 0, // 状态
+                'type' => 0, // 类型：0=全部欢迎，1=仅欢迎牌子，2=仅欢迎航海
+                'content' => null // 内容
+            ];
+        }
+        // 获取感谢关注配置
+        $follow = readFileContent(runtime_path() . '/tmp/follow.cfg');
+        if ($follow) {
+            $follow = json_decode($follow, true);
+        }
+        if (!$follow) {
+            $follow = [
+                'opens' => false, // 是否开启
+                'status' => 0, // 状态
+                'type' => 0, // 类型：0=全部感谢，1=仅感谢牌子，2=仅感谢航海
+                'content' => null // 内容
+            ];
+        }
+        // 获取定时广告配置
+        $share = readFileContent(runtime_path() . '/tmp/share.cfg');
+        if ($share) {
+            $share = json_decode($share, true);
+        }
+        if (!$share) {
+            $share = [
+                'opens' => false, // 是否开启
+                'status' => 0, // 状态
+                'type' => 0, // 类型：0=全部感谢，1=仅感谢牌子，2=仅感谢航海
+                'content' => null // 内容
+            ];
+        }
+        // 获取自动回复配置
+        $autoresponders = readFileContent(runtime_path() . '/tmp/autoresponders.cfg');
+        if ($autoresponders) {
+            $autoresponders = json_decode($autoresponders, true);
+        }
+        if (!$autoresponders) {
+            $autoresponders = [
+                'opens' => false, // 是否开启
+                'status' => 0, // 状态
+                'type' => 0, // 类型：0=全部响应，1=仅响应牌子，2=仅响应航海
+                'content' => [] // 内容
+            ];
+        }
+        // 返回数据
+        Tools\FileUtils::writeToFile(public_path() . '/config/' . $path_name, json_encode([
+            'timing' => $timing,
+            'present' => $present,
+            'enter' => $enter,
+            'follow' => $follow,
+            'share' => $share,
+            'autoresponders' => $autoresponders
+        ], JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
+        // 返回数据
+        return success($request, [
+            'url' => $request->host() . '/config/' . $path_name
+        ]);
+    }
 }
