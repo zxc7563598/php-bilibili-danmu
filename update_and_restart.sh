@@ -16,9 +16,7 @@ php start.php stop
 
 sleep 2
 
-
 php start.php start -d
-
 
 # 完成
 echo "Update and restart completed!"
