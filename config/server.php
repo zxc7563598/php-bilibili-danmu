@@ -14,7 +14,7 @@
  */
 
 return [
-    'listen' => 'http://0.0.0.0:' . getenv('LISTEN'),
+    'listen' => getenv('HOST') . ':' . getenv('LISTEN'),
     'listen_port' => getenv('LISTEN'),
     'transport' => 'tcp',
     'context' => [],
