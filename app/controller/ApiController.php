@@ -216,7 +216,7 @@ class ApiController
      */
     public function versionUpdate(Request $request)
     {
-        $script = base_path() . DIRECTORY_SEPARATOR . '/update_and_restart.sh';
+        $script = base_path() . DIRECTORY_SEPARATOR . 'update_and_restart.sh';
         shell_exec('nohup bash ' . $script . ' > /dev/null 2>&1 &');
     }
 
