@@ -35,6 +35,8 @@ Route::group('/api', function () {
     app\middleware\SignatureMiddleware::class
 ]);
 
+Route::any('/file/import-config', [app\controller\ApiController::class, 'importConfig']);
+
 Route::post('/reload-bilibili', function (Request $request) {
     // 预定义的 API 密钥（可以从配置文件或环境变量中读取）
     $validApiKey = getenv('SECURE_API_KEY');
