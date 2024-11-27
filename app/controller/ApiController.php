@@ -263,7 +263,7 @@ class ApiController
         // 重启定时广告
         restartTiming();
         // 返回数据
-        return success($request, ['param' => $param]);
+        return success($request);
     }
 
     /**
@@ -429,5 +429,60 @@ class ApiController
         return success($request, [
             'url' => $request->host() . '/config/' . $path_name
         ]);
+    }
+
+    /**
+     * 导入配置文件
+     * 
+     * @param Request $request 
+     * @return void 
+     */
+    public function importConfig(Request $request)
+    {
+        // 获取上传的文件
+        $file = $request->file('file');
+        // 检查文件是否上传成功
+        if (!$file || !$file->isValid()) {
+            throw new \Exception("文件上传失败");
+        }
+        // 获取文件临时路径
+        $text = Tools\FileUtils::readFile($file->getPathname());
+        // 读取文件内容
+        $data = json_decode($text, true);
+        $timing = isset($data['timing']) ? $data['timing'] : false;
+        $present = isset($data['present']) ? $data['present'] : false;
+        $enter = isset($data['enter']) ? $data['enter'] : false;
+        $follow = isset($data['follow']) ? $data['follow'] : false;
+        $share = isset($data['share']) ? $data['share'] : false;
+        $autoresponders = isset($data['autoresponders']) ? $data['autoresponders'] : false;
+        // 存储数据
+        if ($timing) {
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/timing.cfg');
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/timing.cfg', json_encode($timing, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
+        }
+        if ($present) {
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/present.cfg');
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/present.cfg', json_encode($present, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
+        }
+        if ($enter) {
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/enter.cfg');
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/enter.cfg', json_encode($enter, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
+        }
+        if ($follow) {
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/follow.cfg');
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/follow.cfg', json_encode($follow, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
+        }
+        if ($share) {
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/share.cfg');
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/share.cfg', json_encode($share, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
+        }
+        if ($autoresponders) {
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/autoresponders.cfg');
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/autoresponders.cfg', json_encode($autoresponders, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
+        }
+        // 重启定时广告
+        restartTiming();
+        // 返回数据
+        return success($request);
     }
 }
