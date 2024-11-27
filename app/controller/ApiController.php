@@ -483,6 +483,8 @@ class ApiController
         // 重启定时广告
         restartTiming();
         // 返回数据
-        return success($request);
+        return success($request, [
+            'data' => $data
+        ]);
     }
 }

@@ -8,6 +8,7 @@
     <script src="/js/vue.3.5.12.js"></script>
     <script src="/js/axios.min.js"></script>
     <link rel="stylesheet" href="/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="/js/crypto-js.min.js"></script>
     <style scoped>
         #app {
@@ -520,12 +521,25 @@
                             </form>
                         </div>
                     </div>
-
                     <div class="card">
                         <div class="card-content">
-                            <button class="button" style="width: 45%;margin: 0 2.5%;">导入配置</button>
-                            <button class="button" style="width: 45%;margin: 0 2.5%;"
-                                @click="exportConfig">导出配置</button>
+                            <div class="file">
+                                <label class="file-label">
+                                    <input class="file-input" type="file" name="resume" @change="importConfig" />
+                                    <span class="file-cta">
+                                        <span class="file-icon">
+                                            <i class="fas fa-upload"></i>
+                                        </span>
+                                        <span class="file-label"> 导入配置 </span>
+                                    </span>
+                                </label>
+                            </div>
+                            <button class="button" @click="exportConfig">
+                                <span class="file-icon">
+                                    <i class="fas fa-download"></i>
+                                </span>
+                                <span class="file-label"> 导入配置 </span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1283,6 +1297,26 @@
                             window.location.href = window.location.protocol + '//' + response.data.data.url;
                         }
                     });
+                },
+                // 导入配置
+                importConfig(event) {
+                    const file = event.target.files[0]; // 获取用户选择的文件
+                    console.log(file);
+                    if (file) {
+                        const formData = new FormData();
+                        formData.append('file', file); // 将文件添加到 FormData 中
+                        axios.post('/file/import-config', formData, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data', // 指定表单数据格式
+                            },
+                        }).then(response => {
+                            console.log(response.data);
+                            if (response.data.code == 0) {
+                            } else {
+                                this.showNotification(response.data.msg, 'error');
+                            }
+                        });
+                    }
                 },
                 // 确认弹窗
                 confirmAction() {
