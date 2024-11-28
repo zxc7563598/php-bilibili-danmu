@@ -28,9 +28,14 @@ if [ $? -ne 0 ]; then
     log_message "Git pull failed. Exiting."
     exit 1
 fi
-sleep 2
 # 停止 Webman 服务
 log_message "Stopping Webman..."
+# 等待端口释放
+while sudo lsof -i:7776 >/dev/null 2>&1; do
+    echo "Port 7776 is still in use. Waiting..."
+    sleep 1
+done
+# 启动webman
 php start.php stop >> $LOG_FILE 2>&1
 if [ $? -ne 0 ]; then
     log_message "Failed to stop Webman. Exiting."
