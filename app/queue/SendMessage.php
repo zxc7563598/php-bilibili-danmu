@@ -74,7 +74,6 @@ class SendMessage
             // 获取优先级最高的任务
             $taskData = Redis::zRange(self::$queueKey, 0, 0);
             if (empty($taskData)) {
-                // echo '在执行' . PHP_EOL;
                 return;
             }
             // 从 Redis 中移除任务
