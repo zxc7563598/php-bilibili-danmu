@@ -92,7 +92,7 @@ class SendMessage
                 $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
                 $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
                 if ($cookie && $room_id) {
-                    // BiliLive\Live::sendMsg($room_id, $cookie, $task['message']);
+                    BiliLive\Live::sendMsg($room_id, $cookie, $task['message']);
                     sublog('逻辑检测', '信息发送', [
                         'message' => $task['message'],
                         'score' => $task['score'],
