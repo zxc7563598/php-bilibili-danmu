@@ -40,17 +40,21 @@ fi
 log_message "Stopping Webman..."
 php start.php stop >> $LOG_FILE 2>&1
 if [ $? -ne 0 ]; then
-    log_message "Failed to stop Webman. Exiting."
-    exit 1
+    log_message "Failed to stop Webman. Attempting to force stop."
+    pkill -f 'php start.php' >> $LOG_FILE 2>&1
+    if [ $? -ne 0 ]; then
+        log_message "Force stop failed. Exiting."
+        exit 1
+    fi
 fi
 
-# 等待端口释放
+# 确保端口释放
 log_message "Checking if port 7776 is still in use..."
 RETRY_COUNT=10  # 最多重试次数
 while [ $RETRY_COUNT -gt 0 ]; do
     if sudo lsof -i:7776 >/dev/null 2>&1 || ps aux | grep '[p]hp start.php' >/dev/null 2>&1; then
-        log_message "Port 7776 is still in use. Retrying..."
-        sleep 1
+        log_message "Port 7776 is still in use. Retrying in 2 seconds..."
+        sleep 2
         RETRY_COUNT=$((RETRY_COUNT - 1))
     else
         log_message "Port 7776 is free."
@@ -60,6 +64,9 @@ done
 
 if [ $RETRY_COUNT -eq 0 ]; then
     log_message "Timeout waiting for port 7776 to be released. Exiting."
+    log_message "Processes still using port 7776:"
+    sudo lsof -i:7776 >> $LOG_FILE 2>&1
+    ps aux | grep '[p]hp start.php' >> $LOG_FILE 2>&1
     exit 1
 fi
 
