@@ -53,15 +53,24 @@ log_message "Ensuring all Webman-related processes are stopped."
 pkill -f "php start.php" >> $LOG_FILE 2>&1
 if [ $? -ne 0 ]; then
     log_message "Failed to kill processes matching 'php start.php'. Continuing."
+else
+    log_message "Successfully killed Webman-related processes."
 fi
 
 # 强制释放端口
 log_message "Ensuring port $PORT is not in use."
-if lsof -i:$PORT >/dev/null 2>&1; then
+if netstat -tuln | grep ":$PORT " >/dev/null 2>&1; then
     log_message "Forcing release of port $PORT by killing associated processes."
-    kill -9 $(lsof -t -i:$PORT) >> $LOG_FILE 2>&1
-    if [ $? -ne 0 ]; then
-        log_message "Failed to kill processes on port $PORT. Continuing."
+    PID=$(netstat -tulnp 2>/dev/null | grep ":$PORT " | awk '{print $7}' | cut -d'/' -f1)
+    if [ -n "$PID" ]; then
+        kill -9 $PID >> $LOG_FILE 2>&1
+        if [ $? -ne 0 ]; then
+            log_message "Failed to kill process $PID using port $PORT. Continuing."
+        else
+            log_message "Successfully killed process $PID using port $PORT."
+        fi
+    else
+        log_message "No process found using port $PORT."
     fi
 else
     log_message "Port $PORT is already free."
@@ -71,7 +80,7 @@ fi
 log_message "Checking if port $PORT is still in use..."
 RETRY_COUNT=10  # 最多重试次数
 while [ $RETRY_COUNT -gt 0 ]; do
-    if lsof -i:$PORT >/dev/null 2>&1; then
+    if netstat -tuln | grep ":$PORT " >/dev/null 2>&1; then
         log_message "Port $PORT is still in use. Retrying in 2 seconds..."
         sleep 2
         RETRY_COUNT=$((RETRY_COUNT - 1))
