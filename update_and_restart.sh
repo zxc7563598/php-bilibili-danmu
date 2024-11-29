@@ -6,6 +6,8 @@ PROJECT_DIR="/var/www/bilibili_danmu"
 LOG_FILE="/var/log/update_and_restart.log"
 # 锁文件路径
 LOCK_FILE="/tmp/update_and_restart.lock"
+# Webman 服务端口
+PORT=7776
 
 # 函数：写入日志
 log_message() {
@@ -42,30 +44,33 @@ php start.php stop >> $LOG_FILE 2>&1
 if [ $? -ne 0 ]; then
     log_message "Failed to stop Webman. Attempting to force stop."
     pkill -f 'php start.php' >> $LOG_FILE 2>&1
-    if [ $? -ne 0 ]; then
-        log_message "Force stop failed. Exiting."
-        exit 1
-    fi
 fi
 
-# 确保端口释放
-log_message "Checking if port 7776 is still in use..."
+# 强制清理端口占用
+log_message "Ensuring port $PORT is not in use."
+sudo fuser -k ${PORT}/tcp >> $LOG_FILE 2>&1
+if [ $? -ne 0 ]; then
+    log_message "Failed to force kill processes on port $PORT. Continuing."
+fi
+
+# 等待端口释放
+log_message "Checking if port $PORT is still in use..."
 RETRY_COUNT=10  # 最多重试次数
 while [ $RETRY_COUNT -gt 0 ]; do
-    if sudo lsof -i:7776 >/dev/null 2>&1 || ps aux | grep '[p]hp start.php' >/dev/null 2>&1; then
-        log_message "Port 7776 is still in use. Retrying in 2 seconds..."
+    if sudo lsof -i:$PORT >/dev/null 2>&1 || ps aux | grep '[p]hp start.php' >/dev/null 2>&1; then
+        log_message "Port $PORT is still in use. Retrying in 2 seconds..."
         sleep 2
         RETRY_COUNT=$((RETRY_COUNT - 1))
     else
-        log_message "Port 7776 is free."
+        log_message "Port $PORT is free."
         break
     fi
 done
 
 if [ $RETRY_COUNT -eq 0 ]; then
-    log_message "Timeout waiting for port 7776 to be released. Exiting."
-    log_message "Processes still using port 7776:"
-    sudo lsof -i:7776 >> $LOG_FILE 2>&1
+    log_message "Timeout waiting for port $PORT to be released. Exiting."
+    log_message "Processes still using port $PORT:"
+    sudo lsof -i:$PORT >> $LOG_FILE 2>&1
     ps aux | grep '[p]hp start.php' >> $LOG_FILE 2>&1
     exit 1
 fi
