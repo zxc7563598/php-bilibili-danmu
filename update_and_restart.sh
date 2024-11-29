@@ -9,6 +9,9 @@ LOCK_FILE="/tmp/update_and_restart.lock"
 # Webman 服务端口
 PORT=7776
 
+# 设置 PATH，确保环境变量完整
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
 # 函数：写入日志
 log_message() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> $LOG_FILE
@@ -43,21 +46,32 @@ log_message "Stopping Webman..."
 php start.php stop >> $LOG_FILE 2>&1
 if [ $? -ne 0 ]; then
     log_message "Failed to stop Webman. Attempting to force stop."
-    pkill -f 'php start.php' >> $LOG_FILE 2>&1
 fi
 
-# 强制清理端口占用
-log_message "Ensuring port $PORT is not in use."
-sudo fuser -k ${PORT}/tcp >> $LOG_FILE 2>&1
+# 强制清理 Webman 相关进程
+log_message "Ensuring all Webman-related processes are stopped."
+pkill -f "php start.php" >> $LOG_FILE 2>&1
 if [ $? -ne 0 ]; then
-    log_message "Failed to force kill processes on port $PORT. Continuing."
+    log_message "Failed to kill processes matching 'php start.php'. Continuing."
 fi
 
-# 等待端口释放
+# 强制释放端口
+log_message "Ensuring port $PORT is not in use."
+if lsof -i:$PORT >/dev/null 2>&1; then
+    log_message "Forcing release of port $PORT by killing associated processes."
+    kill -9 $(lsof -t -i:$PORT) >> $LOG_FILE 2>&1
+    if [ $? -ne 0 ]; then
+        log_message "Failed to kill processes on port $PORT. Continuing."
+    fi
+else
+    log_message "Port $PORT is already free."
+fi
+
+# 再次检查端口是否仍在使用
 log_message "Checking if port $PORT is still in use..."
 RETRY_COUNT=10  # 最多重试次数
 while [ $RETRY_COUNT -gt 0 ]; do
-    if sudo lsof -i:$PORT >/dev/null 2>&1 || ps aux | grep '[p]hp start.php' >/dev/null 2>&1; then
+    if lsof -i:$PORT >/dev/null 2>&1; then
         log_message "Port $PORT is still in use. Retrying in 2 seconds..."
         sleep 2
         RETRY_COUNT=$((RETRY_COUNT - 1))
@@ -69,9 +83,6 @@ done
 
 if [ $RETRY_COUNT -eq 0 ]; then
     log_message "Timeout waiting for port $PORT to be released. Exiting."
-    log_message "Processes still using port $PORT:"
-    sudo lsof -i:$PORT >> $LOG_FILE 2>&1
-    ps aux | grep '[p]hp start.php' >> $LOG_FILE 2>&1
     exit 1
 fi
 
