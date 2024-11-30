@@ -17,6 +17,8 @@ log_message() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> $LOG_FILE
 }
 
+log_message "=============================="
+
 # 检查锁文件
 if [ -f "$LOCK_FILE" ]; then
     log_message "脚本已经在运行 - 退出."
@@ -126,4 +128,3 @@ else
 fi
 
 log_message "检查和更新过程已成功完成."
-log_message "------------------------------"
