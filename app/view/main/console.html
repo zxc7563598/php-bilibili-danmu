@@ -1026,29 +1026,6 @@
                 </footer>
             </div>
         </div>
-        <div class="modal" :class="{ 'is-active': update }">
-            <div class="modal-background"></div>
-            <div class="modal-card">
-                <header class="modal-card-head">
-                    <p class="modal-card-title">当前有新版本更新可用</p>
-                    <button class="delete" aria-label="close" @click="closeUpdate"></button>
-                </header>
-                <section class="modal-card-body">
-                    检测到有新的更新<br>
-                    更新内容与说明请通过访问 <a href="https://github.com/zxc7563598/php-bilibili-danmu">Github</a> 查看
-                    <br><br>
-                    点击确认更新即可进行更新，更新需要几秒钟的时间，请耐心等待
-                    <br>
-                    如点击确认更新后页面长时间无响应，刷新页面即可
-                </section>
-                <footer class="modal-card-foot">
-                    <div class="buttons">
-                        <button class="button is-success" @click="startUpdate">{{confirmUpdate}}</button>
-                        <button class="button" @click="closeUpdate">暂不更新</button>
-                    </div>
-                </footer>
-            </div>
-        </div>
         <!-- 固定在右下角的圆形按钮 -->
         <button class="button is-success is-large fixed-save-button" @click="setConfig">
             保存
@@ -1060,8 +1037,6 @@
             data() {
                 return {
                     showModal: false,
-                    update: false,
-                    confirmUpdate: "确认更新",
                     modalKey: 0,
                     isNotificationVisible: false,
                     notificationType: '',
@@ -1251,28 +1226,6 @@
                         }
                     }
                     this.showModal = false;
-                },
-                // 关闭更新
-                closeUpdate() {
-                    this.update = false;
-                },
-                // 确认更新
-                startUpdate() {
-                    let countdown = 5;
-                    let data = {}
-                    let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
-                    axios.post('/api/version-update', data, {
-                        headers: { 'X-Signature': signature }
-                    })
-                    const timer = setInterval(() => {
-                        if (countdown > 1) {
-                            this.confirmUpdate = countdown;
-                            countdown--;
-                        } else {
-                            clearInterval(timer); // 清除计时器
-                            location.reload();
-                        }
-                    }, 1000);
                 },
                 // 导出配置
                 exportConfig() {
