@@ -204,17 +204,6 @@ class ApiController
     }
 
     /**
-     * 版本更新
-     * 
-     * @return void 
-     */
-    public function versionUpdate(Request $request)
-    {
-        $script = base_path() . DIRECTORY_SEPARATOR . 'update_and_restart.sh';
-        shell_exec('nohup bash ' . $script . ' > /dev/null 2>&1 &');
-    }
-
-    /**
      * 存储配置信息
      * 
      * @param array $timing 定时广告配置
