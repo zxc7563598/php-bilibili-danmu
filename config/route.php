@@ -28,7 +28,6 @@ Route::group('/api', function () {
     Route::any('/get-real-room-info', [app\controller\ApiController::class, 'getRealRoomInfo']);
     Route::any('/get-config', [app\controller\ApiController::class, 'getConfig']);
     Route::any('/set-config', [app\controller\ApiController::class, 'setConfig']);
-    Route::any('/version-update', [app\controller\ApiController::class, 'versionUpdate']);
     Route::any('/connect-out', [app\controller\ApiController::class, 'connectOut']);
     Route::any('/export-config', [app\controller\ApiController::class, 'exportConfig']);
 })->middleware([
