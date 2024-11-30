@@ -124,3 +124,18 @@ function sublog($paths, $filename, $contents): void
     $content = Carbon::now()->timezone(config('app')['default_timezone'])->format('H:i:s') . "        " . json_encode($contents, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION) . "\r\n";
     file_put_contents($file, $content, FILE_APPEND);
 }
+
+/**
+ * 判断当前是否运行在docker中
+ * 
+ * @return bool 
+ */
+function isDocker(): bool
+{
+    $cgroupFile = '/proc/1/cgroup';
+    if (file_exists($cgroupFile)) {
+        $contents = file_get_contents($cgroupFile);
+        return strpos($contents, 'docker') !== false;
+    }
+    return false;
+}
