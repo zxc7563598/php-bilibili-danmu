@@ -190,6 +190,13 @@ class ApiController
             Tools\FileUtils::fileDelete(runtime_path() . '/tmp/autoresponders.cfg');
             Tools\FileUtils::writeToFile(runtime_path() . '/tmp/autoresponders.cfg', json_encode($autoresponders));
         }
+        // 获取是否提示版本更新
+        $update = false;
+        if (isDocker()) {
+            if (trim(shell_exec('git rev-parse HEAD')) != trim(shell_exec('git ls-remote origin -h refs/heads/main | cut -f1'))) {
+                $update = true;
+            }
+        }
         // 返回数据
         return success($request, [
             'timing' => $timing,
@@ -198,8 +205,7 @@ class ApiController
             'follow' => $follow,
             'share' => $share,
             'autoresponders' => $autoresponders,
-            'localVersion' => trim(shell_exec('git rev-parse HEAD')),
-            'remoteVersion' => trim(shell_exec('git ls-remote origin -h refs/heads/main | cut -f1'))
+            'update' => $update
         ]);
     }
 
