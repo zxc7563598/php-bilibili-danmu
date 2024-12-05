@@ -18,23 +18,23 @@ use app\server\core\KeywordMatcher;
 use Webman\Route;
 use support\Request;
 
-Route::get('/', [app\controller\PageController::class, 'main'])->middleware([app\middleware\BasicAuthMiddleware::class]);
-Route::get('/login', [app\controller\PageController::class, 'login'])->middleware([app\middleware\BasicAuthMiddleware::class]);
+Route::get('/', [app\controller\robot\PageController::class, 'main'])->middleware([app\middleware\BasicAuthMiddleware::class]);
+Route::get('/login', [app\controller\robot\PageController::class, 'login'])->middleware([app\middleware\BasicAuthMiddleware::class]);
 
-Route::group('/api', function () {
-    Route::any('/login-check', [app\controller\ApiController::class, 'loginCheck']);
-    Route::any('/login-out', [app\controller\ApiController::class, 'loginOut']);
-    Route::any('/get-user-info', [app\controller\ApiController::class, 'getUserInfo']);
-    Route::any('/get-real-room-info', [app\controller\ApiController::class, 'getRealRoomInfo']);
-    Route::any('/get-config', [app\controller\ApiController::class, 'getConfig']);
-    Route::any('/set-config', [app\controller\ApiController::class, 'setConfig']);
-    Route::any('/connect-out', [app\controller\ApiController::class, 'connectOut']);
-    Route::any('/export-config', [app\controller\ApiController::class, 'exportConfig']);
+Route::group('/api/robot', function () {
+    Route::any('/login-check', [app\controller\robot\ApiController::class, 'loginCheck']);
+    Route::any('/login-out', [app\controller\robot\ApiController::class, 'loginOut']);
+    Route::any('/get-user-info', [app\controller\robot\ApiController::class, 'getUserInfo']);
+    Route::any('/get-real-room-info', [app\controller\robot\ApiController::class, 'getRealRoomInfo']);
+    Route::any('/get-config', [app\controller\robot\ApiController::class, 'getConfig']);
+    Route::any('/set-config', [app\controller\robot\ApiController::class, 'setConfig']);
+    Route::any('/connect-out', [app\controller\robot\ApiController::class, 'connectOut']);
+    Route::any('/export-config', [app\controller\robot\ApiController::class, 'exportConfig']);
 })->middleware([
     app\middleware\SignatureMiddleware::class
 ]);
 
-Route::any('/file/import-config', [app\controller\ApiController::class, 'importConfig']);
+Route::any('/file/import-config', [app\controller\robot\ApiController::class, 'importConfig']);
 
 Route::post('/reload-bilibili', function (Request $request) {
     // 预定义的 API 密钥（可以从配置文件或环境变量中读取）
