@@ -1265,7 +1265,7 @@
                 exportConfig() {
                     let data = {}
                     let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
-                    axios.post('/api/export-config', data, {
+                    axios.post('/api/robot/export-config', data, {
                         headers: { 'X-Signature': signature }
                     }).then(response => {
                         if (response.data.code == 0) {
@@ -1342,7 +1342,7 @@
                 getUserInfo() {
                     let data = {}
                     let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
-                    axios.post('/api/get-user-info', data, {
+                    axios.post('/api/robot/get-user-info', data, {
                         headers: { 'X-Signature': signature }
                     }).then(response => {
                         if (response.data.code == 0) {
@@ -1360,7 +1360,7 @@
                 getConfig() {
                     let data = {}
                     let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
-                    axios.post('/api/get-config', data, {
+                    axios.post('/api/robot/get-config', data, {
                         headers: { 'X-Signature': signature }
                     }).then(response => {
                         if (response.data.code == 0) {
@@ -1392,7 +1392,7 @@
                         autoresponders: this.config.autoresponders
                     }
                     let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
-                    axios.post('/api/set-config', data, {
+                    axios.post('/api/robot/set-config', data, {
                         headers: { 'X-Signature': signature }
                     }).then(response => {
                         if (response.data.code == 0) {
@@ -1411,7 +1411,7 @@
                     }
                     let data = { room_id: room_id }
                     let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
-                    axios.post('/api/get-real-room-info', data, {
+                    axios.post('/api/robot/get-real-room-info', data, {
                         headers: { 'X-Signature': signature }
                     }).then(response => {
                         if (response.data.code == 0) {
@@ -1453,7 +1453,7 @@
                 loginOut() {
                     let data = {}
                     let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
-                    axios.post('/api/login-out', data, {
+                    axios.post('/api/robot/login-out', data, {
                         headers: { 'X-Signature': signature }
                     }).then(response => {
                         if (response.data.code == 0) {
@@ -1465,7 +1465,7 @@
                 connectOut() {
                     let data = {}
                     let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
-                    axios.post('/api/connect-out', data, {
+                    axios.post('/api/robot/connect-out', data, {
                         headers: { 'X-Signature': signature }
                     }).then(response => {
                         if (response.data.code == 0) {

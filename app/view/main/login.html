@@ -60,7 +60,7 @@
                 loginCheck() {
                     let data = { qrcode_key: this.qrcode_key }
                     let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
-                    axios.post('/api/login-check', data, {
+                    axios.post('/api/robot/login-check', data, {
                         headers: { 'X-Signature': signature }
                     }).then(response => {
                         if (response.data.data.code == 0) {
