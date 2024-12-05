@@ -1,6 +1,6 @@
 <?php
 
-namespace app\controller;
+namespace app\controller\robot;
 
 use Carbon\Carbon;
 use Carbon\Exceptions\InvalidTimeZoneException;
@@ -27,7 +27,11 @@ class ApiController
             $user_info = Bililive\Login::getUserInfo($cookie);
             if (!$user_info['is_login']) {
                 Tools\FileUtils::fileDelete(runtime_path() . '/tmp/cookie.cfg');
+                Tools\FileUtils::fileDelete(runtime_path() . '/tmp/uid.cfg');
             }
+        }
+        if (isset($user_info['uid'])) {
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/uid.cfg', $user_info['uid']);
         }
         // 返回数据
         return success($request, [
@@ -300,6 +304,7 @@ class ApiController
     {
         // 删除配置信息
         Tools\FileUtils::fileDelete(runtime_path() . '/tmp/cookie.cfg');
+        Tools\FileUtils::fileDelete(runtime_path() . '/tmp/uid.cfg');
         Tools\FileUtils::fileDelete(runtime_path() . '/tmp/connect.cfg');
         // 重启websocket
         restartBilibili();

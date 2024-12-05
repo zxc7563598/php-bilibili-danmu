@@ -5,6 +5,7 @@ namespace app\server;
 use app\queue\SendMessage;
 use app\server\core\KeywordEvaluator;
 use app\server\core\KeywordMatcher;
+use Hejunjie\Bililive;
 use Exception;
 use Carbon\Exceptions\InvalidTimeZoneException;
 use support\Redis;
@@ -34,13 +35,15 @@ class Autoresponders
             'ruid' => $ruid,
             'guard_level' => $guard_level
         ]);
+        // 不处理自己发送的消息
+        $robot_uid = strval(readFileContent(runtime_path() . '/tmp/uid.cfg'));
         // 获取自动回复配置
         $autoresponders = readFileContent(runtime_path() . '/tmp/autoresponders.cfg');
         if ($autoresponders) {
             $autoresponders = json_decode($autoresponders, true);
         }
         // 开启自动回复
-        if (isset($autoresponders['opens']) && $autoresponders['opens']) {
+        if (isset($autoresponders['opens']) && $autoresponders['opens'] && $uid != $robot_uid) {
             $autoresponders_type = intval($autoresponders['type']); // 类型
             $autoresponders_status = intval($autoresponders['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
             $autoresponders_content = $autoresponders['content']; // 内容
