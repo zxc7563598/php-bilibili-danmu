@@ -1,6 +1,6 @@
 <?php
 
-namespace app\controller;
+namespace app\controller\robot;
 
 use Carbon\Carbon;
 use Carbon\Exceptions\InvalidTimeZoneException;

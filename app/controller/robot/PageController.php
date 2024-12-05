@@ -1,6 +1,6 @@
 <?php
 
-namespace app\controller;
+namespace app\controller\robot;
 
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
