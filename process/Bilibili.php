@@ -341,6 +341,7 @@ class Bilibili
         if ($this->reconnectAttempts >= $this->maxReconnectAttempts) {
             echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "已达到最大重连次数，不再尝试连接。\n";
             Tools\FileUtils::fileDelete(runtime_path() . '/tmp/cookie.cfg');
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/uid.cfg');
             Tools\FileUtils::fileDelete(runtime_path() . '/tmp/connect.cfg');
             $this->cookie = null;
             $this->roomId = null;
