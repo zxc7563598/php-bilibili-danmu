@@ -50,7 +50,8 @@ done
 # 使用初始 root 密码登录，更新 root 密码和创建普通用户
 mysql -h mysql -u root -pinit0925 <<EOF
 CREATE DATABASE IF NOT EXISTS \`${DB_USER}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-GRANT ALL PRIVILEGES ON \`${DB_USER}\`.* TO '${DB_NAME}'@'%' IDENTIFIED BY '${DB_PASSWORD}';
+CREATE USER IF NOT EXISTS '${DB_NAME}'@'%' IDENTIFIED BY '${DB_PASSWORD}';
+GRANT ALL PRIVILEGES ON *.* TO '${DB_NAME}'@'%' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 EOF
 
@@ -63,7 +64,6 @@ sed -i "s/^DB_PASSWORD=.*/DB_PASSWORD=${DB_PASSWORD}/" /var/www/bilibili_danmu/.
 
 # 输出新生成的密码信息（可选，生产环境中建议避免直接打印）
 echo "MySQL setup complete."
-echo "Root Password: ${MYSQL_ROOT_PASSWORD}"
 echo "Database: ${DB_NAME}"
 echo "User Password: ${DB_PASSWORD}"
 
