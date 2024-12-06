@@ -35,3 +35,37 @@ if grep -q "SECURE_API_KEY=" $ENV_FILE; then
 else
     echo "SECURE_API_KEY=$SECURE_API_KEY" >> $ENV_FILE
 fi
+
+# 生成随机的 MySQL root 密码和普通用户密码
+MYSQL_ROOT_PASSWORD=$(openssl rand -base64 16)
+DB_USER="bilibili_$(openssl rand -hex 4)"
+DB_PASSWORD=$(openssl rand -base64 12)
+DB_NAME=bilibili_danmu
+
+# 等待 MySQL 启动完成
+until mysqladmin ping -h "mysql" --silent; do
+    echo "Waiting for MySQL to be ready..."
+    sleep 5
+done
+
+# 使用初始 root 密码登录，更新 root 密码和创建普通用户
+mysql -h mysql -u root -pyour_initial_root_password <<EOF
+ALTER USER 'root'@'%' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+CREATE DATABASE IF NOT EXISTS \`${DB_USER}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT ALL PRIVILEGES ON \`${DB_USER}\`.* TO '${DB_NAME}'@'%' IDENTIFIED BY '${DB_PASSWORD}';
+FLUSH PRIVILEGES;
+EOF
+
+# 替换 .env 文件中的占位符
+sed -i "s/^DB_HOST=.*/DB_HOST=mysql/" /var/www/bilibili_danmu/.env
+sed -i "s/^DB_PORT=.*/DB_PORT=3306/" /var/www/bilibili_danmu/.env
+sed -i "s/^DB_USER=.*/DB_USER=${DB_USER}/" /var/www/bilibili_danmu/.env
+sed -i "s/^DB_NAME=.*/DB_NAME=${DB_NAME}/" /var/www/bilibili_danmu/.env
+sed -i "s/^DB_PASSWORD=.*/DB_PASSWORD=${DB_PASSWORD}/" /var/www/bilibili_danmu/.env
+
+# 输出新生成的密码信息（可选，生产环境中建议避免直接打印）
+echo "MySQL setup complete."
+echo "Root Password: ${MYSQL_ROOT_PASSWORD}"
+echo "Database: ${DB_NAME}"
+echo "User Password: ${DB_PASSWORD}"
+
