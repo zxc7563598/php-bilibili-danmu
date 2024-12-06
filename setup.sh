@@ -37,7 +37,6 @@ else
 fi
 
 # 生成随机的 MySQL root 密码和普通用户密码
-MYSQL_ROOT_PASSWORD=$(openssl rand -base64 16)
 DB_USER="bilibili_$(openssl rand -hex 4)"
 DB_PASSWORD=$(openssl rand -base64 12)
 DB_NAME=bilibili_danmu
@@ -49,8 +48,7 @@ until mysqladmin ping -h "mysql" --silent; do
 done
 
 # 使用初始 root 密码登录，更新 root 密码和创建普通用户
-mysql -h mysql -u root -pyour_initial_root_password <<EOF
-ALTER USER 'root'@'%' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+mysql -h mysql -u root -pinit0925 <<EOF
 CREATE DATABASE IF NOT EXISTS \`${DB_USER}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 GRANT ALL PRIVILEGES ON \`${DB_USER}\`.* TO '${DB_NAME}'@'%' IDENTIFIED BY '${DB_PASSWORD}';
 FLUSH PRIVILEGES;
