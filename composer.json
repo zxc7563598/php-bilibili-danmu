@@ -36,7 +36,11 @@
     "psr/container": "^1.1.1",
     "illuminate/redis": "^11.30",
     "illuminate/events": "^11.30",
-    "robmorgan/phinx": "^0.16.5"
+    "robmorgan/phinx": "^0.16.5",
+    "yzh52521/webman-mailer": "^1.1",
+    "ramsey/uuid": "^4.7",
+    "illuminate/database": "^11.34",
+    "illuminate/pagination": "^11.34"
   },
   "suggest": {
     "ext-event": "For better performance. "
