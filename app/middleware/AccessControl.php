@@ -8,17 +8,23 @@ use Webman\Http\Request;
 
 class AccessControl implements MiddlewareInterface
 {
-    public function process(Request $request, callable $handler): Response
+    public function process(Request $request, callable $next): Response
     {
-        // 如果是options请求则返回一个空响应，否则继续向洋葱芯穿越，并得到一个响应
-        $response = $request->method() == 'OPTIONS' ? response('') : $handler($request);
-        // 给响应添加跨域相关的http头
+        $response = $next($request);
+
+        // 设置 CORS 头
         $response->withHeaders([
+            'Access-Control-Allow-Origin' => '*',
+            'Access-Control-Allow-Methods' => 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers' => 'Content-Type, Authorization',
             'Access-Control-Allow-Credentials' => 'true',
-            'Access-Control-Allow-Origin' => $request->header('origin', '*'),
-            'Access-Control-Allow-Methods' => $request->header('access-control-request-method', '*'),
-            'Access-Control-Allow-Headers' => $request->header('access-control-request-headers', '*'),
         ]);
+
+        // OPTIONS 预检请求的特殊处理
+        if ($request->method() === 'OPTIONS') {
+            return response('', 204, $response->getHeaders());
+        }
+
         return $response;
     }
 }
