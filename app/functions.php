@@ -17,7 +17,7 @@ function success($request, $data = [], $message = ''): Response
 {
     $request->res = [
         'code' => 0,
-        'message' => !empty($message) ? $message : '成功',
+        'message' => !empty($message) ? $message : config('code')[0],
         'data' => empty($data) ? (object)[] : $data
     ];
     return json($request->res, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION);
@@ -36,7 +36,7 @@ function fail($request, $code = 500, $data = [], $message = ''): Response
     // 记录错误信息
     $request->res = [
         'code' => $code,
-        'message' => !empty($message) ? $message : '失败',
+        'message' => !empty($message) ? $message : config('code')[$code],
         'data' => empty($data) ? (object)[] : $data
     ];
     return json($request->res, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION);
