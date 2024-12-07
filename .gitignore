@@ -11,3 +11,5 @@
 /public/config/
 .htaccess
 /public/.well-known/
+.DS_Store
+**/.DS_Store

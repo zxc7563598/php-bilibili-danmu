@@ -23,4 +23,9 @@ return [
     'runtime_path' => base_path(false) . DIRECTORY_SEPARATOR . 'runtime',
     'controller_suffix' => 'Controller',
     'controller_reuse' => false,
+    'api_url' => getenv('SYSTEM_API_URL'), // api链接
+    'image_url' => getenv('SYSTEM_API_URL') . '/attachment', // 图片链接
+    'aes_key' => getenv('SYSTEM_AES_KEY'),
+    'aes_iv' => getenv('SYSTEM_AES_IV'),
+    'key' => getenv('SYSTEM_KEY'),
 ];
