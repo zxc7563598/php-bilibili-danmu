@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of webman.
  *
@@ -13,5 +14,5 @@
  */
 
 return [
-    '' => support\exception\Handler::class,
+    '' => app\exception\Handler::class,
 ];
