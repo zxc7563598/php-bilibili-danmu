@@ -182,8 +182,8 @@ class UserController extends GeneralMethod
             'id_card' => !empty($user_vips->uid) ? $user_vips->uid : null,
             'real_name' => !empty($user_vips->name) ? $user_vips->name : null,
             'company' => [
-                'name' => isset($room_uinfo['uid']) ? $room_uinfo['uid'] : '',
-                'uid' => isset($room_uinfo['uname']) ? $room_uinfo['uname'] : '',
+                'uid' => isset($room_uinfo['uid']) ? $room_uinfo['uid'] : '',
+                'name' => isset($room_uinfo['uname']) ? $room_uinfo['uname'] : '',
                 'face' => isset($room_uinfo['face']) ? $room_uinfo['face'] : ''
             ],
             'signing_date' => Carbon::today()->timezone(config('app')['default_timezone'])->format('Y-m-d'),
