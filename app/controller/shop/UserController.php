@@ -184,6 +184,7 @@ class UserController extends GeneralMethod
             'company' => [
                 'name' => isset($room_uinfo['uid']) ? $room_uinfo['uid'] : '',
                 'uid' => isset($room_uinfo['uname']) ? $room_uinfo['uname'] : '',
+                'face' => isset($room_uinfo['face']) ? $room_uinfo['face'] : ''
             ],
             'signing_date' => Carbon::today()->timezone(config('app')['default_timezone'])->format('Y-m-d'),
             'signing' => !empty($user_vips->sign_image) ? getImageUrl($user_vips->sign_image) : null
