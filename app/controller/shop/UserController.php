@@ -174,14 +174,15 @@ class UserController extends GeneralMethod
         $goods_id = $param['goods_id'];
         // 获取数据
         $sn = $user_vips->created_at->timezone(config('app')['default_timezone'])->format('Ymd') . SupplementStr($user_vips->user_id);
+        $room_uinfo = !empty(strval(readFileContent(runtime_path() . '/tmp/room_uinfo.cfg'))) ? json_decode(strval(readFileContent(runtime_path() . '/tmp/room_uinfo.cfg')), true) : [];
         // 返回信息
         return success($request, [
             'sn' => $sn,
             'id_card' => !empty($user_vips->uid) ? $user_vips->uid : null,
             'real_name' => !empty($user_vips->name) ? $user_vips->name : null,
             'company' => [
-                'name' => '温以泠',
-                'uid' => '3494365156608185',
+                'name' => isset($room_uinfo['uid']) ? $room_uinfo['uid'] : '',
+                'uid' => isset($room_uinfo['uname']) ? $room_uinfo['uname'] : '',
             ],
             'signing_date' => Carbon::today()->timezone(config('app')['default_timezone'])->format('Y-m-d'),
             'signing' => !empty($user_vips->sign_image) ? getImageUrl($user_vips->sign_image) : null
