@@ -914,16 +914,16 @@
         },
         {
             "name": "hejunjie/bililive",
-            "version": "v1.0.1",
+            "version": "v1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zxc7563598/php-bilibili-danmu-core.git",
-                "reference": "3f440b5f291d78a8354158a408453001243af17b"
+                "reference": "613449daf8bb4d7a96c287a31794aea24c110c98"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zxc7563598/php-bilibili-danmu-core/zipball/3f440b5f291d78a8354158a408453001243af17b",
-                "reference": "3f440b5f291d78a8354158a408453001243af17b",
+                "url": "https://api.github.com/repos/zxc7563598/php-bilibili-danmu-core/zipball/613449daf8bb4d7a96c287a31794aea24c110c98",
+                "reference": "613449daf8bb4d7a96c287a31794aea24c110c98",
                 "shasum": ""
             },
             "require": {
@@ -955,9 +955,9 @@
             ],
             "support": {
                 "issues": "https://github.com/zxc7563598/php-bilibili-danmu-core/issues",
-                "source": "https://github.com/zxc7563598/php-bilibili-danmu-core/tree/v1.0.1"
+                "source": "https://github.com/zxc7563598/php-bilibili-danmu-core/tree/v1.0.2"
             },
-            "time": "2024-12-05T15:37:25+00:00"
+            "time": "2024-12-14T06:13:47+00:00"
         },
         {
             "name": "hejunjie/tools",
@@ -4817,12 +4817,12 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.2"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }
