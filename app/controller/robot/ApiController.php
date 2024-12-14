@@ -74,8 +74,8 @@ class ApiController
             // 房间连接成功，重启websocket
             if ($live_info['code'] == 0 && $reconnect) {
                 restartBilibili();
-                Tools\FileUtils::fileDelete(runtime_path() . '/tmp/room_uid.cfg');
-                Tools\FileUtils::writeToFile(runtime_path() . '/tmp/room_uid.cfg', $live_info['data']['uid']);
+                Tools\FileUtils::fileDelete(runtime_path() . '/tmp/room_uinfo.cfg');
+                Tools\FileUtils::writeToFile(runtime_path() . '/tmp/room_uinfo.cfg', json_encode($live_info['data'], JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
             }
         }
         // 返回数据
@@ -85,6 +85,8 @@ class ApiController
             'msg' => isset($live_info['msg']) ? $live_info['msg'] : '',
             'data' => [
                 'uid' => isset($live_info['data']['uid']) ? $live_info['data']['uid'] : 0, // uid
+                'uname' => isset($live_info['data']['uname']) ? $live_info['data']['uname'] : '', // uname
+                'face' => isset($live_info['data']['face']) ? $live_info['data']['face'] : '', // 头像
                 'room_id' => isset($live_info['data']['room_id']) ? $live_info['data']['room_id'] : 0, // 房间号
                 'attention' => isset($live_info['data']['attention']) ? $live_info['data']['attention'] : 0, // 关注数量
                 'online' => isset($live_info['data']['online']) ? $live_info['data']['online'] : 0, // 观看人数
