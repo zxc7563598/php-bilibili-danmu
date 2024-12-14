@@ -17,6 +17,7 @@ use resource\enums\UserAddressEnums;
 use resource\enums\RedemptionRecordsEnums;
 use Webman\Http\Response;
 use yzh52521\mailer\Mailer;
+use Hejunjie\Tools;
 
 class UserController extends GeneralMethod
 {
@@ -173,7 +174,7 @@ class UserController extends GeneralMethod
         // 获取参数
         $goods_id = $param['goods_id'];
         // 获取数据
-        $sn = $user_vips->created_at->timezone(config('app')['default_timezone'])->format('Ymd') . SupplementStr($user_vips->user_id);
+        $sn = $user_vips->created_at->timezone(config('app')['default_timezone'])->format('Ymd') . supplementStr($user_vips->user_id);
         $room_uinfo = !empty(strval(readFileContent(runtime_path() . '/tmp/room_uinfo.cfg'))) ? json_decode(strval(readFileContent(runtime_path() . '/tmp/room_uinfo.cfg')), true) : [];
         // 返回信息
         return success($request, [
@@ -205,7 +206,7 @@ class UserController extends GeneralMethod
         // 获取参数
         $base64 = $param['base64'];
         // base64存储图片
-        $path = public_path('attachment/user-info/' . implode('/', SplitStr(SupplementStr($user_vips->user_id), 2)) . '/signing/');
+        $path = public_path('attachment/user-info/' . implode('/', splitStr(supplementStr($user_vips->user_id), 2)) . '/signing/');
         $storage = ImageStorageBase64($path, $base64);
         if (is_int($storage)) {
             return fail($request, $storage);
