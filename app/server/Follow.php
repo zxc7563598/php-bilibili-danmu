@@ -43,7 +43,7 @@ class Follow
             // 确认链接直播间的情况
             $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
             $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
-            $room_uid = intval(readFileContent(runtime_path() . '/tmp/room_uid.cfg'));
+            $room_uinfo = !empty(strval(readFileContent(runtime_path() . '/tmp/room_uinfo.cfg'))) ? json_decode(strval(readFileContent(runtime_path() . '/tmp/room_uinfo.cfg')), true) : [];
             if ($cookie && $room_id) {
                 // 验证牌子
                 $medal = false;
@@ -52,12 +52,12 @@ class Follow
                         $medal = true;
                         break;
                     case 1: // 仅答谢牌子
-                        if ($room_uid == $ruid) {
+                        if (isset($room_uinfo['uid']) && $room_uinfo['uid'] == $ruid) {
                             $medal = true;
                         }
                         break;
                     case 2: // 仅答谢航海
-                        if (($room_uid == $ruid) && ($guard_level > 0)) {
+                        if ((isset($room_uinfo['uid']) && $room_uinfo['uid'] == $ruid) && ($guard_level > 0)) {
                             $medal = true;
                         }
                         break;

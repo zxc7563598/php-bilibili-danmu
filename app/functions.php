@@ -139,3 +139,18 @@ function isDocker(): bool
     }
     return false;
 }
+
+/**
+ * 获取图片地址信息
+ *
+ * @param string $str 路径信息
+ * 
+ * @return string
+ */
+function getImageUrl($str): string
+{
+    if (strpos($str, 'http://') === false && strpos($str, 'https://') === false) {
+        $str = config('app')['image_url'] . '/' . $str;
+    }
+    return $str;
+}
