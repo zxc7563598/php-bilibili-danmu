@@ -174,7 +174,7 @@ class UserController extends GeneralMethod
         // 获取参数
         $goods_id = $param['goods_id'];
         // 获取数据
-        $sn = $user_vips->created_at->timezone(config('app')['default_timezone'])->format('Ymd') . supplementStr($user_vips->user_id);
+        $sn = $user_vips->created_at->timezone(config('app')['default_timezone'])->format('Ymd') . Tools\Str::padString(0, $user_vips->user_id);
         $room_uinfo = !empty(strval(readFileContent(runtime_path() . '/tmp/room_uinfo.cfg'))) ? json_decode(strval(readFileContent(runtime_path() . '/tmp/room_uinfo.cfg')), true) : [];
         // 返回信息
         return success($request, [
@@ -206,10 +206,10 @@ class UserController extends GeneralMethod
         sublog('积分商城', '签名上传', '===================');
         // 获取参数
         $base64 = $param['base64'];
-        // base64存储图片
-        $path = public_path('attachment/user-info/' . implode('/', splitStr(supplementStr($user_vips->user_id), 2)) . '/signing/');
+        // base64存储图片 
+        $path = public_path('attachment/user-info/' . implode('/', str_split(Tools\Str::padString(0, $user_vips->user_id), 2)) . '/signing/');
         $base64ToImage = Tools\Img::base64ToImage($base64, $path);
-        $image_path = replaceFirst(public_path() . '/attachment/', '', $base64ToImage);
+        $image_path = Tools\Str::replaceFirst(public_path() . '/attachment/', '', $base64ToImage);
         $user_vips->sign_image = $image_path;
         $user_vips->save();
         // 返回数据
@@ -586,7 +586,7 @@ class UserController extends GeneralMethod
         if (is_int($storage)) {
             return fail($request, $storage);
         }
-        $image_path = replaceFirst(public_path() . '/attachment/', '', $storage);
+        $image_path = Tools\Str::replaceFirst(public_path() . '/attachment/', '', $storage);
         sublog('接口调用', '简单的图片Base64上传', json_encode([
             'path' => $image_path,
             'url' => getImageUrl($image_path)
