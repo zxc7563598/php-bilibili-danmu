@@ -172,7 +172,8 @@ class ShopController extends GeneralMethod
                 'amount' => round($goods->amount),
                 'commodity_type' => implode(',', $commodity_type),
                 'freight_fee' => '主包包邮',
-                'address' => ($goods->type == GoodsEnums\Type::Virtually->value || $goods->type == GoodsEnums\Type::Tribute->value) ? false : true
+                'address' => ($goods->type == GoodsEnums\Type::Virtually->value || $goods->type == GoodsEnums\Type::Tribute->value) ? false : true,
+                'protocols' => !empty($user_vips->sign_image) ? true : false
             ]
         ]);
     }
