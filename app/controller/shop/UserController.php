@@ -209,7 +209,7 @@ class UserController extends GeneralMethod
         // base64存储图片
         $path = public_path('attachment/user-info/' . implode('/', splitStr(supplementStr($user_vips->user_id), 2)) . '/signing/');
         $base64ToImage = Tools\Img::base64ToImage($base64, $path);
-        $image_path = ReplaceFirst(public_path() . '/attachment/', '', $base64ToImage);
+        $image_path = replaceFirst(public_path() . '/attachment/', '', $base64ToImage);
         $user_vips->sign_image = $image_path;
         $user_vips->save();
         // 返回数据
@@ -586,7 +586,7 @@ class UserController extends GeneralMethod
         if (is_int($storage)) {
             return fail($request, $storage);
         }
-        $image_path = ReplaceFirst(public_path() . '/attachment/', '', $storage);
+        $image_path = replaceFirst(public_path() . '/attachment/', '', $storage);
         sublog('接口调用', '简单的图片Base64上传', json_encode([
             'path' => $image_path,
             'url' => getImageUrl($image_path)
