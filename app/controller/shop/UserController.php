@@ -41,7 +41,8 @@ class UserController extends GeneralMethod
             'province' => 'province',
             'city' => 'city',
             'county' => 'county',
-            'detail' => 'detail'
+            'detail' => 'detail',
+            'selected' => 'selected'
         ]);
         // 返回数据
         return success($request, [
