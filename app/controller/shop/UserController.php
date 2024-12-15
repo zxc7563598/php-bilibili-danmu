@@ -208,11 +208,8 @@ class UserController extends GeneralMethod
         $base64 = $param['base64'];
         // base64存储图片
         $path = public_path('attachment/user-info/' . implode('/', splitStr(supplementStr($user_vips->user_id), 2)) . '/signing/');
-        $storage = ImageStorageBase64($path, $base64);
-        if (is_int($storage)) {
-            return fail($request, $storage);
-        }
-        $image_path = ReplaceFirst(public_path() . '/attachment/', '', $storage);
+        $base64ToImage = Tools\Img::base64ToImage($base64, $path);
+        $image_path = ReplaceFirst(public_path() . '/attachment/', '', $base64ToImage);
         $user_vips->sign_image = $image_path;
         $user_vips->save();
         // 返回数据
@@ -585,7 +582,7 @@ class UserController extends GeneralMethod
                 break;
         }
         // base64存储图片
-        $storage = ImageStorageBase64($path, $base64);
+        $storage = imageStorageBase64($path, $base64);
         if (is_int($storage)) {
             return fail($request, $storage);
         }
