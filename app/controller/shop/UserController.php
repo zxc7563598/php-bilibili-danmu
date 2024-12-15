@@ -439,15 +439,15 @@ class UserController extends GeneralMethod
         // 发送邮件
         sublog('邮件发送', '积分商城投诉', $subject);
         sublog('邮件发送', '积分商城投诉', $set_html_body);
-        $mailer = Mailer::setFrom(['992182040@qq.com' => "积分商城投诉"])
-            ->setTo('junjie.he.925@gmail.com')
-            ->setCc('482335887@qq.com')
-            ->setSubject($subject)
-            ->setHtmlBody($set_html_body)
-            ->send();
-        sublog('邮件发送', '积分商城投诉', '发送结果');
-        sublog('邮件发送', '积分商城投诉', $mailer);
-        sublog('邮件发送', '积分商城投诉', '----------');
+        // $mailer = Mailer::setFrom(['992182040@qq.com' => "积分商城投诉"])
+        //     ->setTo('junjie.he.925@gmail.com')
+        //     ->setCc('482335887@qq.com')
+        //     ->setSubject($subject)
+        //     ->setHtmlBody($set_html_body)
+        //     ->send();
+        // sublog('邮件发送', '积分商城投诉', '发送结果');
+        // sublog('邮件发送', '积分商城投诉', $mailer);
+        // sublog('邮件发送', '积分商城投诉', '----------');
         // 返回成功
         return success($request, []);
     }
