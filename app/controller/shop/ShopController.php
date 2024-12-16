@@ -226,20 +226,20 @@ class ShopController extends GeneralMethod
         $title = '下单成功！';
         $content = '已经在安排啦';
         $button = '回到首页';
-        $images = getImageUrl('/order/orderFail.png');
+        $images = getImageUrl('order/orderFail.png');
         // 处理信息
         switch ($type) {
             case GoodsEnums\Type::Virtually->value: // 虚拟
                 $title = '下单成功！';
                 $content = '已经在给你准备啦！记得抓紧来找我要嗷～';
                 $button = '啊啊啊啊啊我来了我来了';
-                $images = getImageUrl('/order/orderFail.png');
+                $images = getImageUrl('order/orderFail.png');
                 break;
             case GoodsEnums\Type::Entity->value: // 实体
                 $title = '下单成功！';
                 $content = '已经收到通知啦，很快就会发货嘿嘿嘿';
                 $button = '我自愿体谅主包的辛苦，晚点发也可以';
-                $images = getImageUrl('/order/orderFail.png');
+                $images = getImageUrl('order/orderFail.png');
                 break;
             case GoodsEnums\Type::Tribute->value: // 贡
                 $title = '...';
@@ -284,7 +284,7 @@ class ShopController extends GeneralMethod
                     $content = "上供都上这么勤快真贱啊，废物玩意\r\n你也就只配上供了知道吗臭傻逼\r\n给我多去赚点积分，在这个第一大傻逼的位子上待着\r\n方便我什么时候心情好了骂你两句";
                 }
                 $button = '呜呜呜主人我会继续努力的';
-                $images = getImageUrl('/order/orderFail.png');
+                $images = getImageUrl('order/orderFail.png');
                 break;
         }
         // 返回数据
