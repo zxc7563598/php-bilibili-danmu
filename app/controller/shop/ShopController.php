@@ -280,7 +280,7 @@ class ShopController extends GeneralMethod
                 if ($ranking <= 5) {
                     $content = "你可真是个垃圾\r\n怎么，花钱给主播上供让你感觉很好吗？\r\n才上到个第" . $ranking . "名，你也就这点能耐了，没用的东西\r\n这么爱上就多上点，让我看看你废物到什么程度";
                 }
-                if ($ranking <= 5) {
+                if ($ranking == 1) {
                     $content = "上供都上这么勤快真贱啊，废物玩意\r\n你也就只配上供了知道吗臭傻逼\r\n给我多去赚点积分，在这个第一大傻逼的位子上待着\r\n方便我什么时候心情好了骂你两句";
                 }
                 $button = '呜呜呜主人我会继续努力的';
