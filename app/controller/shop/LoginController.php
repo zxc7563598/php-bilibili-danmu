@@ -119,7 +119,7 @@ class LoginController extends GeneralMethod
             'uname' => $user_vips->name,
             'point' => $user_vips->point,
             'type' => UserVipsEnums\VipType::from($user_vips->vip_type)->label(),
-            'avatar' => getImageUrl('/user/avatar.png')
+            'avatar' => getImageUrl('user/avatar.png')
         ]);
     }
 }
