@@ -53,21 +53,11 @@ Route::group('/api/shop', function () {
     Route::post('/user/get-consumers', [app\controller\shop\UserController::class, 'getConsumers']); // 开通记录
     Route::post('/user/get-redeeming', [app\controller\shop\UserController::class, 'getRedeeming']); // 兑换记录
     Route::post('/user/set-complaint', [app\controller\shop\UserController::class, 'setComplaint']); // 投诉上传
-    Route::post('/user/add-consumers', [app\controller\shop\UserController::class, 'addConsumers']); // 补充开通记录
-    Route::post('/user/add-redemption', [app\controller\shop\UserController::class, 'addRedemption']); // 增加兑换记录
-    Route::post('/user/get-redeeming-address', [app\controller\shop\UserController::class, 'getRedeemingAddress']); // 获取地址
-    Route::post('/user/set-redeeming-complete', [app\controller\shop\UserController::class, 'setRedeemingComplete']); // 标记完成
-
-    Route::post('/user/upload-base64-images', [app\controller\shop\UserController::class, 'uploadBase64Images']); // 图片上传
 
     Route::post('/user/get-protocol-credit', [app\controller\shop\UserController::class, 'getProtocolCredit']); // 获取赊销协议
     Route::post('/user/upload-signing', [app\controller\shop\UserController::class, 'uploadSigning']); // 签名上传
     Route::post('/shop/confirm-product', [app\controller\shop\ShopController::class, 'confirmProduct']); // 确认下单
-    Route::post('/shop/dedication-ranking', [app\controller\shop\ShopController::class, 'dedicationRanking']); // 上供排名
-
-    Route::post('/shop/get-product-list', [app\controller\shop\ShopController::class, 'getProductList']); // 确认下单
-    Route::post('/shop/get-product-details', [app\controller\shop\ShopController::class, 'getProductDetails']); // 确认下单
-    Route::post('/shop/set-product', [app\controller\shop\ShopController::class, 'setProduct']); // 确认下单
+    Route::post('/shop/get-transactions-success', [app\controller\shop\ShopController::class, 'getTransactionsSuccess']); // 获取交易成功页面信息
 })->middleware([
     app\middleware\AccessControl::class,
     app\middleware\ApiAuthCheck::class

