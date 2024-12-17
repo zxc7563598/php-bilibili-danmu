@@ -320,6 +320,9 @@ class UserController extends GeneralMethod
     /**
      * 上传投诉
      *
+     * @param string $title 投诉标题
+     * @param string $complaint 投诉内容
+     *
      * @return Response
      */
     public function setComplaint(Request $request): Response
