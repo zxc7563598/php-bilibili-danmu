@@ -21,6 +21,20 @@ use support\Request;
 Route::get('/', [app\controller\robot\PageController::class, 'main'])->middleware([app\middleware\BasicAuthMiddleware::class]);
 Route::get('/login', [app\controller\robot\PageController::class, 'login'])->middleware([app\middleware\BasicAuthMiddleware::class]);
 
+// 积分商城
+Route::group('/points-mall', function () {
+    Route::get('/dashboard', [app\controller\shop\ManagementController::class, 'pageDashboard']); // 仪表盘
+    Route::get('/system-configuration', [app\controller\shop\ManagementController::class, 'pageSystemConfiguration']); // 系统配置
+    Route::get('/mall-configuration', [app\controller\shop\ManagementController::class, 'pageMallConfiguration']); // 商城配置
+    Route::get('/user-management', [app\controller\shop\ManagementController::class, 'pageUserManagement']); // 用户管理
+    Route::get('/product-management', [app\controller\shop\ManagementController::class, 'pageProductManagement']); // 商品管理
+    Route::get('/shipping-management', [app\controller\shop\ManagementController::class, 'pageShippingManagement']); // 发货管理
+    Route::get('/complaint-management', [app\controller\shop\ManagementController::class, 'pageComplaintManagement']); // 投诉管理
+    Route::get('/feedback', [app\controller\shop\ManagementController::class, 'pageFeedback']); // 问题反馈
+})->middleware([
+    app\middleware\BasicAuthMiddleware::class
+]);
+
 Route::group('/api/robot', function () {
     Route::any('/login-check', [app\controller\robot\ApiController::class, 'loginCheck']);
     Route::any('/login-out', [app\controller\robot\ApiController::class, 'loginOut']);
@@ -33,7 +47,6 @@ Route::group('/api/robot', function () {
 })->middleware([
     app\middleware\SignatureMiddleware::class
 ]);
-
 
 // API接口
 Route::group('/api/shop', function () {

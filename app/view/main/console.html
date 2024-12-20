@@ -118,6 +118,9 @@
         加载中，请稍候...
     </div>
     <div id="app" style="background-color: var(--bulma-scheme-main);">
+        <div class="container" style="padding: 1rem;">
+            <button class="button is-link is-outlined" @click="goPointsMall" style="width:100%">进入积分商城</button>
+        </div>
         <div class="container p-4">
             <!-- 动态通知框 -->
             <transition name="slide-fade" @after-leave="resetNotification">
@@ -1160,6 +1163,10 @@
                 this.getConfig()
             },
             methods: {
+                // 前往积分商城
+                goPointsMall() {
+                    window.location.href = "/points-mall/dashboard";
+                },
                 // 配置按钮切换
                 configSwitch(type, opens) {
                     switch (type) {

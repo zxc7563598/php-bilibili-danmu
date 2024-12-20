@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>积分商城控制台</title>
+    <script src="/js/vue.3.5.12.js"></script>
+    <script src="/js/axios.min.js"></script>
+    <?php include 'layout/style.php'; ?>
+    <style>
+        .table-container {
+            overflow-x: auto;
+            white-space: nowrap;
+            /* 禁止内容换行 */
+        }
+
+        .table-container::-webkit-scrollbar {
+            height: 8px;
+            /* 滚动条高度 */
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 顶部 Navbar -->
+    <?php $currentPage = 'product-management'; ?>
+    <?php include 'layout/navbar.php'; ?>
+    <!-- 主要区域 -->
+    <div class="columns menu-container">
+        <!-- 左侧菜单栏 -->
+        <?php include 'layout/menu.php'; ?>
+        <!-- 主要内容区域 -->
+        <div class="column" id="main-content">
+            <div style="padding: 1rem;">
+                <div class="columns is-multiline">
+                    <div class="column is-full">
+                        <div class="card">
+                            <div class="card-content">
+                                <div class="columns is-multiline">
+                                    <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
+                                        <div class="field">
+                                            <label class="label">商品名称</label>
+                                            <div class="control">
+                                                <input class="input" type="text" placeholder="">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
+                                        <div class="field">
+                                            <label class="label">商品类型</label>
+                                            <div class="control">
+                                                <div class="select is-fullwidth">
+                                                    <select>
+                                                        <option>请选择</option>
+                                                        <option>虚拟商品</option>
+                                                        <option>实体商品</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile"
+                                        style="display: flex;">
+                                        <button class="button is-success" style="flex:1">搜索</button>
+                                        <div style="width: 1rem;"></div>
+                                        <button class="button is-light" style="flex:1">重置</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="columns is-multiline">
+                    <div class="column is-full">
+                        <div class="card">
+                            <div class="card-content table-container">
+                                <table class="table is-fullwidth is-striped is-hoverable">
+                                    <thead>
+                                        <tr>
+                                            <th>封面图</th>
+                                            <th>商品名称</th>
+                                            <th>商品价格</th>
+                                            <th>商品类型</th>
+                                            <th>排序</th>
+                                            <th>状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <figure class="image is-64x64">
+                                                    <img
+                                                        src="https://bulma.io/assets/images/placeholders/128x128.png" />
+                                                </figure>
+                                            </td>
+                                            <td>膜锡liber</td>
+                                            <td>舰长</td>
+                                            <td>2024-02-25 07:12:37</td>
+                                            <td>2024-03-25 07:12:37</td>
+                                            <td>0</td>
+                                            <td>
+                                                <button class="button is-light">变更</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <figure class="image is-64x64">
+                                                    <img
+                                                        src="https://bulma.io/assets/images/placeholders/128x128.png" />
+                                                </figure>
+                                            </td>
+                                            <td>膜锡liber</td>
+                                            <td>舰长</td>
+                                            <td>2024-02-25 07:12:37</td>
+                                            <td>2024-03-25 07:12:37</td>
+                                            <td>0</td>
+                                            <td>
+                                                <button class="button is-light">变更</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <figure class="image is-64x64">
+                                                    <img
+                                                        src="https://bulma.io/assets/images/placeholders/128x128.png" />
+                                                </figure>
+                                            </td>
+                                            <td>膜锡liber</td>
+                                            <td>舰长</td>
+                                            <td>2024-02-25 07:12:37</td>
+                                            <td>2024-03-25 07:12:37</td>
+                                            <td>0</td>
+                                            <td>
+                                                <button class="button is-light">变更</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 底部 Footer -->
+    <?php include 'layout/footer.php'; ?>
+</body>
+
+</html>
