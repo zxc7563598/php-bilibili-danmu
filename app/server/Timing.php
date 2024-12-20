@@ -101,8 +101,24 @@ class Timing
             $text = $content[mt_rand(0, (count($content) - 1))];
             if (!empty($text)) {
                 // 加入消息发送队列
-                SendMessage::push($text, 10);
-                sublog('逻辑检测', '定时广告', '发送数据：' . $text);
+                $lockKey = config('app')['app_name'] . ':send_message_lock';
+                $timing = readFileContent(runtime_path() . '/tmp/timing.cfg');
+                $lockExpiration = false;
+                if ($timing) {
+                    $timing = json_decode($timing, true);
+                    $lockExpiration = $timing['intervals'];
+                }
+                if (!$lockExpiration) {
+                    $lockExpiration = 60;
+                }
+                if (!Redis::get($lockKey)) {
+                    SendMessage::push($text, 10);
+                    // 设置锁，过期时间为 $lockExpiration - 1 秒
+                    Redis::setEx($lockKey, $lockExpiration - 1, 'locked');
+                    sublog('逻辑检测', '定时广告', '发送数据：' . $text);
+                } else {
+                    sublog('逻辑检测', '定时广告', '死锁：' . $text);
+                }
             }
         }
     }
