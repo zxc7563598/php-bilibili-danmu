@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>积分商城控制台</title>
+    <script src="/js/vue.3.5.12.js"></script>
+    <script src="/js/axios.min.js"></script>
+    <?php include 'layout/style.php'; ?>
+    <link href="/css/quill.snow.css" rel="stylesheet">
+    <script src="/js/quill.min.js"></script>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+    <!-- 顶部 Navbar -->
+    <?php $currentPage = 'mall-configuration'; ?>
+    <?php include 'layout/navbar.php'; ?>
+    <!-- 主要区域 -->
+    <div class="columns menu-container">
+        <!-- 左侧菜单栏 -->
+        <?php include 'layout/menu.php'; ?>
+        <!-- 主要内容区域 -->
+        <div class="column" id="main-content">
+            <div style="padding: 1rem;">
+                <div class="columns is-multiline">
+                    <div class="column is-full">
+                        <div class="card">
+                            <header class="card-header">
+                                <p class="card-header-title">商城设置</p>
+                            </header>
+                            <div class="card-content">
+                                <div class="field">
+                                    <label class="label">登录页面背景图</label>
+                                    <div class="control">
+                                        <figure class="image is-128x128">
+                                            <img src="https://bulma.io/assets/images/placeholders/128x128.png" />
+                                        </figure>
+                                    </div>
+                                    <p class="help">此配置项决定商城登录页面的背景图，<a
+                                            href="/attachment/default/login.png">点击查看页面样式</a>，背景图将展示在登录框背后，提供视觉美化和用户体验的提升。登录框本身是半透明的，不会完全遮挡背景图。调整该背景图后，确保页面主体内容能够在背景图上清晰展示，不会与背景图产生冲突或遮挡重要信息。
+                                    </p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">个人中心背景图</label>
+                                    <div class="control">
+                                        <figure class="image is-128x128">
+                                            <img src="https://bulma.io/assets/images/placeholders/128x128.png" />
+                                        </figure>
+                                    </div>
+                                    <p class="help">此配置项决定个人中心页面的背景图，<a
+                                            href="/attachment/default/user.png">点击查看页面样式</a>，背景图展示在个人信息部分的后面，通常会与页面底部的内容产生重叠。背景图的显示区域可能会遮挡部分内容，且底部会使用渐变效果与背景色相匹配。为了确保良好的视觉效果，建议控制背景图的高度。
+                                    </p>
+                                </div>
+                                <div class="field">
+                                    <label class="label" onclick="neirong()">主题色</label>
+                                    <div class="control">
+                                        <input type="color" class="form-control form-control-color"
+                                            id="exampleColorInput" value="#563d7c" title="Choose your color">
+                                        <input type="color" class="form-control form-control-color"
+                                            id="exampleColorInput" value="#563d7c" title="Choose your color">
+                                    </div>
+                                    <p class="help">
+                                        此配置项决定整个商城的主主题色，调整后会影响页面中所有与主题色相关的元素，如按钮颜色、链接颜色、文本强调色等。主题色的变化不仅会改变页面的整体视觉风格，还会影响商城的用户交互体验。第二个主题色（副主题色）可以与主主题色相同，也可以与主主题色有所不同。如果副主题色与主主题色不同，按钮的颜色将呈现从主主题色到副主题色的渐变效果。
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-full">
+                        <div class="card">
+                            <header class="card-header">
+                                <p class="card-header-title">协议相关</p>
+                            </header>
+                            <div class="card-content">
+                                <div class="field">
+                                    <label class="label">协议人名称</label>
+                                    <div class="control">
+                                        <input class="input" type="text" placeholder="协议人名称">
+                                    </div>
+                                    <p class="help">指与用户签署协议的人员名称（通常为主播的名称），可根据需要自由填写，但建议填写真实的 B 站名称以确保用户识别和信任。</p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">协议人UID</label>
+                                    <div class="control">
+                                        <input class="input" type="text" placeholder="协议人UID">
+                                    </div>
+                                    <p class="help">指与用户签署协议的人员唯一标识（通常为主播的 B 站 UID），可自由填写，但建议填写真实的 B 站 UID 以确保准确性和可信度。
+                                    </p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">协议名称</label>
+                                    <div class="control">
+                                        <input class="input" type="text" placeholder="协议名称">
+                                    </div>
+                                    <p class="help">
+                                        此配置项决定用户在兑换商品并填写地址确认下单时，需要签署并确认的协议名称。该协议名称是商城交易过程中必不可少的一部分，用户在确认订单前必须阅读并同意该协议。根据项目需求，可以自定义该协议名称。
+                                    </p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">协议内容</label>
+                                    <div class="control">
+                                        <div id="editor-container" class="box">
+                                            <!-- Quill 编辑器会初始化在这里 -->
+                                        </div>
+                                    </div>
+                                    <p class="help">此配置项允许自定义协议的正文内容，完整的协议由 <b>协议标题</b> + <b>协议双方成员信息</b> + <b>协议正文</b>
+                                        + <b>协议双方签名</b> 四部分组成，用户需在下单前阅读并同意协议才能继续交易。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-full">
+                        <div class="card">
+                            <header class="card-header">
+                                <p class="card-header-title">虚拟礼物设置</p>
+                            </header>
+                            <div class="card-content">
+                                <article class="message is-small">
+                                    <div class="message-body">
+                                        虚拟礼物下单成功后的通知页面：<a href="/attachment/default/type-0.png">点击查看页面样式</a><br>
+                                        页面由 <strong>图标</strong> + <strong>通知内容</strong> + <strong>回到首页的按钮</strong>
+                                        三部分组成<br>
+                                        三部分可以自由设置
+                                    </div>
+                                </article>
+                                <div class="field">
+                                    <label class="label">下单成功图标</label>
+                                    <div class="control">
+                                        <figure class="image is-128x128">
+                                            <img src="https://bulma.io/assets/images/placeholders/128x128.png" />
+                                        </figure>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">下单成功通知内容</label>
+                                    <div class="control">
+                                        <textarea class="textarea" placeholder="下单成功通知内容"></textarea>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">下单成功按钮内容</label>
+                                    <div class="control">
+                                        <input class="input" type="text" placeholder="下单成功按钮内容">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-full">
+                        <div class="card">
+                            <header class="card-header">
+                                <p class="card-header-title">实体礼物设置</p>
+                            </header>
+                            <div class="card-content">
+                                <article class="message is-small">
+                                    <div class="message-body">
+                                        实体礼物下单成功后的通知页面：<a href="/attachment/default/type-1.png">点击查看页面样式</a><br>
+                                        页面由 <strong>图标</strong> + <strong>通知内容</strong> + <strong>回到首页的按钮</strong>
+                                        三部分组成<br>
+                                        三部分可以自由设置
+                                    </div>
+                                </article>
+                                <div class="field">
+                                    <label class="label">下单成功图标</label>
+                                    <div class="control">
+                                        <figure class="image is-128x128">
+                                            <img src="https://bulma.io/assets/images/placeholders/128x128.png" />
+                                        </figure>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">下单成功通知内容</label>
+                                    <div class="control">
+                                        <textarea class="textarea" placeholder="下单成功通知内容"></textarea>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">下单成功按钮内容</label>
+                                    <div class="control">
+                                        <input class="input" type="text" placeholder="下单成功按钮内容">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-full">
+                        <div class="card">
+                            <header class="card-header">
+                                <p class="card-header-title">贡品礼物设置</p>
+                            </header>
+                            <div class="card-content">
+                                <article class="message is-small">
+                                    <div class="message-body">
+                                        虚拟礼物下单成功后的通知页面：<a href="/attachment/default/type-2.png">点击查看页面样式</a><br>
+                                        页面由 <strong>图标</strong> + <strong>通知内容</strong> + <strong>回到首页的按钮</strong> +
+                                        <strong>上供排名</strong>
+                                        四部分组成<br>
+                                        四部分可以自由设置，可以针对上供排名制定不同的<strong>通知内容</strong>
+                                    </div>
+                                </article>
+                                <div class="field">
+                                    <label class="label">下单成功图标</label>
+                                    <div class="control">
+                                        <figure class="image is-128x128">
+                                            <img src="https://bulma.io/assets/images/placeholders/128x128.png" />
+                                        </figure>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">下单成功通知内容（默认）</label>
+                                    <div class="control">
+                                        <textarea class="textarea" placeholder=""></textarea>
+                                    </div>
+                                    <p class="help">当没有针对排名设置通知内容时，用户会看到的默认的通知内容</p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">下单成功按钮内容</label>
+                                    <div class="control">
+                                        <input class="input" type="text" placeholder="">
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">是否开启上供列表</label>
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            <select>
+                                                <option>是</option>
+                                                <option>否</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">排名</label>
+                                    <div class="control">
+                                        <div class="list">
+                                            <div class="field-body">
+                                                <div class="field">
+                                                    <div class="control">
+                                                        <div class="select is-fullwidth">
+                                                            <select>
+                                                                <option>排名大于</option>
+                                                                <option>排名小于</option>
+                                                                <option>排名等于</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="field">
+                                                    <div class="control">
+                                                        <input class="input" type="text" placeholder="第几名">
+                                                    </div>
+                                                </div>
+                                                <div class="field">
+                                                    <div class="control">
+                                                        <textarea class="textarea"
+                                                            placeholder="时的通知内容（覆盖默认通知）"></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                        </div>
+                                        <div class="list">
+                                            <div class="field-body">
+                                                <div class="field">
+                                                    <div class="control">
+                                                        <div class="select is-fullwidth">
+                                                            <select>
+                                                                <option>排名大于</option>
+                                                                <option>排名小于</option>
+                                                                <option>排名等于</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="field">
+                                                    <div class="control">
+                                                        <input class="input" type="text" placeholder="第几名">
+                                                    </div>
+                                                </div>
+                                                <div class="field">
+                                                    <div class="control">
+                                                        <textarea class="textarea"
+                                                            placeholder="时的通知内容（覆盖默认通知）"></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                        </div>
+
+                                        <button class="button is-fullwidth">
+                                            增加配置
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 底部 Footer -->
+    <?php include 'layout/footer.php'; ?>
+</body>
+<script>
+    var quill = new Quill('#editor-container', {
+        theme: 'snow',
+        placeholder: '在这里写下你的内容...',
+        modules: {
+            toolbar: [
+                [{ 'header': '1' }, { 'header': '2' }],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                ['bold', 'italic', 'underline'],
+                [{ 'align': [] }],
+                ['link']
+            ]
+        }
+    });
+    var htmlContent = '';
+    htmlContent += '<p><strong>特别提醒：请用户仔细阅读本协议所有条款（包括附件），尤其是加粗字体及加下划线部分，请务必仔细阅读。如您对本协议内容有任何疑问，那就别有疑问。一旦您通过勾选/点击或确认本协议，即意味着您已阅读本协议所有条款，并对本协议条款的含义及相应的法律后果已全部通晓并充分理解，您同意以数据电文形式订立本协议，虽然本协议完全不具有任何法律约束力。为重视未成年人权益的保障，您在使用本服务时应具备完全民事行为能力。若您不具备完全民事行为能力，请立即v我50。</strong></p><br>';
+    htmlContent += '<strong>基本协议</strong></p><br>';
+    htmlContent += '<p>1.坚持乙方的绝对领导。直播间里温以泠永远是第一位</p><br>';
+    htmlContent += '<p>2.爱护乙方，做文明观众，做到“打不还手，骂不还口，笑脸迎送冷屁股”</p><br>';
+    htmlContent += '<p>3.诚心接受乙方感情上的独裁，“不要和陌生人说话”，尤其不能跟陌生女人说话。当然，问路的老太太除外。</p><br>';
+    htmlContent += '<p>4.坚持工资奖金全部上缴制度。不涂改工资条，不在衣柜里藏钱。不过，每月可以申请领取500元零花（日元）</p><br>';
+    htmlContent += '<p>5.甲方有义务从心里热爱乙方崇敬乙方，视乙方为自己的上帝，与乙方沟通时须使用低三下四/讨好/献媚等温柔语气，不得用生硬、顶撞的语气</p><br>';
+    htmlContent += '<p>6.乙方拥有精神羞辱权，有权剥夺甲方的一切自由和尊严，用语言和行为强迫甲方，达到羞辱的目的。</p><br>';
+    quill.root.innerHTML = htmlContent;
+
+
+    function neirong() {
+        const exampleColorInput = document.getElementById('exampleColorInput');
+        console.log(exampleColorInput.value)
+    }
+</script>
+
+</html>
