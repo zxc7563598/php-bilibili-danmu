@@ -12,12 +12,6 @@ use resource\enums\UserVipsEnums;
 
 class ManagementController extends GeneralMethod
 {
-    public function pageDashboard(Request $request)
-    {
-        return view('shop/dashboard', [
-            'secretKey' => getenv('SECURE_API_KEY')
-        ]);
-    }
     public function pageSystemConfiguration(Request $request)
     {
         return view('shop/system-configuration', [

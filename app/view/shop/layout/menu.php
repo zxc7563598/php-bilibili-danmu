@@ -2,7 +2,6 @@
     <aside class="menu" style="padding:1rem;">
         <p class="menu-label">配置相关</p>
         <ul class="menu-list">
-            <li><a href="/points-mall/dashboard" class="<?php echo ($currentPage === 'dashboard') ? 'is-active' : ''; ?>">仪表盘</a></li>
             <li><a href="/points-mall/system-configuration" class="<?php echo ($currentPage === 'system-configuration') ? 'is-active' : ''; ?>">系统配置</a></li>
             <li><a href="/points-mall/mall-configuration" class="<?php echo ($currentPage === 'mall-configuration') ? 'is-active' : ''; ?>">商城配置</a></li>
         </ul>
