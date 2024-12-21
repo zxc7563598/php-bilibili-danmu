@@ -961,16 +961,16 @@
         },
         {
             "name": "hejunjie/hardware-monitor",
-            "version": "v1.0.0",
+            "version": "v1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zxc7563598/php-hardware-monitor.git",
-                "reference": "4570df5f89d3460bc57082003acd3a724dbdc78f"
+                "reference": "aff112e42ac579f870fab598a2d64ac769cb253b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zxc7563598/php-hardware-monitor/zipball/4570df5f89d3460bc57082003acd3a724dbdc78f",
-                "reference": "4570df5f89d3460bc57082003acd3a724dbdc78f",
+                "url": "https://api.github.com/repos/zxc7563598/php-hardware-monitor/zipball/aff112e42ac579f870fab598a2d64ac769cb253b",
+                "reference": "aff112e42ac579f870fab598a2d64ac769cb253b",
                 "shasum": ""
             },
             "require": {
@@ -995,9 +995,9 @@
             "description": "一个轻量级的 PHP 包，用于获取和监控系统硬件参数。支持获取 CPU 型号和性能信息、内存使用情况、硬盘信息及网络流量数据。通过执行系统命令并使用正则表达式解析输出结果，实时获取硬件性能数据。适用于 PHP8，支持加入原有项目定时任务多次调用以实现硬件监控，帮助开发者监控系统资源使用情况，优化系统性能。",
             "support": {
                 "issues": "https://github.com/zxc7563598/php-hardware-monitor/issues",
-                "source": "https://github.com/zxc7563598/php-hardware-monitor/tree/v1.0.0"
+                "source": "https://github.com/zxc7563598/php-hardware-monitor/tree/v1.0.1"
             },
-            "time": "2024-12-04T08:32:14+00:00"
+            "time": "2024-12-21T07:02:47+00:00"
         },
         {
             "name": "hejunjie/tools",
@@ -4857,12 +4857,12 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.2"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "plugin-api-version": "2.6.0"
 }
