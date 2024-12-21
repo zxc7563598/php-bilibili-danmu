@@ -29,7 +29,10 @@
         <?php include 'layout/menu.php'; ?>
         <!-- 主要内容区域 -->
         <div class="column" id="main-content">
-            <div style="padding: 1rem;">
+            <div id="loading">
+                加载中，请稍候...
+            </div>
+            <div id="main-content-body" style="padding: 1rem;">
                 <!-- 仪表盘的统计信息 -->
                 <div class="columns is-multiline">
                     <!-- CPU 占用卡片 -->
@@ -37,9 +40,13 @@
                         <div class="card">
                             <div class="card-content">
                                 <p class="title">CPU</p>
-                                <p class="subtitle">当前：{{cpu}}%</p>
-                                <progress class="progress" :class="progressColor(cpu)" :value="cpu"
-                                    max="100">{{cpu}}%</progress>
+                                <p class="subtitle is-6 mb-3">{{cpu.model}}</p>
+                                <p class="subtitle is-7 mb-3">用户：{{cpu.user}}%</p>
+                                <p class="subtitle is-7 mb-3">内核：{{cpu.sys}}%</p>
+                                <p class="subtitle is-7 mb-3">空闲：{{cpu.idle}}%</p>
+                                <progress class="progress" :class="progressColor((100-cpu.idle).toFixed(2))"
+                                    :value="(100-cpu.idle).toFixed(2)"
+                                    max="100">{{(100-cpu.idle).toFixed(2)}}%</progress>
                             </div>
                         </div>
                     </div>
@@ -49,21 +56,32 @@
                         <div class="card">
                             <div class="card-content">
                                 <p class="title">内存</p>
-                                <p class="subtitle">当前：{{memory}}%</p>
-                                <progress class="progress" :class="progressColor(memory)" :value="memory"
-                                    max="100">{{memory}}%</progress>
+                                <p class="subtitle is-6 mb-3">-</p>
+                                <p class="subtitle is-7 mb-3">总计：{{memory.total}} Mb</p>
+                                <p class="subtitle is-7 mb-3">已用：{{memory.used}} Mb</p>
+                                <p class="subtitle is-7 mb-3">空闲：{{memory.free}} Mb</p>
+                                <progress class="progress"
+                                    :class="progressColor(((memory.used / memory.total)*100).toFixed(2))"
+                                    :value="((memory.used / memory.total)*100).toFixed(2)" max="100">{{((memory.used /
+                                    memory.total)*100).toFixed(2)}}%</progress>
                             </div>
                         </div>
                     </div>
 
                     <!-- 磁盘占用卡片 -->
-                    <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
+                    <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile"
+                        v-for="(item,index) in disk" :key="index">
                         <div class="card">
                             <div class="card-content">
                                 <p class="title">磁盘</p>
-                                <p class="subtitle">当前：{{disk}}%</p>
-                                <progress class="progress" :class="progressColor(disk)" :value="disk"
-                                    max="100">{{disk}}%</progress>
+                                <p class="subtitle is-6 mb-3">{{item.device}}</p>
+                                <p class="subtitle is-7 mb-3">大小：{{item.size}} Mb</p>
+                                <p class="subtitle is-7 mb-3">已用：{{item.used}} Mb</p>
+                                <p class="subtitle is-7 mb-3">空闲：{{item.free}} Mb</p>
+                                <progress class="progress"
+                                    :class="progressColor((((item.used / item.size)*100)*100).toFixed(2))"
+                                    :value="(item.used / item.size)*100" max="100">{{(((item.used /
+                                    item.size)*100)*100).toFixed(2)}}%</progress>
                             </div>
                         </div>
                     </div>
@@ -240,46 +258,90 @@
     const app = Vue.createApp({
         data() {
             return {
-                cpu: Math.floor(Math.random() * 51),
-                memory: Math.floor(Math.random() * 51),
-                disk: Math.floor(Math.random() * 51),
-                add: 0
+                loading: true,
+                cpu: {
+                    model: null, // CPU 模型
+                    cores: null, // 物理核心数
+                    logical_cores: null, // 逻辑核心数
+                    cores_per_socket: null, // 每个插槽的核心数
+                    user: null, // 用户空间占用 CPU 时间的百分比
+                    sys: null, // 内核空间占用 CPU 时间的百分比
+                    idle: null, // 空闲时间的百分比
+                    wait: null // 等待 I/O 操作的时间百分比
+                },
+                memory: {
+                    total: null, // 总内存
+                    used: null, // 已用内存
+                    free: null, // 空闲内存
+                    cached: null, // 缓存内存
+                    buffers: null // 缓冲区内存
+                },
+                disk: [],
+                add: 0,
+                secretKey: '<?php echo $secretKey ?>'
             };
         },
         created() {
-            this.intervalId = setInterval(() => {
-                this.cpu = Math.floor(Math.random() * 100);
-                this.memory = Math.floor(Math.random() * 100);
-                this.disk = Math.floor(Math.random() * 100);
-            }, 2000);
             this.$nextTick(() => {
-                // 获取当前时间
-                const now = new Date();
-                const midnight = new Date(new Date().setHours(0, 0, 0, 0));
-                const diffMilliseconds = now - midnight;
-                const count = Math.floor(Math.floor((now - midnight) / 1000) / 300);
-                const cpu_data = [];
-                const memory_data = [];
-                for (var i = 0; i < count; i++) {
-                    cpu_data.push(Math.floor(Math.random() * 51));
-                    memory_data.push(Math.floor(Math.random() * 82));
-                }
-                memory(memory_data);
-                cpu(cpu_data)
+                this.getData();
+                this.getHistoriesData();
             });
+            // 设置定时任务
+            this.intervalId = setInterval(() => {
+                this.getData()
+            }, 2000);
         },
         methods: {
+            // 决定进度条颜色
             progressColor(number) {
                 if (number < 40) {
                     return 'is-primary';
                 }
                 if (number < 75) {
-                    return 'is-warning'
+                    return 'is-warning';
                 }
                 if (number > 75) {
                     return 'is-danger';
                 }
                 return 'is-link';
+            },
+            // 获取页面数据
+            getData() {
+                let data = {}
+                let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
+                axios.post('/api/points-mall/dashboard/get-real-time-data', data, {
+                    headers: { 'X-Signature': signature }
+                }).then(response => {
+                    if (response.data.code == 0) {
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('main-content-body').style.display = 'block';
+                        this.cpu = response.data.data.cpu;
+                        this.memory = response.data.data.memory;
+                        this.disk = response.data.data.disk;
+                        console.log(response.data.data);
+                    }
+                });
+            },
+            // 获取CPU/内存历史数据
+            getHistoriesData() {
+                let data = {}
+                let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
+                axios.post('/api/points-mall/dashboard/get-real-time-histories-data', data, {
+                    headers: { 'X-Signature': signature }
+                }).then(response => {
+                    if (response.data.code == 0) {
+                        const cpu_data = [];
+                        const memory_data = [];
+                        response.data.data.cpu.forEach(item => {
+                            cpu_data.push(item);
+                        })
+                        response.data.data.memory.forEach(item => {
+                            memory_data.push(item);
+                        })
+                        memory(memory_data);
+                        cpu(cpu_data)
+                    }
+                });
             }
         },
         beforeDestroy() {

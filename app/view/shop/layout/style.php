@@ -40,6 +40,28 @@
         border-radius: 0 0 var(--bulma-input-radius) var(--bulma-input-radius);
         padding: 1rem 0;
     }
+
+    #main-content {
+        position: relative;
+        min-height: 70vh;
+    }
+
+    #main-content-body {
+        display: none;
+    }
+
+    #loading {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #f0f0f0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
 </style>
 <script>
     document.addEventListener('DOMContentLoaded', () => {

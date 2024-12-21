@@ -35,6 +35,14 @@ Route::group('/points-mall', function () {
     app\middleware\BasicAuthMiddleware::class
 ]);
 
+
+Route::group('/api/points-mall', function () {
+    Route::any('/dashboard/get-real-time-data', [app\controller\shop\management\DashboardController::class, 'getRealTimeData']);
+    Route::any('/dashboard/get-real-time-histories-data', [app\controller\shop\management\DashboardController::class, 'getRealTimeHistoriesData']);
+})->middleware([
+    app\middleware\SignatureMiddleware::class
+]);
+
 Route::group('/api/robot', function () {
     Route::any('/login-check', [app\controller\robot\ApiController::class, 'loginCheck']);
     Route::any('/login-out', [app\controller\robot\ApiController::class, 'loginOut']);
