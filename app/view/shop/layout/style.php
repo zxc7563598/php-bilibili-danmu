@@ -1,4 +1,6 @@
 <link rel="stylesheet" href="/css/bulma.min.css">
+<script src="/js/vue.3.5.12.js"></script>
+<script src="/js/axios.min.js"></script>
 <script src="/js/crypto-js.min.js"></script>
 <style>
     html,
@@ -62,6 +64,26 @@
         align-items: center;
         z-index: 9999;
     }
+
+    /* 悬浮通知样式 */
+    .notification-fixed {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        width: 90%;
+        max-width: 500px;
+    }
+
+    /* 滑入和淡出动画 */
+    .slide-fade-enter-active {
+        animation: slideIn 0.5s ease-out;
+    }
+
+    .slide-fade-leave-active {
+        animation: fadeOut 0.5s ease-out;
+    }
 </style>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -95,7 +117,6 @@
                 mainContent.style.width = '80%'; // 菜单显示时，内容区域留出 250px 的空间
             }
         };
-
         adjustContentWidth();
     });
 </script>

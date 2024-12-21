@@ -48,8 +48,5 @@ return [
     ],
     'timing'  => [
         'handler'  => app\server\Timing::class
-    ],
-    'task'  => [
-        'handler'  => process\Task::class
-    ],
+    ]
 ];

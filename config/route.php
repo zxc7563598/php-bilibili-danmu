@@ -23,7 +23,6 @@ Route::get('/login', [app\controller\robot\PageController::class, 'login'])->mid
 
 // 积分商城
 Route::group('/points-mall', function () {
-    Route::get('/dashboard', [app\controller\shop\ManagementController::class, 'pageDashboard']); // 仪表盘
     Route::get('/system-configuration', [app\controller\shop\ManagementController::class, 'pageSystemConfiguration']); // 系统配置
     Route::get('/mall-configuration', [app\controller\shop\ManagementController::class, 'pageMallConfiguration']); // 商城配置
     Route::get('/user-management', [app\controller\shop\ManagementController::class, 'pageUserManagement']); // 用户管理
@@ -37,8 +36,8 @@ Route::group('/points-mall', function () {
 
 
 Route::group('/api/points-mall', function () {
-    Route::any('/dashboard/get-real-time-data', [app\controller\shop\management\DashboardController::class, 'getRealTimeData']);
-    Route::any('/dashboard/get-real-time-histories-data', [app\controller\shop\management\DashboardController::class, 'getRealTimeHistoriesData']);
+    Route::any('/system-configuration/get-data', [app\controller\shop\management\SystemConfiguration::class, 'getData']);
+    Route::any('/system-configuration/set-data', [app\controller\shop\management\SystemConfiguration::class, 'setData']);
 })->middleware([
     app\middleware\SignatureMiddleware::class
 ]);
