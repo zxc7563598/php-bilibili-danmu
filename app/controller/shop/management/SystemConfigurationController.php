@@ -6,7 +6,7 @@ use app\controller\GeneralMethod;
 use Hejunjie\Tools;
 use support\Request;
 
-class SystemConfiguration extends GeneralMethod
+class SystemConfigurationController extends GeneralMethod
 {
     public function getData(Request $request)
     {

@@ -36,8 +36,11 @@ Route::group('/points-mall', function () {
 
 
 Route::group('/api/points-mall', function () {
-    Route::any('/system-configuration/get-data', [app\controller\shop\management\SystemConfiguration::class, 'getData']);
-    Route::any('/system-configuration/set-data', [app\controller\shop\management\SystemConfiguration::class, 'setData']);
+    Route::any('/system-configuration/get-data', [app\controller\shop\management\SystemConfigurationController::class, 'getData']);
+    Route::any('/system-configuration/set-data', [app\controller\shop\management\SystemConfigurationController::class, 'setData']);
+    Route::any('/mall-configuration/get-data', [app\controller\shop\management\MallConfigurationController::class, 'getData']);
+    Route::any('/mall-configuration/set-data', [app\controller\shop\management\MallConfigurationController::class, 'setData']);
+    Route::any('/mall-configuration/upload-images', [app\controller\shop\management\MallConfigurationController::class, 'uploadImages']);
 })->middleware([
     app\middleware\SignatureMiddleware::class
 ]);
