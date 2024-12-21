@@ -201,6 +201,7 @@ final class CreateShopConfig extends AbstractMigration
                 'updated_at' => time()
             ]
         ]);
+        $tableAdd->saveData();
     }
 
     /**
