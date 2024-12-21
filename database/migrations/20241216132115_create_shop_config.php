@@ -22,7 +22,8 @@ final class CreateShopConfig extends AbstractMigration
             ->addColumn('deleted_at', 'integer', ['comment' => '逻辑删除', 'null' => true, 'limit' => MysqlAdapter::INT_BIG])
             ->create();
         // 添加数据
-        $table->insert([
+        $tableAdd = $this->table('bl_shop_config');
+        $tableAdd->insert([
             [
                 'config_id' => 1,
                 'title' => 'login-background-image',
