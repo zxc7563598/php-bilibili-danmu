@@ -168,14 +168,14 @@
                                 <div class="field">
                                     <label class="label">数据库账号</label>
                                     <div class="control">
-                                        <input class="input" type="text" placeholder="" v-model="form.db_user">
+                                        <input class="input" type="text" placeholder="" v-model="form.db_name">
                                     </div>
                                     <p class="help">此配置项决定用于连接数据库的用户账号。</p>
                                 </div>
                                 <div class="field">
                                     <label class="label">数据库名称</label>
                                     <div class="control">
-                                        <input class="input" type="text" placeholder="" v-model="form.db_name">
+                                        <input class="input" type="text" placeholder="" v-model="form.db_user">
                                     </div>
                                     <p class="help">此配置项决定应用程序连接的数据库名称。确保该名称与数据库中实际存在的数据库一致。如果该数据库不存在，系统可能无法正常连接并进行数据操作。
                                     </p>
@@ -217,21 +217,21 @@
                 notificationType: '',
                 loading: false,
                 form: {
-                    db_host: "8.210.141.97",
-                    db_name: "root",
-                    db_password: "zxc7563598.",
-                    db_port: "3306",
-                    db_user: "bilibili_danmu",
-                    host: "http://127.0.0.1",
-                    listen: "7776",
-                    redis_host: "8.210.141.97",
-                    redis_port: "6379",
-                    re_open_host: "http://127.0.0.1",
-                    secure_api_key: "EUoYkEA5SSwiGw18kX5WIFlDbkSyHVl3",
-                    system_aes_iv: "abc1232IF866nji7",
-                    system_aes_key: "6jqvnd8SHT2u288w",
-                    system_api_url: "http://127.0.0.1/7776",
-                    system_key: "aJeE7zY27AoJEEIS6l8hRkSK5As9Fh2v"
+                    db_host: "",
+                    db_name: "",
+                    db_password: "",
+                    db_port: "",
+                    db_user: "",
+                    host: "",
+                    listen: "",
+                    redis_host: "",
+                    redis_port: "",
+                    re_open_host: "",
+                    secure_api_key: "",
+                    system_aes_iv: "",
+                    system_aes_key: "",
+                    system_api_url: "",
+                    system_key: ""
                 }
             };
         },
