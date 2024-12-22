@@ -138,8 +138,6 @@ Route::post('/reload-timing', function (Request $request) {
     return response($response);
 });
 
-
-
 Route::get('/test', function (Request $request) {
     $param = $request->all();
     $msg = isset($param['msg']) ? $param['msg'] : '';

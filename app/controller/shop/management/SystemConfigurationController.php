@@ -33,21 +33,21 @@ class SystemConfigurationController extends GeneralMethod
     public function setData(Request $request)
     {
         $param = $request->all();
-        $system_api_url = isset($param['system_api_url']) ? $param['system_api_url'] : '';
-        $system_aes_key = isset($param['system_aes_key']) ? $param['system_aes_key'] : '';
-        $system_aes_iv = isset($param['system_aes_iv']) ? $param['system_aes_iv'] : '';
-        $system_key = isset($param['system_key']) ? $param['system_key'] : '';
-        $host = isset($param['host']) ? $param['host'] : '';
-        $listen = isset($param['listen']) ? $param['listen'] : '';
-        $re_open_host = isset($param['re_open_host']) ? $param['re_open_host'] : '';
-        $secure_api_key = isset($param['secure_api_key']) ? $param['secure_api_key'] : '';
-        $redis_host = isset($param['redis_host']) ? $param['redis_host'] : '';
-        $redis_port = isset($param['redis_port']) ? $param['redis_port'] : '';
-        $db_host = isset($param['db_host']) ? $param['db_host'] : '';
-        $db_port = isset($param['db_port']) ? $param['db_port'] : '';
-        $db_name = isset($param['db_name']) ? $param['db_name'] : '';
-        $db_user = isset($param['db_user']) ? $param['db_user'] : '';
-        $db_password = isset($param['db_password']) ? $param['db_password'] : '';
+        $system_api_url = $param['system_api_url'];
+        $system_aes_key = $param['system_aes_key'];
+        $system_aes_iv = $param['system_aes_iv'];
+        $system_key = $param['system_key'];
+        $host = $param['host'];
+        $listen = $param['listen'];
+        $re_open_host = $param['re_open_host'];
+        $secure_api_key = $param['secure_api_key'];
+        $redis_host = $param['redis_host'];
+        $redis_port = $param['redis_port'];
+        $db_host = $param['db_host'];
+        $db_port = $param['db_port'];
+        $db_name = $param['db_name'];
+        $db_user = $param['db_user'];
+        $db_password = $param['db_password'];
         // 存储数据
         // 要修改的环境变量名和值
         $data = [
