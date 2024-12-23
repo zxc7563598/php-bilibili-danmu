@@ -28,7 +28,7 @@
         <!-- 主要内容区域 -->
         <div class="column" id="main-content">
             <!-- 动态通知框 -->
-            <transition name="slide-fade" @after-leave="resetNotification">
+            <transition name="slide-fade" @after-leave="hideNotification">
                 <div v-if="isNotificationVisible" class="notification notification-fixed" :class="notificationType">
                     <button class="delete" @click="hideNotification"></button>
                     {{notificationMessage}}
@@ -37,7 +37,8 @@
             <div id="loading">
                 加载中，请稍候...
             </div>
-            <input ref="fileInput" type="file" @change="(event) => handleFileChange(event, fileType)" style="display: none;"/>
+            <input ref="fileInput" type="file" @change="(event) => handleFileChange(event, fileType)"
+                style="display: none;" />
             <div id="main-content-body" style="padding: 1rem;">
                 <div class="columns is-multiline">
                     <div class="column is-full">
@@ -73,7 +74,7 @@
                                     </p>
                                 </div>
                                 <div class="field">
-                                    <label class="label" onclick="neirong()">主题色</label>
+                                    <label class="label">主题色</label>
                                     <div class="control">
                                         <input type="color" class="form-control form-control-color"
                                             id="exampleColorInput" v-model="form.theme_color[0]"
@@ -375,7 +376,6 @@
 </body>
 <script>
     let quill;
-
     function quillInit(htmlContent) {
         quill = new Quill('#editor-container', {
             theme: 'snow',
@@ -395,13 +395,6 @@
 
     function getQuillHtml() {
         return quill.root.innerHTML;
-    }
-
-    function neirong() {
-        const themeColorButton = document.getElementById('theme_color_button');
-        themeColorButton.style.backgroundColor = 'linear-gradient(to right, rgb(114, 50, 221), rgb(146, 103, 220))'
-
-        console.log(exampleColorInput.value)
     }
 </script>
 
@@ -442,13 +435,12 @@
             };
         },
         created() {
-
             this.getData();
         },
         computed: {
             themeColorButton() {
                 return {
-                    color: `#fff`,
+                    color: '#fff',
                     background: `linear-gradient(to right, ${this.form.theme_color[0]}, ${this.form.theme_color[1]})`
                 };
             }
@@ -459,127 +451,138 @@
                 this.fileType = fileType;
                 this.$refs.fileInput.click();
             },
+
             // 文件上传
             handleFileChange(event, fileType) {
-                let reader = new FileReader();
-                reader.readAsDataURL(event.target.files[0]);
-                reader.onload = () => {
-                    let data = { base64: reader.result, type: fileType }
-                    let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
-                    axios.post('/api/points-mall/mall-configuration/upload-images', data, {
-                        headers: { 'X-Signature': signature }
-                    }).then(response => {
-                        if (response.data.code == 0) {
-                            switch (fileType) {
-                                case 'login_background_image':
-                                    this.form.login_background_image = response.data.data;
-                                    break;
-                                case 'personal_background_image':
-                                    this.form.personal_background_image = response.data.data;
-                                    break;
-                                case 'protocols_signature':
-                                    this.form.protocols_signature = response.data.data;
-                                    break;
-                                case 'virtual_gift_order_successful_icon':
-                                    this.form.virtual_gift_order_successful_icon = response.data.data;
-                                    break;
-                                case 'realism_gift_order_successful_icon':
-                                    this.form.realism_gift_order_successful_icon = response.data.data;
-                                    break;
-                                case 'tribute_gift_order_successful_icon':
-                                    this.form.tribute_gift_order_successful_icon = response.data.data;
-                                    break;
-                            }
-                        }
-                    });
-                };
-                reader.onerror = (error) => {
-                    this.showNotification('文件读取错误，请确认图片类型', 'warning')
-                };
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = () => this.uploadFile(reader.result, fileType);
+                reader.onerror = () => this.showNotification('文件读取错误，请确认图片类型', 'warning');
+                reader.readAsDataURL(file);
+
+                // 清空 input file 内容
                 this.$refs.fileInput.value = null;
             },
+
+            // 上传文件并更新表单数据
+            uploadFile(base64Data, fileType) {
+                const data = { base64: base64Data, type: fileType };
+                const signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
+
+                axios.post('/api/points-mall/mall-configuration/upload-images', data, {
+                    headers: { 'X-Signature': signature }
+                }).then(response => {
+                    if (response.data.code === 0) {
+                        this.updateFormImage(fileType, response.data.data);
+                    } else {
+                        this.showNotification('上传失败，请稍后重试', 'error');
+                    }
+                }).catch(() => this.showNotification('请求失败，请稍后重试', 'error'));
+            },
+
+            // 更新表单中的文件数据
+            updateFormImage(fileType, data) {
+                const fields = {
+                    'login_background_image': 'login_background_image',
+                    'personal_background_image': 'personal_background_image',
+                    'protocols_signature': 'protocols_signature',
+                    'virtual_gift_order_successful_icon': 'virtual_gift_order_successful_icon',
+                    'realism_gift_order_successful_icon': 'realism_gift_order_successful_icon',
+                    'tribute_gift_order_successful_icon': 'tribute_gift_order_successful_icon',
+                };
+
+                if (fields[fileType]) {
+                    this.form[fields[fileType]] = data;
+                }
+            },
+
             // 显示通知
             showNotification(message, type = 'info') {
                 this.isNotificationVisible = true;
                 this.notificationMessage = message;
-                switch (type) {
-                    case 'success':
-                        this.notificationType = 'is-success is-light'
-                        break;
-                    case 'info':
-                        this.notificationType = 'is-light'
-                        break;
-                    case 'error':
-                        this.notificationType = 'is-danger is-light'
-                        break;
-                    case 'warning':
-                        this.notificationType = 'is-warning is-light'
-                        break;
-                }
+                this.notificationType = this.getNotificationClass(type);
+
                 setTimeout(this.hideNotification, 3000);
             },
+
+            // 获取通知的样式
+            getNotificationClass(type) {
+                const types = {
+                    success: 'is-success is-light',
+                    info: 'is-light',
+                    error: 'is-danger is-light',
+                    warning: 'is-warning is-light'
+                };
+                return types[type] || 'is-light';
+            },
+
             // 隐藏通知
             hideNotification() {
                 this.isNotificationVisible = false;
             },
-            // 防止通知重复
-            resetNotification() {
-                this.isNotificationVisible = false;
-            },
+
             // 增加排名列表
             rankingsListAdd() {
                 this.form.tribute_gift_order_successful_rankingslist.push({
                     comparison: 0,
                     position: null,
                     content: null
-                })
+                });
             },
+
             // 删除排名列表
             rankingsListDelete(index) {
                 this.form.tribute_gift_order_successful_rankingslist.splice(index, 1);
             },
+
             // 获取页面数据
             getData() {
-                let data = {}
-                let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
+                const data = {};
+                const signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
+
                 axios.post('/api/points-mall/mall-configuration/get-data', data, {
                     headers: { 'X-Signature': signature }
                 }).then(response => {
-                    if (response.data.code == 0) {
+                    if (response.data.code === 0) {
+                        this.form = response.data.data;
+                        quillInit(this.form.protocols_content);
                         document.getElementById('loading').style.display = 'none';
                         document.getElementById('main-content-body').style.display = 'block';
-                        this.form = response.data.data;
-                        quillInit(this.form.protocols_content)
                     }
+                }).catch(() => {
+                    this.showNotification('数据加载失败', 'error');
                 });
             },
+
             // 存储信息
             saveData() {
                 this.loading = true;
                 this.form.protocols_content = getQuillHtml();
-                let data = this.form;
-                let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
-                try {
-                    axios.post('/api/points-mall/mall-configuration/set-data', data, {
-                        headers: { 'X-Signature': signature }
-                    }).then(response => {
-                        this.loading = false;
-                        if (response.data.code == 0) {
-                            this.showNotification('存储成功', 'success')
-                        } else {
-                            this.showNotification(response.data.msg, 'warning')
-                        }
-                    });
-                } catch (error) {
-                    this.showNotification('请求失败，请稍后重试', 'error')
-                }
+
+                const data = this.form;
+                const signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
+
+                axios.post('/api/points-mall/mall-configuration/set-data', data, {
+                    headers: { 'X-Signature': signature }
+                }).then(response => {
+                    this.loading = false;
+                    if (response.data.code === 0) {
+                        this.showNotification('存储成功', 'success');
+                    } else {
+                        this.showNotification(response.data.message, 'warning');
+                    }
+                }).catch(() => {
+                    this.loading = false;
+                    this.showNotification('请求失败，请稍后重试', 'error');
+                });
             }
-        },
-        beforeDestroy() {
-            clearInterval(this.intervalId);
         }
     });
+
     app.mount('#app');
 </script>
+
 
 </html>

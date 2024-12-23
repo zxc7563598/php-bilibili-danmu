@@ -102,7 +102,6 @@ class UserManagementController extends GeneralMethod
         $name = $param['name'];
         $password = !empty($param['password']) ? $param['password'] : null;
         $vip_type = $param['vip_type'];
-        $point = $param['point'];
         // 获取数据
         $users = new UserVips();
         if (!empty($user_id)) {
@@ -123,7 +122,6 @@ class UserManagementController extends GeneralMethod
             $users->password = $password;
         }
         $users->vip_type = $vip_type;
-        $users->point = $point;
         $users->save();
         // 返回数据
         return success($request, []);

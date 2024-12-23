@@ -36,7 +36,7 @@
         <!-- 主要内容区域 -->
         <div class="column" id="main-content">
             <!-- 动态通知框 -->
-            <transition name="slide-fade" @after-leave="resetNotification">
+            <transition name="slide-fade" @after-leave="hideNotification">
                 <div v-if="isNotificationVisible" class="notification notification-fixed" :class="notificationType">
                     <button class="delete" @click="hideNotification"></button>
                     {{notificationMessage}}
@@ -107,9 +107,9 @@
                                             <td>{{item.end_vip_at}}</td>
                                             <td>{{item.point}}</td>
                                             <td>
-                                                <button class="button is-light"
+                                                <button class="button is-light mr-2 is-small"
                                                     @click="userEdit(item.user_id)">变更</button>
-                                                <button class="button is-light"
+                                                <button class="button is-light is-small"
                                                     @click="userRecords(item.user_id)">积分记录</button>
                                             </td>
                                         </tr>
@@ -197,29 +197,21 @@
                             </tr>
                         </tbody>
                     </table>
-                    <!-- <div class="field">
-                        <label class="label">上舰日期</label>
-                        <div class="control">
-                            <input class="input" :class="last_vip_at_error ? 'is-danger' : ''" type="text" v-model="user.last_vip_at" @input="validateLastVipDate" placeholder="YYYY-mm-dd HH:ii:ss">
-                        </div>
-                        <p class="help">如果只是添加用户，对方并没有上舰，则可不填，填写时注意日期格式为「年年年年-月月-日日 时时:分分:秒秒」</p>
-                        <p class="help is-danger" v-if="last_vip_at_error">请输入合法的日期</p>
-                    </div> -->
                 </section>
                 <footer class="modal-card-foot">
                     <div class="buttons">
                         <button class="button is-success" @click="saveUser">存储</button>
-                        <button class="button" @click="this.uerinfo_active = false">取消</button>
+                        <button class="button" @click="this.userinfo_active = false">取消</button>
                     </div>
                 </footer>
             </div>
         </div>
-        <div class="modal" :class="uerinfo_active ? 'is-active' : ''">
+        <div class="modal" :class="userinfo_active ? 'is-active' : ''">
             <div class="modal-background"></div>
             <div class="modal-card">
                 <header class="modal-card-head">
                     <p class="modal-card-title">{{user.user_id ? '编辑用户' : '新增用户'}}</p>
-                    <button class="delete" aria-label="close" @click="this.uerinfo_active = false"></button>
+                    <button class="delete" aria-label="close" @click="this.userinfo_active = false"></button>
                 </header>
                 <section class="modal-card-body">
                     <div class="field">
@@ -259,26 +251,11 @@
                             </div>
                         </div>
                     </div>
-                    <div class="field">
-                        <label class="label">积分</label>
-                        <div class="control">
-                            <input class="input" type="text" v-model="user.point" placeholder="积分">
-                        </div>
-                        <p class="help">无特殊情况无需进行变更</p>
-                    </div>
-                    <!-- <div class="field">
-                        <label class="label">上舰日期</label>
-                        <div class="control">
-                            <input class="input" :class="last_vip_at_error ? 'is-danger' : ''" type="text" v-model="user.last_vip_at" @input="validateLastVipDate" placeholder="YYYY-mm-dd HH:ii:ss">
-                        </div>
-                        <p class="help">如果只是添加用户，对方并没有上舰，则可不填，填写时注意日期格式为「年年年年-月月-日日 时时:分分:秒秒」</p>
-                        <p class="help is-danger" v-if="last_vip_at_error">请输入合法的日期</p>
-                    </div> -->
                 </section>
                 <footer class="modal-card-foot">
                     <div class="buttons">
                         <button class="button is-success" @click="saveUser">存储</button>
-                        <button class="button" @click="this.uerinfo_active = false">取消</button>
+                        <button class="button" @click="this.userinfo_active = false">取消</button>
                     </div>
                 </footer>
             </div>
@@ -292,6 +269,9 @@
         data() {
             return {
                 secretKey: '<?php echo $secretKey ?>',
+                isNotificationVisible: false,
+                notificationMessage: null,
+                notificationType: '',
                 form: {
                     uid: null,
                     uname: null,
@@ -304,232 +284,211 @@
                 },
                 list: [],
                 records: [],
-                uerinfo_active: false,
+                userinfo_active: false,
                 records_active: false,
                 add_user_records_active: false,
-                last_vip_at_error: false,
-                end_vip_at_error: false,
                 uid_error: false,
                 user: {
                     user_id: null,
                     uid: null,
                     name: null,
                     password: null,
-                    vip_type: '',
-                    point: 0
+                    vip_type: ''
+                },
+                notification: {
+                    isVisible: false,
+                    message: '',
+                    type: ''
                 }
             };
         },
         created() {
-            this.getData()
+            this.getData();
         },
         computed: {
             pageNumbers() {
-                const currentPage = this.list.current_page
-                const totalPages = this.list.total_page
-                let pages = [];
-                // 最多展示7个页码，第一页和最后一页必定显示
+                const currentPage = this.list.current_page;
+                const totalPages = this.list.total_page;
+                let pages = [1]; // 必须展示第一页
+
                 const maxPages = 7;
-                // 1. 必须展示第一页
-                pages.push(1);
-                // 2. 确定显示范围
-                // 如果当前页接近第一页，展示更多页
+
+                // 确定展示的页码范围
                 if (currentPage <= 4) {
-                    // 显示前两页加当前页及其后面的页
                     for (let i = 2; i <= Math.min(maxPages - 1, totalPages - 1); i++) {
                         pages.push(i);
                     }
-                }
-                // 如果当前页接近最后一页，展示更多页
-                else if (currentPage >= totalPages - 3) {
-                    // 显示后面几页
+                } else if (currentPage >= totalPages - 3) {
                     for (let i = Math.max(totalPages - maxPages + 1, 2); i < totalPages; i++) {
                         pages.push(i);
                     }
-                }
-                // 如果当前页在中间
-                else {
-                    // 显示当前页前后各2个页码
+                } else {
                     for (let i = currentPage - 2; i <= currentPage + 2; i++) {
                         pages.push(i);
                     }
                 }
-                // 3. 必须展示最后一页
+
                 if (pages[pages.length - 1] !== totalPages) {
-                    pages.push(totalPages);
+                    pages.push(totalPages); // 必须展示最后一页
                 }
-                // 4. 如果有断层，添加省略号
-                const result = [];
-                for (let i = 0; i < pages.length; i++) {
-                    if (i > 0 && pages[i] - pages[i - 1] > 1) {
-                        result.push('...'); // 添加省略号
-                    }
-                    result.push(pages[i]);
-                }
-                return result;
+
+                return this.addEllipsis(pages);
             }
         },
         methods: {
+            // 封装API请求
+            async apiRequest(endpoint, data = {}) {
+                try {
+                    const signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
+                    const response = await axios.post(endpoint, data, {
+                        headers: { 'X-Signature': signature }
+                    });
+
+                    if (response.data.code === 0) {
+                        return response.data.data;
+                    } else {
+                        this.showNotification(response.data.message, 'warning');
+                        return null;
+                    }
+                } catch (error) {
+                    this.showNotification('请求失败，请稍后重试', 'error');
+                    return null;
+                }
+            },
+
             // 显示通知
             showNotification(message, type = 'info') {
                 this.isNotificationVisible = true;
                 this.notificationMessage = message;
-                switch (type) {
-                    case 'success':
-                        this.notificationType = 'is-success is-light'
-                        break;
-                    case 'info':
-                        this.notificationType = 'is-light'
-                        break;
-                    case 'error':
-                        this.notificationType = 'is-danger is-light'
-                        break;
-                    case 'warning':
-                        this.notificationType = 'is-warning is-light'
-                        break;
-                }
+                this.notificationType = this.getNotificationClass(type);
+
                 setTimeout(this.hideNotification, 3000);
             },
+
+            // 获取通知的样式
+            getNotificationClass(type) {
+                const types = {
+                    success: 'is-success is-light',
+                    info: 'is-light',
+                    error: 'is-danger is-light',
+                    warning: 'is-warning is-light'
+                };
+                return types[type] || 'is-light';
+            },
+
             // 隐藏通知
             hideNotification() {
                 this.isNotificationVisible = false;
             },
-            // 防止通知重复
-            resetNotification() {
-                this.isNotificationVisible = false;
-            },
-            // 获取页面数据
-            getData() {
-                let data = this.form;
-                let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
-                axios.post('/api/points-mall/user-management/get-data', data, {
-                    headers: { 'X-Signature': signature }
-                }).then(response => {
-                    if (response.data.code == 0) {
-                        document.getElementById('loading').style.display = 'none';
-                        document.getElementById('main-content-body').style.display = 'block';
-                        this.list = response.data.data.list
+
+            // 分页数据处理
+            addEllipsis(pages) {
+                const result = [];
+                for (let i = 0; i < pages.length; i++) {
+                    if (i > 0 && pages[i] - pages[i - 1] > 1) {
+                        result.push('...');
                     }
-                });
+                    result.push(pages[i]);
+                }
+                return result;
             },
-            // 翻页
+
+            async getData() {
+                const data = this.form;
+                const result = await this.apiRequest('/api/points-mall/user-management/get-data', data);
+                if (result) {
+                    this.list = result.list;
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('main-content-body').style.display = 'block';
+                }
+            },
+
             handlePageChange(page) {
-                if (page < 1) {
-                    page = 1;
-                }
-                if (page > this.list.total_page) {
-                    page = this.list.total_page;
-                }
+                if (page < 1) page = 1;
+                if (page > this.list.total_page) page = this.list.total_page;
                 this.form.page = page;
                 this.getData();
             },
-            // 搜索信息
+
             searchData() {
                 this.form.page = 1;
                 this.getData();
             },
-            // 清空搜索
+
             emptyData() {
                 this.form.uid = null;
                 this.form.uname = null;
                 this.form.page = 1;
                 this.getData();
             },
-            // 添加用户
+
             addUser() {
-                this.user.user_id = null;
-                this.user.uid = null;
-                this.user.name = null;
-                this.user.password = null;
-                this.user.vip_type = '';
-                this.user.point = 0;
-                this.uerinfo_active = true;
+                this.resetUser();
+                this.userinfo_active = true;
             },
-            // 编辑用户
-            userEdit(user_id) {
-                this.uerinfo_active = true;
-                // 获取数据
-                let data = { user_id: user_id };
-                let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
-                axios.post('/api/points-mall/user-management/get-user-data', data, {
-                    headers: { 'X-Signature': signature }
-                }).then(response => {
-                    if (response.data.code == 0) {
-                        this.user = response.data.data.users;
-                    }
-                });
+
+            async userEdit(user_id) {
+                this.userinfo_active = true;
+                const result = await this.apiRequest('/api/points-mall/user-management/get-user-data', { user_id });
+                if (result) {
+                    this.user = result.users;
+                }
             },
-            // 存储用户
-            saveUser() {
-                // 获取数据
-                let data = this.user;
-                let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
-                axios.post('/api/points-mall/user-management/set-data', data, {
-                    headers: { 'X-Signature': signature }
-                }).then(response => {
-                    if (response.data.code == 0) {
-                        this.showNotification('操作成功', 'success')
-                        this.user.user_id = null;
-                        this.user.uid = null;
-                        this.user.name = null;
-                        this.user.password = null;
-                        this.user.vip_type = '';
-                        this.user.point = 0;
-                        this.uerinfo_active = false;
-                        this.getData()
-                    }
-                });
+
+            async saveUser() {
+                const result = await this.apiRequest('/api/points-mall/user-management/set-data', this.user);
+                if (result) {
+                    this.showNotification('操作成功', 'success');
+                    this.resetUser();
+                    this.userinfo_active = false;
+                    this.getData();
+                }
             },
-            // 查询用户
-            searchUid() {
-                let data = { uid: this.user.uid };
-                let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
-                axios.post('/api/points-mall/user-management/get-user-info', data, {
-                    headers: { 'X-Signature': signature }
-                }).then(response => {
-                    if (response.data.code == 0 && response.data.data.uname) {
-                        this.user.name = response.data.data.uname;
-                        this.uid_error = false;
-                    } else {
-                        this.uid_error = true;
-                    }
-                });
+
+            async searchUid() {
+                const result = await this.apiRequest('/api/points-mall/user-management/get-user-info', { uid: this.user.uid });
+                if (result && result.uname) {
+                    this.user.name = result.uname;
+                    this.uid_error = false;
+                } else {
+                    this.uid_error = true;
+                }
             },
-            // 查看记录
-            userRecords(user_id) {
-                this.records = [];
+
+            async userRecords(user_id) {
                 this.records_active = true;
-                // 获取数据
-                let data = { user_id: user_id };
-                let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
-                axios.post('/api/points-mall/user-management/get-user-records', data, {
-                    headers: { 'X-Signature': signature }
-                }).then(response => {
-                    if (response.data.code == 0) {
-                        this.add_user_records_active = false;
-                        this.records = response.data.data.records;
-                        this.set_user_point.user_id = user_id;
-                        this.set_user_point.point = 0;
-                        this.set_user_point.type = 0;
-                    }
-                });
+                this.add_user_records_active = false;
+                const result = await this.apiRequest('/api/points-mall/user-management/get-user-records', { user_id });
+                if (result) {
+                    this.records = result.records;
+                    this.set_user_point.user_id = user_id;
+                    this.set_user_point.point = 0;
+                    this.set_user_point.type = 0;
+                }
             },
-            // 增加记录
-            addUserRecords() {
-                // 获取数据
-                let data = this.set_user_point;
-                let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
-                axios.post('/api/points-mall/user-management/set-user-point', data, {
-                    headers: { 'X-Signature': signature }
-                }).then(response => {
-                    if (response.data.code == 0) {
-                        this.userRecords(this.set_user_point.user_id)
-                    }
-                });
+
+            async addUserRecords() {
+                const result = await this.apiRequest('/api/points-mall/user-management/set-user-point', this.set_user_point);
+                if (result) {
+                    this.showNotification('操作成功', 'success');
+                    this.userRecords(this.set_user_point.user_id);
+                }
             },
+
+            resetUser() {
+                this.user = {
+                    user_id: null,
+                    uid: null,
+                    name: null,
+                    password: null,
+                    vip_type: ''
+                };
+            }
         }
     });
+
     app.mount('#app');
 </script>
+
 
 </html>
