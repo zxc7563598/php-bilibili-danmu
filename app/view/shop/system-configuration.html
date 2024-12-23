@@ -296,7 +296,7 @@
                         if (response.data.code === 0) {
                             this.showNotification('存储成功', 'success');
                         } else {
-                            this.showNotification(response.data.msg, 'warning');
+                            this.showNotification(response.data.message, 'warning');
                         }
                     })
                     .catch(() => {
