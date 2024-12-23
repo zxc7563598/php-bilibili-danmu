@@ -2,11 +2,12 @@
 
 namespace app\model;
 
+use Carbon\Carbon;
 use support\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class UserVips extends Model
+class SystemChangePointRecords extends Model
 {
     use HasFactory;
     use SoftDeletes;
@@ -16,14 +17,14 @@ class UserVips extends Model
      *
      * @var string
      */
-    protected $table = 'bl_user_vips';
+    protected $table = 'bl_system_change_point_records';
 
     /**
      * 重定义主键，默认是id
      *
      * @var string
      */
-    protected $primaryKey = 'user_id';
+    protected $primaryKey = 'records_id';
 
     /**
      * 指示是否自动维护时间戳
@@ -44,11 +45,11 @@ class UserVips extends Model
     {
         parent::boot();
 
-        static::saving(function ($model) {
-            if ($model->getOriginal('password') != $model->password) {
-                $model->salt = mt_rand(1000, 9999);
-                $model->password = sha1(sha1($model->password) . $model->salt);
-            }
+        static::creating(function ($model) {
+            // 用户信息变更
+            $user_vips = UserVips::where('user_id', $model->user_id)->first();
+            $user_vips->point = $model->after_point;
+            $user_vips->save();
         });
     }
 }

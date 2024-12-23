@@ -24,10 +24,12 @@ class ManagementController extends GeneralMethod
             'secretKey' => getenv('SECURE_API_KEY')
         ]);
     }
-    public function pageUserManagement(Request $request)
+    public function pageUserManagement(Request $request, $page = null)
     {
+        $page = !empty($page) ? $page : 1;
         return view('shop/user-management', [
-            'secretKey' => getenv('SECURE_API_KEY')
+            'secretKey' => getenv('SECURE_API_KEY'),
+            'page' => $page
         ]);
     }
     public function pageProductManagement(Request $request)

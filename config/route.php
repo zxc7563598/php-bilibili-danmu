@@ -34,13 +34,18 @@ Route::group('/points-mall', function () {
     app\middleware\BasicAuthMiddleware::class
 ]);
 
-
 Route::group('/api/points-mall', function () {
     Route::any('/system-configuration/get-data', [app\controller\shop\management\SystemConfigurationController::class, 'getData']);
     Route::any('/system-configuration/set-data', [app\controller\shop\management\SystemConfigurationController::class, 'setData']);
     Route::any('/mall-configuration/get-data', [app\controller\shop\management\MallConfigurationController::class, 'getData']);
     Route::any('/mall-configuration/set-data', [app\controller\shop\management\MallConfigurationController::class, 'setData']);
     Route::any('/mall-configuration/upload-images', [app\controller\shop\management\MallConfigurationController::class, 'uploadImages']);
+    Route::any('/user-management/get-data', [app\controller\shop\management\UserManagementController::class, 'getData']);
+    Route::any('/user-management/get-user-data', [app\controller\shop\management\UserManagementController::class, 'getUserData']);
+    Route::any('/user-management/get-user-info', [app\controller\shop\management\UserManagementController::class, 'getUserInfo']);
+    Route::any('/user-management/set-data', [app\controller\shop\management\UserManagementController::class, 'setData']);
+    Route::any('/user-management/get-user-records', [app\controller\shop\management\UserManagementController::class, 'getUserRecords']);
+    Route::any('/user-management/set-user-point', [app\controller\shop\management\UserManagementController::class, 'setUserPoint']);
 })->middleware([
     app\middleware\SignatureMiddleware::class
 ]);

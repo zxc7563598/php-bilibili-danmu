@@ -5,8 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>积分商城控制台</title>
-    <script src="/js/vue.3.5.12.js"></script>
-    <script src="/js/axios.min.js"></script>
     <?php include 'layout/style.php'; ?>
 </head>
 
@@ -21,7 +19,7 @@
         <!-- 主要内容区域 -->
         <div class="column" id="main-content">
             <!-- 动态通知框 -->
-            <transition name="slide-fade" @after-leave="resetNotification">
+            <transition name="slide-fade" @after-leave="showNotification">
                 <div v-if="isNotificationVisible" class="notification notification-fixed" :class="notificationType">
                     <button class="delete" @click="hideNotification"></button>
                     {{notificationMessage}}
@@ -216,6 +214,7 @@
                 notificationMessage: null,
                 notificationType: '',
                 loading: false,
+                showPage: false,
                 form: {
                     db_host: "",
                     db_name: "",
@@ -243,70 +242,80 @@
             showNotification(message, type = 'info') {
                 this.isNotificationVisible = true;
                 this.notificationMessage = message;
-                switch (type) {
-                    case 'success':
-                        this.notificationType = 'is-success is-light'
-                        break;
-                    case 'info':
-                        this.notificationType = 'is-light'
-                        break;
-                    case 'error':
-                        this.notificationType = 'is-danger is-light'
-                        break;
-                    case 'warning':
-                        this.notificationType = 'is-warning is-light'
-                        break;
-                }
-                setTimeout(this.hideNotification, 3000);
+                this.notificationType = this.getNotificationClass(type);
+                setTimeout(() => this.hideNotification(), 3000);
             },
+
             // 隐藏通知
             hideNotification() {
                 this.isNotificationVisible = false;
             },
-            // 防止通知重复
-            resetNotification() {
-                this.isNotificationVisible = false;
+
+            // 获取通知样式
+            getNotificationClass(type) {
+                const types = {
+                    success: 'is-success is-light',
+                    info: 'is-light',
+                    error: 'is-danger is-light',
+                    warning: 'is-warning is-light'
+                };
+                return types[type] || 'is-light';
             },
+
             // 获取页面数据
             getData() {
-                let data = {}
-                let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
+                const data = {};
+                const signature = this.generateSignature(data);
                 axios.post('/api/points-mall/system-configuration/get-data', data, {
                     headers: { 'X-Signature': signature }
-                }).then(response => {
-                    if (response.data.code == 0) {
+                })
+                    .then(response => {
+                        if (response.data.code === 0) {
+                            document.getElementById('loading').style.display = 'none';
+                            document.getElementById('main-content-body').style.display = 'block';
+                            this.form = response.data.data;
+                        }
+                    })
+                    .catch(() => {
                         document.getElementById('loading').style.display = 'none';
                         document.getElementById('main-content-body').style.display = 'block';
-                        this.form = response.data.data;
-                    }
-                });
+                        this.showNotification('请求失败，请稍后重试', 'error');
+                    });
             },
+            
             // 存储信息
             saveData() {
                 this.loading = true;
-                let data = this.form
-                let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
-                try {
-                    axios.post('/api/points-mall/system-configuration/set-data', data, {
-                        headers: { 'X-Signature': signature }
-                    }).then(response => {
+                const data = this.form;
+                const signature = this.generateSignature(data);
+                axios.post('/api/points-mall/system-configuration/set-data', data, {
+                    headers: { 'X-Signature': signature }
+                })
+                    .then(response => {
                         this.loading = false;
-                        if (response.data.code == 0) {
-                            this.showNotification('存储成功', 'success')
+                        if (response.data.code === 0) {
+                            this.showNotification('存储成功', 'success');
                         } else {
-                            this.showNotification(response.data.msg, 'warning')
+                            this.showNotification(response.data.msg, 'warning');
                         }
+                    })
+                    .catch(() => {
+                        this.loading = false;
+                        this.showNotification('请求失败，请稍后重试', 'error');
                     });
-                } catch (error) {
-                    this.showNotification('请求失败，请稍后重试', 'error')
-                }
+            },
+
+            // 生成签名
+            generateSignature(data) {
+                return CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
             }
         },
-        beforeDestroy() {
+        beforeUnmount() {
             clearInterval(this.intervalId);
         }
     });
     app.mount('#app');
 </script>
+
 
 </html>

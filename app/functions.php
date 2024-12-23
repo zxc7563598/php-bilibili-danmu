@@ -154,3 +154,22 @@ function getImageUrl($str): string
     }
     return $str;
 }
+
+/**
+ * Api数据分页返回
+ *
+ * @param object|array $list 分页数据
+ * 
+ * @return array
+ */
+function pageToArray($list): array
+{
+    $data = is_array($list) ? $list : $list->toArray();
+    $result = [];
+    $result['total'] = (int)$data['total']; // 总计条数
+    $result['per_page'] = (int)$data['per_page']; // 每页最大展示条数
+    $result['current_page'] = (int)$data['current_page']; // 当前页码
+    $result['total_page'] = (int)$data['last_page']; // 最大页码
+    $result['data'] = $data['data']; // 数据
+    return $result;
+}
