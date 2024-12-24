@@ -46,6 +46,10 @@ Route::group('/api/points-mall', function () {
     Route::any('/user-management/set-data', [app\controller\shop\management\UserManagementController::class, 'setData']);
     Route::any('/user-management/get-user-records', [app\controller\shop\management\UserManagementController::class, 'getUserRecords']);
     Route::any('/user-management/set-user-point', [app\controller\shop\management\UserManagementController::class, 'setUserPoint']);
+    Route::any('/product-management/get-data', [app\controller\shop\management\ProductManagementController::class, 'getData']);
+    Route::any('/product-management/get-data-details', [app\controller\shop\management\ProductManagementController::class, 'getDataDetails']);
+    Route::any('/product-management/set-data-details', [app\controller\shop\management\ProductManagementController::class, 'setDataDetails']);
+    Route::any('/product-management/upload-images', [app\controller\shop\management\ProductManagementController::class, 'uploadImages']);
 })->middleware([
     app\middleware\SignatureMiddleware::class
 ]);

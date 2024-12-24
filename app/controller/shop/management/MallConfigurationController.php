@@ -49,6 +49,10 @@ class MallConfigurationController extends GeneralMethod
             'protocols_name' => $data['protocols-name'], // 协议名称
             'protocols_signature' => $data['protocols-signature'], // 协议人签名
             'protocols_content' => $data['protocols-content'], // 协议内容
+            'listening_open_vip' => $data['listening-open-vip'], // 大航海监听
+            'vip_lv1_bonus_points' => $data['vip-lv1-bonus-points'], // 开通舰长奖励积分
+            'vip_lv2_bonus_points' => $data['vip-lv2-bonus-points'], // 开通提督奖励积分
+            'vip_lv3_bonus_points' => $data['vip-lv3-bonus-points'], // 开通总督奖励积分
             'virtual_gift_order_successful_icon' => $data['virtual-gift-order-successful-icon'], // 虚拟礼物下单成功图标
             'virtual_gift_order_successful_title' => $data['virtual-gift-order-successful-title'], // 虚拟礼物下单成功标题
             'virtual_gift_order_successful_content' => $data['virtual-gift-order-successful-content'], // 虚拟礼物下单成功内容
@@ -78,6 +82,10 @@ class MallConfigurationController extends GeneralMethod
         $input['protocols-name'] = $param['protocols_name']; // 协议名称
         $input['protocols-signature'] = $param['protocols_signature']; // 协议人签名
         $input['protocols-content'] = $param['protocols_content']; // 协议内容
+        $input['listening-open-vip'] = $param['listening_open_vip']; // 大航海监听
+        $input['vip-lv1-bonus-points'] = $param['vip_lv1_bonus_points']; // 开通舰长奖励积分
+        $input['vip-lv2-bonus-points'] = $param['vip_lv2_bonus_points']; // 开通提督奖励积分
+        $input['vip-lv3-bonus-points'] = $param['vip_lv3_bonus_points']; // 开通总督奖励积分
         $input['virtual-gift-order-successful-icon'] = $param['virtual_gift_order_successful_icon']; // 虚拟礼物下单成功图标
         $input['virtual-gift-order-successful-title'] = $param['virtual_gift_order_successful_title']; // 虚拟礼物下单成功标题
         $input['virtual-gift-order-successful-content'] = $param['virtual_gift_order_successful_content']; // 虚拟礼物下单成功内容

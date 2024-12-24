@@ -99,6 +99,9 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <tr v-if="list.data && list.data.length == 0">
+                                            <td colspan="7" style="text-align: center;">无数据</td>
+                                        </tr>
                                         <tr v-for="(item,index) in list.data">
                                             <td>{{item.uid}}</td>
                                             <td>{{item.name}}</td>
@@ -115,7 +118,8 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                                <nav class="pagination is-rounded" role="navigation" aria-label="pagination">
+                                <nav class="pagination is-rounded" role="navigation" aria-label="pagination"
+                                    v-if="pageNumbers.length > 1">
                                     <a href="javascript:;" class="pagination-previous"
                                         @click="handlePageChange(this.list.current_page-1)">上一页</a>
                                     <a href="javascript:;" class="pagination-next"
@@ -294,11 +298,6 @@
                     name: null,
                     password: null,
                     vip_type: ''
-                },
-                notification: {
-                    isVisible: false,
-                    message: '',
-                    type: ''
                 }
             };
         },
@@ -429,7 +428,7 @@
 
             async userEdit(user_id) {
                 this.userinfo_active = true;
-                const result = await this.apiRequest('/api/points-mall/user-management/get-user-data', { user_id });
+                const result = await this.apiRequest('/api/points-mall/user-management/get-user-data', { user_id: user_id });
                 if (result) {
                     this.user = result.users;
                 }
@@ -458,7 +457,7 @@
             async userRecords(user_id) {
                 this.records_active = true;
                 this.add_user_records_active = false;
-                const result = await this.apiRequest('/api/points-mall/user-management/get-user-records', { user_id });
+                const result = await this.apiRequest('/api/points-mall/user-management/get-user-records', { user_id: user_id });
                 if (result) {
                     this.records = result.records;
                     this.set_user_point.user_id = user_id;
@@ -486,7 +485,6 @@
             }
         }
     });
-
     app.mount('#app');
 </script>
 

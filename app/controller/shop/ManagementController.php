@@ -32,22 +32,28 @@ class ManagementController extends GeneralMethod
             'page' => $page
         ]);
     }
-    public function pageProductManagement(Request $request)
+    public function pageProductManagement(Request $request, $page = null)
     {
+        $page = !empty($page) ? $page : 1;
         return view('shop/product-management', [
-            'secretKey' => getenv('SECURE_API_KEY')
+            'secretKey' => getenv('SECURE_API_KEY'),
+            'page' => $page
         ]);
     }
-    public function pageShippingManagement(Request $request)
+    public function pageShippingManagement(Request $request, $page = null)
     {
+        $page = !empty($page) ? $page : 1;
         return view('shop/shipping-management', [
-            'secretKey' => getenv('SECURE_API_KEY')
+            'secretKey' => getenv('SECURE_API_KEY'),
+            'page' => $page
         ]);
     }
-    public function pageComplaintManagement(Request $request)
+    public function pageComplaintManagement(Request $request, $page = null)
     {
+        $page = !empty($page) ? $page : 1;
         return view('shop/complaint-management', [
-            'secretKey' => getenv('SECURE_API_KEY')
+            'secretKey' => getenv('SECURE_API_KEY'),
+            'page' => $page
         ]);
     }
     public function pageFeedback(Request $request)
