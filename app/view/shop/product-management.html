@@ -148,17 +148,17 @@
                                             <td colspan="7" style="text-align: center;">无数据</td>
                                         </tr>
                                         <tr v-for="(item,index) in list.data">
-                                            <td>
-                                                <figure class="image is-24x24">
+                                            <td class="is-vcentered">
+                                                <figure class="image is-32x32">
                                                     <img :src="item.cover_image" />
                                                 </figure>
                                             </td>
-                                            <td>{{item.name}}</td>
-                                            <td>{{item.amount}}</td>
-                                            <td>{{item.status}}</td>
-                                            <td>{{item.type}}</td>
-                                            <td>{{item.sort}}</td>
-                                            <td>
+                                            <td class="is-vcentered">{{item.name}}</td>
+                                            <td class="is-vcentered">{{item.amount}}</td>
+                                            <td class="is-vcentered">{{item.status}}</td>
+                                            <td class="is-vcentered">{{item.type}}</td>
+                                            <td class="is-vcentered">{{item.sort}}</td>
+                                            <td class="is-vcentered">
                                                 <button class="button is-light is-small"
                                                     @click="editGoods(item.goods_id)">变更</button>
                                             </td>
@@ -375,7 +375,8 @@
                 </section>
                 <footer class="modal-card-foot">
                     <div class="buttons">
-                        <button class="button is-success" @click="saveGoods" :class="loading ? 'is-loading' : ''">存储</button>
+                        <button class="button is-success" @click="saveGoods"
+                            :class="loading ? 'is-loading' : ''">存储</button>
                         <button class=" button" @click="this.goods_active = false">取消</button>
                     </div>
                 </footer>
@@ -502,6 +503,14 @@
             // 隐藏通知
             hideNotification() {
                 this.isNotificationVisible = false;
+            },
+
+            // 变更页码
+            handlePageChange(page) {
+                if (page < 1) page = 1;
+                if (page > this.list.total_page) page = this.list.total_page;
+                this.form.page = page;
+                this.getData();
             },
 
             // 分页数据处理

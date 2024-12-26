@@ -4,7 +4,9 @@ namespace app\controller\shop;
 
 use app\controller\GeneralMethod;
 use app\core\LoginPublicMethods;
+use app\model\ShopConfig;
 use app\model\UserVips;
+use Carbon\Exceptions\InvalidTimeZoneException;
 use support\Request;
 use support\Redis;
 use Webman\Http\Response;
@@ -12,6 +14,27 @@ use resource\enums\UserVipsEnums;
 
 class LoginController extends GeneralMethod
 {
+
+    /**
+     * 获取登录页背景图片
+     * 
+     * @return Response 
+     */
+    public function getLoginBackground(Request $request): Response
+    {
+        $param = $request->data;
+        sublog('积分商城', '获取登录页背景图片', $param);
+        sublog('积分商城', '获取登录页背景图片', '===================');
+        // 获取数据
+        $config = ShopConfig::where('title', 'login-background-image')->first([
+            'content' => 'content'
+        ]);
+        // 返回数据
+        return success($request, [
+            'background' => !empty($config->content) ? $config->content : null
+        ]);
+    }
+
     /**
      * 获取用户是否存在
      *
