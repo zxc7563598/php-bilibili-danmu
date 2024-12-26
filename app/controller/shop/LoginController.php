@@ -16,6 +16,29 @@ class LoginController extends GeneralMethod
 {
 
     /**
+     * 获取商城主题色
+     * 
+     * @return Response 
+     */
+    public function getThemeColor(Request $request): Response
+    {
+        $param = $request->data;
+        sublog('积分商城', '获取登录页背景图片', $param);
+        sublog('积分商城', '获取登录页背景图片', '===================');
+        // 获取数据
+        $config = ShopConfig::where('title', 'theme-color')->first([
+            'content' => 'content'
+        ]);
+        $theme_color = explode(',', $config->content);
+        $color = isset($theme_color[0]) ? $theme_color[0] : '#7232dd';
+        // 返回数据
+        return success($request, [
+            $color,
+            isset($theme_color[1]) ? $theme_color[1] : $color
+        ]);
+    }
+
+    /**
      * 获取登录页背景图片
      * 
      * @return Response 
