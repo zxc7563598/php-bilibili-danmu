@@ -31,7 +31,7 @@ class LoginController extends GeneralMethod
         ]);
         // 返回数据
         return success($request, [
-            'background' => !empty($config->content) ? $config->content : null
+            'background' => !empty($config->content) ? getImageUrl($config->content) : null
         ]);
     }
 
