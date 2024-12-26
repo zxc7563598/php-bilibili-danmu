@@ -50,6 +50,11 @@ Route::group('/api/points-mall', function () {
     Route::any('/product-management/get-data-details', [app\controller\shop\management\ProductManagementController::class, 'getDataDetails']);
     Route::any('/product-management/set-data-details', [app\controller\shop\management\ProductManagementController::class, 'setDataDetails']);
     Route::any('/product-management/upload-images', [app\controller\shop\management\ProductManagementController::class, 'uploadImages']);
+    Route::any('/shipping-management/get-data', [app\controller\shop\management\ShippingManagementController::class, 'getData']);
+    Route::any('/shipping-management/get-data-details', [app\controller\shop\management\ShippingManagementController::class, 'getDataDetails']);
+    Route::any('/shipping-management/set-data-details', [app\controller\shop\management\ShippingManagementController::class, 'setDataDetails']);
+    Route::any('/complaint-management/get-data', [app\controller\shop\management\ComplaintManagementController::class, 'getData']);
+    Route::any('/complaint-management/get-data-details', [app\controller\shop\management\ComplaintManagementController::class, 'getDataDetails']);
 })->middleware([
     app\middleware\SignatureMiddleware::class
 ]);
@@ -69,6 +74,7 @@ Route::group('/api/robot', function () {
 
 // API接口
 Route::group('/api/shop', function () {
+    Route::post('/login/get-login-background', [app\controller\shop\LoginController::class, 'getLoginBackground']); // 获取背景图片
     Route::post('/login/get-user-vip', [app\controller\shop\LoginController::class, 'getUserVip']); // 获取用户是否存在
     Route::post('/login/perform-login', [app\controller\shop\LoginController::class, 'performLogin']); // 执行登陆
     Route::post('/login/logout', [app\controller\shop\LoginController::class, 'logout']); // 退出登录
