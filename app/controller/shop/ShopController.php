@@ -14,6 +14,7 @@ use Webman\Http\Response;
 use resource\enums\GoodsEnums;
 use resource\enums\GoodSubsEnums;
 use resource\enums\UserAddressEnums;
+use resource\enums\ShopConfigEnums;
 use support\Db;
 
 class ShopController extends GeneralMethod
@@ -227,70 +228,135 @@ class ShopController extends GeneralMethod
         // 获取参数
         $type = $param['type'];
         // 声明数据
-        $ranking = 0;
-        $redemption = [];
         $title = '下单成功！';
         $content = '已经在安排啦';
         $button = '回到首页';
-        $images = getImageUrl('order/orderFail.png');
+        $images = getImageUrl('default/orderFail.png');
+        $ranking = 0;
+        $redemption = [];
         // 处理信息
         switch ($type) {
             case GoodsEnums\Type::Virtually->value: // 虚拟
-                $title = '下单成功！';
-                $content = '已经在给你准备啦！记得抓紧来找我要嗷～';
-                $button = '啊啊啊啊啊我来了我来了';
-                $images = getImageUrl('order/orderFail.png');
+                $config_database = ShopConfig::whereIn('title', [
+                    'virtual-gift-order-successful-icon',
+                    'virtual-gift-order-successful-title',
+                    'virtual-gift-order-successful-content',
+                    'virtual-gift-order-successful-button'
+                ])->get([
+                    'title' => 'title',
+                    'content' => 'content'
+                ]);
+                $config = [];
+                foreach ($config_database as $_config_database) {
+                    $config[$_config_database->title] = $_config_database->content;
+                }
+                $title = $config['virtual-gift-order-successful-title'];
+                $content = $config['virtual-gift-order-successful-content'];
+                $button = $config['virtual-gift-order-successful-button'];
+                $images = getImageUrl($config['virtual-gift-order-successful-icon']);
                 break;
             case GoodsEnums\Type::Entity->value: // 实体
-                $title = '下单成功！';
-                $content = '已经收到通知啦，很快就会发货嘿嘿嘿';
-                $button = '我自愿体谅主包的辛苦，晚点发也可以';
-                $images = getImageUrl('order/orderFail.png');
+                $config_database = ShopConfig::whereIn('title', [
+                    'realism-gift-order-successful-icon',
+                    'realism-gift-order-successful-title',
+                    'realism-gift-order-successful-content',
+                    'realism-gift-order-successful-button'
+                ])->get([
+                    'title' => 'title',
+                    'content' => 'content'
+                ]);
+                $config = [];
+                foreach ($config_database as $_config_database) {
+                    $config[$_config_database->title] = $_config_database->content;
+                }
+                $title = $config['realism-gift-order-successful-title'];
+                $content = $config['realism-gift-order-successful-content'];
+                $button = $config['realism-gift-order-successful-button'];
+                $images = getImageUrl($config['realism-gift-order-successful-icon']);
                 break;
             case GoodsEnums\Type::Tribute->value: // 贡
-                $title = '...';
-                // 获取信息
-                $goods = Goods::where('type', GoodsEnums\Type::Tribute->value)->get([
-                    'goods_id' => 'goods_id'
+                $config_database = ShopConfig::whereIn('title', [
+                    'tribute-gift-order-successful-icon',
+                    'tribute-gift-order-successful-title',
+                    'tribute-gift-order-successful-content',
+                    'tribute-gift-order-successful-button',
+                    'tribute-gift-order-successful-rankings',
+                    'tribute-gift-order-successful-rankingslist'
+                ])->get([
+                    'title' => 'title',
+                    'content' => 'content'
                 ]);
-                $goods_id = [];
-                foreach ($goods as $_goods) {
-                    $goods_id[] = $_goods->goods_id;
+                $config = [];
+                foreach ($config_database as $_config_database) {
+                    $config[$_config_database->title] = $_config_database->content;
                 }
-                $redemption = RedemptionRecords::join('bl_user_vips', 'bl_user_vips.user_id', '=', 'bl_redemption_records.user_id')
-                    ->whereIn('bl_redemption_records.goods_id', $goods_id)
-                    ->groupBy('bl_redemption_records.user_id')
-                    ->orderByRaw('count desc')
-                    ->orderBy('bl_redemption_records.created_at', 'asc')
-                    ->get([
-                        Db::raw("bl_user_vips.user_id as user_id"),
-                        Db::raw("bl_user_vips.name as name"),
-                        Db::raw("count(*) as count"),
-                        Db::raw("sum(bl_redemption_records.point) as amount")
+                $title = $config['tribute-gift-order-successful-title'];
+                $content = $config['tribute-gift-order-successful-content'];
+                $button = $config['tribute-gift-order-successful-button'];
+                $images = getImageUrl($config['tribute-gift-order-successful-icon']);
+                // 获取贡品信息
+                if ($config['tribute-gift-order-successful-rankings'] == 1) {
+                    $goods = Goods::where('type', GoodsEnums\Type::Tribute->value)->get([
+                        'goods_id' => 'goods_id'
                     ]);
-                // 获取自己的排名
-                $i = 1;
-                foreach ($redemption as &$_redemption) {
-                    if ($ranking == 0) {
-                        if ($user_vips->user_id == $_redemption->user_id) {
-                            $ranking = $i;
-                        }
+                    $goods_id = [];
+                    foreach ($goods as $_goods) {
+                        $goods_id[] = $_goods->goods_id;
                     }
-                    unset($_redemption->user_id);
-                    $i++;
+                    $redemption = RedemptionRecords::join('bl_user_vips', 'bl_user_vips.user_id', '=', 'bl_redemption_records.user_id')
+                        ->whereIn('bl_redemption_records.goods_id', $goods_id)
+                        ->groupBy('bl_redemption_records.user_id')
+                        ->orderByRaw('count desc')
+                        ->orderBy('bl_redemption_records.created_at', 'asc')
+                        ->get([
+                            Db::raw("bl_user_vips.user_id as user_id"),
+                            Db::raw("bl_user_vips.name as name"),
+                            Db::raw("count(*) as count"),
+                            Db::raw("sum(bl_redemption_records.point) as amount")
+                        ]);
+                    // 获取自己的排名
+                    $i = 1;
+                    foreach ($redemption as &$_redemption) {
+                        if ($ranking == 0) {
+                            if ($user_vips->user_id == $_redemption->user_id) {
+                                $ranking = $i;
+                            }
+                        }
+                        unset($_redemption->user_id);
+                        $i++;
+                    }
                 }
-                $content = '你连垃圾都不如';
-                if ($ranking <= 10) {
-                    $content = "你以为把积分上供就能挨骂了？\r\n你什么都得不到，废物东西\r\n就算是废物都有被我踩在脚底下的价值\r\n你那点积分就跟你一样一点用都没有\r\n犯贱就继续上，让我看看你个废物东西能有多贱";
+                $rankingslist = json_decode($config['tribute-gift-order-successful-rankingslist'], true);
+                foreach ($rankingslist as $_rankingslist) {
+                    switch ($_rankingslist['comparison']) {
+                        case ShopConfigEnums\Comparison::GreaterThan->value: // 大于
+                            if ($ranking > $_rankingslist['position']) {
+                                $content = $_rankingslist['content'];
+                            }
+                            break;
+                        case ShopConfigEnums\Comparison::GreaterThanOrEqualTo->value: // 大于等于
+                            if ($ranking >= $_rankingslist['position']) {
+                                $content = $_rankingslist['content'];
+                            }
+                            break;
+                        case ShopConfigEnums\Comparison::LessThan->value: // 小于
+                            if ($ranking < $_rankingslist['position']) {
+                                $content = $_rankingslist['content'];
+                            }
+                            break;
+                        case ShopConfigEnums\Comparison::LessThanOrEqualTo->value: // 小于等于
+                            if ($ranking <= $_rankingslist['position']) {
+                                $content = $_rankingslist['content'];
+                            }
+                            break;
+                        case ShopConfigEnums\Comparison::EqualTo->value: // 等于
+                            if ($ranking == $_rankingslist['position']) {
+                                $content = $_rankingslist['content'];
+                            }
+                            break;
+                    }
                 }
-                if ($ranking <= 5) {
-                    $content = "你可真是个垃圾\r\n怎么，花钱给主播上供让你感觉很好吗？\r\n才上到个第" . $ranking . "名，你也就这点能耐了，没用的东西\r\n这么爱上就多上点，让我看看你废物到什么程度";
-                }
-                if ($ranking == 1) {
-                    $content = "上供都上这么勤快真贱啊，废物玩意\r\n你也就只配上供了知道吗臭傻逼\r\n给我多去赚点积分，在这个第一大傻逼的位子上待着\r\n方便我什么时候心情好了骂你两句";
-                }
-                $button = '呜呜呜主人我会继续努力的';
-                $images = getImageUrl('order/orderFail.png');
+
                 break;
         }
         // 返回数据
@@ -298,8 +364,8 @@ class ShopController extends GeneralMethod
             'title' => $title,
             'content' => $content,
             'button' => $button,
-            'ranking' => $ranking,
             'images' => $images,
+            'ranking' => $ranking,
             'redemption' => $redemption
         ]);
     }
