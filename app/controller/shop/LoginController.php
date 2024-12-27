@@ -164,26 +164,6 @@ class LoginController extends GeneralMethod
         $config = ShopConfig::where('title', 'live-streaming-link')->first([
             'content' => 'content'
         ]);
-        // 获取用户头像
-        $getMasterInfo = Tools\HttpClient::sendGetRequest('https://api.live.bilibili.com/live_user/v1/Master/info?uid=' . $user_vips->uid, [
-            "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
-            "Origin: https://live.bilibili.com",
-        ], 10);
-        if ($getMasterInfo['httpStatus'] == 200) {
-            $getMasterInfoData = json_decode($getMasterInfo['data'], true);
-        }
-        if (isset($getMasterInfoData['data']['info']['uname']) && isset($getMasterInfoData['data']['info']['face'])) {
-            if ($user_vips->name != $getMasterInfoData['data']['info']['uname']) {
-                $user_vips->name = $getMasterInfoData['data']['info']['uname'];
-            }
-            $file_name = pathinfo($getMasterInfoData['data']['info']['face'], PATHINFO_FILENAME);
-            if ($user_vips->avatar != $file_name) {
-                $path = public_path('attachment/user-info/' . implode('/', str_split(Tools\Str::padString(0, $user_vips->user_id), 2)) . '/avatar/');
-                $image_path = Tools\Img::downloadImageFromUrl($getMasterInfoData['data']['info']['face'], $path, $file_name);
-                $user_vips->avatar = Tools\Str::replaceFirst(public_path() . '/attachment/', '', $image_path);
-            }
-            $user_vips->save();
-        }
         // 返回处理
         return success($request, [
             'uid' => $user_vips->uid,

@@ -39,6 +39,7 @@ class UserController extends GeneralMethod
             'background' => !empty($config->content) ? getImageUrl($config->content) : null
         ]);
     }
+    
     /**
      * 获取用户地址列表
      * 
