@@ -176,7 +176,7 @@ class LoginController extends GeneralMethod
             if ($user_vips->name != $getMasterInfoData['data']['info']['uname']) {
                 $user_vips->name = $getMasterInfoData['data']['info']['uname'];
             }
-            $file_name = Tools\FileUtils::getFileNameWithoutExtension($getMasterInfoData['data']['info']['face']);
+            $file_name = Tools\FileUtils::getFileNameWithoutExtension(preg_replace('#^https?://#', '/', $getMasterInfoData['data']['info']['face']));
             if ($user_vips->avatar != $file_name) {
                 $path = public_path('attachment/user-info/' . implode('/', str_split(Tools\Str::padString(0, $user_vips->user_id), 2)) . '/avatar/');
                 $image_path = Tools\Img::downloadImageFromUrl($getMasterInfoData['data']['info']['face'], $path, $file_name);
