@@ -28,28 +28,8 @@ class LoginPublicMethods extends GeneralMethod
         $user_vip->name = !empty($name) ? $name : '潜在老头';
         $user_vip->vip_type = UserVipsEnums\VipType::Lv0->value;
         $user_vip->point = 0;
-        $getMasterInfo = Tools\HttpClient::sendGetRequest('https://api.live.bilibili.com/live_user/v1/Master/info?uid=' . $user_vip->uid, [
-            "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
-            "Origin: https://live.bilibili.com",
-        ], 10);
-        if ($getMasterInfo['httpStatus'] == 200) {
-            $getMasterInfoData = json_decode($getMasterInfo['data'], true);
-        }
-        if (isset($getMasterInfoData['data']['info']['uname'])) {
-            if ($user_vip->name != $getMasterInfoData['data']['info']['uname']) {
-                $user_vip->name = $getMasterInfoData['data']['info']['uname'];
-            }
-        }
         $user_vip->save();
-        if (isset($getMasterInfoData['data']['info']['face'])) {
-            $file_name = pathinfo($getMasterInfoData['data']['info']['face'], PATHINFO_FILENAME);
-            if ($user_vip->avatar != $file_name) {
-                $path = public_path('attachment/user-info/' . implode('/', str_split(Tools\Str::padString(0, $user_vip->user_id), 2)) . '/avatar/');
-                $image_path = Tools\Img::downloadImageFromUrl($getMasterInfoData['data']['info']['face'], $path, $file_name);
-                $user_vip->avatar = Tools\Str::replaceFirst(public_path() . '/attachment/', '', $image_path);
-                $user_vip->save();
-            }
-        }
+        self::updatingUserProfiles($uid);
         return true;
     }
 
@@ -76,11 +56,45 @@ class LoginPublicMethods extends GeneralMethod
         if (!$setToken) {
             return 900005;
         }
+        self::updatingUserProfiles($uid);
         // 返回数据 
         return [
             'user_id' => $user_vip->user_id,
             'token' => $token
         ];
+    }
+
+    /**
+     * 更新用户头像/名称信息
+     * 
+     * @param integer $uid 用户uid
+     * 
+     * @return void
+     */
+    public static function updatingUserProfiles($uid): void
+    {
+        // 获取用户信息
+        $user_vips = UserVips::where('uid', $uid)->first();
+        if (!empty($user_vips)) {
+            // 获取用户名称与头像
+            $getMasterInfo = Tools\HttpClient::sendGetRequest('https://api.live.bilibili.com/live_user/v1/Master/info?uid=' . $user_vips->uid, [
+                "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
+                "Origin: https://live.bilibili.com",
+            ], 10);
+            if ($getMasterInfo['httpStatus'] == 200) {
+                $getMasterInfoData = json_decode($getMasterInfo['data'], true);
+            }
+            if (isset($getMasterInfoData['data']['info']['uname']) && isset($getMasterInfoData['data']['info']['face'])) {
+                if ($user_vips->name != $getMasterInfoData['data']['info']['uname']) {
+                    $user_vips->name = $getMasterInfoData['data']['info']['uname'];
+                }
+                $file_name = pathinfo($getMasterInfoData['data']['info']['face'], PATHINFO_FILENAME);
+                $path = public_path('attachment/user-info/' . implode('/', str_split(Tools\Str::padString(0, $user_vips->user_id), 2)) . '/avatar/');
+                $image_path = Tools\Img::downloadImageFromUrl($getMasterInfoData['data']['info']['face'], $path, $file_name);
+                $user_vips->avatar = Tools\Str::replaceFirst(public_path() . '/attachment/', '', $image_path);
+                $user_vips->save();
+            }
+        }
     }
 
     /**

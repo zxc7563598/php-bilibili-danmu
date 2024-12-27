@@ -342,7 +342,7 @@
                                         <textarea class="textarea" v-model="form.tribute_gift_order_successful_content"
                                             placeholder="下单成功通知内容"></textarea>
                                     </div>
-                                    <p class="help">当没有针对排名设置通知内容时，用户会看到的默认的通知内容</p>
+                                    <p class="help">当没有为排名单独设置通知内容时，用户将会收到该默认通知内容</p>
                                 </div>
                                 <div class="field">
                                     <label class="label">下单成功按钮内容</label>
@@ -352,7 +352,7 @@
                                     </div>
                                 </div>
                                 <div class="field">
-                                    <label class="label">是否开启上供列表</label>
+                                    <label class="label">是否开启上供排名</label>
                                     <div class="control">
                                         <div class="select is-fullwidth">
                                             <select v-model="form.tribute_gift_order_successful_rankings">
@@ -361,9 +361,13 @@
                                             </select>
                                         </div>
                                     </div>
+                                    <p class="help">开启后，下单成功页面将展示按贡品商品购买次数排名的前十名用户及其购买次数。</p>
                                 </div>
                                 <div class="field">
-                                    <label class="label">排名</label>
+                                    <label class="label">排名规则</label>
+                                    <p class="help">开启上供排名后，用户排名满足设置的规则时，会展示对应的通知内容。</p>
+                                    <p class="help">设置多条规则时，按照规则顺序进行判断，若满足条件，则替换为对应的通知内容。</p>
+                                    <p class="help mb-2">如果没有任何规则匹配，则显示默认的下单成功通知内容。</p>
                                     <div class="control">
                                         <div class="rankings-list"
                                             v-for="(item,index) in form.tribute_gift_order_successful_rankingslist"
