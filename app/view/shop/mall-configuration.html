@@ -89,6 +89,15 @@
                                             :style="themeColorButton">这是存储设置后商城按钮的颜色</button>
                                     </p>
                                 </div>
+                                <div class="field">
+                                    <label class="label">直播间链接</label>
+                                    <div class="control">
+                                        <input class="input" type="text" v-model="form.live_streaming_link"
+                                            placeholder="直播间链接">
+                                    </div>
+                                    <p class="help">用户在积分商城「我的」页面中点击「立即爆米」跳转的页面，通常建议填写直播间链接</p>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -459,6 +468,7 @@
                     login_background_image: [], // 登录页面背景图
                     personal_background_image: [], // 个人中心背景图
                     theme_color: [], // 主题色
+                    live_streaming_link: null, // 直播间链接
                     protocols_surname: null, // 协议人姓名
                     protocols_uid: null, // 协议人UID
                     protocols_name: null, // 协议名称

@@ -44,6 +44,7 @@ class MallConfigurationController extends GeneralMethod
             'login_background_image' => $data['login-background-image'], // 登录页面背景图
             'personal_background_image' => $data['personal-background-image'], // 个人中心背景图
             'theme_color' => $data['theme-color'], // 主题色
+            'live_streaming_link' => $data['live-streaming-link'], // 直播间链接
             'protocols_surname' => $data['protocols-surname'], // 协议人姓名
             'protocols_uid' => $data['protocols-uid'], // 协议人UID
             'protocols_name' => $data['protocols-name'], // 协议名称
@@ -77,6 +78,7 @@ class MallConfigurationController extends GeneralMethod
         $input['login-background-image'] = $param['login_background_image']; // 登录页面背景图
         $input['personal-background-image'] = $param['personal_background_image']; // 个人中心背景图
         $input['theme-color'] = $param['theme_color']; // 主题色
+        $input['live-streaming-link'] = $param['live_streaming_link']; // 直播间链接
         $input['protocols-surname'] = $param['protocols_surname']; // 协议人姓名
         $input['protocols-uid'] = $param['protocols_uid']; // 协议人UID
         $input['protocols-name'] = $param['protocols_name']; // 协议名称

@@ -8,6 +8,7 @@ use app\model\Goods;
 use app\model\GoodSubs;
 use app\model\PaymentRecords;
 use app\model\RedemptionRecords;
+use app\model\ShopConfig;
 use app\model\UserAddress;
 use Carbon\Carbon;
 use support\Request;
@@ -18,6 +19,26 @@ use Hejunjie\Tools;
 
 class UserController extends GeneralMethod
 {
+
+    /**
+     * 获取个人中心&意见反馈页背景图片
+     * 
+     * @return Response 
+     */
+    public function getBackground(Request $request): Response
+    {
+        $param = $request->data;
+        sublog('积分商城', '获取个人中心&意见反馈页背景图片', $param);
+        sublog('积分商城', '获取个人中心&意见反馈页背景图片', '===================');
+        // 获取数据
+        $config = ShopConfig::where('title', 'personal-background-image')->first([
+            'content' => 'content'
+        ]);
+        // 返回数据
+        return success($request, [
+            'background' => !empty($config->content) ? getImageUrl($config->content) : null
+        ]);
+    }
     /**
      * 获取用户地址列表
      * 

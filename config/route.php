@@ -75,7 +75,7 @@ Route::group('/api/robot', function () {
 // API接口
 Route::group('/api/shop', function () {
     Route::post('/login/get-theme-color', [app\controller\shop\LoginController::class, 'getThemeColor']); // 获取主题色
-    Route::post('/login/get-login-background', [app\controller\shop\LoginController::class, 'getLoginBackground']); // 获取背景图片
+    Route::post('/login/get-background', [app\controller\shop\LoginController::class, 'getBackground']); // 获取背景图片
     Route::post('/login/get-user-vip', [app\controller\shop\LoginController::class, 'getUserVip']); // 获取用户是否存在
     Route::post('/login/perform-login', [app\controller\shop\LoginController::class, 'performLogin']); // 执行登陆
     Route::post('/login/logout', [app\controller\shop\LoginController::class, 'logout']); // 退出登录
@@ -85,6 +85,8 @@ Route::group('/api/shop', function () {
     Route::post('/shop/get-goods-details', [app\controller\shop\ShopController::class, 'getGoodsDetails']); // 获取商品详情
     Route::post('/shop/get-confirm', [app\controller\shop\ShopController::class, 'getConfirm']); // 获取确认订单信息
 
+    
+    Route::post('/user/get-background', [app\controller\shop\UserController::class, 'getBackground']); // 获取背景图片
     Route::post('/user/get-address-list', [app\controller\shop\UserController::class, 'getAddressList']); // 获取用户地址列表
     Route::post('/user/get-address-details', [app\controller\shop\UserController::class, 'getAddressDetails']); // 获取用户地址详情
     Route::post('/user/set-address-list', [app\controller\shop\UserController::class, 'setAddressList']); // 存储地址信息
