@@ -195,16 +195,33 @@ class UserController extends GeneralMethod
         // 获取数据
         $sn = $user_vips->created_at->timezone(config('app')['default_timezone'])->format('Ymd') . Tools\Str::padString(0, $user_vips->user_id);
         $room_uinfo = !empty(strval(readFileContent(runtime_path() . '/tmp/room_uinfo.cfg'))) ? json_decode(strval(readFileContent(runtime_path() . '/tmp/room_uinfo.cfg')), true) : [];
+        // 获取配置信息
+        $config_database = ShopConfig::whereIn('title', [
+            'protocols-surname',
+            'protocols-uid',
+            'protocols-signature',
+            'protocols-content',
+            'protocols-name'
+        ])->get([
+            'title' => 'title',
+            'content' => 'content'
+        ]);
+        $config = [];
+        foreach ($config_database as $_config) {
+            $config[$_config->title] = $_config->content;
+        }
         // 返回信息
         return success($request, [
             'sn' => $sn,
+            'title' => isset($config['protocols-name']) ? $config['protocols-name'] : '',
             'id_card' => !empty($user_vips->uid) ? $user_vips->uid : null,
             'real_name' => !empty($user_vips->name) ? $user_vips->name : null,
             'company' => [
-                'uid' => isset($room_uinfo['uid']) ? $room_uinfo['uid'] : '',
-                'name' => isset($room_uinfo['uname']) ? $room_uinfo['uname'] : '',
-                'face' => isset($room_uinfo['face']) ? $room_uinfo['face'] : ''
+                'uid' => isset($config['protocols-uid']) ? $config['protocols-uid'] : '',
+                'name' => isset($config['protocols-surnam']) ? $config['protocols-surnam'] : '',
+                'face' => isset($config['protocols-signature']) ? getImageUrl($config['protocols-signature']) : ''
             ],
+            'protocols' => isset($config['protocols-content']) ? getImageUrl($config['protocols-content']) : '',
             'signing_date' => Carbon::today()->timezone(config('app')['default_timezone'])->format('Y-m-d'),
             'signing' => !empty($user_vips->sign_image) ? getImageUrl($user_vips->sign_image) : null
         ]);

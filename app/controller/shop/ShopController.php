@@ -7,6 +7,7 @@ use app\core\UserPublicMethods;
 use app\model\Goods;
 use app\model\GoodSubs;
 use app\model\RedemptionRecords;
+use app\model\ShopConfig;
 use app\model\UserAddress;
 use support\Request;
 use Webman\Http\Response;
@@ -152,6 +153,10 @@ class ShopController extends GeneralMethod
         foreach ($good_subs as $_good_subs) {
             $commodity_type[] = $_good_subs->name . '*1  ';
         }
+        // 获取配置信息
+        $config = ShopConfig::where('title', 'protocols-name')->first([
+            'content' => 'content'
+        ]);
         // 返回数据
         return success($request, [
             'user_address' => $user_address,
@@ -167,7 +172,8 @@ class ShopController extends GeneralMethod
                     ['key' => '运费', 'value' => '主包包邮'],
                     ['key' => '发货时间', 'value' => '取决于主包心情']
                 ]
-            ]
+            ],
+            'protocols_title' => !empty($config->content) ? $config->content : '协议'
         ]);
     }
 
