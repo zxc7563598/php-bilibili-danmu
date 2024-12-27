@@ -194,7 +194,6 @@ class UserController extends GeneralMethod
         $goods_id = $param['goods_id'];
         // 获取数据
         $sn = $user_vips->created_at->timezone(config('app')['default_timezone'])->format('Ymd') . Tools\Str::padString(0, $user_vips->user_id);
-        $room_uinfo = !empty(strval(readFileContent(runtime_path() . '/tmp/room_uinfo.cfg'))) ? json_decode(strval(readFileContent(runtime_path() . '/tmp/room_uinfo.cfg')), true) : [];
         // 获取配置信息
         $config_database = ShopConfig::whereIn('title', [
             'protocols-surname',
@@ -218,7 +217,7 @@ class UserController extends GeneralMethod
             'real_name' => !empty($user_vips->name) ? $user_vips->name : null,
             'company' => [
                 'uid' => isset($config['protocols-uid']) ? $config['protocols-uid'] : '',
-                'name' => isset($config['protocols-surnam']) ? $config['protocols-surnam'] : '',
+                'name' => isset($config['protocols-surname']) ? $config['protocols-surname'] : '',
                 'face' => isset($config['protocols-signature']) ? getImageUrl($config['protocols-signature']) : ''
             ],
             'protocols' => isset($config['protocols-content']) ? getImageUrl($config['protocols-content']) : '',
