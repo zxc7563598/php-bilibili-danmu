@@ -2,6 +2,10 @@
 
 namespace process;
 
+use app\core\LoginPublicMethods;
+use app\model\PaymentRecords;
+use app\model\ShopConfig;
+use app\model\UserVips;
 use app\queue\SendMessage;
 use app\server\Autoresponders;
 use app\server\Enter;
@@ -18,6 +22,7 @@ use Workerman\Protocols\Ws;
 use Hejunjie\Tools;
 use Random\RandomException;
 use support\Redis;
+use resource\enums\PaymentRecordsEnums;
 
 class Bilibili
 {
@@ -269,6 +274,48 @@ class Bilibili
                             $payload['payload']['data']['guard_level'],
                             0
                         );
+                        // 上舰
+                        $config = ShopConfig::where('title', 'listening-open-vip')->first([
+                            'content' => 'content'
+                        ]);
+                        if (isset($config->content) && $config->content == 1) {
+                            $user_vip = UserVips::where('uid', $payload['payload']['data']['uid'])->first();
+                            if (empty($user_vip)) {
+                                LoginPublicMethods::userRegister($payload['payload']['data']['uid']);
+                                $user_vip = UserVips::where('uid', $payload['payload']['data']['uid'])->first();
+                            }
+                            if (!empty($user_vip)) {
+                                switch (intval($payload['payload']['data']['guard_level'])) {
+                                    case 1: // 总督
+                                        $point = ShopConfig::where('title', 'vip-lv3-bonus-points')->first([
+                                            'content' => 'content'
+                                        ]);
+                                        $vip_type = PaymentRecordsEnums\VipType::Lv3->value;
+                                        break;
+                                    case 2: // 提督
+                                        $point = ShopConfig::where('title', 'vip-lv2-bonus-points')->first([
+                                            'content' => 'content'
+                                        ]);
+                                        $vip_type = PaymentRecordsEnums\VipType::Lv2->value;
+                                        break;
+                                    case 3: // 舰长
+                                        $point = ShopConfig::where('title', 'vip-lv1-bonus-points')->first([
+                                            'content' => 'content'
+                                        ]);
+                                        $vip_type = PaymentRecordsEnums\VipType::Lv1->value;
+                                        break;
+                                }
+                                $payment_records = new PaymentRecords();
+                                $payment_records->user_id = $user_vip->user_id;
+                                $payment_records->vip_type = $vip_type;
+                                $payment_records->amount = intval($payload['payload']['data']['price'] / 10);
+                                $payment_records->point = $point->content;
+                                $payment_records->pre_point = $user_vip->point;
+                                $payment_records->after_point = $payment_records->pre_point + $point->content;
+                                $payment_records->payment_at = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
+                                $payment_records->save();
+                            }
+                        }
                         break;
                     case 'INTERACT_WORD': // 直播间互动
                         switch (intval($payload['payload']['data']['msg_type'])) {
