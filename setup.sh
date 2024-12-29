@@ -48,7 +48,7 @@ until mariadb-admin ping -h "mysql" --silent; do
 done
 
 # 使用初始 root 密码登录，更新 root 密码和创建普通用户
-mysql -h mysql -u root -pinit0925 --ssl=0 <<EOF
+mariadb -h mysql -u root -pinit0925 --ssl=0 <<EOF
 CREATE DATABASE IF NOT EXISTS \`${DB_USER}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER IF NOT EXISTS '${DB_NAME}'@'%' IDENTIFIED BY '${DB_PASSWORD}';
 GRANT ALL PRIVILEGES ON *.* TO '${DB_NAME}'@'%' WITH GRANT OPTION;
