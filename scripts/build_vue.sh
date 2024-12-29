@@ -15,13 +15,13 @@ fi
 cp /var/www/bilibili_danmu/public/shop/.env.example /var/www/bilibili_danmu/public/shop/.env
 
 # 提取系统配置文件中的值
-SYSTEM_API_URL=$(grep -oP '^SYSTEM_API_URL=\K.*' /var/www/bilibili_danmu/.env)
-SYSTEM_AES_KEY=$(grep -oP '^SYSTEM_AES_KEY=\K.*' /var/www/bilibili_danmu/.env)
-SYSTEM_AES_IV=$(grep -oP '^SYSTEM_AES_IV=\K.*' /var/www/bilibili_danmu/.env)
-SYSTEM_KEY=$(grep -oP '^SYSTEM_KEY=\K.*' /var/www/bilibili_danmu/.env)
+SYSTEM_API_URL=$(awk -F'=' '/^SYSTEM_API_URL/ {print $2}' /var/www/bilibili_danmu/.env)
+SYSTEM_AES_KEY=$(awk -F'=' '/^SYSTEM_AES_KEY/ {print $2}' /var/www/bilibili_danmu/.env)
+SYSTEM_AES_IV=$(awk -F'=' '/^SYSTEM_AES_IV/ {print $2}' /var/www/bilibili_danmu/.env)
+SYSTEM_KEY=$(awk -F'=' '/^SYSTEM_KEY/ {print $2}' /var/www/bilibili_danmu/.env)
 
 # 替换 .env 文件中的配置项
-sed -i "s/^VITE_APP_NAME=.*/VITE_APP_NAME=积分商城/" /var/www/bilibili_danmu/public/shop/.env
+sed -i "s/^VITE_APP_NAME=.*/VITE_APP_NAME=YourAppName/" /var/www/bilibili_danmu/public/shop/.env
 sed -i "s|^VITE_API_URL=.*|VITE_API_URL=$SYSTEM_API_URL|" /var/www/bilibili_danmu/public/shop/.env
 sed -i "s|^VITE_API_AES_KEY=.*|VITE_API_AES_KEY=$SYSTEM_AES_KEY|" /var/www/bilibili_danmu/public/shop/.env
 sed -i "s|^VITE_API_AES_IV=.*|VITE_API_AES_IV=$SYSTEM_AES_IV|" /var/www/bilibili_danmu/public/shop/.env
