@@ -118,6 +118,9 @@
         加载中，请稍候...
     </div>
     <div id="app" style="background-color: var(--bulma-scheme-main);">
+        <div class="container" style="padding: 1rem;">
+            <button class="button is-link is-outlined" @click="goPointsMall" style="width:100%">进入积分商城</button>
+        </div>
         <div class="container p-4">
             <!-- 动态通知框 -->
             <transition name="slide-fade" @after-leave="resetNotification">
@@ -1160,6 +1163,10 @@
                 this.getConfig()
             },
             methods: {
+                // 前往积分商城
+                goPointsMall() {
+                    window.location.href = "/points-mall/user-management";
+                },
                 // 配置按钮切换
                 configSwitch(type, opens) {
                     switch (type) {
@@ -1288,7 +1295,7 @@
                             console.log(response.data);
                             if (response.data.code == 0) {
                             } else {
-                                this.showNotification(response.data.msg, 'error');
+                                this.showNotification(response.data.message, 'error');
                             }
                         });
                     }
@@ -1352,7 +1359,7 @@
                             this.user_info.face = response.data.data.data.face;
                             this.getRealRoomInfo(0)
                         } else {
-                            this.showNotification(response.data.msg, 'error');
+                            this.showNotification(response.data.message, 'error');
                         }
                     });
                 },
@@ -1377,7 +1384,7 @@
                             this.config.autoresponders.content = response.data.data.autoresponders.content;
                             this.update = response.data.data.update;
                         } else {
-                            this.showNotification(response.data.msg, 'error');
+                            this.showNotification(response.data.message, 'error');
                         }
                     });
                 },
@@ -1398,7 +1405,7 @@
                         if (response.data.code == 0) {
                             this.showNotification('保存成功', 'success');
                         } else {
-                            this.showNotification(response.data.msg, 'error');
+                            this.showNotification(response.data.message, 'error');
                         }
                     });
 
@@ -1442,10 +1449,10 @@
                                 this.live_info.live_time = response.data.data.data.live_time;
                                 this.live_info.keyframe = response.data.data.data.keyframe;
                             } else {
-                                this.showNotification(response.data.data.msg, 'error');
+                                this.showNotification(response.data.data.message, 'error');
                             }
                         } else {
-                            this.showNotification(response.data.msg, 'error');
+                            this.showNotification(response.data.message, 'error');
                         }
                     });
                 },

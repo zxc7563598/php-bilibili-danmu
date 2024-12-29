@@ -23,7 +23,7 @@ class UserAddress extends Model
      *
      * @var string
      */
-    protected $primaryKey = 'user_id';
+    protected $primaryKey = 'id';
 
     /**
      * 指示是否自动维护时间戳

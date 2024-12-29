@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>积分商城控制台</title>
+    <?php include 'layout/style.php'; ?>
+    <style>
+        .table-container {
+            overflow-x: auto;
+            white-space: nowrap;
+            /* 禁止内容换行 */
+        }
+
+        .table-container::-webkit-scrollbar {
+            height: 8px;
+            /* 滚动条高度 */
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 顶部 Navbar -->
+    <?php $currentPage = 'user-management'; ?>
+    <?php include 'layout/navbar.php'; ?>
+    <!-- 主要区域 -->
+    <div class="columns menu-container" id="app">
+        <!-- 左侧菜单栏 -->
+        <?php include 'layout/menu.php'; ?>
+        <!-- 主要内容区域 -->
+        <div class="column" id="main-content">
+            <!-- 动态通知框 -->
+            <transition name="slide-fade" @after-leave="hideNotification">
+                <div v-if="isNotificationVisible" class="notification notification-fixed" :class="notificationType">
+                    <button class="delete" @click="hideNotification"></button>
+                    {{notificationMessage}}
+                </div>
+            </transition>
+            <div id="loading">
+                加载中，请稍候...
+            </div>
+            <div id="main-content-body" style="padding: 1rem;">
+                <div class="columns is-multiline">
+                    <div class="column is-full">
+                        <div class="card">
+                            <div class="card-content">
+                                <div class="columns is-multiline">
+                                    <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
+                                        <div class="field">
+                                            <label class="label">UID</label>
+                                            <div class="control">
+                                                <input class="input" type="text" placeholder="支持模糊查询"
+                                                    v-model="form.uid">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
+                                        <div class="field">
+                                            <label class="label">名称</label>
+                                            <div class="control">
+                                                <input class="input" type="text" placeholder="支持模糊查询"
+                                                    v-model="form.uname">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="column is-one-third-desktop is-half-tablet is-full-mobile"
+                                        style="display: flex;">
+                                        <button class="button is-success" style="flex:1" @click="searchData">搜索</button>
+                                        <div style="width: 1rem;"></div>
+                                        <button class="button is-light" style="flex:1" @click="emptyData">重置</button>
+                                        <div style="width: 1rem;"></div>
+                                        <button class="button is-light" style="flex:1" @click="addUser">新增</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="columns is-multiline">
+                    <div class="column is-full">
+                        <div class="card">
+                            <div class="card-content table-container">
+                                <table class="table is-fullwidth is-striped is-hoverable">
+                                    <thead>
+                                        <tr>
+                                            <th>UID</th>
+                                            <th>名称</th>
+                                            <th>类型</th>
+                                            <th>开启时间</th>
+                                            <th>到期时间</th>
+                                            <th>积分</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-if="list.data && list.data.length == 0">
+                                            <td colspan="7" style="text-align: center;">无数据</td>
+                                        </tr>
+                                        <tr v-for="(item,index) in list.data">
+                                            <td>{{item.uid}}</td>
+                                            <td>{{item.name}}</td>
+                                            <td>{{item.vip_type}}</td>
+                                            <td>{{item.last_vip_at}}</td>
+                                            <td>{{item.end_vip_at}}</td>
+                                            <td>{{item.point}}</td>
+                                            <td>
+                                                <button class="button is-light mr-2 is-small"
+                                                    @click="userEdit(item.user_id)">变更</button>
+                                                <button class="button is-light is-small"
+                                                    @click="userRecords(item.user_id)">积分记录</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <nav class="pagination is-rounded" role="navigation" aria-label="pagination"
+                                    v-if="pageNumbers.length > 1">
+                                    <a href="javascript:;" class="pagination-previous"
+                                        @click="handlePageChange(this.list.current_page-1)">上一页</a>
+                                    <a href="javascript:;" class="pagination-next"
+                                        @click="handlePageChange(this.list.current_page+1)">下一页</a>
+                                    <ul class="pagination-list">
+                                        <li v-for="page in pageNumbers" :key="page" @click="handlePageChange(page)">
+                                            <a href="javascript:;" class="pagination-link"
+                                                :class="page == this.list.current_page ? 'is-current' : ''"
+                                                v-if="page != '...'">{{page}}</a>
+                                            <span class="pagination-ellipsis" v-else>&hellip;</span>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 弹窗 -->
+        <div class="modal" :class="records_active ? 'is-active' : ''">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">开通记录</p>
+                    <button class="delete" aria-label="close" @click="this.records_active = false"></button>
+                </header>
+                <section class="modal-card-body">
+                    <table class="table is-fullwidth is-striped is-hoverable">
+                        <thead>
+                            <tr>
+                                <th colspan="2">操作类型</th>
+                                <th>变更积分</th>
+                                <th>变更后积分</th>
+                                <th>变更时间</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="5"><button class="button is-fullwidth"
+                                        @click="add_user_records_active = true">新增</button>
+                                </td>
+                            </tr>
+                            <tr v-if="add_user_records_active">
+                                <td colspan="2">
+                                    <div class="field">
+                                        <div class="control">
+                                            <div class="select is-fullwidth">
+                                                <select v-model="set_user_point.type">
+                                                    <option value="" disabled>请选择</option>
+                                                    <option value="0">增加</option>
+                                                    <option value="1">减少</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td colspan="2">
+                                    <div class="field">
+                                        <div class="control">
+                                            <input class="input" type="number" v-model="set_user_point.point"
+                                                placeholder="积分">
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><button class="button is-fullwidth is-success" @click="addUserRecords">保存</button>
+                                </td>
+                            </tr>
+                            <tr v-for="(item,index) in records">
+                                <td>
+                                    <figure class="image is-32x32">
+                                        <img :src="item.icon" />
+                                    </figure>
+                                </td>
+                                <td>{{item.name}}</td>
+                                <td>{{item.point}}</td>
+                                <td>{{item.after_point}}</td>
+                                <td>{{item.date}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+                <footer class="modal-card-foot">
+                    <div class="buttons">
+                        <button class="button is-success" @click="saveUser">存储</button>
+                        <button class="button" @click="this.userinfo_active = false">取消</button>
+                    </div>
+                </footer>
+            </div>
+        </div>
+        <div class="modal" :class="userinfo_active ? 'is-active' : ''">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">{{user.user_id ? '编辑用户' : '新增用户'}}</p>
+                    <button class="delete" aria-label="close" @click="this.userinfo_active = false"></button>
+                </header>
+                <section class="modal-card-body">
+                    <div class="field">
+                        <label class="label">UID</label>
+                        <div class="control">
+                            <input class="input" :class="uid_error ? 'is-danger' : ''" type="text" v-model="user.uid"
+                                placeholder="用户UID" @blur="searchUid">
+                        </div>
+                        <p class="help">B站用户ID，打开网页版哔哩哔哩，搜索对应用户查看个人主页后，可在对方个人主页的网址后方查看到（一串数字）。</p>
+                        <p class="help is-danger" v-if="uid_error">未查询到用户信息，请确认 UID 输入正确</p>
+                    </div>
+                    <div class="field">
+                        <label class="label">用户名</label>
+                        <div class="control">
+                            <input class="input" type="text" v-model="user.name" placeholder="用户名">
+                        </div>
+                        <p class="help">无需输入，填写UID后会自动查询用户，仅作为确认是否为需要添加的用户</p>
+                    </div>
+                    <div class="field">
+                        <label class="label">登录密码</label>
+                        <div class="control">
+                            <input class="input" type="text" v-model="user.password" placeholder="密码">
+                        </div>
+                        <p class="help">输入后为用户设置密码，如果<b>不需要设置</b>或<b>不需要更改</b>密码，则不需要输入</p>
+                    </div>
+                    <div class="field">
+                        <label class="label">用户类型</label>
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select v-model="user.vip_type">
+                                    <option value="" disabled>请选择</option>
+                                    <option value="0">潜在老头（穷逼）</option>
+                                    <option value="1">舰长宝宝</option>
+                                    <option value="2">提督大人</option>
+                                    <option value="3">总督主人</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <footer class="modal-card-foot">
+                    <div class="buttons">
+                        <button class="button is-success" @click="saveUser">存储</button>
+                        <button class="button" @click="this.userinfo_active = false">取消</button>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </div>
+    <!-- 底部 Footer -->
+    <?php include 'layout/footer.php'; ?>
+</body>
+<script>
+    const app = Vue.createApp({
+        data() {
+            return {
+                secretKey: '<?php echo $secretKey ?>',
+                isNotificationVisible: false,
+                notificationMessage: null,
+                notificationType: '',
+                form: {
+                    uid: null,
+                    uname: null,
+                    page: '<?php echo $page ?>'
+                },
+                set_user_point: {
+                    user_id: 0,
+                    type: 0,
+                    point: 0
+                },
+                list: [],
+                records: [],
+                userinfo_active: false,
+                records_active: false,
+                add_user_records_active: false,
+                uid_error: false,
+                user: {
+                    user_id: null,
+                    uid: null,
+                    name: null,
+                    password: null,
+                    vip_type: ''
+                }
+            };
+        },
+        created() {
+            this.getData();
+        },
+        computed: {
+            pageNumbers() {
+                const currentPage = this.list.current_page;
+                const totalPages = this.list.total_page;
+                let pages = [1]; // 必须展示第一页
+
+                const maxPages = 7;
+
+                // 确定展示的页码范围
+                if (currentPage <= 4) {
+                    for (let i = 2; i <= Math.min(maxPages - 1, totalPages - 1); i++) {
+                        pages.push(i);
+                    }
+                } else if (currentPage >= totalPages - 3) {
+                    for (let i = Math.max(totalPages - maxPages + 1, 2); i < totalPages; i++) {
+                        pages.push(i);
+                    }
+                } else {
+                    for (let i = currentPage - 2; i <= currentPage + 2; i++) {
+                        pages.push(i);
+                    }
+                }
+
+                if (pages[pages.length - 1] !== totalPages) {
+                    pages.push(totalPages); // 必须展示最后一页
+                }
+
+                return this.addEllipsis(pages);
+            }
+        },
+        methods: {
+            // 封装API请求
+            async apiRequest(endpoint, data = {}) {
+                try {
+                    const signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
+                    const response = await axios.post(endpoint, data, {
+                        headers: { 'X-Signature': signature }
+                    });
+
+                    if (response.data.code === 0) {
+                        return response.data.data;
+                    } else {
+                        this.showNotification(response.data.message, 'warning');
+                        return null;
+                    }
+                } catch (error) {
+                    this.showNotification('请求失败，请稍后重试', 'error');
+                    return null;
+                }
+            },
+
+            // 显示通知
+            showNotification(message, type = 'info') {
+                this.isNotificationVisible = true;
+                this.notificationMessage = message;
+                this.notificationType = this.getNotificationClass(type);
+
+                setTimeout(this.hideNotification, 3000);
+            },
+
+            // 获取通知的样式
+            getNotificationClass(type) {
+                const types = {
+                    success: 'is-success is-light',
+                    info: 'is-light',
+                    error: 'is-danger is-light',
+                    warning: 'is-warning is-light'
+                };
+                return types[type] || 'is-light';
+            },
+
+            // 隐藏通知
+            hideNotification() {
+                this.isNotificationVisible = false;
+            },
+
+            // 分页数据处理
+            addEllipsis(pages) {
+                const result = [];
+                for (let i = 0; i < pages.length; i++) {
+                    if (i > 0 && pages[i] - pages[i - 1] > 1) {
+                        result.push('...');
+                    }
+                    result.push(pages[i]);
+                }
+                return result;
+            },
+
+            async getData() {
+                const data = this.form;
+                const result = await this.apiRequest('/api/points-mall/user-management/get-data', data);
+                if (result) {
+                    this.list = result.list;
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('main-content-body').style.display = 'block';
+                }
+            },
+
+            handlePageChange(page) {
+                if (page < 1) page = 1;
+                if (page > this.list.total_page) page = this.list.total_page;
+                this.form.page = page;
+                this.getData();
+            },
+
+            searchData() {
+                this.form.page = 1;
+                this.getData();
+            },
+
+            emptyData() {
+                this.form.uid = null;
+                this.form.uname = null;
+                this.form.page = 1;
+                this.getData();
+            },
+
+            addUser() {
+                this.resetUser();
+                this.userinfo_active = true;
+            },
+
+            async userEdit(user_id) {
+                this.userinfo_active = true;
+                const result = await this.apiRequest('/api/points-mall/user-management/get-user-data', { user_id: user_id });
+                if (result) {
+                    this.user = result.users;
+                }
+            },
+
+            async saveUser() {
+                const result = await this.apiRequest('/api/points-mall/user-management/set-data', this.user);
+                if (result) {
+                    this.showNotification('操作成功', 'success');
+                    this.resetUser();
+                    this.userinfo_active = false;
+                    this.getData();
+                }
+            },
+
+            async searchUid() {
+                const result = await this.apiRequest('/api/points-mall/user-management/get-user-info', { uid: this.user.uid });
+                if (result && result.uname) {
+                    this.user.name = result.uname;
+                    this.uid_error = false;
+                } else {
+                    this.uid_error = true;
+                }
+            },
+
+            async userRecords(user_id) {
+                this.records_active = true;
+                this.add_user_records_active = false;
+                const result = await this.apiRequest('/api/points-mall/user-management/get-user-records', { user_id: user_id });
+                if (result) {
+                    this.records = result.records;
+                    this.set_user_point.user_id = user_id;
+                    this.set_user_point.point = 0;
+                    this.set_user_point.type = 0;
+                }
+            },
+
+            async addUserRecords() {
+                const result = await this.apiRequest('/api/points-mall/user-management/set-user-point', this.set_user_point);
+                if (result) {
+                    this.showNotification('操作成功', 'success');
+                    this.userRecords(this.set_user_point.user_id);
+                }
+            },
+
+            resetUser() {
+                this.user = {
+                    user_id: null,
+                    uid: null,
+                    name: null,
+                    password: null,
+                    vip_type: ''
+                };
+            }
+        }
+    });
+    app.mount('#app');
+</script>
+
+
+</html>

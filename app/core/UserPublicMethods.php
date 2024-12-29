@@ -50,14 +50,14 @@ class UserPublicMethods extends GeneralMethod
         if (($user_vips->point - $goods->amount) < 0) {
             return 800007;
         }
-        if ($goods->type == GoodsEnums\Type::Virtually->value) {
-            $shipping_address = '虚拟礼物';
-            $shipping_name = '虚拟礼物';
-            $shipping_phone = '虚拟礼物';
-        } else {
+        if ($goods->type == GoodsEnums\Type::Entity->value) {
             $shipping_address = !empty($user_address) ? ($user_address->province . '/' . $user_address->city . '/' . $user_address->county . '/' . $user_address->detail) : null;
             $shipping_name = !empty($user_address) ? ($user_address->name) : null;
             $shipping_phone = !empty($user_address) ? ($user_address->phone) : null;
+        } else {
+            $shipping_address = '虚拟礼物';
+            $shipping_name = '虚拟礼物';
+            $shipping_phone = '虚拟礼物';
         }
         // 增加兑换记录
         $redemption_records = new RedemptionRecords();

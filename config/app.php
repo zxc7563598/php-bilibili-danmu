@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of webman.
  *
@@ -23,6 +24,7 @@ return [
     'runtime_path' => base_path(false) . DIRECTORY_SEPARATOR . 'runtime',
     'controller_suffix' => 'Controller',
     'controller_reuse' => false,
+    'app_name' => 'BilibiliDanmuji',
     'api_url' => getenv('SYSTEM_API_URL'), // api链接
     'image_url' => getenv('SYSTEM_API_URL') . '/attachment', // 图片链接
     'aes_key' => getenv('SYSTEM_AES_KEY'),

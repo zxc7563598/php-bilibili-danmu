@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>积分商城控制台</title>
+    <?php include 'layout/style.php'; ?>
+</head>
+
+<body>
+    <!-- 顶部 Navbar -->
+    <?php $currentPage = 'system-configuration'; ?>
+    <?php include 'layout/navbar.php'; ?>
+    <!-- 主要区域 -->
+    <div class="columns menu-container" id="app">
+        <!-- 左侧菜单栏 -->
+        <?php include 'layout/menu.php'; ?>
+        <!-- 主要内容区域 -->
+        <div class="column" id="main-content">
+            <!-- 动态通知框 -->
+            <transition name="slide-fade" @after-leave="showNotification">
+                <div v-if="isNotificationVisible" class="notification notification-fixed" :class="notificationType">
+                    <button class="delete" @click="hideNotification"></button>
+                    {{notificationMessage}}
+                </div>
+            </transition>
+            <div id="loading">
+                加载中，请稍候...
+            </div>
+            <div id="main-content-body" style="padding: 1rem;">
+                <div class="columns is-multiline">
+                    <div class="column is-full">
+                        <article class="message">
+                            <div class="message-header">
+                                <p>请注意！</p>
+                            </div>
+                            <div class="message-body">
+                                本页面展示信息为系统运行所必需的信息<br>
+                                通常情况下<strong>不需要</strong>进行任何更改<br>
+                                保存更改信息后系统将进行重启，若配置异常则可能影响系统稳定性<br>
+                                因此建议在<strong>了解其原理</strong>或与<strong>作者本人</strong>取得联系后进行变更
+                            </div>
+                        </article>
+                    </div>
+                    <div class="column is-full">
+                        <div class="card">
+                            <div class="card-content">
+                                <div class="field">
+                                    <label class="label">项目地址</label>
+                                    <div class="control">
+                                        <input class="input" type="text" placeholder="" v-model="form.system_api_url">
+                                    </div>
+                                    <p class="help">此配置项决定了项目请求的根路径，影响整体项目中所有资源（如图片、CSS、JavaScript
+                                        等）的链接地址。调整此配置会改变项目中所有相关资源的访问路径。</p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">AES加密KEY</label>
+                                    <div class="control">
+                                        <input class="input" type="text" placeholder="" v-model="form.system_aes_key">
+                                    </div>
+                                    <p class="help">此配置项决定项目接口与前端页面之间数据的加密和解密过程。AES加密KEY
+                                        用于对前端发送到后端的数据进行加密，同时也用于后端返回给前端的数据的解密。调整此密钥会影响整个项目中的数据安全性，特别是在积分商城等涉及用户敏感数据传输的功能模块中
+                                    </p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">AES加密IV</label>
+                                    <div class="control">
+                                        <input class="input" type="text" placeholder="" v-model="form.system_aes_iv">
+                                    </div>
+                                    <p class="help">此配置项决定项目接口与前端页面之间数据的加密和解密过程。AES加密KEY
+                                        用于对前端发送到后端的数据进行加密，同时也用于后端返回给前端的数据的解密。调整此密钥会影响整个项目中的数据安全性，特别是在积分商城等涉及用户敏感数据传输的功能模块中
+                                    </p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">签名KEY</label>
+                                    <div class="control">
+                                        <input class="input" type="text" placeholder="" v-model="form.system_key">
+                                    </div>
+                                    <p class="help">此配置项决定项目接口与前端页面之间的数据签名机制，用于确保数据在传输过程中未被篡改。签名KEY
+                                        用于生成请求数据的签名，并通过接口校验签名的正确性。调整此密钥会影响整个项目中接口的请求验证过程，特别是在积分商城等涉及敏感操作的功能模块中。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-full">
+                        <div class="card">
+                            <div class="card-content">
+                                <div class="field">
+                                    <label class="label">项目启动地址</label>
+                                    <div class="control">
+                                        <input class="input" type="text" placeholder="" v-model="form.host">
+                                    </div>
+                                    <p class="help">此配置项决定项目在系统运行中的本机地址，影响项目的访问路径。调整该配置后，将影响项目的整体运行。</p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">项目启动端口</label>
+                                    <div class="control">
+                                        <input class="input" type="text" placeholder="" v-model="form.listen">
+                                    </div>
+                                    <p class="help">
+                                        此配置项决定项目在系统中运行的端口，影响项目在本机或服务器上启动时的访问端口。调整该配置后，将影响整个项目的访问路径，包括客户端和服务器之间的通信。</p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">重启项目地址</label>
+                                    <div class="control">
+                                        <input class="input" type="text" placeholder="" v-model="form.re_open_host">
+                                    </div>
+                                    <p class="help">此配置项决定了通知系统重新与 B站 直播间建立 WebSocket 连接时使用的地址。调整该配置后，会影响机器人与 B站
+                                        直播间的实时数据监控功能，包括实时弹幕、消息推送等交互。该地址通常用于通知系统重新启动连接，尤其在连接断开或需要切换直播间时。</p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">重启密钥</label>
+                                    <div class="control">
+                                        <input class="input" type="text" placeholder="" v-model="form.secure_api_key">
+                                    </div>
+                                    <p class="help">此配置项决定在通知系统重新与 B站 建立 WebSocket
+                                        连接时所使用的加密信息。调整该密钥后，会影响机器人对直播间数据的监控，尤其是在系统发送重启请求时用于验证请求的合法性和防止滥用。该密钥用于生成请求签名，以确保只有有效的请求才能触发
+                                        WebSocket 连接的重启操作。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-full">
+                        <div class="card">
+                            <div class="card-content">
+                                <div class="field">
+                                    <label class="label">Redis地址</label>
+                                    <div class="control">
+                                        <input class="input" type="text" placeholder="" v-model="form.redis_host">
+                                    </div>
+                                    <p class="help">此配置项决定系统与 Redis 服务之间的通信地址，影响项目中与 Redis
+                                        相关的所有功能，如缓存存储、会话管理、消息队列等。调整该配置后，将直接影响到项目中依赖 Redis
+                                        的功能，例如商城用户登录时的缓存信息、商品数据缓存等。确保此地址配置正确，以便系统能够正常与 Redis 进行数据交互。</p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">Redis端口</label>
+                                    <div class="control">
+                                        <input class="input" type="text" placeholder="" v-model="form.redis_port">
+                                    </div>
+                                    <p class="help">此配置项决定系统与 Redis 服务通信时所使用的端口号。Redis 默认运行在 6379 端口，如果 Redis
+                                        服务运行在其他端口，需要通过此配置项指定正确的端口号。调整该端口后，将影响所有依赖 Redis
+                                        的功能，如缓存、会话管理、任务队列等，确保系统能够通过正确的端口与 Redis 服务进行数据交互。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-full">
+                        <div class="card">
+                            <div class="card-content">
+                                <div class="field">
+                                    <label class="label">数据库地址</label>
+                                    <div class="control">
+                                        <input class="input" type="text" placeholder="" v-model="form.db_host">
+                                    </div>
+                                    <p class="help">此配置项决定应用连接到数据库服务的主机地址。可以是本地地址或远程数据库服务的 IP
+                                        地址或域名。确保该地址能够正确指向数据库实例所在的服务器。</p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">数据库端口</label>
+                                    <div class="control">
+                                        <input class="input" type="text" placeholder="" v-model="form.db_port">
+                                    </div>
+                                    <p class="help">此配置项决定连接数据库时所使用的端口号。</p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">数据库账号</label>
+                                    <div class="control">
+                                        <input class="input" type="text" placeholder="" v-model="form.db_name">
+                                    </div>
+                                    <p class="help">此配置项决定用于连接数据库的用户账号。</p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">数据库名称</label>
+                                    <div class="control">
+                                        <input class="input" type="text" placeholder="" v-model="form.db_user">
+                                    </div>
+                                    <p class="help">此配置项决定应用程序连接的数据库名称。确保该名称与数据库中实际存在的数据库一致。如果该数据库不存在，系统可能无法正常连接并进行数据操作。
+                                    </p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">数据库密码</label>
+                                    <div class="control">
+                                        <input class="input" type="text" placeholder="" v-model="form.db_password">
+                                    </div>
+                                    <p class="help">此配置项为连接数据库的密码。确保该密码与数据库中指定用户的密码一致。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="column is-full">
+                        <div class="card">
+                            <div class="card-content">
+                                <button class="button is-link is-fullwidth" @click="saveData"
+                                    :class="loading ? 'is-loading' : ''">保存</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 底部 Footer -->
+    <?php include 'layout/footer.php'; ?>
+</body>
+
+<script>
+    const app = Vue.createApp({
+        data() {
+            return {
+                secretKey: '<?php echo $secretKey ?>',
+                isNotificationVisible: false,
+                notificationMessage: null,
+                notificationType: '',
+                loading: false,
+                showPage: false,
+                form: {
+                    db_host: "",
+                    db_name: "",
+                    db_password: "",
+                    db_port: "",
+                    db_user: "",
+                    host: "",
+                    listen: "",
+                    redis_host: "",
+                    redis_port: "",
+                    re_open_host: "",
+                    secure_api_key: "",
+                    system_aes_iv: "",
+                    system_aes_key: "",
+                    system_api_url: "",
+                    system_key: ""
+                }
+            };
+        },
+        created() {
+            this.getData();
+        },
+        methods: {
+            // 显示通知
+            showNotification(message, type = 'info') {
+                this.isNotificationVisible = true;
+                this.notificationMessage = message;
+                this.notificationType = this.getNotificationClass(type);
+                setTimeout(() => this.hideNotification(), 3000);
+            },
+
+            // 隐藏通知
+            hideNotification() {
+                this.isNotificationVisible = false;
+            },
+
+            // 获取通知样式
+            getNotificationClass(type) {
+                const types = {
+                    success: 'is-success is-light',
+                    info: 'is-light',
+                    error: 'is-danger is-light',
+                    warning: 'is-warning is-light'
+                };
+                return types[type] || 'is-light';
+            },
+
+            // 获取页面数据
+            getData() {
+                const data = {};
+                const signature = this.generateSignature(data);
+                axios.post('/api/points-mall/system-configuration/get-data', data, {
+                    headers: { 'X-Signature': signature }
+                })
+                    .then(response => {
+                        if (response.data.code === 0) {
+                            document.getElementById('loading').style.display = 'none';
+                            document.getElementById('main-content-body').style.display = 'block';
+                            this.form = response.data.data;
+                        }
+                    })
+                    .catch(() => {
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('main-content-body').style.display = 'block';
+                        this.showNotification('请求失败，请稍后重试', 'error');
+                    });
+            },
+            
+            // 存储信息
+            saveData() {
+                this.loading = true;
+                const data = this.form;
+                const signature = this.generateSignature(data);
+                axios.post('/api/points-mall/system-configuration/set-data', data, {
+                    headers: { 'X-Signature': signature }
+                })
+                    .then(response => {
+                        this.loading = false;
+                        if (response.data.code === 0) {
+                            this.showNotification('存储成功', 'success');
+                        } else {
+                            this.showNotification(response.data.message, 'warning');
+                        }
+                    })
+                    .catch(() => {
+                        this.loading = false;
+                        this.showNotification('请求失败，请稍后重试', 'error');
+                    });
+            },
+
+            // 生成签名
+            generateSignature(data) {
+                return CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
+            }
+        },
+        beforeUnmount() {
+            clearInterval(this.intervalId);
+        }
+    });
+    app.mount('#app');
+</script>
+
+
+</html>

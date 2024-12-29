@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>积分商城控制台</title>
+    <script src="/js/vue.3.5.12.js"></script>
+    <script src="/js/axios.min.js"></script>
+    <?php include 'layout/style.php'; ?>
+    <style>
+        .table-container {
+            overflow-x: auto;
+            white-space: nowrap;
+            /* 禁止内容换行 */
+        }
+
+        .table-container::-webkit-scrollbar {
+            height: 8px;
+            /* 滚动条高度 */
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 4px;
+        }
+
+        .image-list {
+            position: relative;
+            width: 100%;
+
+            .image-list-item {
+                width: 100%;
+            }
+
+            .image-list-item-close {
+                position: absolute;
+                right: 1rem;
+                top: 1rem;
+            }
+        }
+
+        .carousel-images {
+            width: 100%;
+            overflow: auto;
+
+            .carousel-images-item {
+                height: 5rem;
+                position: relative;
+                display: inline-block;
+
+                .carousel-images-item-img {
+                    height: 5rem;
+                }
+
+                .carousel-images-item-close {
+                    position: absolute;
+                    right: .5rem;
+                    top: .5rem;
+                }
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 顶部 Navbar -->
+    <?php $currentPage = 'product-management'; ?>
+    <?php include 'layout/navbar.php'; ?>
+    <!-- 主要区域 -->
+    <div class="columns menu-container" id="app">
+        <!-- 左侧菜单栏 -->
+        <?php include 'layout/menu.php'; ?>
+        <!-- 主要内容区域 -->
+        <div class="column" id="main-content">
+            <!-- 动态通知框 -->
+            <transition name="slide-fade" @after-leave="hideNotification">
+                <div v-if="isNotificationVisible" class="notification notification-fixed" :class="notificationType">
+                    <button class="delete" @click="hideNotification"></button>
+                    {{notificationMessage}}
+                </div>
+            </transition>
+            <div id="loading">
+                加载中，请稍候...
+            </div>
+            <input ref="fileInput" type="file" @change="(event) => handleFileChange(event, fileType)"
+                style="display: none;" />
+            <div id="main-content-body" style="padding: 1rem;">
+                <div class="columns is-multiline">
+                    <div class="column is-full">
+                        <div class="card">
+                            <div class="card-content">
+                                <div class="columns is-multiline">
+                                    <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
+                                        <div class="field">
+                                            <label class="label">商品名称</label>
+                                            <div class="control">
+                                                <input class="input" type="text" placeholder="" v-model="form.name">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
+                                        <div class="field">
+                                            <label class="label">商品类型</label>
+                                            <div class="control">
+                                                <div class="select is-fullwidth">
+                                                    <select v-model="form.type">
+                                                        <option :value="null" disabled>请选择</option>
+                                                        <option value="0">虚拟礼物</option>
+                                                        <option value="1">实体礼物</option>
+                                                        <option value="2">贡品</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="column is-one-third-desktop is-half-tablet is-full-mobile"
+                                        style="display: flex;">
+                                        <button class="button is-success" style="flex:1" @click="searchData">搜索</button>
+                                        <div style="width: 1rem;"></div>
+                                        <button class="button is-light" style="flex:1" @click="emptyData">重置</button>
+                                        <div style="width: 1rem;"></div>
+                                        <button class="button is-light" style="flex:1" @click="addGoods">新增</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="columns is-multiline">
+                    <div class="column is-full">
+                        <div class="card">
+                            <div class="card-content table-container">
+                                <table class="table is-fullwidth is-striped is-hoverable">
+                                    <thead>
+                                        <tr>
+                                            <th>封面图</th>
+                                            <th>商品名称</th>
+                                            <th>商品价格</th>
+                                            <th>状态</th>
+                                            <th>商品类型</th>
+                                            <th>排序</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-if="list.data && list.data.length == 0">
+                                            <td colspan="7" style="text-align: center;">无数据</td>
+                                        </tr>
+                                        <tr v-for="(item,index) in list.data">
+                                            <td class="is-vcentered">
+                                                <figure class="image is-32x32">
+                                                    <img :src="item.cover_image" />
+                                                </figure>
+                                            </td>
+                                            <td class="is-vcentered">{{item.name}}</td>
+                                            <td class="is-vcentered">{{item.amount}}</td>
+                                            <td class="is-vcentered">{{item.status}}</td>
+                                            <td class="is-vcentered">{{item.type}}</td>
+                                            <td class="is-vcentered">{{item.sort}}</td>
+                                            <td class="is-vcentered">
+                                                <button class="button is-light is-small"
+                                                    @click="editGoods(item.goods_id)">变更</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <nav class="pagination is-rounded" role="navigation" aria-label="pagination"
+                                    v-if="pageNumbers.length > 1">
+                                    <a href="javascript:;" class="pagination-previous"
+                                        @click="handlePageChange(this.list.current_page-1)">上一页</a>
+                                    <a href="javascript:;" class="pagination-next"
+                                        @click="handlePageChange(this.list.current_page+1)">下一页</a>
+                                    <ul class="pagination-list">
+                                        <li v-for="page in pageNumbers" :key="page" @click="handlePageChange(page)">
+                                            <a href="javascript:;" class="pagination-link"
+                                                :class="page == this.list.current_page ? 'is-current' : ''"
+                                                v-if="page != '...'">{{page}}</a>
+                                            <span class="pagination-ellipsis" v-else>&hellip;</span>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal" :class="goods_active ? 'is-active' : ''">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">{{goods.goods_id ? '编辑商品' : '新增商品'}}</p>
+                    <button class="delete" aria-label="close" @click="this.goods_active = false"></button>
+                </header>
+                <section class="modal-card-body">
+                    <div class="field">
+                        <label class="label">商品封面</label>
+                        <div class="control">
+                            <figure class="image is-128x128" v-if="goods.cover_image['url']">
+                                <img :src="goods.cover_image['url']" @click="triggerFileInput('cover_image')"
+                                    style="height:100%;" />
+                            </figure>
+                            <button class="button is-link" @click="triggerFileInput('cover_image')" v-else>上传照片</button>
+                        </div>
+                        <p class="help">商品封面图，建议与其他商品封面图尺寸一致</p>
+                    </div>
+                    <div class="card">
+                        <header class="card-header">
+                            <p class="card-header-title">商品展示图</p>
+                        </header>
+                        <div class="card-content">
+                            <div class="carousel-images">
+                                <div class="carousel-images-item" v-for="(item,index) in goods.carousel_images"
+                                    :key="index">
+                                    <img class="carousel-images-item-img" :src="item.url">
+                                    <button class="delete carousel-images-item-close" aria-label="close"
+                                        @click="imageDeleted(index,'carousel_images')"></button>
+                                </div>
+                            </div>
+                            <p class="help">在商品详情页滚动展示，可以上传多张，上传多张时建议保持图片高度一致</p>
+                            <button class="button is-link is-fullwidth"
+                                @click="triggerFileInput('carousel_images')">增加图片</button>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">商品名称</label>
+                        <div class="control">
+                            <input class="input" type="text" v-model="goods.name" placeholder="商品名称">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">商品类型</label>
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select v-model="goods.type">
+                                    <option value="" disabled>请选择</option>
+                                    <option value="0">虚拟礼物</option>
+                                    <option value="1">实体礼物</option>
+                                    <option value="2">贡品</option>
+                                </select>
+                            </div>
+                        </div>
+                        <p class="help">实体礼物会收集收货地址，虚拟礼物会收集邮箱地址，贡品什么都不会收集</p>
+                    </div>
+                    <div class="field">
+                        <label class="label">商品价格</label>
+                        <div class="control">
+                            <input class="input" type="number" v-model="goods.amount" placeholder="商品价格">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">规格选择数量</label>
+                        <div class="control">
+                            <input class="input" type="number" v-model="goods.sub_num" placeholder="规格选择数量">
+                        </div>
+                        <p class="help">用户在购买时可以选择几种规格，通常为1，设置多个则用户必须选择多个才被允许下单</p>
+                    </div>
+                    <div class="field">
+                        <label class="label">购买说明</label>
+                        <div class="control">
+                            <input class="input" type="text" v-model="goods.tips" placeholder="购买说明">
+                        </div>
+                        <p class="help">在商品详情页中滚动展示，内容不宜过长</p>
+                    </div>
+                    <div class="field">
+                        <label class="label">商品状态</label>
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select v-model="goods.status">
+                                    <option value="" disabled>请选择</option>
+                                    <option value="0">停用</option>
+                                    <option value="1">正常</option>
+                                </select>
+                            </div>
+                        </div>
+                        <p class="help">停用后商品不再积分商城进行展示</p>
+                    </div>
+                    <div class="field">
+                        <label class="label">排序</label>
+                        <div class="control">
+                            <input class="input" type="number" v-model="goods.sort" placeholder="排序">
+                        </div>
+                        <p class="help">数量越小，商品展示越靠前</p>
+                    </div>
+                    <div class="field">
+                        <label class="label">销售数量</label>
+                        <div class="control">
+                            <input class="input" type="number" v-model="goods.sale_num" placeholder="销售数量">
+                        </div>
+                        <p class="help">已售数量，可自行设置</p>
+                    </div>
+                    <div class="field">
+                        <label class="label">每次销售递增</label>
+                        <div class="control">
+                            <input class="input" type="number" v-model="goods.sale_increase" placeholder="每次销售递增">
+                        </div>
+                        <p class="help">每次用户真实下单后增加多少销量，若设置为 10 则每有 1 人下单销售数量 +10</p>
+                    </div>
+                    <div class="card">
+                        <header class="card-header">
+                            <p class="card-header-title">规格设置</p>
+                        </header>
+                        <div class="card-content">
+                            <div class="columns is-multiline">
+                                <div class="column is-half-tablet is-full-mobile" v-for="(item,index) in goods.subs"
+                                    :key="index">
+                                    <div class="card">
+                                        <div class="card-content">
+                                            <div class="field">
+                                                <label class="label">规格{{index+1}}图片</label>
+                                                <div class="control">
+                                                    <figure class="image is-128x128" v-if="item.icon['url']">
+                                                        <img :src="item.icon['url']"
+                                                            @click="triggerFileInput('sub_cover_image',index)"
+                                                            style="height:100%;" />
+                                                    </figure>
+                                                    <button class="button is-link"
+                                                        @click="triggerFileInput('sub_cover_image',index)"
+                                                        v-else>上传照片</button>
+                                                </div>
+                                                <p class="help">规格封面图，建议传递1:1比例样图（正方形图片）</p>
+                                            </div>
+                                            <div class="field">
+                                                <label class="label">规格{{index+1}}名称</label>
+                                                <div class="control">
+                                                    <input class="input" type="text" v-model="item.name"
+                                                        placeholder="商品名称">
+                                                </div>
+                                            </div>
+                                            <button class="button is-danger is-fullwidth"
+                                                @click="delSubs(index)">删除规格</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="button is-link is-fullwidth" @click="addSubs">新增规格</button>
+                        </div>
+                    </div>
+                    <div class="columns is-multiline">
+                        <div class="column is-half-tablet is-full-mobile">
+                            <div class="card">
+                                <header class="card-header">
+                                    <p class="card-header-title">商品说明</p>
+                                </header>
+                                <div class="card-content">
+                                    <div class="image-list" v-for="(item,index) in goods.details_images" :key="index">
+                                        <img :src="item.url" class="image-list-item">
+                                        <button class="delete image-list-item-close" aria-label="close"
+                                            @click="imageDeleted(index,'details_images')"></button>
+                                    </div>
+                                    <button class="button is-link is-fullwidth"
+                                        @click="triggerFileInput('details_images')">上传照片</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column is-half-tablet is-full-mobile">
+                            <div class="card">
+                                <header class="card-header">
+                                    <p class="card-header-title">服务说明</p>
+                                </header>
+                                <div class="card-content">
+                                    <div class="image-list" v-for="(item,index) in goods.service_description_images"
+                                        :key="index">
+                                        <img :src="item.url" class="image-list-item">
+                                        <button class="delete image-list-item-close" aria-label="close"
+                                            @click="imageDeleted(index,'service_description_images')"></button>
+                                    </div>
+                                    <button class="button is-link is-fullwidth"
+                                        @click="triggerFileInput('service_description_images')">上传照片</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <footer class="modal-card-foot">
+                    <div class="buttons">
+                        <button class="button is-success" @click="saveGoods"
+                            :class="loading ? 'is-loading' : ''">存储</button>
+                        <button class=" button" @click="this.goods_active = false">取消</button>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </div>
+    <!-- 底部 Footer -->
+    <?php include 'layout/footer.php'; ?>
+</body>
+<script>
+    const app = Vue.createApp({
+        data() {
+            return {
+                secretKey: '<?php echo $secretKey ?>',
+                isNotificationVisible: false,
+                notificationMessage: null,
+                notificationType: '',
+                goods_active: false,
+                fileType: '',
+                subsIndex: 0,
+                loading: false,
+                form: {
+                    name: null,
+                    type: null,
+                    page: '<?php echo $page ?>'
+                },
+                list: [],
+                goods: {
+                    goods_id: null,
+                    name: null, // 商品名称
+                    amount: null, // 商品价格
+                    sub_num: null, // 规格选择数量
+                    tips: null, // 购买说明
+                    cover_image: {
+                        url: '',
+                        path: ''
+                    }, // 封面图
+                    carousel_images: [], // 商品展示图（多个）
+                    details_images: [], // 详情图（多个）
+                    service_description_images: [], // 服务说明图（多个）
+                    status: 1, // 状态
+                    type: 0, // 商品类型
+                    sort: null, // 排序，从小到大
+                    sale_num: null, // 销售数量
+                    sale_increase: null, // 每次销售递增
+                    subs: []
+                }
+            };
+        },
+        created() {
+            this.getData();
+        },
+        computed: {
+            pageNumbers() {
+                const currentPage = this.list.current_page;
+                const totalPages = this.list.total_page;
+                let pages = [1]; // 必须展示第一页
+
+                const maxPages = 7;
+
+                // 确定展示的页码范围
+                if (currentPage <= 4) {
+                    for (let i = 2; i <= Math.min(maxPages - 1, totalPages - 1); i++) {
+                        pages.push(i);
+                    }
+                } else if (currentPage >= totalPages - 3) {
+                    for (let i = Math.max(totalPages - maxPages + 1, 2); i < totalPages; i++) {
+                        pages.push(i);
+                    }
+                } else {
+                    for (let i = currentPage - 2; i <= currentPage + 2; i++) {
+                        pages.push(i);
+                    }
+                }
+
+                if (pages[pages.length - 1] !== totalPages) {
+                    pages.push(totalPages); // 必须展示最后一页
+                }
+
+                return this.addEllipsis(pages);
+            }
+        },
+        methods: {
+            // 封装API请求
+            async apiRequest(endpoint, data = {}) {
+                try {
+                    const signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
+                    const response = await axios.post(endpoint, data, {
+                        headers: { 'X-Signature': signature }
+                    });
+
+                    if (response.data.code === 0) {
+                        return response.data.data;
+                    } else {
+                        this.showNotification(response.data.message, 'warning');
+                        return null;
+                    }
+                } catch (error) {
+                    this.showNotification('请求失败，请稍后重试', 'error');
+                    return null;
+                }
+            },
+
+            // 显示通知
+            showNotification(message, type = 'info') {
+                this.isNotificationVisible = true;
+                this.notificationMessage = message;
+                this.notificationType = this.getNotificationClass(type);
+
+                setTimeout(this.hideNotification, 3000);
+            },
+
+            // 获取通知的样式
+            getNotificationClass(type) {
+                const types = {
+                    success: 'is-success is-light',
+                    info: 'is-light',
+                    error: 'is-danger is-light',
+                    warning: 'is-warning is-light'
+                };
+                return types[type] || 'is-light';
+            },
+
+            // 隐藏通知
+            hideNotification() {
+                this.isNotificationVisible = false;
+            },
+
+            // 变更页码
+            handlePageChange(page) {
+                if (page < 1) page = 1;
+                if (page > this.list.total_page) page = this.list.total_page;
+                this.form.page = page;
+                this.getData();
+            },
+
+            // 分页数据处理
+            addEllipsis(pages) {
+                const result = [];
+                for (let i = 0; i < pages.length; i++) {
+                    if (i > 0 && pages[i] - pages[i - 1] > 1) {
+                        result.push('...');
+                    }
+                    result.push(pages[i]);
+                }
+                return result;
+            },
+
+            // 获取数据
+            async getData() {
+                const data = this.form;
+                const result = await this.apiRequest('/api/points-mall/product-management/get-data', data);
+                if (result) {
+                    this.list = result.list;
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('main-content-body').style.display = 'block';
+                }
+            },
+
+            // 搜索
+            searchData() {
+                this.form.page = 1;
+                this.getData();
+            },
+
+            // 清空搜索
+            emptyData() {
+                this.form.name = null;
+                this.form.type = null;
+                this.form.page = 1;
+                this.getData();
+            },
+
+            // 点击添加商品
+            addGoods() {
+                this.resetGoods();
+                this.goods_active = true;
+            },
+
+            // 点击变更商品
+            async editGoods(goods_id) {
+                this.goods_active = true;
+                const result = await this.apiRequest('/api/points-mall/product-management/get-data-details', { goods_id: goods_id });
+                if (result) {
+                    this.goods = result.goods;
+                }
+            },
+
+            // 存储商品
+            async saveGoods() {
+                // 验证参数
+                if (!this.goods.name) {
+                    this.showNotification('商品名称不能为空', 'warning');
+                    return false;
+                }
+                if (!this.goods.amount) {
+                    this.showNotification('商品价格不能为空或为0', 'warning');
+                    return false;
+                }
+                if (!this.goods.sub_num) {
+                    this.showNotification('规格选择数量不能为空或为0', 'warning');
+                    return false;
+                }
+                if (!this.goods.cover_image.path) {
+                    this.showNotification('封面图不能为空', 'warning');
+                    return false;
+                }
+                if (!this.goods.carousel_images.length) {
+                    this.showNotification('商品展示图不能为空', 'warning');
+                    return false;
+                }
+                this.goods.carousel_images.forEach(item => {
+                    if (!item.path) {
+                        this.showNotification('商品展示图中有无数据的项目，请删除', 'warning');
+                        return false;
+                    }
+                })
+                if (!this.goods.details_images.length) {
+                    this.showNotification('详情图不能为空', 'warning');
+                    return false;
+                }
+                this.goods.details_images.forEach(item => {
+                    if (!item.path) {
+                        this.showNotification('详情图中有无数据的项目，请删除', 'warning');
+                        return false;
+                    }
+                })
+                if (!this.goods.service_description_images.length) {
+                    this.showNotification('服务说明图不能为空', 'warning');
+                    return false;
+                }
+                this.goods.service_description_images.forEach(item => {
+                    if (!item.path) {
+                        this.showNotification('服务说明图中有无数据的项目，请删除', 'warning');
+                        return false;
+                    }
+                })
+                if (!this.goods.sort) {
+                    this.showNotification('排序不能为空', 'warning');
+                    return false;
+                }
+                if (!this.goods.subs.length) {
+                    this.showNotification('规格不能为空', 'warning');
+                    return false;
+                }
+                this.goods.subs.forEach(item => {
+                    if (!item.name) {
+                        this.showNotification('规格中有无名称的项目，请删除', 'warning');
+                        return false;
+                    }
+                    if (!item.icon.path) {
+                        this.showNotification('规格中有无封面图的项目，请删除', 'warning');
+                        return false;
+                    }
+                })
+                this.loading = true;
+                const result = await this.apiRequest('/api/points-mall/product-management/set-data-details', this.goods);
+                if (result) {
+                    this.showNotification('操作成功', 'success');
+                    this.resetGoods();
+                    this.goods_active = false;
+                    this.loading = false;
+                    this.getData();
+                }
+            },
+
+            // 清空弹窗内容
+            resetGoods() {
+                this.goods.goods_id = null;
+                this.goods.name = ''; // 商品名称
+                this.goods.amount = ''; // 商品价格
+                this.goods.sub_num = ''; // 规格选择数量
+                this.goods.tips = ''; // 购买说明
+                this.goods.cover_image = {
+                    url: '',
+                    path: ''
+                }; // 封面图
+                this.goods.carousel_images = []; // 商品展示图（多个）
+                this.goods.details_images = []; // 详情图（多个）
+                this.goods.service_description_images = []; // 服务说明图（多个）
+                this.goods.status = 1; // 状态
+                this.goods.type = 0; // 商品类型
+                this.goods.sort = ''; // 排序，从小到大
+                this.goods.sale_num = ''; // 销售数量
+                this.goods.sale_increase = ''; // 每次销售递增
+                this.goods.subs = [];
+            },
+
+            // 增加规格
+            addSubs() {
+                this.goods.subs.push({
+                    icon: {
+                        url: null,
+                        path: null
+                    },
+                    name: ''
+                });
+            },
+
+            // 删除规格
+            delSubs(index) {
+                this.goods.subs.splice(index, 1);
+            },
+
+            // 触发 input file 的点击事件
+            triggerFileInput(fileType, subsIndex = null) {
+                this.fileType = fileType;
+                this.$refs.fileInput.click();
+                if (subsIndex !== null) {
+                    this.subsIndex = subsIndex
+                }
+            },
+
+            // 文件上传
+            handleFileChange(event, fileType) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = () => this.uploadFile(reader.result, fileType);
+                reader.onerror = () => this.showNotification('文件读取错误，请确认图片类型', 'warning');
+                reader.readAsDataURL(file);
+
+                // 清空 input file 内容
+                this.$refs.fileInput.value = null;
+            },
+
+            // 上传文件并更新表单数据
+            uploadFile(base64Data, fileType) {
+                const data = { base64: base64Data, type: fileType };
+                const signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
+
+                axios.post('/api/points-mall/product-management/upload-images', data, {
+                    headers: { 'X-Signature': signature }
+                }).then(response => {
+                    if (response.data.code === 0) {
+                        this.updateFormImage(fileType, response.data.data);
+                    } else {
+                        this.showNotification('上传失败，请稍后重试', 'error');
+                    }
+                }).catch(() => this.showNotification('请求失败，请稍后重试', 'error'));
+            },
+
+            // 更新表单中的文件数据
+            updateFormImage(fileType, data) {
+                switch (fileType) {
+                    case 'cover_image':
+                        this.goods[fileType] = data;
+                        break;
+                    case 'carousel_images':
+                    case 'details_images':
+                    case 'service_description_images':
+                        this.goods[fileType].push(data);
+                        break;
+                    case 'sub_cover_image':
+                        this.goods.subs[this.subsIndex].icon = data;
+                        break;
+                }
+            },
+
+            // 多图删除
+            imageDeleted(index, fileType) {
+                this.goods[fileType].splice(index, 1);
+            }
+
+        }
+    });
+    app.mount('#app');
+</script>
+
+</html>

@@ -42,7 +42,10 @@ class ApiAuthCheck implements MiddlewareInterface
         }
         // 验证签名
         if (md5(config('app')['key'] . $param['timestamp']) != $param['sign']) {
-            return fail($request, 900002);
+            return fail($request, 900002, [
+                'str' => config('app')['key'] . $param['timestamp'],
+                'md5' => md5(config('app')['key'] . $param['timestamp'])
+            ]);
         }
         // 解密数据
         $data = openssl_decrypt($param['en_data'], 'aes-128-cbc', config('app')['aes_key'], 0, config('app')['aes_iv']);
@@ -57,6 +60,8 @@ class ApiAuthCheck implements MiddlewareInterface
         $whitelisting = [
             '/api/shop/login/get-user-vip',
             '/api/shop/login/perform-login',
+            '/api/shop/login/get-background',
+            '/api/shop/login/get-theme-color'
         ];
         if (!in_array($path, $whitelisting)) {
             if (empty($token)) {

