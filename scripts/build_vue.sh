@@ -11,6 +11,9 @@ if [ $? -ne 0 ]; then
     exit 1  # 如果 git clone 失败，则退出并返回非零状态
 fi
 
+# 复制 .env.example 为 .env
+cp /var/www/bilibili_danmu/public/shop/.env.example /var/www/bilibili_danmu/public/shop/.env
+
 # 提取系统配置文件中的值
 SYSTEM_API_URL=$(grep -oP '^SYSTEM_API_URL=\K.*' /var/www/bilibili_danmu/.env)
 SYSTEM_AES_KEY=$(grep -oP '^SYSTEM_AES_KEY=\K.*' /var/www/bilibili_danmu/.env)
