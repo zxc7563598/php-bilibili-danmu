@@ -57,6 +57,7 @@ Route::group('/api/points-mall', function () {
     Route::any('/complaint-management/get-data', [app\controller\shop\management\ComplaintManagementController::class, 'getData']);
     Route::any('/complaint-management/get-data-details', [app\controller\shop\management\ComplaintManagementController::class, 'getDataDetails']);
 })->middleware([
+    app\middleware\AccessControl::class,
     app\middleware\SignatureMiddleware::class
 ]);
 
