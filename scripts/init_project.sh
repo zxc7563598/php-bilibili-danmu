@@ -35,7 +35,7 @@ if [ ! -f "$ENV_FILE" ]; then
     if grep -q "SECURE_API_KEY=" $ENV_FILE; then
         sed -i "s|SECURE_API_KEY=.*|SECURE_API_KEY=$SECURE_API_KEY|" $ENV_FILE
     else
-        echo "SECURE_API_KEY=$SECURE_API_KEY" >> $ENV_FILE
+        echo "SECURE_API_KEY=$SECURE_API_KEY" >>$ENV_FILE
     fi
 
     # 生成随机的 MySQL root 密码和普通用户密码
@@ -57,7 +57,7 @@ if [ ! -f "$ENV_FILE" ]; then
     GRANT ALL PRIVILEGES ON *.* TO '${DB_NAME}'@'%' WITH GRANT OPTION;
     DELETE FROM mysql.user WHERE user = 'root' AND host != 'localhost';
     FLUSH PRIVILEGES;
-    EOF
+EOF
 
     # 替换 .env 文件中的占位符
     sed -i "s/^DB_HOST=.*/DB_HOST=mysql/" /var/www/bilibili_danmu/.env
@@ -73,4 +73,7 @@ if [ ! -f "$ENV_FILE" ]; then
 
     # 构建数据库
     php vendor/bin/phinx migrate -e development
+
+    # 启动项目
+    php start.php start -d
 fi
