@@ -94,9 +94,6 @@ class SystemConfigurationController extends GeneralMethod
         $scriptPath = 'sh ' . base_path() . '/scripts/build_vue.sh';
         // 执行脚本
         exec($scriptPath, $output, $return_var);
-        sublog('测试接口', '构建vue', $scriptPath);
-        sublog('测试接口', '构建vue', $output);
-        sublog('测试接口', '构建vue', $return_var);
         // 返回数据
         if ($return_var !== 0) {
             return fail($request, 900007);
