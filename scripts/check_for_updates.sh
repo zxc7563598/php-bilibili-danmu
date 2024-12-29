@@ -3,9 +3,9 @@
 # 项目目录路径
 PROJECT_DIR="/var/www/bilibili_danmu"
 # 日志文件路径
-LOG_FILE="/var/log/check_and_update.log"
+LOG_FILE="/var/log/check_for_updates.log"
 # 锁文件路径
-LOCK_FILE="/tmp/check_and_update.lock"
+LOCK_FILE="/tmp/check_for_updates.lock"
 # Webman 服务端口
 PORT=7776
 
