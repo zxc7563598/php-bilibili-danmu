@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 设置日志路径（可选）
-LOG_FILE="/var/log/build_vue.log"
+LOG_FILE="/var/log/script.log"
 
 # 拉取项目
 echo "正在拉取项目..."
@@ -11,11 +11,20 @@ if [ $? -ne 0 ]; then
     exit 1  # 如果 git clone 失败，则退出并返回非零状态
 fi
 
-# 前往目录并构建
-echo "进入项目目录并开始构建..."
+# 前往目录
+echo "进入项目目录..."
 cd /var/www/bilibili_danmu/public/shop || { echo "无法进入目录" >> $LOG_FILE; exit 1; }
 
-# 运行 npm build
+# 安装依赖
+echo "开始安装项目依赖..."
+npm install >> $LOG_FILE 2>&1
+if [ $? -ne 0 ]; then
+    echo "安装依赖失败" >> $LOG_FILE
+    exit 1  # 如果 npm install 失败，则退出并返回非零状态
+fi
+
+# 构建项目
+echo "开始构建项目..."
 npm run build >> $LOG_FILE 2>&1
 if [ $? -ne 0 ]; then
     echo "构建失败" >> $LOG_FILE
