@@ -37,6 +37,7 @@ Route::group('/points-mall', function () {
 Route::group('/api/points-mall', function () {
     Route::any('/system-configuration/get-data', [app\controller\shop\management\SystemConfigurationController::class, 'getData']);
     Route::any('/system-configuration/set-data', [app\controller\shop\management\SystemConfigurationController::class, 'setData']);
+    Route::any('/system-configuration/build-shop', [app\controller\shop\management\SystemConfigurationController::class, 'buildShop']);
     Route::any('/mall-configuration/get-data', [app\controller\shop\management\MallConfigurationController::class, 'getData']);
     Route::any('/mall-configuration/set-data', [app\controller\shop\management\MallConfigurationController::class, 'setData']);
     Route::any('/mall-configuration/upload-images', [app\controller\shop\management\MallConfigurationController::class, 'uploadImages']);
@@ -85,7 +86,7 @@ Route::group('/api/shop', function () {
     Route::post('/shop/get-goods-details', [app\controller\shop\ShopController::class, 'getGoodsDetails']); // 获取商品详情
     Route::post('/shop/get-confirm', [app\controller\shop\ShopController::class, 'getConfirm']); // 获取确认订单信息
 
-    
+
     Route::post('/user/get-background', [app\controller\shop\UserController::class, 'getBackground']); // 获取背景图片
     Route::post('/user/get-address-list', [app\controller\shop\UserController::class, 'getAddressList']); // 获取用户地址列表
     Route::post('/user/get-address-details', [app\controller\shop\UserController::class, 'getAddressDetails']); // 获取用户地址详情

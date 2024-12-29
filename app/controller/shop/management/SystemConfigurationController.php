@@ -10,8 +10,10 @@ class SystemConfigurationController extends GeneralMethod
 {
     public function getData(Request $request)
     {
+        $shop = is_dir(public_path('shop'));
         // 返回数据
         return success($request, [
+            'shop' => $shop,
             'system_api_url' => getenv('SYSTEM_API_URL', ''),
             'system_aes_key' => getenv('SYSTEM_AES_KEY', ''),
             'system_aes_iv' => getenv('SYSTEM_AES_IV', ''),
@@ -83,6 +85,19 @@ class SystemConfigurationController extends GeneralMethod
         // 重启系统
         posix_kill(posix_getppid(), SIGUSR1);
         // 返回数据
+        return success($request, []);
+    }
+
+    public function buildShop(Request $request)
+    {
+        // 定义脚本路径
+        $scriptPath = base_path() . '/scripts/build_vue.sh';
+        // 执行脚本
+        exec($scriptPath, $output, $return_var);
+        // 返回数据
+        if ($return_var !== 0) {
+            return fail($request, 900007);
+        }
         return success($request, []);
     }
 }

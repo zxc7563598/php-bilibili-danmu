@@ -197,7 +197,7 @@ class Bilibili
 
     private function analysis($payload)
     {
-        $dir = base_path() . '/runtime/logs/直播间信息记录/';
+        $dir = base_path() . '/runtime/logs/' . Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d') . '/直播间信息记录/';
         if (!is_dir($dir)) {
             mkdir($dir, 0777, true);
         }
