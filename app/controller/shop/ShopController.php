@@ -7,14 +7,14 @@ use app\core\UserPublicMethods;
 use app\model\Goods;
 use app\model\GoodSubs;
 use app\model\RedemptionRecords;
+use app\model\ShopConfig;
 use app\model\UserAddress;
-use Carbon\Exceptions\InvalidTimeZoneException;
-use InvalidArgumentException;
 use support\Request;
 use Webman\Http\Response;
 use resource\enums\GoodsEnums;
 use resource\enums\GoodSubsEnums;
 use resource\enums\UserAddressEnums;
+use resource\enums\ShopConfigEnums;
 use support\Db;
 
 class ShopController extends GeneralMethod
@@ -27,7 +27,6 @@ class ShopController extends GeneralMethod
     public function getGoods(Request $request): Response
     {
         $param = $request->data;
-        $user_vips = $request->user_vips;
         sublog('积分商城', '获取商品列表', $param);
         sublog('积分商城', '获取商品列表', '===================');
         // 获取商品
@@ -56,7 +55,6 @@ class ShopController extends GeneralMethod
     public function getGoodsDetails(Request $request): Response
     {
         $param = $request->data;
-        $user_vips = $request->user_vips;
         sublog('积分商城', '获取商品列表', $param);
         sublog('积分商城', '获取商品列表', '===================');
         // 获取参数
@@ -71,7 +69,9 @@ class ShopController extends GeneralMethod
             'carousel_images' => 'carousel_images',
             'details_images' => 'details_images',
             'type' => 'type',
-            'service_description_images' => 'service_description_images'
+            'service_description_images' => 'service_description_images',
+            'sale_num' => 'sale_num',
+            'tips' => 'tips'
         ]);
         if (empty($goods)) {
             return fail($request, 800006);
@@ -97,15 +97,6 @@ class ShopController extends GeneralMethod
         foreach ($service_description_images as &$_service_description_images) {
             $_service_description_images = getImageUrl($_service_description_images);
         }
-        $tips = '';
-        switch ($goods->type) {
-            case GoodsEnums\Type::Virtually->value:
-                $tips = "该礼物为虚拟礼物，下单后将有人与您联系，请留意私信";
-                break;
-            case GoodsEnums\Type::Tribute->value:
-                $tips = "希望您可以支付全部的积分，即使您不会得到任何东西";
-                break;
-        }
         // 返回数据
         return success($request, [
             'goods_id' => $goods->goods_id,
@@ -118,7 +109,8 @@ class ShopController extends GeneralMethod
             'service_description_images' => $service_description_images,
             'commodity_type' => $commodity_type,
             'type' => GoodsEnums\Type::from($goods->type)->label(),
-            'tips' => $tips
+            'sale' => $goods->sale_num,
+            'tips' => $goods->tips
         ]);
     }
 
@@ -162,6 +154,10 @@ class ShopController extends GeneralMethod
         foreach ($good_subs as $_good_subs) {
             $commodity_type[] = $_good_subs->name . '*1  ';
         }
+        // 获取配置信息
+        $config = ShopConfig::where('title', 'protocols-name')->first([
+            'content' => 'content'
+        ]);
         // 返回数据
         return success($request, [
             'user_address' => $user_address,
@@ -171,9 +167,14 @@ class ShopController extends GeneralMethod
                 'cover' => getImageUrl($goods->cover_image),
                 'amount' => round($goods->amount),
                 'commodity_type' => implode(',', $commodity_type),
-                'freight_fee' => '主包包邮',
-                'address' => ($goods->type == GoodsEnums\Type::Virtually->value || $goods->type == GoodsEnums\Type::Tribute->value) ? false : true
-            ]
+                'address' => ($goods->type == GoodsEnums\Type::Entity->value) ? true : false,
+                'protocols' => !empty($user_vips->sign_image) ? true : false,
+                'details' => [
+                    ['key' => '运费', 'value' => '主包包邮'],
+                    ['key' => '发货时间', 'value' => '取决于主包心情']
+                ]
+            ],
+            'protocols_title' => !empty($config->content) ? $config->content : '协议'
         ]);
     }
 
@@ -212,293 +213,160 @@ class ShopController extends GeneralMethod
     }
 
     /**
-     * 上供排名
-     * 
-     * @return Response 
-     */
-    public function dedicationRanking(Request $request): Response
-    {
-        $user_vips = $request->user_vips;
-        sublog('积分商城', '上供排名', $user_vips);
-        sublog('积分商城', '上供排名', '===================');
-        // 获取信息
-        $goods = Goods::where('type', GoodsEnums\Type::Tribute->value)->get([
-            'goods_id' => 'goods_id'
-        ]);
-        $goods_id = [];
-        foreach ($goods as $_goods) {
-            $goods_id[] = $_goods->goods_id;
-        }
-        $redemption = RedemptionRecords::join('bl_user_vips', 'bl_user_vips.user_id', '=', 'bl_redemption_records.user_id')
-            ->whereIn('bl_redemption_records.goods_id', $goods_id)
-            ->groupBy('bl_redemption_records.user_id')
-            ->orderByRaw('count desc')
-            ->orderBy('bl_redemption_records.created_at', 'asc')
-            ->get([
-                Db::raw("bl_user_vips.user_id as user_id"),
-                Db::raw("bl_user_vips.name as name"),
-                Db::raw("count(*) as count"),
-                Db::raw("sum(bl_redemption_records.point) as amount")
-            ]);
-        // 获取自己的排名
-        $ranking = 0;
-        $i = 1;
-        foreach ($redemption as &$_redemption) {
-            if ($ranking == 0) {
-                if ($user_vips->user_id == $_redemption->user_id) {
-                    $ranking = $i;
-                }
-            }
-            unset($_redemption->user_id);
-            $i++;
-        }
-        // 返回数据
-        return success($request, [
-            'redemption' => $redemption,
-            'ranking' => $ranking
-        ]);
-    }
-
-    /**
-     * 获取商品列表
+     * 获取交易成功页面信息
      * 
      * @param Request $request 
      * @return Response 
      */
-    public function getProductList(Request $request): Response
+    public function getTransactionsSuccess(Request $request): Response
     {
-        $param = $request->data;
         $user_vips = $request->user_vips;
-        sublog('积分商城', '获取商品列表', $user_vips);
-        sublog('积分商城', '获取商品列表', $param);
-        sublog('积分商城', '获取商品列表', '===================');
-        // 验证添加权限
-        if (!in_array($user_vips->uid, [
-            4325051,
-            3494365156608185
-        ])) {
-            return fail($request, 800010);
-        }
-        // 获取商品列表
-        $goods = Goods::orderBy('sort', 'asc')->get([
-            'goods_id' => 'goods_id',
-            'cover_image' => 'cover_image',
-            'name' => 'name',
-            'status' => 'status',
-            'type' => 'type'
-        ]);
-        // 处理数据
-        foreach ($goods as $_goods) {
-            $_goods->status = GoodsEnums\Status::from($_goods->status)->label();
-            $_goods->type = GoodsEnums\Type::from($_goods->type)->label();
-            $_goods->cover_image = getImageUrl($_goods->cover_image);
-        }
-        // 返回数据
-        return success($request, [
-            'goods' => $goods
-        ]);
-    }
-
-    /**
-     * 获取变更商品信息
-     * 
-     * @param Request $request 
-     * @return Response 
-     */
-    public function getProductDetails(Request $request): Response
-    {
         $param = $request->data;
-        $user_vips = $request->user_vips;
-        sublog('积分商城', '获取变更商品信息', $user_vips);
-        sublog('积分商城', '获取变更商品信息', $param);
-        sublog('积分商城', '获取变更商品信息', '===================');
+        sublog('积分商城', '获取交易成功页面信息', $user_vips);
+        sublog('积分商城', '获取交易成功页面信息', $param);
+        sublog('积分商城', '获取交易成功页面信息', '===================');
         // 获取参数
-        $goods_id = !empty($param['goods_id']) ? $param['goods_id'] : null;
-        // 验证添加权限
-        if (!in_array($user_vips->uid, [
-            4325051,
-            3494365156608185
-        ])) {
-            return fail($request, 800010);
-        }
-        // 获取商品信息
-        $goods = Goods::where('goods_id', $goods_id)->first([
-            'goods_id' => 'goods_id',
-            'name' => 'name',
-            'amount' => 'amount',
-            'sub_num' => 'sub_num',
-            'cover_image' => 'cover_image',
-            'carousel_images' => 'carousel_images', // 
-            'details_images' => 'details_images', // 
-            'service_description_images' => 'service_description_images', // 
-            'status' => 'status',
-            'type' => 'type',
-            'sort' => 'sort'
-        ]);
-        $carousel_images = [];
-        $details_images = [];
-        $service_description_images = [];
-        $sub = [];
-        $sub_list = [];
-        if (!empty($goods)) {
-            if (!empty($goods->carousel_images)) {
-                $carousel = explode('-|-', $goods->carousel_images);
-                foreach ($carousel as $_carousel) {
-                    $carousel_images[] = [
-                        'path' => $_carousel,
-                        'url' => getImageUrl($_carousel)
-                    ];
-                }
-            }
-            if (!empty($goods->details_images)) {
-                $details = explode('-|-', $goods->details_images);
-                foreach ($details as $_details) {
-                    $details_images[] = [
-                        'path' => $_details,
-                        'url' => getImageUrl($_details)
-                    ];
-                }
-            }
-            if (!empty($goods->service_description_images)) {
-                $service_description = explode('-|-', $goods->service_description_images);
-                foreach ($service_description as $_service_description) {
-                    $service_description_images[] = [
-                        'path' => $_service_description,
-                        'url' => getImageUrl($_service_description)
-                    ];
-                }
-            }
-            $sub = GoodSubs::where('goods_id', $goods->goods_id)->get([
-                'sub_id' => 'sub_id',
-                'name' => 'name',
-                'cover_image' => 'cover_image',
-                'status' => 'status'
-            ]);
-            foreach ($sub as &$_sub) {
-                $sub_list[] = [
-                    'sub_id' => $_sub->sub_id,
-                    'name' => $_sub->name,
-                    'cover_image' => [
-                        'path' => !empty($_sub->cover_image) ? $_sub->cover_image : null,
-                        'url' => !empty($_sub->cover_image) ? getImageUrl($_sub->cover_image) : null
-                    ],
-                    'status' => $_sub->status
-                ];
-            }
-        }
-        // 返回数据
-        return success($request, [
-            'record' => [
-                'goods_id' => !empty($goods) ? $goods->goods_id : null,
-                'name' => !empty($goods) ? $goods->name : null,
-                'amount' => !empty($goods) ? $goods->amount : null,
-                'sub_num' => !empty($goods) ? $goods->sub_num : null,
-                'sub' => $sub_list,
-                'cover_image' => [
-                    'path' => !empty($goods->cover_image) ? $goods->cover_image : null,
-                    'url' => !empty($goods->cover_image) ? getImageUrl($goods->cover_image) : null
-                ],
-                'carousel_images' => $carousel_images,
-                'details_images' => $details_images,
-                'service_description_images' => $service_description_images,
-                'status' => !empty($goods) ? $goods->status : null,
-                'type' => !empty($goods) ? $goods->type : null,
-                'sort' => !empty($goods) ? $goods->sort : null,
-            ],
-            'enumeration' => [
-                'status' => GoodsEnums\Status::all(),
-                'type' => GoodsEnums\Type::all(),
-                'sub_status' => GoodSubsEnums\Status::all()
-            ]
-        ]);
-    }
-
-    /**
-     * 变更商品
-     * 
-     * @param integer $goods_id 商品id
-     * @param string $name 商品名称
-     * @param string $amount 积分
-     * @param array $sub 规格
-     * @param array $cover_image 封面图
-     * @param array $carousel_images 轮播图
-     * @param array $details_images 商品详情图
-     * @param array $service_description_images 服务说明图
-     * @param integer $type 类型
-     * @param integer $status 状态
-     * @param integer $sort 排序
-     * 
-     * @return Response 
-     */
-    public function setProduct(Request $request): Response
-    {
-        $param = $request->data;
-        $user_vips = $request->user_vips;
-        sublog('积分商城', '变更商品', $user_vips);
-        sublog('积分商城', '变更商品', $param);
-        sublog('积分商城', '变更商品', '===================');
-        // 获取参数
-        $goods_id = !empty($param['goods_id']) ? $param['goods_id'] : null;
-        $name = $param['name'];
-        $amount = $param['amount'];
-        $sub = $param['sub'];
-        $cover_image = $param['cover_image'][0];
-        $carousel_images = $param['carousel_images'];
-        $details_images = $param['details_images'];
-        $service_description_images = $param['service_description_images'];
-        $status = $param['status'];
         $type = $param['type'];
-        $sub_num = $param['sub_num'];
-        $sort = $param['sort'];
-        // 验证添加权限
-        if (!in_array($user_vips->uid, [
-            4325051,
-            3494365156608185
-        ])) {
-            return fail($request, 800010);
-        }
-        // 处理数据
-        if (!count($sub)) {
-            return fail($request, 800011);
-        }
-        if (!count($carousel_images)) {
-            return fail($request, 800011);
-        }
-        if (!count($details_images)) {
-            return fail($request, 800011);
-        }
-        if (!count($service_description_images)) {
-            return fail($request, 800011);
-        }
-        // 录入信息
-        $goods = new Goods();
-        if (!empty($goods_id)) {
-            $goods = Goods::where('goods_id', $goods_id)->first();
-        }
-        $goods->name = $name;
-        $goods->amount = $amount;
-        $goods->sub_num = $sub_num;
-        $goods->cover_image = $cover_image;
-        $goods->carousel_images = implode('-|-', $carousel_images);
-        $goods->details_images = implode('-|-', $details_images);
-        $goods->service_description_images = implode('-|-', $service_description_images);
-        $goods->status = $status;
-        $goods->type = $type;
-        $goods->sort = $sort;
-        $goods->save();
-        // 录入或变更子商品信息
-        foreach ($sub as $_sub) {
-            $goods_subs = new GoodSubs();
-            if (!empty($_sub['sub_id'])) {
-                $goods_subs = GoodSubs::where('sub_id', $_sub['sub_id'])->first();
-            }
-            $goods_subs->goods_id = $goods->goods_id;
-            $goods_subs->name = $_sub['name'];
-            $goods_subs->cover_image = $_sub['cover_image'][0];
-            $goods_subs->status = $_sub['status'];
-            $goods_subs->save();
+        // 声明数据
+        $title = '下单成功！';
+        $content = '已经在安排啦';
+        $button = '回到首页';
+        $images = getImageUrl('default/orderFail.png');
+        $ranking = 0;
+        $redemption = [];
+        // 处理信息
+        switch ($type) {
+            case GoodsEnums\Type::Virtually->value: // 虚拟
+                $config_database = ShopConfig::whereIn('title', [
+                    'virtual-gift-order-successful-icon',
+                    'virtual-gift-order-successful-title',
+                    'virtual-gift-order-successful-content',
+                    'virtual-gift-order-successful-button'
+                ])->get([
+                    'title' => 'title',
+                    'content' => 'content'
+                ]);
+                $config = [];
+                foreach ($config_database as $_config_database) {
+                    $config[$_config_database->title] = $_config_database->content;
+                }
+                $title = $config['virtual-gift-order-successful-title'];
+                $content = $config['virtual-gift-order-successful-content'];
+                $button = $config['virtual-gift-order-successful-button'];
+                $images = getImageUrl($config['virtual-gift-order-successful-icon']);
+                break;
+            case GoodsEnums\Type::Entity->value: // 实体
+                $config_database = ShopConfig::whereIn('title', [
+                    'realism-gift-order-successful-icon',
+                    'realism-gift-order-successful-title',
+                    'realism-gift-order-successful-content',
+                    'realism-gift-order-successful-button'
+                ])->get([
+                    'title' => 'title',
+                    'content' => 'content'
+                ]);
+                $config = [];
+                foreach ($config_database as $_config_database) {
+                    $config[$_config_database->title] = $_config_database->content;
+                }
+                $title = $config['realism-gift-order-successful-title'];
+                $content = $config['realism-gift-order-successful-content'];
+                $button = $config['realism-gift-order-successful-button'];
+                $images = getImageUrl($config['realism-gift-order-successful-icon']);
+                break;
+            case GoodsEnums\Type::Tribute->value: // 贡
+                $config_database = ShopConfig::whereIn('title', [
+                    'tribute-gift-order-successful-icon',
+                    'tribute-gift-order-successful-title',
+                    'tribute-gift-order-successful-content',
+                    'tribute-gift-order-successful-button',
+                    'tribute-gift-order-successful-rankings',
+                    'tribute-gift-order-successful-rankingslist'
+                ])->get([
+                    'title' => 'title',
+                    'content' => 'content'
+                ]);
+                $config = [];
+                foreach ($config_database as $_config_database) {
+                    $config[$_config_database->title] = $_config_database->content;
+                }
+                $title = $config['tribute-gift-order-successful-title'];
+                $content = $config['tribute-gift-order-successful-content'];
+                $button = $config['tribute-gift-order-successful-button'];
+                $images = getImageUrl($config['tribute-gift-order-successful-icon']);
+                // 获取贡品信息
+                if ($config['tribute-gift-order-successful-rankings'] == 1) {
+                    $goods = Goods::where('type', GoodsEnums\Type::Tribute->value)->get([
+                        'goods_id' => 'goods_id'
+                    ]);
+                    $goods_id = [];
+                    foreach ($goods as $_goods) {
+                        $goods_id[] = $_goods->goods_id;
+                    }
+                    $redemption = RedemptionRecords::join('bl_user_vips', 'bl_user_vips.user_id', '=', 'bl_redemption_records.user_id')
+                        ->whereIn('bl_redemption_records.goods_id', $goods_id)
+                        ->groupBy('bl_redemption_records.user_id')
+                        ->orderByRaw('count desc')
+                        ->orderBy('bl_redemption_records.created_at', 'asc')
+                        ->get([
+                            Db::raw("bl_user_vips.user_id as user_id"),
+                            Db::raw("bl_user_vips.name as name"),
+                            Db::raw("count(*) as count"),
+                            Db::raw("sum(bl_redemption_records.point) as amount")
+                        ]);
+                    // 获取自己的排名
+                    $i = 1;
+                    foreach ($redemption as &$_redemption) {
+                        if ($ranking == 0) {
+                            if ($user_vips->user_id == $_redemption->user_id) {
+                                $ranking = $i;
+                            }
+                        }
+                        unset($_redemption->user_id);
+                        $i++;
+                    }
+                }
+                $rankingslist = json_decode($config['tribute-gift-order-successful-rankingslist'], true);
+                foreach ($rankingslist as $_rankingslist) {
+                    switch ($_rankingslist['comparison']) {
+                        case ShopConfigEnums\Comparison::GreaterThan->value: // 大于
+                            if ($ranking > $_rankingslist['position']) {
+                                $content = $_rankingslist['content'];
+                            }
+                            break;
+                        case ShopConfigEnums\Comparison::GreaterThanOrEqualTo->value: // 大于等于
+                            if ($ranking >= $_rankingslist['position']) {
+                                $content = $_rankingslist['content'];
+                            }
+                            break;
+                        case ShopConfigEnums\Comparison::LessThan->value: // 小于
+                            if ($ranking < $_rankingslist['position']) {
+                                $content = $_rankingslist['content'];
+                            }
+                            break;
+                        case ShopConfigEnums\Comparison::LessThanOrEqualTo->value: // 小于等于
+                            if ($ranking <= $_rankingslist['position']) {
+                                $content = $_rankingslist['content'];
+                            }
+                            break;
+                        case ShopConfigEnums\Comparison::EqualTo->value: // 等于
+                            if ($ranking == $_rankingslist['position']) {
+                                $content = $_rankingslist['content'];
+                            }
+                            break;
+                    }
+                }
+
+                break;
         }
         // 返回数据
-        return success($request, []);
+        return success($request, [
+            'title' => $title,
+            'content' => $content,
+            'button' => $button,
+            'images' => $images,
+            'ranking' => $ranking,
+            'redemption' => $redemption
+        ]);
     }
 }

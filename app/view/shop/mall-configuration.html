@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>积分商城控制台</title>
+    <?php include 'layout/style.php'; ?>
+    <link href="/css/quill.snow.css" rel="stylesheet">
+    <script src="/js/quill.js"></script>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <style>
+        .rankings-list {
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 顶部 Navbar -->
+    <?php $currentPage = 'mall-configuration'; ?>
+    <?php include 'layout/navbar.php'; ?>
+    <!-- 主要区域 -->
+    <div class="columns menu-container" id="app">
+        <!-- 左侧菜单栏 -->
+        <?php include 'layout/menu.php'; ?>
+        <!-- 主要内容区域 -->
+        <div class="column" id="main-content">
+            <!-- 动态通知框 -->
+            <transition name="slide-fade" @after-leave="hideNotification">
+                <div v-if="isNotificationVisible" class="notification notification-fixed" :class="notificationType">
+                    <button class="delete" @click="hideNotification"></button>
+                    {{notificationMessage}}
+                </div>
+            </transition>
+            <div id="loading">
+                加载中，请稍候...
+            </div>
+            <input ref="fileInput" type="file" @change="(event) => handleFileChange(event, fileType)"
+                style="display: none;" />
+            <div id="main-content-body" style="padding: 1rem;">
+                <div class="columns is-multiline">
+                    <div class="column is-full">
+                        <div class="card">
+                            <header class="card-header">
+                                <p class="card-header-title">商城设置</p>
+                            </header>
+                            <div class="card-content">
+                                <div class="field">
+                                    <label class="label">登录页面背景图</label>
+                                    <div class="control">
+                                        <figure class="image is-128x128">
+                                            <img :src="form.login_background_image['url']"
+                                                @click="triggerFileInput('login_background_image')"
+                                                style="height:100%;" />
+                                        </figure>
+                                    </div>
+                                    <p class="help">此配置项决定商城登录页面的背景图，<a
+                                            href="/attachment/default/login.png">点击查看页面样式</a>，背景图将展示在登录框背后，提供视觉美化和用户体验的提升。登录框本身是半透明的，不会完全遮挡背景图。调整该背景图后，确保页面主体内容能够在背景图上清晰展示，不会与背景图产生冲突或遮挡重要信息。
+                                    </p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">个人中心背景图</label>
+                                    <div class="control">
+                                        <figure class="image is-128x128">
+                                            <img :src="form.personal_background_image['url']"
+                                                @click="triggerFileInput('personal_background_image')"
+                                                style="height:100%;" />
+                                        </figure>
+                                    </div>
+                                    <p class="help">此配置项决定个人中心页面的背景图，<a
+                                            href="/attachment/default/user.png">点击查看页面样式</a>，背景图展示在个人信息部分的后面，通常会与页面底部的内容产生重叠。背景图的显示区域可能会遮挡部分内容，且底部会使用渐变效果与背景色相匹配。为了确保良好的视觉效果，建议控制背景图的高度。
+                                    </p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">主题色</label>
+                                    <div class="control">
+                                        <input type="color" class="form-control form-control-color"
+                                            id="exampleColorInput" v-model="form.theme_color[0]"
+                                            title="Choose your color">
+                                        <input type="color" class="form-control form-control-color"
+                                            id="exampleColorInput" v-model="form.theme_color[1]"
+                                            title="Choose your color">
+                                    </div>
+                                    <p class="help">
+                                        此配置项决定整个商城的主主题色，调整后会影响页面中所有与主题色相关的元素，如按钮颜色、链接颜色、文本强调色等。主题色的变化不仅会改变页面的整体视觉风格，还会影响商城的用户交互体验。第二个主题色（副主题色）可以与主主题色相同，也可以与主主题色有所不同。如果副主题色与主主题色不同，按钮的颜色将呈现从主主题色到副主题色的渐变效果。
+                                        <br><button class="button is-small"
+                                            :style="themeColorButton">这是存储设置后商城按钮的颜色</button>
+                                    </p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">直播间链接</label>
+                                    <div class="control">
+                                        <input class="input" type="text" v-model="form.live_streaming_link"
+                                            placeholder="直播间链接">
+                                    </div>
+                                    <p class="help">用户在积分商城「我的」页面中点击「立即爆米」跳转的页面，通常建议填写直播间链接</p>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-full">
+                        <div class="card">
+                            <header class="card-header">
+                                <p class="card-header-title">用户相关</p>
+                            </header>
+                            <div class="card-content">
+                                <div class="field">
+                                    <label class="label">大航海监听</label>
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            <select v-model="form.listening_open_vip">
+                                                <option :value="null" disabled>请选择</option>
+                                                <option value="0">否</option>
+                                                <option value="1">是</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <p class="help">开启后，监听到用户在直播间上舰后会自动记录，为其增加积分</p>
+                                    <p class="help"><b>注意：需要在控制台监听房间后才可生效</b></p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">开通舰长奖励积分</label>
+                                    <div class="control">
+                                        <input class="input" type="text" v-model="form.vip_lv1_bonus_points"
+                                            placeholder="协议人名称">
+                                    </div>
+                                    <p class="help">指与用户开通舰长后获得的积分，仅在开启大航海监听后有效</p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">开通提督奖励积分</label>
+                                    <div class="control">
+                                        <input class="input" type="text" v-model="form.vip_lv2_bonus_points"
+                                            placeholder="协议人名称">
+                                    </div>
+                                    <p class="help">指与用户开通提督后获得的积分，仅在开启大航海监听后有效</p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">开通总督奖励积分</label>
+                                    <div class="control">
+                                        <input class="input" type="text" v-model="form.vip_lv3_bonus_points"
+                                            placeholder="协议人名称">
+                                    </div>
+                                    <p class="help">指与用户开通总督后获得的积分，仅在开启大航海监听后有效</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-full">
+                        <div class="card">
+                            <header class="card-header">
+                                <p class="card-header-title">协议相关</p>
+                            </header>
+                            <div class="card-content">
+                                <div class="field">
+                                    <label class="label">协议人名称</label>
+                                    <div class="control">
+                                        <input class="input" type="text" v-model="form.protocols_surname"
+                                            placeholder="协议人名称">
+                                    </div>
+                                    <p class="help">指与用户签署协议的人员名称（通常为主播的名称），可根据需要自由填写，但建议填写真实的 B 站名称以确保用户识别和信任。</p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">协议人UID</label>
+                                    <div class="control">
+                                        <input class="input" type="text" v-model="form.protocols_uid"
+                                            placeholder="协议人UID">
+                                    </div>
+                                    <p class="help">指与用户签署协议的人员唯一标识（通常为主播的 B 站 UID），可自由填写，但建议填写真实的 B 站 UID 以确保准确性和可信度。
+                                    </p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">协议名称</label>
+                                    <div class="control">
+                                        <input class="input" type="text" v-model="form.protocols_name"
+                                            placeholder="协议名称">
+                                    </div>
+                                    <p class="help">
+                                        此配置项决定用户在兑换商品并填写地址确认下单时，需要签署并确认的协议名称。该协议名称是商城交易过程中必不可少的一部分，用户在确认订单前必须阅读并同意该协议。根据项目需求，可以自定义该协议名称。
+                                    </p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">协议人签名</label>
+                                    <div class="control">
+                                        <figure class="image is-128x128">
+                                            <img :src="form.protocols_signature['url']"
+                                                @click="triggerFileInput('protocols_signature')" style="height:100%;" />
+                                        </figure>
+                                    </div>
+                                    <p class="help">此项配置决定协议中主播方的签名，<a
+                                            href="/attachment/default/protocols_signature.png">点击查看页面样式</a>，签名将会在协议中进行展示，通常建议上传与主播信息相关的内容（表情包，或头像等）以便增强用户体验
+                                    </p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">协议内容</label>
+                                    <div class="control">
+                                        <div id="editor-container" class="box">
+                                            <!-- Quill 编辑器会初始化在这里 -->
+                                        </div>
+                                    </div>
+                                    <p class="help">此配置项允许自定义协议的正文内容，完整的协议由 <b>协议标题</b> + <b>协议双方成员信息</b> + <b>协议正文</b>
+                                        + <b>协议双方签名</b> 四部分组成，用户需在下单前阅读并同意协议才能继续交易。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-full">
+                        <div class="card">
+                            <header class="card-header">
+                                <p class="card-header-title">虚拟礼物设置</p>
+                            </header>
+                            <div class="card-content">
+                                <article class="message is-small">
+                                    <div class="message-body">
+                                        虚拟礼物下单成功后的通知页面：<a href="/attachment/default/type-0.png">点击查看页面样式</a><br>
+                                        页面由 <strong>图标</strong> + <strong>通知标题</strong> + <strong>通知内容</strong> +
+                                        <strong>回到首页的按钮</strong>
+                                        四部分组成<br>
+                                        四部分可以自由设置
+                                    </div>
+                                </article>
+                                <div class="field">
+                                    <label class="label">下单成功图标</label>
+                                    <div class="control">
+                                        <figure class="image is-128x128">
+                                            <img :src="form.virtual_gift_order_successful_icon['url']"
+                                                @click="triggerFileInput('virtual_gift_order_successful_icon')"
+                                                style="height:100%;" />
+                                        </figure>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">下单成功通知标题</label>
+                                    <div class="control">
+                                        <input class="input" type="text"
+                                            v-model="form.virtual_gift_order_successful_title" placeholder="下单成功通知标题">
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">下单成功通知内容</label>
+                                    <div class="control">
+                                        <textarea class="textarea" v-model="form.virtual_gift_order_successful_content"
+                                            placeholder="下单成功通知内容"></textarea>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">下单成功按钮内容</label>
+                                    <div class="control">
+                                        <input class="input" v-model="form.virtual_gift_order_successful_button"
+                                            type="text" placeholder="下单成功按钮内容">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-full">
+                        <div class="card">
+                            <header class="card-header">
+                                <p class="card-header-title">实体礼物设置</p>
+                            </header>
+                            <div class="card-content">
+                                <article class="message is-small">
+                                    <div class="message-body">
+                                        实体礼物下单成功后的通知页面：<a href="/attachment/default/type-1.png">点击查看页面样式</a><br>
+                                        页面由 <strong>图标</strong> + <strong>通知标题</strong> + <strong>通知内容</strong> +
+                                        <strong>回到首页的按钮</strong>
+                                        四部分组成<br>
+                                        四部分可以自由设置
+                                    </div>
+                                </article>
+                                <div class="field">
+                                    <label class="label">下单成功图标</label>
+                                    <div class="control">
+                                        <figure class="image is-128x128">
+                                            <img :src="form.realism_gift_order_successful_icon['url']"
+                                                @click="triggerFileInput('realism_gift_order_successful_icon')"
+                                                style="height:100%;" />
+                                        </figure>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">下单成功通知标题</label>
+                                    <div class="control">
+                                        <input class="input" type="text"
+                                            v-model="form.realism_gift_order_successful_title" placeholder="下单成功通知标题">
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">下单成功通知内容</label>
+                                    <div class="control">
+                                        <textarea class="textarea" v-model="form.realism_gift_order_successful_content"
+                                            placeholder="下单成功通知内容"></textarea>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">下单成功按钮内容</label>
+                                    <div class="control">
+                                        <input class="input" type="text"
+                                            v-model="form.realism_gift_order_successful_button" placeholder="下单成功按钮内容">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-full">
+                        <div class="card">
+                            <header class="card-header">
+                                <p class="card-header-title">贡品礼物设置</p>
+                            </header>
+                            <div class="card-content">
+                                <article class="message is-small">
+                                    <div class="message-body">
+                                        贡品下单成功后的通知页面：<a href="/attachment/default/type-2.png">点击查看页面样式</a><br>
+                                        页面由 <strong>图标</strong> + <strong>通知内容</strong> + <strong>回到首页的按钮</strong> +
+                                        <strong>上供排名</strong>
+                                        四部分组成<br>
+                                        四部分可以自由设置，可以针对上供排名制定不同的<strong>通知内容</strong>
+                                    </div>
+                                </article>
+                                <div class="field">
+                                    <label class="label">下单成功图标</label>
+                                    <div class="control">
+                                        <figure class="image is-128x128">
+                                            <img :src="form.tribute_gift_order_successful_icon['url']"
+                                                @click="triggerFileInput('tribute_gift_order_successful_icon')"
+                                                style="height:100%;" />
+                                        </figure>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">下单成功通知标题</label>
+                                    <div class="control">
+                                        <input class="input" type="text"
+                                            v-model="form.tribute_gift_order_successful_title" placeholder="下单成功通知标题">
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">下单成功通知内容（默认）</label>
+                                    <div class="control">
+                                        <textarea class="textarea" v-model="form.tribute_gift_order_successful_content"
+                                            placeholder="下单成功通知内容"></textarea>
+                                    </div>
+                                    <p class="help">当没有为排名单独设置通知内容时，用户将会收到该默认通知内容</p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">下单成功按钮内容</label>
+                                    <div class="control">
+                                        <input class="input" type="text"
+                                            v-model="form.tribute_gift_order_successful_button" placeholder="">
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">是否开启上供排名</label>
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            <select v-model="form.tribute_gift_order_successful_rankings">
+                                                <option value="1">是</option>
+                                                <option value="0">否</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <p class="help">开启后，下单成功页面将展示按贡品商品购买次数排名的前十名用户及其购买次数。</p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">排名规则</label>
+                                    <p class="help">开启上供排名后，用户排名满足设置的规则时，会展示对应的通知内容。</p>
+                                    <p class="help">设置多条规则时，按照规则顺序进行判断，若满足条件，则替换为对应的通知内容。</p>
+                                    <p class="help mb-2">如果没有任何规则匹配，则显示默认的下单成功通知内容。</p>
+                                    <div class="control">
+                                        <div class="rankings-list"
+                                            v-for="(item,index) in form.tribute_gift_order_successful_rankingslist"
+                                            :key="index">
+                                            <div>
+                                                <div class="field-body" style="align-items: center;">
+                                                    <div class="field">
+                                                        <div class="control">
+                                                            <div class="select is-fullwidth">
+                                                                <select v-model="item.comparison">
+                                                                    <option value="0">大于</option>
+                                                                    <option value="1">大于等于</option>
+                                                                    <option value="2">小于</option>
+                                                                    <option value="3">小于等于</option>
+                                                                    <option value="4">等于</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div style="width: 1rem;"></div>
+                                                    <div class="field">
+                                                        <div class="control">
+                                                            <input class="input" type="text" placeholder="第几名"
+                                                                v-model="item.position">
+                                                        </div>
+                                                    </div>
+                                                    <div style="width: 1rem;"></div>
+                                                    <button class="delete" @click="rankingsListDelete(index)"></button>
+                                                </div>
+                                            </div>
+                                            <div style="height: 1rem;"></div>
+                                            <div>
+                                                <div class="field-body" style="align-items: center;">
+                                                    <div class="field">
+                                                        <div class="control">
+                                                            <textarea class="textarea" placeholder="时的通知内容（覆盖默认通知）"
+                                                                v-model="item.content"></textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                        </div>
+                                        <button class="button is-fullwidth" @click="rankingsListAdd">
+                                            增加配置
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-full">
+                        <div class="card">
+                            <div class="card-content">
+                                <button class="button is-link is-fullwidth" @click="saveData"
+                                    :class="loading ? 'is-loading' : ''">保存</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 底部 Footer -->
+    <?php include 'layout/footer.php'; ?>
+</body>
+<script>
+    let quill;
+    function quillInit(htmlContent) {
+        quill = new Quill('#editor-container', {
+            theme: 'snow',
+            placeholder: '在这里写下你的内容...',
+            modules: {
+                toolbar: [
+                    [{ 'header': '1' }, { 'header': '2' }],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    ['bold', 'italic', 'underline'],
+                    [{ 'align': [] }],
+                    ['link']
+                ]
+            }
+        });
+        quill.root.innerHTML = htmlContent;
+    }
+
+    function getQuillHtml() {
+        return quill.root.innerHTML;
+    }
+</script>
+
+<script>
+    const app = Vue.createApp({
+        data() {
+            return {
+                secretKey: '<?php echo $secretKey ?>',
+                isNotificationVisible: false,
+                notificationMessage: null,
+                notificationType: '',
+                loading: false,
+                fileType: null,
+                form: {
+                    login_background_image: [], // 登录页面背景图
+                    personal_background_image: [], // 个人中心背景图
+                    theme_color: [], // 主题色
+                    live_streaming_link: null, // 直播间链接
+                    protocols_surname: null, // 协议人姓名
+                    protocols_uid: null, // 协议人UID
+                    protocols_name: null, // 协议名称
+                    protocols_signature: [], // 协议人签名
+                    protocols_content: null, // 协议内容
+                    listening_open_vip: null, // 大航海监听
+                    vip_lv1_bonus_points: null, // 开通舰长奖励积分
+                    vip_lv2_bonus_points: null, // 开通提督奖励积分
+                    vip_lv3_bonus_points: null, // 开通总督奖励积分
+                    virtual_gift_order_successful_icon: [], // 虚拟礼物下单成功图标
+                    virtual_gift_order_successful_title: null, // 虚拟礼物下单成功标题
+                    virtual_gift_order_successful_content: null, // 虚拟礼物下单成功内容
+                    virtual_gift_order_successful_button: null, // 虚拟礼物下单成功按钮
+                    realism_gift_order_successful_icon: [], // 实体礼物下单成功图标
+                    realism_gift_order_successful_title: null, // 实体礼物下单成功标题
+                    realism_gift_order_successful_content: null, // 实体礼物下单成功内容
+                    realism_gift_order_successful_button: null, // 实体礼物下单成功按钮
+                    tribute_gift_order_successful_icon: [], // 贡品下单成功图标
+                    tribute_gift_order_successful_title: null, // 贡品下单成功标题
+                    tribute_gift_order_successful_content: null, // 贡品下单成功内容
+                    tribute_gift_order_successful_button: null, // 贡品下单成功按钮
+                    tribute_gift_order_successful_rankings: null, // 贡品下单成功是否开启排名
+                    tribute_gift_order_successful_rankingslist: null // 贡品下单成功排名列表
+                }
+            };
+        },
+        created() {
+            this.getData();
+        },
+        computed: {
+            themeColorButton() {
+                return {
+                    color: '#fff',
+                    background: `linear-gradient(to right, ${this.form.theme_color[0]}, ${this.form.theme_color[1]})`
+                };
+            }
+        },
+        methods: {
+            // 触发 input file 的点击事件
+            triggerFileInput(fileType) {
+                this.fileType = fileType;
+                this.$refs.fileInput.click();
+            },
+
+            // 文件上传
+            handleFileChange(event, fileType) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = () => this.uploadFile(reader.result, fileType);
+                reader.onerror = () => this.showNotification('文件读取错误，请确认图片类型', 'warning');
+                reader.readAsDataURL(file);
+
+                // 清空 input file 内容
+                this.$refs.fileInput.value = null;
+            },
+
+            // 上传文件并更新表单数据
+            uploadFile(base64Data, fileType) {
+                const data = { base64: base64Data, type: fileType };
+                const signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
+
+                axios.post('/api/points-mall/mall-configuration/upload-images', data, {
+                    headers: { 'X-Signature': signature }
+                }).then(response => {
+                    if (response.data.code === 0) {
+                        this.updateFormImage(fileType, response.data.data);
+                    } else {
+                        this.showNotification('上传失败，请稍后重试', 'error');
+                    }
+                }).catch(() => this.showNotification('请求失败，请稍后重试', 'error'));
+            },
+
+            // 更新表单中的文件数据
+            updateFormImage(fileType, data) {
+                const fields = {
+                    'login_background_image': 'login_background_image',
+                    'personal_background_image': 'personal_background_image',
+                    'protocols_signature': 'protocols_signature',
+                    'virtual_gift_order_successful_icon': 'virtual_gift_order_successful_icon',
+                    'realism_gift_order_successful_icon': 'realism_gift_order_successful_icon',
+                    'tribute_gift_order_successful_icon': 'tribute_gift_order_successful_icon',
+                };
+
+                if (fields[fileType]) {
+                    this.form[fields[fileType]] = data;
+                }
+            },
+
+            // 显示通知
+            showNotification(message, type = 'info') {
+                this.isNotificationVisible = true;
+                this.notificationMessage = message;
+                this.notificationType = this.getNotificationClass(type);
+
+                setTimeout(this.hideNotification, 3000);
+            },
+
+            // 获取通知的样式
+            getNotificationClass(type) {
+                const types = {
+                    success: 'is-success is-light',
+                    info: 'is-light',
+                    error: 'is-danger is-light',
+                    warning: 'is-warning is-light'
+                };
+                return types[type] || 'is-light';
+            },
+
+            // 隐藏通知
+            hideNotification() {
+                this.isNotificationVisible = false;
+            },
+
+            // 增加排名列表
+            rankingsListAdd() {
+                this.form.tribute_gift_order_successful_rankingslist.push({
+                    comparison: 0,
+                    position: null,
+                    content: null
+                });
+            },
+
+            // 删除排名列表
+            rankingsListDelete(index) {
+                this.form.tribute_gift_order_successful_rankingslist.splice(index, 1);
+            },
+
+            // 获取页面数据
+            getData() {
+                const data = {};
+                const signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
+
+                axios.post('/api/points-mall/mall-configuration/get-data', data, {
+                    headers: { 'X-Signature': signature }
+                }).then(response => {
+                    if (response.data.code === 0) {
+                        this.form = response.data.data;
+                        quillInit(this.form.protocols_content);
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('main-content-body').style.display = 'block';
+                    }
+                }).catch(() => {
+                    this.showNotification('数据加载失败', 'error');
+                });
+            },
+
+            // 存储信息
+            saveData() {
+                this.loading = true;
+                this.form.protocols_content = getQuillHtml();
+
+                const data = this.form;
+                const signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
+
+                axios.post('/api/points-mall/mall-configuration/set-data', data, {
+                    headers: { 'X-Signature': signature }
+                }).then(response => {
+                    this.loading = false;
+                    if (response.data.code === 0) {
+                        this.showNotification('存储成功', 'success');
+                    } else {
+                        this.showNotification(response.data.message, 'warning');
+                    }
+                }).catch(() => {
+                    this.loading = false;
+                    this.showNotification('请求失败，请稍后重试', 'error');
+                });
+            }
+        }
+    });
+
+    app.mount('#app');
+</script>
+
+
+</html>

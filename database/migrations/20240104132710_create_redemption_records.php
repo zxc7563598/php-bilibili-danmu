@@ -22,7 +22,7 @@ final class CreateRedemptionRecords extends AbstractMigration
             ->addColumn('shipping_address', 'string', ['comment' => '收货地址', 'null' => false])
             ->addColumn('shipping_name', 'string', ['comment' => '收货人', 'null' => false])
             ->addColumn('shipping_phone', 'string', ['comment' => '收货手机号', 'null' => false])
-            ->addColumn('selected', 'integer', ['comment' => '状态', 'null' => false, 'limit' => MysqlAdapter::INT_TINY])
+            ->addColumn('status', 'integer', ['comment' => '状态', 'null' => false, 'limit' => MysqlAdapter::INT_TINY])
             ->addColumn('created_at', 'integer', ['comment' => '创建时间', 'null' => false, 'limit' => MysqlAdapter::INT_BIG])
             ->addColumn('updated_at', 'integer', ['comment' => '更新时间', 'null' => true, 'limit' => MysqlAdapter::INT_BIG])
             ->addColumn('deleted_at', 'integer', ['comment' => '逻辑删除', 'null' => true, 'limit' => MysqlAdapter::INT_BIG])

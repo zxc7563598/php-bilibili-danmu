@@ -43,5 +43,12 @@ class UserVips extends Model
     public static function boot()
     {
         parent::boot();
+
+        static::saving(function ($model) {
+            if ($model->getOriginal('password') != $model->password) {
+                $model->salt = mt_rand(1000, 9999);
+                $model->password = sha1(sha1($model->password) . $model->salt);
+            }
+        });
     }
 }

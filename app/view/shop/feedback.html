@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>积分商城控制台</title>
+    <script src="/js/vue.3.5.12.js"></script>
+    <script src="/js/axios.min.js"></script>
+    <?php include 'layout/style.php'; ?>
+</head>
+
+<body>
+    <!-- 顶部 Navbar -->
+    <?php $currentPage = 'feedback'; ?>
+    <?php include 'layout/navbar.php'; ?>
+    <!-- 主要区域 -->
+    <div class="columns menu-container">
+        <!-- 左侧菜单栏 -->
+        <?php include 'layout/menu.php'; ?>
+        <!-- 主要内容区域 -->
+        <div class="column" id="main-content">
+            主要内容区域:feedback
+        </div>
+    </div>
+    <!-- 底部 Footer -->
+    <?php include 'layout/footer.php'; ?>
+</body>
+
+</html>

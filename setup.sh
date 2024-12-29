@@ -42,13 +42,13 @@ DB_PASSWORD=$(openssl rand -base64 12)
 DB_NAME=bilibili_danmu
 
 # 等待 MySQL 启动完成
-until mysqladmin ping -h "mysql" --silent; do
+until mariadb-admin ping -h "mysql" --silent; do
     echo "Waiting for MySQL to be ready..."
     sleep 5
 done
 
 # 使用初始 root 密码登录，更新 root 密码和创建普通用户
-mysql -h mysql -u root -pinit0925 <<EOF
+mysql -h mysql -u root -pinit0925 --ssl=0 <<EOF
 CREATE DATABASE IF NOT EXISTS \`${DB_USER}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER IF NOT EXISTS '${DB_NAME}'@'%' IDENTIFIED BY '${DB_PASSWORD}';
 GRANT ALL PRIVILEGES ON *.* TO '${DB_NAME}'@'%' WITH GRANT OPTION;

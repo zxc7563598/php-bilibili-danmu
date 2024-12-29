@@ -48,5 +48,5 @@ return [
     ],
     'timing'  => [
         'handler'  => app\server\Timing::class
-    ],
+    ]
 ];

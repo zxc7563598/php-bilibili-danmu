@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>积分商城控制台</title>
+    <script src="/js/vue.3.5.12.js"></script>
+    <script src="/js/axios.min.js"></script>
+    <?php include 'layout/style.php'; ?>
+    <style>
+        .table-container {
+            overflow-x: auto;
+            white-space: nowrap;
+            /* 禁止内容换行 */
+        }
+
+        .table-container::-webkit-scrollbar {
+            height: 8px;
+            /* 滚动条高度 */
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 顶部 Navbar -->
+    <?php $currentPage = 'shipping-management'; ?>
+    <?php include 'layout/navbar.php'; ?>
+    <!-- 主要区域 -->
+    <div class="columns menu-container" id="app">
+        <!-- 左侧菜单栏 -->
+        <?php include 'layout/menu.php'; ?>
+        <!-- 主要内容区域 -->
+        <div class="column" id="main-content">
+            <!-- 动态通知框 -->
+            <transition name="slide-fade" @after-leave="hideNotification">
+                <div v-if="isNotificationVisible" class="notification notification-fixed" :class="notificationType">
+                    <button class="delete" @click="hideNotification"></button>
+                    {{notificationMessage}}
+                </div>
+            </transition>
+            <div id="loading">
+                加载中，请稍候...
+            </div>
+            <div id="main-content-body" style="padding: 1rem;">
+                <div class="columns is-multiline">
+                    <div class="column is-full">
+                        <div class="card">
+                            <div class="card-content">
+                                <div class="columns is-multiline">
+                                    <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
+                                        <div class="field">
+                                            <label class="label">用户UID</label>
+                                            <div class="control">
+                                                <input class="input" type="text" placeholder="" v-model="form.user_uid">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
+                                        <div class="field">
+                                            <label class="label">用户名称</label>
+                                            <div class="control">
+                                                <input class="input" type="text" placeholder=""
+                                                    v-model="form.user_name">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
+                                        <div class="field">
+                                            <label class="label">商品名称</label>
+                                            <div class="control">
+                                                <input class="input" type="text" placeholder=""
+                                                    v-model="form.goods_name">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
+                                        <div class="field">
+                                            <label class="label">商品类型</label>
+                                            <div class="control">
+                                                <div class="select is-fullwidth">
+                                                    <select v-model="form.goods_type">
+                                                        <option :value="null" disabled>请选择</option>
+                                                        <option value="0">虚拟礼物</option>
+                                                        <option value="1">实体礼物</option>
+                                                        <option value="2">贡品</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
+                                        <div class="field">
+                                            <label class="label">发货状态</label>
+                                            <div class="control">
+                                                <div class="select is-fullwidth">
+                                                    <select v-model="form.status">
+                                                        <option :value="null" disabled>请选择</option>
+                                                        <option value="0">未发货</option>
+                                                        <option value="1">已发货</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile"
+                                        style="display: flex;">
+                                        <button class="button is-success" style="flex:1" @click="searchData">搜索</button>
+                                        <div style="width: 1rem;"></div>
+                                        <button class="button is-light" style="flex:1" @click="emptyData">重置</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="columns is-multiline">
+                    <div class="column is-full">
+                        <div class="card">
+                            <div class="card-content table-container">
+                                <table class="table is-fullwidth is-striped is-hoverable">
+                                    <thead>
+                                        <tr>
+                                            <th>UID</th>
+                                            <th>兑换人</th>
+                                            <th>兑换商品</th>
+                                            <th>支付积分</th>
+                                            <th>发货状态</th>
+                                            <th>下单时间</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-if="list.data && list.data.length == 0">
+                                            <td colspan="7" style="text-align: center;">无数据</td>
+                                        </tr>
+                                        <tr v-for="(item,index) in list.data">
+                                            <td class="is-vcentered">{{item.uid}}</td>
+                                            <td class="is-vcentered">{{item.user_name}}</td>
+                                            <td class="is-vcentered">{{item.goods_name}}<p class="help">
+                                                    {{item.goods_sub}}</p>
+                                            </td>
+                                            <td class="is-vcentered">{{item.point}}</td>
+                                            <td class="is-vcentered">{{item.status}}</td>
+                                            <td class="is-vcentered">{{item.create_time}}</td>
+                                            <td class="is-vcentered">
+                                                <button class="button is-light is-small"
+                                                    @click="editShopping(item.records_id)">操作</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <nav class="pagination is-rounded" role="navigation" aria-label="pagination"
+                                    v-if="pageNumbers.length > 1">
+                                    <a href="javascript:;" class="pagination-previous"
+                                        @click="handlePageChange(this.list.current_page-1)">上一页</a>
+                                    <a href="javascript:;" class="pagination-next"
+                                        @click="handlePageChange(this.list.current_page+1)">下一页</a>
+                                    <ul class="pagination-list">
+                                        <li v-for="page in pageNumbers" :key="page" @click="handlePageChange(page)">
+                                            <a href="javascript:;" class="pagination-link"
+                                                :class="page == this.list.current_page ? 'is-current' : ''"
+                                                v-if="page != '...'">{{page}}</a>
+                                            <span class="pagination-ellipsis" v-else>&hellip;</span>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal" :class="active ? 'is-active' : ''">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">发货管理</p>
+                    <button class="delete" aria-label="close" @click="this.active = false"></button>
+                </header>
+                <section class="modal-card-body">
+                    <div class="card">
+                        <header class="card-header">
+                            <p class="card-header-title">发货信息</p>
+                        </header>
+                        <div class="card-content">
+                            <div class="columns is-multiline">
+                                <div class="column is-half-tablet is-full-mobile">
+                                    <div class="card">
+                                        <div class="card-content">
+                                            <div class="field" style="text-align: center;">
+                                                <label class="label">商品信息</label>
+                                                <div class="control">
+                                                    <img :src="shopping.goods.cover_image" style="width:70%;" />
+                                                </div>
+                                                <p>
+                                                    <span class="tag is-link is-light is-normal">
+                                                        <span v-if="shopping.goods.type == 0">虚拟礼物</span>
+                                                        <span v-if="shopping.goods.type == 1">实体礼物</span>
+                                                        <span v-if="shopping.goods.type == 2">贡品</span>
+                                                    </span>
+                                                </p>
+                                                <p>{{shopping.goods.name}}</p>
+                                                <p class="help" v-for="(item,index) in shopping.goods.subs">{{item}}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="column is-half-tablet is-full-mobile">
+                                    <div class="card">
+                                        <div class="card-content">
+                                            <div class="field" style="text-align: center;">
+                                                <label class="label">发货信息</label>
+                                                <p class="help">{{shopping.shipping_name ? shopping.shipping_name :
+                                                    '无'}}</p>
+                                                <p class="help">{{shopping.shipping_phone ? shopping.shipping_phone :
+                                                    '无'}}</p>
+                                                <p class="help">{{shopping.shipping_address ? shopping.shipping_address
+                                                    : '无'}}</p>
+                                                <button class="button is-link is-fullwidth mt-2"
+                                                    @click="copyAddress">复制地址</button>
+                                            </div>
+                                            <div class="field" style="text-align: center;">
+                                                <label class="label">邮箱地址</label>
+                                                <p class="help">{{shopping.shipping_email ? shopping.shipping_email :
+                                                    '无'}}</p>
+                                                <button class="button is-link is-fullwidth mt-2"
+                                                    @click="sendEmail">发送邮件</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field" v-if="shopping.goods.type == 1">
+                        <label class="label">快递单号</label>
+                        <div class="control">
+                            <input class="input" type="text" v-model="shopping.tracking_number" placeholder="快递单号">
+                        </div>
+                        <p class="help">建议输入快递单号，方便后续查询，也可不输入</p>
+                    </div>
+                    <div class="field">
+                        <label class="label">发货状态</label>
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select v-model="shopping.status">
+                                    <option value="" disabled>请选择</option>
+                                    <option value="0">未发货</option>
+                                    <option value="1">已发货</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <footer class="modal-card-foot">
+                    <div class="buttons">
+                        <button class="button is-success" @click="saveShopping">存储</button>
+                        <button class="button" @click="this.active = false">取消</button>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </div>
+    <!-- 底部 Footer -->
+    <?php include 'layout/footer.php'; ?>
+</body>
+<script>
+    const app = Vue.createApp({
+        data() {
+            return {
+                secretKey: '<?php echo $secretKey ?>',
+                isNotificationVisible: false,
+                notificationMessage: null,
+                notificationType: '',
+                active: false,
+                form: {
+                    user_name: null,
+                    user_uid: null,
+                    goods_name: null,
+                    goods_type: null,
+                    status: null,
+                    page: '<?php echo $page ?>'
+                },
+                shopping: {
+                    records_id: null,
+                    goods: {
+                        name: null,
+                        cover_image: null,
+                        subs: null
+                    },
+                    user: {
+                        uid: null,
+                        name: null
+                    },
+                    shipping_email: null, // 邮件地址
+                    shipping_address: null, // 收货地址
+                    shipping_name: null, // 收货人姓名
+                    shipping_phone: null, // 收货人手机号
+                    tracking_number: null, // 快递单号
+                    status: null // 发货状态
+                },
+                list: []
+            };
+        },
+        created() {
+            this.getData();
+        },
+        computed: {
+            pageNumbers() {
+                const currentPage = this.list.current_page;
+                const totalPages = this.list.total_page;
+                let pages = [1]; // 必须展示第一页
+
+                const maxPages = 7;
+
+                // 确定展示的页码范围
+                if (currentPage <= 4) {
+                    for (let i = 2; i <= Math.min(maxPages - 1, totalPages - 1); i++) {
+                        pages.push(i);
+                    }
+                } else if (currentPage >= totalPages - 3) {
+                    for (let i = Math.max(totalPages - maxPages + 1, 2); i < totalPages; i++) {
+                        pages.push(i);
+                    }
+                } else {
+                    for (let i = currentPage - 2; i <= currentPage + 2; i++) {
+                        pages.push(i);
+                    }
+                }
+
+                if (pages[pages.length - 1] !== totalPages) {
+                    pages.push(totalPages); // 必须展示最后一页
+                }
+
+                return this.addEllipsis(pages);
+            }
+        },
+        methods: {
+            // 封装API请求
+            async apiRequest(endpoint, data = {}) {
+                try {
+                    const signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
+                    const response = await axios.post(endpoint, data, {
+                        headers: { 'X-Signature': signature }
+                    });
+
+                    if (response.data.code === 0) {
+                        return response.data.data;
+                    } else {
+                        this.showNotification(response.data.message, 'warning');
+                        return null;
+                    }
+                } catch (error) {
+                    this.showNotification('请求失败，请稍后重试', 'error');
+                    return null;
+                }
+            },
+
+            // 显示通知
+            showNotification(message, type = 'info') {
+                this.isNotificationVisible = true;
+                this.notificationMessage = message;
+                this.notificationType = this.getNotificationClass(type);
+
+                setTimeout(this.hideNotification, 3000);
+            },
+
+            // 获取通知的样式
+            getNotificationClass(type) {
+                const types = {
+                    success: 'is-success is-light',
+                    info: 'is-light',
+                    error: 'is-danger is-light',
+                    warning: 'is-warning is-light'
+                };
+                return types[type] || 'is-light';
+            },
+
+            // 隐藏通知
+            hideNotification() {
+                this.isNotificationVisible = false;
+            },
+
+            // 变更页码
+            handlePageChange(page) {
+                if (page < 1) page = 1;
+                if (page > this.list.total_page) page = this.list.total_page;
+                this.form.page = page;
+                this.getData();
+            },
+
+            // 分页数据处理
+            addEllipsis(pages) {
+                const result = [];
+                for (let i = 0; i < pages.length; i++) {
+                    if (i > 0 && pages[i] - pages[i - 1] > 1) {
+                        result.push('...');
+                    }
+                    result.push(pages[i]);
+                }
+                return result;
+            },
+
+            // 获取数据
+            async getData() {
+                const data = this.form;
+                const result = await this.apiRequest('/api/points-mall/shipping-management/get-data', data);
+                if (result) {
+                    this.list = result.list;
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('main-content-body').style.display = 'block';
+                }
+            },
+
+            // 搜索
+            searchData() {
+                this.form.page = 1
+                this.getData();
+            },
+
+            // 重置搜索
+            emptyData() {
+                this.form.user_name = null;
+                this.form.user_uid = null;
+                this.form.goods_name = null;
+                this.form.goods_type = null;
+                this.form.status = null;
+                this.form.page = 1
+                this.getData();
+            },
+
+            // 编辑发货信息
+            async editShopping(records_id) {
+                this.shopping = {
+                    goods: {
+                        name: null,
+                        cover_image: null,
+                        subs: null
+                    },
+                    user: {
+                        uid: null,
+                        name: null
+                    },
+                    shipping_email: null, // 邮件地址
+                    shipping_address: null, // 收货地址
+                    shipping_name: null, // 收货人姓名
+                    shipping_phone: null, // 收货人手机号
+                    tracking_number: null, // 快递单号
+                    status: null // 发货状态
+                }
+                this.active = true;
+                const result = await this.apiRequest('/api/points-mall/shipping-management/get-data-details', { records_id: records_id });
+                if (result) {
+                    this.shopping = result;
+                }
+            },
+
+            // 存储发货信息
+            async saveShopping() {
+                const result = await this.apiRequest('/api/points-mall/shipping-management/set-data-details', {
+                    records_id: this.shopping.records_id,
+                    tracking_number: this.shopping.tracking_number,
+                    status: this.shopping.status
+                });
+                if (result) {
+                    this.showNotification('成功', 'success');
+                    this.active = false;
+                    this.getData()
+                }
+            },
+
+            // 复制发货地址
+            copyAddress() {
+                let text = this.shopping.shipping_phone + "\r\n" + this.shopping.shipping_name + "\r\n" + this.shopping.shipping_address;
+                // 优先使用 Clipboard API
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        this.showNotification('复制成功', 'success');
+                    }).catch(err => {
+                        console.error('Clipboard API failed, trying execCommand...', err);
+                        this.fallbackCopyText(text);
+                    });
+                } else {
+                    // 如果 Clipboard API 不可用，使用 execCommand 作为回退
+                    this.fallbackCopyText(text);
+                }
+            },
+
+            // 打开邮件
+            sendEmail() {
+                if (this.shopping.shipping_email) {
+                    window.location.href = "mailto:" + this.shopping.shipping_email;
+                }
+            },
+
+            // 复制文本
+            fallbackCopyText(text) {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed'; // 防止在某些浏览器中页面滚动
+                textArea.style.opacity = 0;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        this.showNotification('复制成功', 'success');
+                    } else {
+                        this.showNotification('复制失败，请手动复制', 'warning');
+                    }
+                } catch (err) {
+                    this.showNotification('复制失败，请手动复制', 'error');
+                }
+                document.body.removeChild(textArea);
+            }
+        }
+    });
+    app.mount('#app');
+</script>
+
+</html>
