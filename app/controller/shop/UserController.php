@@ -2,20 +2,20 @@
 
 namespace app\controller\shop;
 
-use app\controller\GeneralMethod;
-use app\model\Complaint;
+use Carbon\Carbon;
+use Hejunjie\Tools;
+use support\Request;
 use app\model\Goods;
 use app\model\GoodSubs;
-use app\model\PaymentRecords;
-use app\model\RedemptionRecords;
+use app\model\Complaint;
+use Webman\Http\Response;
 use app\model\ShopConfig;
 use app\model\UserAddress;
-use Carbon\Carbon;
-use support\Request;
+use app\model\PaymentRecords;
+use app\model\RedemptionRecords;
+use app\controller\GeneralMethod;
 use resource\enums\UserAddressEnums;
 use resource\enums\RedemptionRecordsEnums;
-use Webman\Http\Response;
-use Hejunjie\Tools;
 
 class UserController extends GeneralMethod
 {
@@ -39,7 +39,7 @@ class UserController extends GeneralMethod
             'background' => !empty($config->content) ? getImageUrl($config->content) : null
         ]);
     }
-    
+
     /**
      * 获取用户地址列表
      * 

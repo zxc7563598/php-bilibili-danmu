@@ -40,7 +40,7 @@
                                         <div class="field">
                                             <label class="label">用户UID</label>
                                             <div class="control">
-                                                <input class="input" type="text" placeholder="">
+                                                <input class="input" type="text" placeholder="" v-model="form.uid">
                                             </div>
                                         </div>
                                     </div>
@@ -48,37 +48,15 @@
                                         <div class="field">
                                             <label class="label">用户名称</label>
                                             <div class="control">
-                                                <input class="input" type="text" placeholder="">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
-                                        <div class="field">
-                                            <label class="label">商品名称</label>
-                                            <div class="control">
-                                                <input class="input" type="text" placeholder="">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
-                                        <div class="field">
-                                            <label class="label">商品类型</label>
-                                            <div class="control">
-                                                <div class="select is-fullwidth">
-                                                    <select>
-                                                        <option>请选择</option>
-                                                        <option>虚拟商品</option>
-                                                        <option>实体商品</option>
-                                                    </select>
-                                                </div>
+                                                <input class="input" type="text" placeholder="" v-model="form.uname">
                                             </div>
                                         </div>
                                     </div>
                                     <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile"
                                         style="display: flex;">
-                                        <button class="button is-success" style="flex:1">搜索</button>
+                                        <button class="button is-success" style="flex:1" @click="searchData">搜索</button>
                                         <div style="width: 1rem;"></div>
-                                        <button class="button is-light" style="flex:1">重置</button>
+                                        <button class="button is-light" style="flex:1" @click="emptyData">重置</button>
                                     </div>
                                 </div>
                             </div>
@@ -290,6 +268,18 @@
                     result.push(pages[i]);
                 }
                 return result;
+            },
+
+            searchData() {
+                this.form.page = 1;
+                this.getData();
+            },
+
+            emptyData() {
+                this.form.uid = null;
+                this.form.uname = null;
+                this.form.page = 1;
+                this.getData();
             },
 
             async getData() {
