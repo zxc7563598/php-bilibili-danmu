@@ -2,35 +2,44 @@
 
 namespace app\controller\shop\management;
 
-use app\controller\GeneralMethod;
-use app\model\PaymentRecords;
-use app\model\RedemptionRecords;
-use app\model\SystemChangePointRecords;
-use app\model\UserVips;
 use Carbon\Carbon;
 use Hejunjie\Tools;
 use support\Request;
+use support\Response;
+use app\model\UserVips;
+use app\model\PaymentRecords;
+use app\model\RedemptionRecords;
+use app\controller\GeneralMethod;
 use resource\enums\UserVipsEnums;
 use resource\enums\PaymentRecordsEnums;
+use app\model\SystemChangePointRecords;
 use resource\enums\SystemChangePointRecordsEnums;
-use Hejunjie\Bililive;
 
 class UserManagementController extends GeneralMethod
 {
+    /**
+     * 获取用户列表
+     * 
+     * @param integer $page 页码
+     * @param string $uid 用户UID
+     * @param string $uname 用户名称
+     * 
+     * @return Response 
+     */
     public function getData(Request $request)
     {
         $param = $request->all();
         // 获取参数
         $page = $param['page'];
-        $uid = isset($param['uid']) ? $param['uid'] : null;
-        $uname = isset($param['uname']) ? $param['uname'] : null;
+        $uid = $param['uid'] ?? null;
+        $uname = $param['uname'] ?? null;
         // 获取数据
-        $users = new UserVips();
-        if (!empty($uid)) {
-            $users = $users->where('uid', 'like', '%' . $uid . '%');
+        $users = UserVips::query();
+        if (!is_null($uid)) {
+            $users->where('uid', 'like', '%' . $uid . '%');
         }
-        if (!empty($uname)) {
-            $users = $users->where('name', 'like', '%' . $uname . '%');
+        if (!is_null($uname)) {
+            $users->where('name', 'like', '%' . $uname . '%');
         }
         $users = $users->orderBy('last_vip_at', 'desc')
             ->paginate(100, [
@@ -43,36 +52,49 @@ class UserManagementController extends GeneralMethod
                 'point' => 'point'
             ], 'page', $page);
         // 处理数据
-        foreach ($users as &$_users) {
-            $_users->vip_type = UserVipsEnums\VipType::from($_users->vip_type)->label();
-            $_users->last_vip_at = Carbon::parse($_users->last_vip_at)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
-            $_users->end_vip_at = Carbon::parse($_users->end_vip_at)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
+        foreach ($users as &$_user) {
+            $_user->vip_type = UserVipsEnums\VipType::from($_user->vip_type)->label();
+            $_user->last_vip_at = Carbon::parse($_user->last_vip_at)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
+            $_user->end_vip_at = Carbon::parse($_user->end_vip_at)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
         }
         // 返回数据
-        return success($request, [
-            'list' => pageToArray($users)
-        ]);
+        return success($request, ['list' => pageToArray($users)]);
     }
 
+    /**
+     * 获取用户详细信息
+     * 
+     * @param integer $user_id 用户ID
+     * 
+     * @return Response 
+     */
     public function getUserData(Request $request)
     {
         $param = $request->all();
         // 获取参数
         $user_id = $param['user_id'];
-        // 获取数据
-        $users = UserVips::where('user_id', $user_id)->first([
+        // 获取用户数据
+        $user = UserVips::where('user_id', $user_id)->first([
             'user_id' => 'user_id',
             'uid' => 'uid',
             'name' => 'name',
             'vip_type' => 'vip_type',
             'point' => 'point'
         ]);
+        if (empty($user)) {
+            return fail($request, 800013);
+        }
         // 返回数据
-        return success($request, [
-            'users' => $users
-        ]);
+        return success($request, ['users' => $user]);
     }
 
+    /**
+     * 根据UID查询用户数据
+     * 
+     * @param integer $uid 用户UID
+     * 
+     * @return Response 
+     */
     public function getUserInfo(Request $request)
     {
         $param = $request->all();
@@ -83,56 +105,65 @@ class UserManagementController extends GeneralMethod
             "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
             "Origin: https://live.bilibili.com",
         ], 10);
-        if ($getMasterInfo['httpStatus'] == 200) {
-            $getMasterInfoData = json_decode($getMasterInfo['data'], true);
-        }
+        // 处理数据
+        $getMasterInfoData = $getMasterInfo['httpStatus'] == 200 ? json_decode($getMasterInfo['data'], true) : [];
         // 返回数据
         return success($request, [
-            'uname' => isset($getMasterInfoData['data']['info']['uname']) ? $getMasterInfoData['data']['info']['uname'] : null,
-            'face' => isset($getMasterInfoData['data']['info']['face']) ? $getMasterInfoData['data']['info']['face'] : null
+            'uname' => $getMasterInfoData['data']['info']['uname'] ?? null,
+            'face' => $getMasterInfoData['data']['info']['face'] ?? null,
         ]);
     }
 
+    /**
+     * 存储用户信息
+     * 
+     * @param integer $user_id 用户ID
+     * @param integer $uid 用户UID
+     * @param string $name 用户名称
+     * @param string $password 登录密码
+     * @param integer $vip_type 航海类型
+     * 
+     * @return Response 
+     */
     public function setData(Request $request)
     {
         $param = $request->all();
         // 获取参数
-        $user_id = $param['user_id'];
+        $user_id = $param['user_id'] ?? null;
         $uid = $param['uid'];
         $name = $param['name'];
-        $password = !empty($param['password']) ? $param['password'] : null;
+        $password = $param['password'] ?? null;
         $vip_type = $param['vip_type'];
         // 获取数据
-        $users = new UserVips();
-        if (!empty($user_id)) {
-            $users = UserVips::where('user_id', $user_id)->first();
-            if (empty($users)) {
-                return fail($request, 800013);
-            }
-        } else {
-            $user_vips = UserVips::where('uid', $uid)->first();
-            if (!empty($user_vips)) {
-                return fail($request, 800012);
-            }
+        $user = !is_null($user_id) ? UserVips::find($user_id) : new UserVips();
+        if (!$user && !is_null($user_id)) {
+            return fail($request, 800013);
         }
-        $users->user_id = $user_id;
-        $users->uid = $uid;
-        $users->name = $name;
+        // 更新用户数据
+        $user->uid = $uid;
+        $user->name = $name;
         if (!is_null($password)) {
-            $users->password = $password;
+            $user->password = $password;
         }
-        $users->vip_type = $vip_type;
-        $users->save();
+        $user->vip_type = $vip_type;
+        $user->save();
         // 返回数据
         return success($request, []);
     }
 
+    /**
+     * 获取用户航海开通记录
+     * 
+     * @param integer $user_id 用户ID
+     * 
+     * @return Response 
+     */
     public function getUserRecords(Request $request)
     {
         $param = $request->all();
         // 获取参数
         $user_id = $param['user_id'];
-        // 获取数据
+        // 获取记录
         $payment_records = PaymentRecords::where('user_id', $user_id)->get([
             'vip_type' => 'vip_type',
             'point' => 'point',
@@ -156,12 +187,10 @@ class UserManagementController extends GeneralMethod
         ]);
         // 处理数据
         $data = [];
+        // 整合上舰数据
         foreach ($payment_records as $_payment_records) {
             $icon = getImageUrl('shop-config/jian.png');
             switch ($_payment_records->vip_type) {
-                case PaymentRecordsEnums\VipType::Lv1->value:
-                    $icon = getImageUrl('shop-config/jian.png');
-                    break;
                 case PaymentRecordsEnums\VipType::Lv2->value:
                     $icon = getImageUrl('shop-config/ti.png');
                     break;
@@ -174,47 +203,45 @@ class UserManagementController extends GeneralMethod
                 'name' => '成为' . PaymentRecordsEnums\VipType::from($_payment_records->vip_type)->label(),
                 'point' => '+ ' . $_payment_records->point,
                 'after_point' => $_payment_records->after_point,
-                'date' => $_payment_records->payment_at
+                'date' => Carbon::parse($_payment_records->payment_at)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
             ];
         }
+        // 整合系统变更数据
         foreach ($system_change_point_records as $_system_change_point_records) {
-            $type = '';
-            switch ($_system_change_point_records->type) {
-                case SystemChangePointRecordsEnums\Type::Up->value:
-                    $type = '+';
-                    break;
-                case SystemChangePointRecordsEnums\Type::Down->value:
-                    $type = '-';
-                    break;
-            }
+            $type = $_system_change_point_records->type == SystemChangePointRecordsEnums\Type::Up->value ? '+' : '-';
             $data[] = [
                 'icon' => getImageUrl('shop-config/supreme.png'),
                 'name' => '主播变更',
                 'point' => $type . ' ' . $_system_change_point_records->point,
                 'after_point' => $_system_change_point_records->after_point,
-                'date' => $_system_change_point_records->created_at->timezone(config('app')['default_timezone'])->timestamp
+                'date' => $_system_change_point_records->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
             ];
         }
+        // 整合消费数据
         foreach ($redemption_records as $_redemption_records) {
             $data[] = [
                 'icon' => getImageUrl($_redemption_records->cover_image),
                 'name' => $_redemption_records->name,
                 'point' => '- ' . $_redemption_records->point,
                 'after_point' => $_redemption_records->after_point,
-                'date' => $_redemption_records->created_at->timezone(config('app')['default_timezone'])->timestamp
+                'date' => $_redemption_records->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
             ];
         }
-        // 数组排序后整理时间
+        // 排序
         $data = Tools\Arr::sortByField($data, 'date', false);
-        foreach ($data as &$_data) {
-            $_data['date'] = Carbon::parse($_data['date'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
-        }
         // 返回数据
-        return success($request, [
-            'records' => $data
-        ]);
+        return success($request, ['records' => $data]);
     }
 
+    /**
+     * 变更用户积分
+     * 
+     * @param integer $type 变更类型 
+     * @param integer $point 变更积分 
+     * @param integer $user_id 用户ID 
+     * 
+     * @return Response 
+     */
     public function setUserPoint(Request $request)
     {
         $param = $request->all();
@@ -222,7 +249,7 @@ class UserManagementController extends GeneralMethod
         $type = $param['type'];
         $point = $param['point'];
         $user_id = $param['user_id'];
-        // 获取数据
+        // 获取用户数据
         $user_vips = UserVips::where('user_id', $user_id)->first();
         if (empty($user_vips)) {
             return fail($request, 800013);
@@ -233,14 +260,7 @@ class UserManagementController extends GeneralMethod
         $system_change_point_records->type = $type;
         $system_change_point_records->point = $point;
         $system_change_point_records->pre_point = $user_vips->point;
-        switch ($type) {
-            case SystemChangePointRecordsEnums\Type::Up->value:
-                $system_change_point_records->after_point = $system_change_point_records->pre_point + $point;
-                break;
-            case SystemChangePointRecordsEnums\Type::Down->value:
-                $system_change_point_records->after_point = $system_change_point_records->pre_point - $point;
-                break;
-        }
+        $system_change_point_records->after_point = $type === SystemChangePointRecordsEnums\Type::Up->value ? $user_vips->point + $point : $user_vips->point - $point;
         $system_change_point_records->save();
         // 返回数据
         return success($request, []);

@@ -19,7 +19,7 @@
         <!-- 主要内容区域 -->
         <div class="column" id="main-content">
             <!-- 动态通知框 -->
-            <transition name="slide-fade" @after-leave="showNotification">
+            <transition name="slide-fade" @after-leave="hideNotification">
                 <div v-if="isNotificationVisible" class="notification notification-fixed" :class="notificationType">
                     <button class="delete" @click="hideNotification"></button>
                     {{notificationMessage}}
