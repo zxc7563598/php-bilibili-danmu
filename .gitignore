@@ -15,5 +15,6 @@
 .DS_Store
 **/.DS_Store
 /public/attachment/goods/
+/public/attachment/shop/
 /public/attachment/user-info/
 /public/attachment/shop-config/
