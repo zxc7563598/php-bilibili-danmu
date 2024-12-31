@@ -2,85 +2,90 @@
 
 namespace app\controller\shop\management;
 
-use app\controller\GeneralMethod;
 use app\model\Goods;
-use app\model\GoodSubs;
-use app\model\RedemptionRecords;
-use app\model\UserVips;
-use Hejunjie\Tools;
 use support\Request;
+use support\Response;
+use app\model\GoodSubs;
+use app\model\UserVips;
+use app\model\RedemptionRecords;
+use app\controller\GeneralMethod;
 use resource\enums\RedemptionRecordsEnums;
 
 class ShippingManagementController extends GeneralMethod
 {
+    /**
+     * 获取发货列表数据
+     * 
+     * @param integer $page 页码
+     * @param string $user_name 用户名称
+     * @param string $user_uid 用户UID
+     * @param string $goods_name 商品名称
+     * @param integer $goods_type 商品类型
+     * @param integer $status 发货状态
+     * 
+     * @return Response 
+     */
     public function getData(Request $request)
     {
         $param = $request->all();
         // 获取参数
         $page = $param['page'];
-        $user_name = isset($param['user_name']) ? $param['user_name'] : null;
-        $user_uid = isset($param['user_uid']) ? $param['user_uid'] : null;
-        $goods_name = isset($param['goods_name']) ? $param['goods_name'] : null;
-        $goods_type = isset($param['goods_type']) ? $param['goods_type'] : null;
-        $status = isset($param['status']) ? $param['status'] : null;
-        // 获取数据
-        $redemption_records = RedemptionRecords::join('bl_user_vips', 'bl_user_vips.user_id', '=', 'bl_redemption_records.user_id')->join('bl_goods', 'bl_goods.goods_id', '=', 'bl_redemption_records.goods_id');
-
+        $user_name = $param['user_name'] ?? null;
+        $user_uid = $param['user_uid'] ?? null;
+        $goods_name = $param['goods_name'] ?? null;
+        $goods_type = $param['goods_type'] ?? null;
+        $status = $param['status'] ?? null;
+        // 获取数据并构建查询
+        $redemption_records = RedemptionRecords::join('bl_user_vips', 'bl_user_vips.user_id', '=', 'bl_redemption_records.user_id')
+            ->join('bl_goods', 'bl_goods.goods_id', '=', 'bl_redemption_records.goods_id');
         if (!is_null($user_name)) {
-            $redemption_records = $redemption_records->where('bl_user_vips.name', 'like', '%' . $user_name . '%');
+            $redemption_records = $redemption_records->where("bl_user_vips.name", 'like', '%' . $user_name . '%');
         }
         if (!is_null($user_uid)) {
-            $redemption_records = $redemption_records->where('bl_user_vips.uid', 'like', '%' . $user_uid . '%');
+            $redemption_records = $redemption_records->where("bl_user_vips.uid", $user_uid);
         }
         if (!is_null($goods_name)) {
-            $redemption_records = $redemption_records->where('bl_goods.name', 'like', '%' . $goods_name . '%');
+            $redemption_records = $redemption_records->where("bl_goods.name", 'like', '%' . $goods_name . '%');
         }
         if (!is_null($goods_type)) {
-            $redemption_records = $redemption_records->where('bl_goods.type', $goods_type);
+            $redemption_records = $redemption_records->where("bl_goods.type", $goods_type);
         }
         if (!is_null($status)) {
-            $redemption_records = $redemption_records->where('bl_redemption_records.status', $status);
+            $redemption_records = $redemption_records->where("bl_redemption_records.status", $status);
         }
         $redemption_records = $redemption_records->orderBy('bl_redemption_records.created_at', 'desc')
             ->paginate(100, [
                 'records_id' => 'bl_redemption_records.records_id',
                 'uid' => 'bl_user_vips.uid',
-                'user_name' => 'bl_user_vips.name as user_name', // 用户名
-                'goods_name' => 'bl_goods.name as goods_name', // 商品名
-                'sub_id' => 'bl_redemption_records.sub_id', // 子集id
-                'point' => 'bl_redemption_records.point', // 消耗积分
+                'user_name' => 'bl_user_vips.name as user_name',
+                'goods_name' => 'bl_goods.name as goods_name',
+                'sub_id' => 'bl_redemption_records.sub_id',
+                'point' => 'bl_redemption_records.point',
                 'status' => 'bl_redemption_records.status',
                 'created_at' => 'bl_redemption_records.created_at'
             ], 'page', $page);
-        // 处理数据
-        $sub_id = [];
+
+        // 处理子集数据
+        $sub_ids = [];
         foreach ($redemption_records as &$_redemption_records) {
-            $data = explode(',', $_redemption_records->sub_id);
-            foreach ($data as $_data) {
-                if (!in_array($_data, $sub_id)) {
-                    $sub_id[] = $_data;
-                }
-            }
+            $sub_ids = array_merge($sub_ids, explode(',', $_redemption_records->sub_id));
         }
-        $goods_subs_database = GoodSubs::whereIn('sub_id', $sub_id)->get([
+        $goods_subs_database = GoodSubs::whereIn('sub_id', array_unique($sub_ids))->get([
             'sub_id' => 'sub_id',
             'name' => 'name'
         ]);
+        // 将子集信息映射为数组
         $goods_subs = [];
         foreach ($goods_subs_database as $_goods_subs_database) {
             $goods_subs[$_goods_subs_database->sub_id] = $_goods_subs_database->name;
         }
+        // 添加子集和状态等字段
         foreach ($redemption_records as &$_redemption_records) {
             $subs = explode(',', $_redemption_records->sub_id);
-            $subs_array = [];
-            foreach ($subs as $_subs) {
-                $subs_array[] = $goods_subs[$_subs];
-            }
-            $_redemption_records->goods_sub = implode("\r\n", $subs_array);
+            $_redemption_records->goods_sub = implode("\r\n", array_map(fn($sub) => $goods_subs[$sub], $subs));
             $_redemption_records->status = RedemptionRecordsEnums\Status::from($_redemption_records->status)->label();
             $_redemption_records->create_time = $_redemption_records->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
-            unset($_redemption_records->sub_id);
-            unset($_redemption_records->created_at);
+            unset($_redemption_records->sub_id, $_redemption_records->created_at);
         }
         // 返回数据
         return success($request, [
@@ -88,6 +93,13 @@ class ShippingManagementController extends GeneralMethod
         ]);
     }
 
+    /**
+     * 获取发货详情
+     * 
+     * @param integer $records_id 记录ID
+     * 
+     * @return Response 
+     */
     public function getDataDetails(Request $request)
     {
         $param = $request->all();
@@ -106,7 +118,7 @@ class ShippingManagementController extends GeneralMethod
             'tracking_number' => 'tracking_number',
             'status' => 'status'
         ]);
-        if (empty($redemption_records)) {
+        if (!$redemption_records) {
             return fail($request, 800013);
         }
         // 获取商品信息
@@ -115,25 +127,23 @@ class ShippingManagementController extends GeneralMethod
             'cover_image' => 'cover_image',
             'type' => 'type'
         ]);
-        if (empty($goods)) {
+        if (!$goods) {
             return fail($request, 800013);
         }
+        // 获取商品子集
         $subs = GoodSubs::whereIn('sub_id', explode(',', $redemption_records->sub_id))->get([
             'name' => 'name'
-        ]);
-        $goods_sub = [];
-        foreach ($subs as $_subs) {
-            $goods_sub[] = $_subs->name;
-        }
+        ])->toArray();
+        $goods_sub = array_map(fn($sub) => $sub['name'], $subs);
         // 获取用户信息
         $user_vips = UserVips::where('user_id', $redemption_records->user_id)->first([
             'uid' => 'uid',
             'name' => 'name'
         ]);
-        if (empty($user_vips)) {
+        if (!$user_vips) {
             return fail($request, 800013);
         }
-        // 返回信息
+        // 返回数据
         return success($request, [
             'records_id' => $redemption_records->records_id,
             'goods' => [
@@ -155,6 +165,15 @@ class ShippingManagementController extends GeneralMethod
         ]);
     }
 
+    /**
+     * 变更发货信息
+     * 
+     * @param integer $records_id 记录ID
+     * @param string $tracking_number 快递单号
+     * @param integer $status 发货状态
+     * 
+     * @return Response 
+     */
     public function setDataDetails(Request $request)
     {
         $param = $request->all();
@@ -164,10 +183,10 @@ class ShippingManagementController extends GeneralMethod
         $status = $param['status'];
         // 获取数据
         $records = RedemptionRecords::where('records_id', $records_id)->first();
-        if (empty($records)) {
+        if (!$records) {
             return fail($request, 800013);
         }
-        // 存储数据
+        // 更新数据
         $records->tracking_number = $tracking_number;
         $records->status = $status;
         $records->save();

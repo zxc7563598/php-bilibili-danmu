@@ -3,12 +3,10 @@
 namespace app\controller\robot;
 
 use Carbon\Carbon;
-use Carbon\Exceptions\InvalidTimeZoneException;
-use Exception;
-use support\Request;
-use Hejunjie\Bililive;
 use Hejunjie\Tools;
+use support\Request;
 use support\Response;
+use Hejunjie\Bililive;
 
 class ApiController
 {
@@ -17,7 +15,6 @@ class ApiController
      * 获取用户信息
      * 
      * @return Response 
-     * @throws Exception 
      */
     public function getUserInfo(Request $request)
     {
@@ -50,8 +47,6 @@ class ApiController
      * @param int $room_id 房间号
      * 
      * @return Response 
-     * @throws Exception 
-     * @throws InvalidTimeZoneException 
      */
     public function getRealRoomInfo(Request $request)
     {
@@ -273,7 +268,6 @@ class ApiController
      * @param string $qrcode_key 扫码登录密钥
      *  
      * @return Response 
-     * @throws Exception 
      */
     public function loginCheck(Request $request)
     {
@@ -300,7 +294,6 @@ class ApiController
      * 退出登录
      * 
      * @return Response 
-     * @throws InvalidTimeZoneException 
      */
     public function loginOut(Request $request)
     {
@@ -318,7 +311,6 @@ class ApiController
      * 断开直播间链接
      * 
      * @return Response 
-     * @throws InvalidTimeZoneException 
      */
     public function connectOut(Request $request)
     {
@@ -334,7 +326,6 @@ class ApiController
      * 导出配置文件
      * 
      * @return Response 
-     * @throws InvalidTimeZoneException 
      */
     public function exportConfig(Request $request)
     {
@@ -436,8 +427,7 @@ class ApiController
     /**
      * 导入配置文件
      * 
-     * @param Request $request 
-     * @return void 
+     * @return Response 
      */
     public function importConfig(Request $request)
     {
