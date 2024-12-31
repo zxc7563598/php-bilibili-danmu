@@ -2,20 +2,20 @@
 
 namespace app\controller\shop;
 
-use app\controller\GeneralMethod;
-use app\core\UserPublicMethods;
+use support\Db;
 use app\model\Goods;
+use support\Request;
 use app\model\GoodSubs;
-use app\model\RedemptionRecords;
+use Webman\Http\Response;
 use app\model\ShopConfig;
 use app\model\UserAddress;
-use support\Request;
-use Webman\Http\Response;
 use resource\enums\GoodsEnums;
+use app\core\UserPublicMethods;
+use app\model\RedemptionRecords;
+use app\controller\GeneralMethod;
 use resource\enums\GoodSubsEnums;
-use resource\enums\UserAddressEnums;
 use resource\enums\ShopConfigEnums;
-use support\Db;
+use resource\enums\UserAddressEnums;
 
 class ShopController extends GeneralMethod
 {

@@ -19,7 +19,7 @@
         <!-- 主要内容区域 -->
         <div class="column" id="main-content">
             <!-- 动态通知框 -->
-            <transition name="slide-fade" @after-leave="showNotification">
+            <transition name="slide-fade" @after-leave="hideNotification">
                 <div v-if="isNotificationVisible" class="notification notification-fixed" :class="notificationType">
                     <button class="delete" @click="hideNotification"></button>
                     {{notificationMessage}}
@@ -320,6 +320,7 @@
 
             // 构建商城
             buildApp() {
+                this.showNotification('构建中，大概需要30秒左右，请耐心等待...', 'info');
                 this.buildLoading = true;
                 // 存储构建信息
                 this.form.system_api_url = window.location.protocol + "//" + window.location.host;
@@ -333,24 +334,17 @@
                 axios.post('/api/points-mall/system-configuration/build-shop', data, {
                     headers: { 'X-Signature': signature }
                 }).then(response => {
-                    this.loading = false;
+                    this.buildLoading = false;
                     if (response.data.code === 0) {
-                        if (notify) {
-                            this.showNotification('创建成功', 'success');
-                            this.getData();
-                        }
+                        this.showNotification('创建成功', 'success');
+                        this.getData();
                     } else {
-                        if (notify) {
-                            this.showNotification(response.data.message, 'warning');
-                        }
+                        this.showNotification(response.data.message, 'warning');
                     }
                 }).catch(() => {
-                    this.loading = false;
-                    if (notify) {
-                        this.showNotification('请求失败，请稍后重试', 'error');
-                    }
+                    this.buildLoading = false;
+                    this.showNotification('请求失败，请稍后重试', 'error');
                 });
-                this.buildLoading = false;
             },
 
             // 获取随机字符串

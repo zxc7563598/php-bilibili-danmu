@@ -6,9 +6,15 @@ use app\controller\GeneralMethod;
 use app\model\ShopConfig;
 use Hejunjie\Tools;
 use support\Request;
+use support\Response;
 
 class MallConfigurationController extends GeneralMethod
 {
+    /**
+     * 获取商城配置信息
+     * 
+     * @return Response 
+     */
     public function getData(Request $request)
     {
         // 获取数据
@@ -71,37 +77,70 @@ class MallConfigurationController extends GeneralMethod
         ]);
     }
 
+    /**
+     * 存储商城配置信息
+     * 
+     * @param string $login_background_image 登录页面背景图
+     * @param string $personal_background_image 个人中心背景图
+     * @param string $theme_color 主题色
+     * @param string $live_streaming_link 直播间链接
+     * @param string $protocols_surname 协议人姓名
+     * @param string $protocols_uid 协议人UID
+     * @param string $protocols_name 协议名称
+     * @param string $protocols_signature 协议人签名
+     * @param string $protocols_content 协议内容
+     * @param string $listening_open_vip 大航海监听
+     * @param string $vip_lv1_bonus_points 开通舰长奖励积分
+     * @param string $vip_lv2_bonus_points 开通提督奖励积分
+     * @param string $vip_lv3_bonus_points 开通总督奖励积分
+     * @param string $virtual_gift_order_successful_icon 虚拟礼物下单成功图标
+     * @param string $virtual_gift_order_successful_title 虚拟礼物下单成功标题
+     * @param string $virtual_gift_order_successful_content 虚拟礼物下单成功内容
+     * @param string $virtual_gift_order_successful_button 虚拟礼物下单成功按钮
+     * @param string $realism_gift_order_successful_icon 实体礼物下单成功图标
+     * @param string $realism_gift_order_successful_title 实体礼物下单成功标题
+     * @param string $realism_gift_order_successful_content 实体礼物下单成功内容
+     * @param string $realism_gift_order_successful_button 实体礼物下单成功按钮
+     * @param string $tribute_gift_order_successful_icon 贡品下单成功图标
+     * @param string $tribute_gift_order_successful_title 贡品下单成功标题
+     * @param string $tribute_gift_order_successful_content 贡品下单成功内容
+     * @param string $tribute_gift_order_successful_button 贡品下单成功按钮
+     * @param string $tribute_gift_order_successful_rankings 贡品下单成功是否开启排名
+     * @param string $tribute_gift_order_successful_rankingslist 贡品下单成功排名列表
+     * 
+     * @return Response 
+     */
     public function setData(Request $request)
     {
         $param = $request->all();
         $input = [];
-        $input['login-background-image'] = $param['login_background_image']; // 登录页面背景图
-        $input['personal-background-image'] = $param['personal_background_image']; // 个人中心背景图
-        $input['theme-color'] = $param['theme_color']; // 主题色
-        $input['live-streaming-link'] = $param['live_streaming_link']; // 直播间链接
-        $input['protocols-surname'] = $param['protocols_surname']; // 协议人姓名
-        $input['protocols-uid'] = $param['protocols_uid']; // 协议人UID
-        $input['protocols-name'] = $param['protocols_name']; // 协议名称
-        $input['protocols-signature'] = $param['protocols_signature']; // 协议人签名
-        $input['protocols-content'] = $param['protocols_content']; // 协议内容
-        $input['listening-open-vip'] = $param['listening_open_vip']; // 大航海监听
-        $input['vip-lv1-bonus-points'] = $param['vip_lv1_bonus_points']; // 开通舰长奖励积分
-        $input['vip-lv2-bonus-points'] = $param['vip_lv2_bonus_points']; // 开通提督奖励积分
-        $input['vip-lv3-bonus-points'] = $param['vip_lv3_bonus_points']; // 开通总督奖励积分
-        $input['virtual-gift-order-successful-icon'] = $param['virtual_gift_order_successful_icon']; // 虚拟礼物下单成功图标
-        $input['virtual-gift-order-successful-title'] = $param['virtual_gift_order_successful_title']; // 虚拟礼物下单成功标题
-        $input['virtual-gift-order-successful-content'] = $param['virtual_gift_order_successful_content']; // 虚拟礼物下单成功内容
-        $input['virtual-gift-order-successful-button'] = $param['virtual_gift_order_successful_button']; // 虚拟礼物下单成功按钮
-        $input['realism-gift-order-successful-icon'] = $param['realism_gift_order_successful_icon']; // 实体礼物下单成功图标
-        $input['realism-gift-order-successful-title'] = $param['realism_gift_order_successful_title']; // 实体礼物下单成功标题
-        $input['realism-gift-order-successful-content'] = $param['realism_gift_order_successful_content']; // 实体礼物下单成功内容
-        $input['realism-gift-order-successful-button'] = $param['realism_gift_order_successful_button']; // 实体礼物下单成功按钮
-        $input['tribute-gift-order-successful-icon'] = $param['tribute_gift_order_successful_icon']; // 贡品下单成功图标
-        $input['tribute-gift-order-successful-title'] = $param['tribute_gift_order_successful_title']; // 贡品下单成功标题
-        $input['tribute-gift-order-successful-content'] = $param['tribute_gift_order_successful_content']; // 贡品下单成功内容
-        $input['tribute-gift-order-successful-button'] = $param['tribute_gift_order_successful_button']; // 贡品下单成功按钮
-        $input['tribute-gift-order-successful-rankings'] = $param['tribute_gift_order_successful_rankings']; // 贡品下单成功是否开启排名
-        $input['tribute-gift-order-successful-rankingslist'] = $param['tribute_gift_order_successful_rankingslist']; // 贡品下单成功排名列表
+        $input['login-background-image'] = $param['login_background_image'];
+        $input['personal-background-image'] = $param['personal_background_image'];
+        $input['theme-color'] = $param['theme_color'];
+        $input['live-streaming-link'] = $param['live_streaming_link'];
+        $input['protocols-surname'] = $param['protocols_surname'];
+        $input['protocols-uid'] = $param['protocols_uid'];
+        $input['protocols-name'] = $param['protocols_name'];
+        $input['protocols-signature'] = $param['protocols_signature'];
+        $input['protocols-content'] = $param['protocols_content'];
+        $input['listening-open-vip'] = $param['listening_open_vip'];
+        $input['vip-lv1-bonus-points'] = $param['vip_lv1_bonus_points'];
+        $input['vip-lv2-bonus-points'] = $param['vip_lv2_bonus_points'];
+        $input['vip-lv3-bonus-points'] = $param['vip_lv3_bonus_points'];
+        $input['virtual-gift-order-successful-icon'] = $param['virtual_gift_order_successful_icon'];
+        $input['virtual-gift-order-successful-title'] = $param['virtual_gift_order_successful_title'];
+        $input['virtual-gift-order-successful-content'] = $param['virtual_gift_order_successful_content'];
+        $input['virtual-gift-order-successful-button'] = $param['virtual_gift_order_successful_button'];
+        $input['realism-gift-order-successful-icon'] = $param['realism_gift_order_successful_icon'];
+        $input['realism-gift-order-successful-title'] = $param['realism_gift_order_successful_title'];
+        $input['realism-gift-order-successful-content'] = $param['realism_gift_order_successful_content'];
+        $input['realism-gift-order-successful-button'] = $param['realism_gift_order_successful_button'];
+        $input['tribute-gift-order-successful-icon'] = $param['tribute_gift_order_successful_icon'];
+        $input['tribute-gift-order-successful-title'] = $param['tribute_gift_order_successful_title'];
+        $input['tribute-gift-order-successful-content'] = $param['tribute_gift_order_successful_content'];
+        $input['tribute-gift-order-successful-button'] = $param['tribute_gift_order_successful_button'];
+        $input['tribute-gift-order-successful-rankings'] = $param['tribute_gift_order_successful_rankings'];
+        $input['tribute-gift-order-successful-rankingslist'] = $param['tribute_gift_order_successful_rankingslist'];
         // 获取数据
         $shop_config = ShopConfig::get([
             'config_id' => 'config_id',
@@ -140,6 +179,14 @@ class MallConfigurationController extends GeneralMethod
         return success($request, []);
     }
 
+    /**
+     * 上传图片
+     * 
+     * @param string $base64 图片base64
+     * @param string $type 图片类型
+     * 
+     * @return Response 
+     */
     public function uploadImages(Request $request)
     {
         $param = $request->all();

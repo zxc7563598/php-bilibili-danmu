@@ -2,16 +2,14 @@
 
 namespace app\controller\shop;
 
-use app\controller\GeneralMethod;
-use app\core\LoginPublicMethods;
-use app\model\ShopConfig;
-use app\model\UserVips;
-use Carbon\Exceptions\InvalidTimeZoneException;
-use support\Request;
 use support\Redis;
+use support\Request;
+use app\model\UserVips;
+use app\model\ShopConfig;
 use Webman\Http\Response;
+use app\core\LoginPublicMethods;
 use resource\enums\UserVipsEnums;
-use Hejunjie\Tools;
+use app\controller\GeneralMethod;
 
 class LoginController extends GeneralMethod
 {

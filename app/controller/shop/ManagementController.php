@@ -2,20 +2,16 @@
 
 namespace app\controller\shop;
 
-use app\controller\GeneralMethod;
-use app\core\LoginPublicMethods;
+use support\Request;
 use app\model\Complaint;
 use app\model\RedemptionRecords;
-use app\model\UserVips;
-use support\Request;
-use support\Redis;
-use Webman\Http\Response;
-use resource\enums\UserVipsEnums;
+use app\controller\GeneralMethod;
 use resource\enums\ComplaintEnums;
 use resource\enums\RedemptionRecordsEnums;
 
 class ManagementController extends GeneralMethod
 {
+
     public function pageSystemConfiguration(Request $request)
     {
         // 获取未发货数量
