@@ -4,6 +4,13 @@
 
 <img src="https://raw.githubusercontent.com/zxc7563598/php-bilibili-danmu/main/public/cover.png">
 
+
+<img src="https://raw.githubusercontent.com/zxc7563598/php-bilibili-danmu/main/public/iphone_1.png" style="display:inline-block;width:20%;">
+<img src="https://raw.githubusercontent.com/zxc7563598/php-bilibili-danmu/main/public/iphone_2.png" style="display:inline-block;width:20%;">
+<img src="https://raw.githubusercontent.com/zxc7563598/php-bilibili-danmu/main/public/iphone_3.png" style="display:inline-block;width:20%;">
+<img src="https://raw.githubusercontent.com/zxc7563598/php-bilibili-danmu/main/public/iphone_4.png" style="display:inline-block;width:20%;">
+<img src="https://raw.githubusercontent.com/zxc7563598/php-bilibili-danmu/main/public/iphone_5.png" style="display:inline-block;width:20%;">
+
 ---
 
 ## 项目特色
