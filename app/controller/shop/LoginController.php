@@ -169,7 +169,13 @@ class LoginController extends GeneralMethod
             'point' => $user_vips->point,
             'type' => UserVipsEnums\VipType::from($user_vips->vip_type)->label(),
             'avatar' => getImageUrl($user_vips->avatar),
-            'link' => !empty($config->content) ? $config->content : 'javascript:;'
+            'link' => !empty($config->content) ? $config->content : 'javascript:;',
+            'icon' => [
+                'pay_log' => getImageUrl('attachment/icon/pay_log.png'),
+                'convertible' => getImageUrl('attachment/icon/convertible.png'),
+                'address' => getImageUrl('attachment/icon/address.png'),
+                'complain' => getImageUrl('attachment/icon/complain.png')
+            ]
         ]);
     }
 }
