@@ -4,12 +4,13 @@
 
 <img src="https://raw.githubusercontent.com/zxc7563598/php-bilibili-danmu/main/public/cover.png">
 
-
-<img src="https://raw.githubusercontent.com/zxc7563598/php-bilibili-danmu/main/public/iphone_1.png" style="display:inline-block;width:20%;">
-<img src="https://raw.githubusercontent.com/zxc7563598/php-bilibili-danmu/main/public/iphone_2.png" style="display:inline-block;width:20%;">
-<img src="https://raw.githubusercontent.com/zxc7563598/php-bilibili-danmu/main/public/iphone_3.png" style="display:inline-block;width:20%;">
-<img src="https://raw.githubusercontent.com/zxc7563598/php-bilibili-danmu/main/public/iphone_4.png" style="display:inline-block;width:20%;">
-<img src="https://raw.githubusercontent.com/zxc7563598/php-bilibili-danmu/main/public/iphone_5.png" style="display:inline-block;width:20%;">
+<div style="display: flex; justify-content: space-around;">
+  <img src="https://raw.githubusercontent.com/zxc7563598/php-bilibili-danmu/main/public/iphone_6.png" style="width: 20%;">
+  <img src="https://raw.githubusercontent.com/zxc7563598/php-bilibili-danmu/main/public/iphone_2.png" style="width: 20%;">
+  <img src="https://raw.githubusercontent.com/zxc7563598/php-bilibili-danmu/main/public/iphone_3.png" style="width: 20%;">
+  <img src="https://raw.githubusercontent.com/zxc7563598/php-bilibili-danmu/main/public/iphone_4.png" style="width: 20%;">
+  <img src="https://raw.githubusercontent.com/zxc7563598/php-bilibili-danmu/main/public/iphone_5.png" style="width: 20%;">
+</div>
 
 ---
 
