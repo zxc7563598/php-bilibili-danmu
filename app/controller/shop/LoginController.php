@@ -171,10 +171,10 @@ class LoginController extends GeneralMethod
             'avatar' => getImageUrl($user_vips->avatar),
             'link' => !empty($config->content) ? $config->content : 'javascript:;',
             'icon' => [
-                'pay_log' => getImageUrl('attachment/icon/pay_log.png'),
-                'convertible' => getImageUrl('attachment/icon/convertible.png'),
-                'address' => getImageUrl('attachment/icon/address.png'),
-                'complain' => getImageUrl('attachment/icon/complain.png')
+                'pay_log' => getImageUrl('icon/pay_log.png'),
+                'convertible' => getImageUrl('icon/convertible.png'),
+                'address' => getImageUrl('icon/address.png'),
+                'complain' => getImageUrl('icon/complain.png')
             ]
         ]);
     }
