@@ -408,7 +408,7 @@
                             this.showNotification('存储成功，正在构建商城，大概需要30秒左右，请稍后', 'success');
                             setTimeout(() => {
                                 this.getData()
-                            }, 5000);
+                            }, 10000);
                         } else {
                             this.showNotification('存储成功', 'success');
                             this.getData()
@@ -425,13 +425,16 @@
             // 构建商城
             buildApp() {
                 // 存储构建信息
-                this.form.shop_name = '积分商城';
-                this.form.shop_url = window.location.protocol + "//" + window.location.hostname + ":5177";
-                this.form.system_api_url = window.location.protocol + "//" + window.location.host;
-                this.form.system_aes_key = this.getRandomString(16)
-                this.form.system_aes_iv = this.getRandomString(16)
-                this.form.system_key = this.getRandomString(32)
-                this.saveData();
+                if (!this.buildLoading) {
+                    this.form.shop_name = '积分商城';
+                    this.form.shop_url = window.location.protocol + "//" + window.location.hostname + ":5177";
+                    this.form.system_api_url = window.location.protocol + "//" + window.location.host;
+                    this.form.system_aes_key = this.getRandomString(16)
+                    this.form.system_aes_iv = this.getRandomString(16)
+                    this.form.system_key = this.getRandomString(32)
+                    this.saveData();
+                }
+                this.buildLoading = true;
             },
 
             // 获取随机字符串
