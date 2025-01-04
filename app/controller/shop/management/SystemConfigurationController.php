@@ -26,6 +26,8 @@ class SystemConfigurationController extends GeneralMethod
         // 返回数据
         return success($request, [
             'shop' => $shop,
+            'shop_name' => getenv('SHOP_NAME', ''),
+            'shop_url' => getenv('SHOP_URL', ''),
             'system_api_url' => getenv('SYSTEM_API_URL', ''),
             'system_aes_key' => getenv('SYSTEM_AES_KEY', ''),
             'system_aes_iv' => getenv('SYSTEM_AES_IV', ''),
@@ -75,6 +77,8 @@ class SystemConfigurationController extends GeneralMethod
     /**
      * 设置系统配置数据
      * 
+     * @param string $shop_name 商城名称 
+     * @param string $shop_url 商城链接 
      * @param string $system_api_url 项目地址 
      * @param string $system_aes_key AES加密KEY 
      * @param string $system_aes_iv AES加密IV 
@@ -98,6 +102,8 @@ class SystemConfigurationController extends GeneralMethod
         // 获取请求参数
         $param = $request->all();
         $configKeys = [
+            'shop_name',
+            'shop_url',
             'system_api_url',
             'system_aes_key',
             'system_aes_iv',
@@ -120,7 +126,7 @@ class SystemConfigurationController extends GeneralMethod
         $env = Tools\FileUtils::readFile(base_path() . '/.env');
         // 需要重新构建VUE的关键配置项
         $shouldExecuteCode = false;
-        $keysToCheck = ['SYSTEM_API_URL', 'SYSTEM_AES_KEY', 'SYSTEM_AES_IV', 'SYSTEM_KEY'];
+        $keysToCheck = ['SYSTEM_API_URL', 'SYSTEM_AES_KEY', 'SYSTEM_AES_IV', 'SYSTEM_KEY', 'SHOP_NAME', 'SHOP_URL'];
         foreach ($keysToCheck as $key) {
             preg_match("/^$key=(.*)$/m", $env, $matches);
             $currentValue = $matches[1] ?? null;
