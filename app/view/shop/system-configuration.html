@@ -409,6 +409,7 @@
                         } else {
                             this.showNotification('存储成功', 'success');
                         }
+                        this.getData()
                     } else {
                         this.showNotification(response.data.message, 'warning');
                     }
