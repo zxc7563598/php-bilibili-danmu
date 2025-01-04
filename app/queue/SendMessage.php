@@ -33,7 +33,7 @@ class SendMessage
                 $getUserBarrageMsg = Bililive\Live::getUserBarrageMsg($room_id, $cookie);
                 if (isset($getUserBarrageMsg['length'])) {
                     $length = $getUserBarrageMsg['length'];
-                    Redis::set('bilibili_speak_length', $length);
+                    Redis::setEx('bilibili_speak_length', 3600, $length);
                 }
             }
             if (empty($length)) {
