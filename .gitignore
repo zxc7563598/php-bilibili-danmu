@@ -16,6 +16,7 @@
 **/.DS_Store
 /public/attachment/goods/
 /public/attachment/shop/
+/public/attachment/qrcode/
 /public/attachment/user-info/
 /public/attachment/shop-config/
 /public/attachment/detailsImages/

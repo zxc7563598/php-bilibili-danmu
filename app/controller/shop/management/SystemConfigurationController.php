@@ -7,6 +7,10 @@ use Exception;
 use Hejunjie\Tools;
 use support\Request;
 use support\Response;
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\Exception\ValidationException;
 
 class SystemConfigurationController extends GeneralMethod
 {
@@ -37,6 +41,34 @@ class SystemConfigurationController extends GeneralMethod
             'db_name' => getenv('DB_NAME', ''),
             'db_user' => getenv('DB_USER', ''),
             'db_password' => getenv('DB_PASSWORD', '')
+        ]);
+    }
+
+    /**
+     * 获取商城二维码
+     * 
+     * @param string $url 地址
+     *  
+     * @return Response 
+     */
+    public function getDataQrCode(Request $request)
+    {
+        // 获取请求参数
+        $param = $request->all();
+        $url = $param['url'];
+        // 生成二维码
+        $qrcode = md5($url) . '.png';
+        // 确认目录信息，不存在则创建
+        if (!is_dir(public_path() . '/attachment/qrcode/shop')) {
+            mkdir(public_path() . '/attachment/qrcode/shop', 0777, true);
+        }
+        // 信息存储，并生成二维码
+        $code = new Builder();
+        $code->build(new PngWriter(), null, null, $url, new Encoding('UTF-8'), null, 300, 10)
+            ->saveToFile(public_path() . '/attachment/qrcode/shop/' . $qrcode);
+        // 返回数据
+        return success($request, [
+            'url' => getImageUrl('qrcode/shop/' . $qrcode)
         ]);
     }
 
