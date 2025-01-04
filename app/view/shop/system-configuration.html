@@ -6,6 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>积分商城控制台</title>
     <?php include 'layout/style.php'; ?>
+    <style>
+        @media (max-width: 768px) {
+            .responsive-image {
+                width: 100%;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .responsive-image {
+                width: 50%;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -44,41 +57,89 @@
                         </article>
                     </div>
                     <div class="column is-full">
-                        <div class="card" v-if="form.shop">
-                            <div class="card-content">
-                                <div class="field">
-                                    <label class="label">项目地址</label>
-                                    <div class="control">
-                                        <input class="input" type="text" placeholder="" v-model="form.system_api_url">
+                        <div class="columns is-multiline" v-if="form.shop">
+                            <div class="column is-half-tablet is-full-mobile">
+                                <div class="card">
+                                    <div class="card-content">
+                                        <div class="field">
+                                            <label class="label">项目地址</label>
+                                            <div class="control">
+                                                <input class="input" type="text" placeholder=""
+                                                    v-model="form.system_api_url">
+                                            </div>
+                                            <p class="help">此配置项决定了项目请求的根路径，影响整体项目中所有资源（如图片、CSS、JavaScript
+                                                等）的链接地址。调整此配置会改变项目中所有相关资源的访问路径。</p>
+                                        </div>
+                                        <div class="field">
+                                            <label class="label">AES加密KEY</label>
+                                            <div class="control">
+                                                <input class="input" type="text" placeholder=""
+                                                    v-model="form.system_aes_key">
+                                            </div>
+                                            <p class="help">此配置项决定项目接口与前端页面之间数据的加密和解密过程。AES加密KEY
+                                                用于对前端发送到后端的数据进行加密，同时也用于后端返回给前端的数据的解密。调整此密钥会影响整个项目中的数据安全性，特别是在积分商城等涉及用户敏感数据传输的功能模块中
+                                            </p>
+                                        </div>
+                                        <div class="field">
+                                            <label class="label">AES加密IV</label>
+                                            <div class="control">
+                                                <input class="input" type="text" placeholder=""
+                                                    v-model="form.system_aes_iv">
+                                            </div>
+                                            <p class="help">此配置项决定项目接口与前端页面之间数据的加密和解密过程。AES加密KEY
+                                                用于对前端发送到后端的数据进行加密，同时也用于后端返回给前端的数据的解密。调整此密钥会影响整个项目中的数据安全性，特别是在积分商城等涉及用户敏感数据传输的功能模块中
+                                            </p>
+                                        </div>
+                                        <div class="field">
+                                            <label class="label">签名KEY</label>
+                                            <div class="control">
+                                                <input class="input" type="text" placeholder=""
+                                                    v-model="form.system_key">
+                                            </div>
+                                            <p class="help">此配置项决定项目接口与前端页面之间的数据签名机制，用于确保数据在传输过程中未被篡改。签名KEY
+                                                用于生成请求数据的签名，并通过接口校验签名的正确性。调整此密钥会影响整个项目中接口的请求验证过程，特别是在积分商城等涉及敏感操作的功能模块中。
+                                            </p>
+                                        </div>
                                     </div>
-                                    <p class="help">此配置项决定了项目请求的根路径，影响整体项目中所有资源（如图片、CSS、JavaScript
-                                        等）的链接地址。调整此配置会改变项目中所有相关资源的访问路径。</p>
                                 </div>
-                                <div class="field">
-                                    <label class="label">AES加密KEY</label>
-                                    <div class="control">
-                                        <input class="input" type="text" placeholder="" v-model="form.system_aes_key">
+                            </div>
+                            <div class="column is-half-tablet is-full-mobile">
+                                <div class="card">
+                                    <div class="card-content">
+                                        <div class="field">
+                                            <label class="label">商城地址</label>
+                                            <div class="control">
+                                                <input class="input" type="text" placeholder="" v-model="shop_url">
+                                            </div>
+                                            <p class="help">
+                                                积分商城默认地址，如果需要通过域名进行访问，可以通过<a
+                                                    href="https://dc.console.aliyun.com/">阿里云</a>或<a
+                                                    href="https://www.godaddy.com/">godaddy</a>等其他任意平台注册域名</a>，通常费用在每年几十元左右
+                                            </p>
+                                            <p class="help">
+                                                购买域名后解析到服务器后，就可以拥有一个网址链接供粉丝访问，教程出起来好麻烦，搞不懂可以直接<a
+                                                    href='mailto:junjie.he.925@gmail.com'>联系作者</a>
+                                            </p>
+                                        </div>
+                                        <div class="field">
+                                            <label class="label">商城二维码</label>
+                                            <div class="control">
+                                                <figure class="image is-1by1 responsive-image">
+                                                    <img :src="shop_qr_url">
+                                                </figure>
+                                            </div>
+                                            <p class="help">
+                                                二维码扫描后可以打开商城地址，如果需要美化样式，可以前往<a href="https://cli.im/url/">草料二维码</a>进行美化
+                                            </p>
+                                            <p class="help">
+                                                通常情况下，<b>微信</b>，<b>QQ</b>等软件可能会限制IP类型地址或未备案域名链接的访问，因此需要告知用户通过系统自带扫码工具进行扫码
+                                            </p>
+                                            <p class="help">
+                                                如果无备案域名也想要用户在QQ/微信扫码访问，也可以直接<a
+                                                    href='mailto:junjie.he.925@gmail.com'>联系作者</a>
+                                            </p>
+                                        </div>
                                     </div>
-                                    <p class="help">此配置项决定项目接口与前端页面之间数据的加密和解密过程。AES加密KEY
-                                        用于对前端发送到后端的数据进行加密，同时也用于后端返回给前端的数据的解密。调整此密钥会影响整个项目中的数据安全性，特别是在积分商城等涉及用户敏感数据传输的功能模块中
-                                    </p>
-                                </div>
-                                <div class="field">
-                                    <label class="label">AES加密IV</label>
-                                    <div class="control">
-                                        <input class="input" type="text" placeholder="" v-model="form.system_aes_iv">
-                                    </div>
-                                    <p class="help">此配置项决定项目接口与前端页面之间数据的加密和解密过程。AES加密KEY
-                                        用于对前端发送到后端的数据进行加密，同时也用于后端返回给前端的数据的解密。调整此密钥会影响整个项目中的数据安全性，特别是在积分商城等涉及用户敏感数据传输的功能模块中
-                                    </p>
-                                </div>
-                                <div class="field">
-                                    <label class="label">签名KEY</label>
-                                    <div class="control">
-                                        <input class="input" type="text" placeholder="" v-model="form.system_key">
-                                    </div>
-                                    <p class="help">此配置项决定项目接口与前端页面之间的数据签名机制，用于确保数据在传输过程中未被篡改。签名KEY
-                                        用于生成请求数据的签名，并通过接口校验签名的正确性。调整此密钥会影响整个项目中接口的请求验证过程，特别是在积分商城等涉及敏感操作的功能模块中。</p>
                                 </div>
                             </div>
                         </div>
@@ -222,6 +283,8 @@
                 loading: false,
                 buildLoading: false,
                 showPage: false,
+                shop_url: "",
+                shop_qr_url: '',
                 form: {
                     shop: false,
                     db_host: "",
@@ -277,19 +340,37 @@
                 const signature = this.generateSignature(data);
                 axios.post('/api/points-mall/system-configuration/get-data', data, {
                     headers: { 'X-Signature': signature }
-                })
-                    .then(response => {
-                        if (response.data.code === 0) {
-                            document.getElementById('loading').style.display = 'none';
-                            document.getElementById('main-content-body').style.display = 'block';
-                            this.form = response.data.data;
-                        }
-                    })
-                    .catch(() => {
+                }).then(response => {
+                    if (response.data.code === 0) {
                         document.getElementById('loading').style.display = 'none';
                         document.getElementById('main-content-body').style.display = 'block';
-                        this.showNotification('请求失败，请稍后重试', 'error');
-                    });
+                        this.form = response.data.data;
+                        if (this.form.shop) {
+                            this.getDataShop()
+                        }
+                    }
+                }).catch(() => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('main-content-body').style.display = 'block';
+                    this.showNotification('请求失败，请稍后重试', 'error');
+                });
+            },
+
+            getDataShop() {
+                this.shop_url = window.location.protocol + "//" + window.location.hostname + ":5177";
+                const data = {
+                    url: this.shop_url
+                };
+                const signature = this.generateSignature(data);
+                axios.post('/api/points-mall/system-configuration/get-data-qrcode', data, {
+                    headers: { 'X-Signature': signature }
+                }).then(response => {
+                    if (response.data.code === 0) {
+                        this.shop_qr_url = response.data.data.url
+                    }
+                }).catch(() => {
+                    this.showNotification('请求失败，请稍后重试', 'error');
+                });
             },
 
             // 存储信息
@@ -332,7 +413,8 @@
                 const data = {};
                 const signature = this.generateSignature(data);
                 axios.post('/api/points-mall/system-configuration/build-shop', data, {
-                    headers: { 'X-Signature': signature }
+                    headers: { 'X-Signature': signature },
+                    timeout: 100000
                 }).then(response => {
                     this.buildLoading = false;
                     if (response.data.code === 0) {
