@@ -380,7 +380,8 @@
                 const data = this.form;
                 const signature = this.generateSignature(data);
                 axios.post('/api/points-mall/system-configuration/set-data', data, {
-                    headers: { 'X-Signature': signature }
+                    headers: { 'X-Signature': signature },
+                    timeout: 100000
                 }).then(response => {
                     this.loading = false;
                     if (response.data.code === 0) {
