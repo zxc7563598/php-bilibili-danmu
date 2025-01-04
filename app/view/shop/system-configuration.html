@@ -406,10 +406,13 @@
                     if (response.data.code === 0) {
                         if (response.data.data.shell) {
                             this.showNotification('存储成功，正在构建商城，大概需要30秒左右，请稍后', 'success');
+                            setTimeout(() => {
+                                this.getData()
+                            }, 5000);
                         } else {
                             this.showNotification('存储成功', 'success');
+                            this.getData()
                         }
-                        this.getData()
                     } else {
                         this.showNotification(response.data.message, 'warning');
                     }
@@ -421,8 +424,6 @@
 
             // 构建商城
             buildApp() {
-                this.showNotification('构建中，大概需要30秒左右，请耐心等待...', 'info');
-                this.buildLoading = true;
                 // 存储构建信息
                 this.form.shop_name = '积分商城';
                 this.form.shop_url = window.location.protocol + "//" + window.location.hostname + ":5177";
