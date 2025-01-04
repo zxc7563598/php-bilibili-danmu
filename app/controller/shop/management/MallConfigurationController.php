@@ -5,6 +5,7 @@ namespace app\controller\shop\management;
 use app\controller\GeneralMethod;
 use app\model\ShopConfig;
 use Hejunjie\Tools;
+use support\Redis;
 use support\Request;
 use support\Response;
 
@@ -51,6 +52,7 @@ class MallConfigurationController extends GeneralMethod
             'personal_background_image' => $data['personal-background-image'], // 个人中心背景图
             'theme_color' => $data['theme-color'], // 主题色
             'live_streaming_link' => $data['live-streaming-link'], // 直播间链接
+            'user_login_password' => $data['user-login-password'], // 用户是否需要密码登录
             'protocols_surname' => $data['protocols-surname'], // 协议人姓名
             'protocols_uid' => $data['protocols-uid'], // 协议人UID
             'protocols_name' => $data['protocols-name'], // 协议名称
@@ -84,6 +86,7 @@ class MallConfigurationController extends GeneralMethod
      * @param string $personal_background_image 个人中心背景图
      * @param string $theme_color 主题色
      * @param string $live_streaming_link 直播间链接
+     * @param string $user_login_password 用户是否需要密码登录
      * @param string $protocols_surname 协议人姓名
      * @param string $protocols_uid 协议人UID
      * @param string $protocols_name 协议名称
@@ -118,6 +121,7 @@ class MallConfigurationController extends GeneralMethod
         $input['personal-background-image'] = $param['personal_background_image'];
         $input['theme-color'] = $param['theme_color'];
         $input['live-streaming-link'] = $param['live_streaming_link'];
+        $input['user-login-password'] = $param['user_login_password'];
         $input['protocols-surname'] = $param['protocols_surname'];
         $input['protocols-uid'] = $param['protocols_uid'];
         $input['protocols-name'] = $param['protocols_name'];
@@ -175,6 +179,8 @@ class MallConfigurationController extends GeneralMethod
                 }
             }
         }
+        // 删除缓存的配置信息
+        Redis::del(config('app')['app_name'] . ':config');
         // 返回数据
         return success($request, []);
     }
