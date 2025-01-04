@@ -155,9 +155,7 @@ class ShopController extends GeneralMethod
             $commodity_type[] = $_good_subs->name . '*1  ';
         }
         // 获取配置信息
-        $config = ShopConfig::where('title', 'protocols-name')->first([
-            'content' => 'content'
-        ]);
+        $config = self::getShopConfig();
         // 返回数据
         return success($request, [
             'user_address' => $user_address,
@@ -174,7 +172,7 @@ class ShopController extends GeneralMethod
                     ['key' => '发货时间', 'value' => '取决于主包心情']
                 ]
             ],
-            'protocols_title' => !empty($config->content) ? $config->content : '协议'
+            'protocols_title' => !empty($config['protocols-name']) ? $config['protocols-name'] : '协议'
         ]);
     }
 
@@ -235,61 +233,21 @@ class ShopController extends GeneralMethod
         $ranking = 0;
         $redemption = [];
         // 处理信息
+        $config = self::getShopConfig();
         switch ($type) {
             case GoodsEnums\Type::Virtually->value: // 虚拟
-                $config_database = ShopConfig::whereIn('title', [
-                    'virtual-gift-order-successful-icon',
-                    'virtual-gift-order-successful-title',
-                    'virtual-gift-order-successful-content',
-                    'virtual-gift-order-successful-button'
-                ])->get([
-                    'title' => 'title',
-                    'content' => 'content'
-                ]);
-                $config = [];
-                foreach ($config_database as $_config_database) {
-                    $config[$_config_database->title] = $_config_database->content;
-                }
                 $title = $config['virtual-gift-order-successful-title'];
                 $content = $config['virtual-gift-order-successful-content'];
                 $button = $config['virtual-gift-order-successful-button'];
                 $images = getImageUrl($config['virtual-gift-order-successful-icon']);
                 break;
             case GoodsEnums\Type::Entity->value: // 实体
-                $config_database = ShopConfig::whereIn('title', [
-                    'realism-gift-order-successful-icon',
-                    'realism-gift-order-successful-title',
-                    'realism-gift-order-successful-content',
-                    'realism-gift-order-successful-button'
-                ])->get([
-                    'title' => 'title',
-                    'content' => 'content'
-                ]);
-                $config = [];
-                foreach ($config_database as $_config_database) {
-                    $config[$_config_database->title] = $_config_database->content;
-                }
                 $title = $config['realism-gift-order-successful-title'];
                 $content = $config['realism-gift-order-successful-content'];
                 $button = $config['realism-gift-order-successful-button'];
                 $images = getImageUrl($config['realism-gift-order-successful-icon']);
                 break;
             case GoodsEnums\Type::Tribute->value: // 贡
-                $config_database = ShopConfig::whereIn('title', [
-                    'tribute-gift-order-successful-icon',
-                    'tribute-gift-order-successful-title',
-                    'tribute-gift-order-successful-content',
-                    'tribute-gift-order-successful-button',
-                    'tribute-gift-order-successful-rankings',
-                    'tribute-gift-order-successful-rankingslist'
-                ])->get([
-                    'title' => 'title',
-                    'content' => 'content'
-                ]);
-                $config = [];
-                foreach ($config_database as $_config_database) {
-                    $config[$_config_database->title] = $_config_database->content;
-                }
                 $title = $config['tribute-gift-order-successful-title'];
                 $content = $config['tribute-gift-order-successful-content'];
                 $button = $config['tribute-gift-order-successful-button'];

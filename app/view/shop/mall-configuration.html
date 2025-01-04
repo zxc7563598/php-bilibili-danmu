@@ -109,7 +109,18 @@
                                     </div>
                                     <p class="help">用户在积分商城「我的」页面中点击「立即爆米」跳转的页面，通常建议填写直播间链接</p>
                                 </div>
-
+                                <div class="field">
+                                    <label class="label">用户是否需要密码登录</label>
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            <select v-model="form.user_login_password">
+                                                <option value="1">是</option>
+                                                <option value="0">否</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <p class="help">关闭后，任意用户输入任意人的UID均可进入商城进行兑换，不建议关闭</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -485,6 +496,7 @@
                     personal_background_image: [], // 个人中心背景图
                     theme_color: [], // 主题色
                     live_streaming_link: null, // 直播间链接
+                    user_login_password: null, // 用户是否需要密码登录
                     protocols_surname: null, // 协议人姓名
                     protocols_uid: null, // 协议人UID
                     protocols_name: null, // 协议名称

@@ -2,6 +2,7 @@
 
 namespace app\controller;
 
+use app\model\ShopConfig;
 use support\Redis;
 
 class GeneralMethod
@@ -22,6 +23,7 @@ class GeneralMethod
      *
      * @param string $token 用户token
      * @param string $type token类型
+     * 
      * @return void
      */
     protected static function checkToken($token, $type)
@@ -40,6 +42,7 @@ class GeneralMethod
      * @param string $token 用户token
      * @param array $uinfo 用户信息
      * @param string $type token类型
+     * 
      * @return bool
      */
     protected static function setToken($token, $uinfo, $type): bool
@@ -64,6 +67,7 @@ class GeneralMethod
      *
      * @param string $token 需要删除的token
      * @param string $type token类型
+     * 
      * @return void
      */
     protected static function delToken($token, $type): void
@@ -74,5 +78,26 @@ class GeneralMethod
             $user = unserialize($user);
             Redis::del(config('app')['app_name'] . ':uid_to_token:' . $type . ':' . $user['uid']);
         }
+    }
+
+    /**
+     * 获取商城配置信息
+     * 
+     * @return array 
+     */
+    protected static function getShopConfig(): array
+    {
+        $config = Redis::get(config('app')['app_name'] . ':config');
+        if (empty($config)) {
+            $shop_config = ShopConfig::get();
+            $data = [];
+            foreach ($shop_config as $_shop_config) {
+                $data[$_shop_config->title] = $_shop_config->content;
+            }
+            Redis::set(config('app')['app_name'] . ':config', json_encode($data));
+        } else {
+            $data = json_decode($config, true);
+        }
+        return $data;
     }
 }

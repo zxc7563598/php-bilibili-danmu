@@ -25,10 +25,8 @@ class LoginController extends GeneralMethod
         sublog('积分商城', '获取登录页背景图片', $param);
         sublog('积分商城', '获取登录页背景图片', '===================');
         // 获取数据
-        $config = ShopConfig::where('title', 'theme-color')->first([
-            'content' => 'content'
-        ]);
-        $theme_color = explode(',', $config->content);
+        $config = self::getShopConfig();
+        $theme_color = explode(',', $config['theme-color']);
         $color = isset($theme_color[0]) ? $theme_color[0] : '#7232dd';
         // 返回数据
         return success($request, [
@@ -38,22 +36,21 @@ class LoginController extends GeneralMethod
     }
 
     /**
-     * 获取登录页背景图片
+     * 获取登录页配置
      * 
      * @return Response 
      */
-    public function getBackground(Request $request): Response
+    public function getConfig(Request $request): Response
     {
         $param = $request->data;
-        sublog('积分商城', '获取登录页背景图片', $param);
-        sublog('积分商城', '获取登录页背景图片', '===================');
+        sublog('积分商城', '获取登录页配置', $param);
+        sublog('积分商城', '获取登录页配置', '===================');
         // 获取数据
-        $config = ShopConfig::where('title', 'login-background-image')->first([
-            'content' => 'content'
-        ]);
+        $config = self::getShopConfig();
         // 返回数据
         return success($request, [
-            'background' => !empty($config->content) ? getImageUrl($config->content) : null
+            'background' => !empty($config['login-background-image']) ? getImageUrl($config['login-background-image']) : null,
+            'password' => isset($config['user-login-password']) ? ($config['user-login-password'] == 0 ? false : true) : true
         ]);
     }
 
@@ -159,9 +156,7 @@ class LoginController extends GeneralMethod
         sublog('积分商城', '获取我的信息', $user_vips);
         sublog('积分商城', '获取我的信息', '===================');
         // 获取链接
-        $config = ShopConfig::where('title', 'live-streaming-link')->first([
-            'content' => 'content'
-        ]);
+        $config = self::getShopConfig();
         // 返回处理
         return success($request, [
             'uid' => $user_vips->uid,
@@ -169,7 +164,7 @@ class LoginController extends GeneralMethod
             'point' => $user_vips->point,
             'type' => UserVipsEnums\VipType::from($user_vips->vip_type)->label(),
             'avatar' => getImageUrl($user_vips->avatar),
-            'link' => !empty($config->content) ? $config->content : 'javascript:;',
+            'link' => !empty($config['live-streaming-link']) ? $config['live-streaming-link'] : 'javascript:;',
             'icon' => [
                 'pay_log' => getImageUrl('icon/pay_log.png'),
                 'convertible' => getImageUrl('icon/convertible.png'),
