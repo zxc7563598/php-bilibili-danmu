@@ -3,6 +3,9 @@
 # 设置日志路径（可选）
 LOG_FILE="$PWD/runtime/logs/script.log"
 
+# 删除原有路径
+rm -rf $PWD/public/shop
+
 # 拉取项目
 echo "正在拉取项目..." >> $LOG_FILE 2>&1
 git clone https://github.com/zxc7563598/vue-bilibili-danmu-shop.git $PWD/public/shop >> $LOG_FILE 2>&1
