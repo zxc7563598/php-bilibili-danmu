@@ -60,7 +60,7 @@ class ApiAuthCheck implements MiddlewareInterface
         $whitelisting = [
             '/api/shop/login/get-user-vip',
             '/api/shop/login/perform-login',
-            '/api/shop/login/get-background',
+            '/api/shop/login/get-config',
             '/api/shop/login/get-theme-color'
         ];
         if (!in_array($path, $whitelisting)) {
