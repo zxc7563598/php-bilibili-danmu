@@ -31,12 +31,10 @@ class UserController extends GeneralMethod
         sublog('积分商城', '获取个人中心&意见反馈页背景图片', $param);
         sublog('积分商城', '获取个人中心&意见反馈页背景图片', '===================');
         // 获取数据
-        $config = ShopConfig::where('title', 'personal-background-image')->first([
-            'content' => 'content'
-        ]);
+        $config = self::getShopConfig();
         // 返回数据
         return success($request, [
-            'background' => !empty($config->content) ? getImageUrl($config->content) : null
+            'background' => !empty($config['personal-background-image']) ? getImageUrl($config['personal-background-image']) : null
         ]);
     }
 
@@ -196,20 +194,7 @@ class UserController extends GeneralMethod
         // 获取数据
         $sn = $user_vips->created_at->timezone(config('app')['default_timezone'])->format('Ymd') . Tools\Str::padString(0, $user_vips->user_id);
         // 获取配置信息
-        $config_database = ShopConfig::whereIn('title', [
-            'protocols-surname',
-            'protocols-uid',
-            'protocols-signature',
-            'protocols-content',
-            'protocols-name'
-        ])->get([
-            'title' => 'title',
-            'content' => 'content'
-        ]);
-        $config = [];
-        foreach ($config_database as $_config) {
-            $config[$_config->title] = $_config->content;
-        }
+        $config = self::getShopConfig();
         // 返回信息
         return success($request, [
             'sn' => $sn,
