@@ -394,7 +394,7 @@
             },
 
             // 存储信息
-            saveData(notify = true) {
+            saveData() {
                 this.loading = true;
                 const data = this.form;
                 const signature = this.generateSignature(data);
@@ -404,19 +404,17 @@
                 }).then(response => {
                     this.loading = false;
                     if (response.data.code === 0) {
-                        if (notify) {
+                        if (response.data.data.shell) {
+                            this.showNotification('存储成功，正在构建商城，大概需要30秒左右，请稍后', 'success');
+                        } else {
                             this.showNotification('存储成功', 'success');
                         }
                     } else {
-                        if (notify) {
-                            this.showNotification(response.data.message, 'warning');
-                        }
+                        this.showNotification(response.data.message, 'warning');
                     }
                 }).catch(() => {
                     this.loading = false;
-                    if (notify) {
-                        this.showNotification('请求失败，请稍后重试', 'error');
-                    }
+                    this.showNotification('请求失败，请稍后重试', 'error');
                 });
             },
 
@@ -431,25 +429,7 @@
                 this.form.system_aes_key = this.getRandomString(16)
                 this.form.system_aes_iv = this.getRandomString(16)
                 this.form.system_key = this.getRandomString(32)
-                this.saveData(false);
-                // 构建包
-                const data = {};
-                const signature = this.generateSignature(data);
-                axios.post('/api/points-mall/system-configuration/build-shop', data, {
-                    headers: { 'X-Signature': signature },
-                    timeout: 100000
-                }).then(response => {
-                    this.buildLoading = false;
-                    if (response.data.code === 0) {
-                        this.showNotification('创建成功', 'success');
-                        this.getData();
-                    } else {
-                        this.showNotification(response.data.message, 'warning');
-                    }
-                }).catch(() => {
-                    this.buildLoading = false;
-                    this.showNotification('请求失败，请稍后重试', 'error');
-                });
+                this.saveData();
             },
 
             // 获取随机字符串
