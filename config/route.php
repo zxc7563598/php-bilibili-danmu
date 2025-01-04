@@ -78,7 +78,7 @@ Route::group('/api/robot', function () {
 // API接口
 Route::group('/api/shop', function () {
     Route::post('/login/get-theme-color', [app\controller\shop\LoginController::class, 'getThemeColor']); // 获取主题色
-    Route::post('/login/get-background', [app\controller\shop\LoginController::class, 'getBackground']); // 获取背景图片
+    Route::post('/login/get-config', [app\controller\shop\LoginController::class, 'getConfig']); // 获取登录配置
     Route::post('/login/get-user-vip', [app\controller\shop\LoginController::class, 'getUserVip']); // 获取用户是否存在
     Route::post('/login/perform-login', [app\controller\shop\LoginController::class, 'performLogin']); // 执行登陆
     Route::post('/login/logout', [app\controller\shop\LoginController::class, 'logout']); // 退出登录
