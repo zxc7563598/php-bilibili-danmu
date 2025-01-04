@@ -54,6 +54,11 @@ if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
 
     log_message "成功获取最新代码."
 
+    # 更新数据库
+    vendor/bin/phinx migrate >> $LOG_FILE 2>&1
+
+    log_message "数据库完成更新."
+
     # 停止 Webman 服务
     log_message "停止项目..."
     php start.php stop >> $LOG_FILE 2>&1
