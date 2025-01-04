@@ -148,37 +148,18 @@ class SystemConfigurationController extends GeneralMethod
         // 重启系统（发送信号）
         posix_kill(posix_getppid(), SIGUSR1);
         // 重新构建VUE
+        $shell = false;
         if ($shouldExecuteCode) {
-            // 定义脚本路径并执行
+            // 定义脚本路径
             $scriptPath = base_path() . '/scripts/build_vue.sh';
-            exec("sh $scriptPath", $output, $return_var);
-            // 判断脚本执行结果
-            if ($return_var !== 0) {
-                return fail($request, 900007);
-            }
+            // 将脚本放到后台执行
+            $command = "sh $scriptPath > /dev/null 2>&1 &";
+            exec($command);
+            $shell = true;
         }
         // 返回数据
-        return success($request, []);
-    }
-
-    /**
-     * 构建积分商城
-     * 
-     * @return Response 
-     */
-    public function buildShop(Request $request)
-    {
-        // 定义脚本路径并执行
-        $scriptPath = base_path() . '/scripts/build_vue.sh';
-        exec("sh $scriptPath", $output, $return_var);
-        // 判断脚本执行结果
-        if ($return_var !== 0) {
-            return fail($request, 900007);
-        }
-        // 返回成功响应
         return success($request, [
-            'output' => $output,
-            'return_var' => $return_var
+            'shell' => $shell
         ]);
     }
 }
