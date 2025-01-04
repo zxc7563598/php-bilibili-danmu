@@ -38,7 +38,6 @@ Route::group('/api/points-mall', function () {
     Route::any('/system-configuration/get-data', [app\controller\shop\management\SystemConfigurationController::class, 'getData']);
     Route::any('/system-configuration/get-data-qrcode', [app\controller\shop\management\SystemConfigurationController::class, 'getDataQrCode']);
     Route::any('/system-configuration/set-data', [app\controller\shop\management\SystemConfigurationController::class, 'setData']);
-    Route::any('/system-configuration/build-shop', [app\controller\shop\management\SystemConfigurationController::class, 'buildShop']);
     Route::any('/mall-configuration/get-data', [app\controller\shop\management\MallConfigurationController::class, 'getData']);
     Route::any('/mall-configuration/set-data', [app\controller\shop\management\MallConfigurationController::class, 'setData']);
     Route::any('/mall-configuration/upload-images', [app\controller\shop\management\MallConfigurationController::class, 'uploadImages']);
