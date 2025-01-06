@@ -6,7 +6,6 @@
 .env
 /tests/tmp
 /tests/.phpunit.result.cache
-/public/ssl/
 /public/qrcode.png
 /public/qrcode/
 /public/config/
