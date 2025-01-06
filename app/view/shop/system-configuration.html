@@ -407,7 +407,7 @@
                         if (response.data.data.shell) {
                             this.showNotification('存储成功，正在构建商城，大概需要30秒左右，请稍后', 'success');
                             setTimeout(() => {
-                                this.getData()
+                                window.location.reload();
                             }, 10000);
                         } else {
                             this.showNotification('存储成功', 'success');
