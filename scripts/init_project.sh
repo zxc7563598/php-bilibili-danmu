@@ -70,10 +70,10 @@ EOF
     echo "MySQL setup complete."
     echo "Database: ${DB_NAME}"
     echo "User Password: ${DB_PASSWORD}"
-
-    # 构建数据库
-    php vendor/bin/phinx migrate -e development
-
-    # 启动项目
-    php start.php start -d
 fi
+
+# 构建数据库
+php vendor/bin/phinx migrate -e development
+
+# 启动项目
+php start.php start -d
