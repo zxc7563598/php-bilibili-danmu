@@ -169,7 +169,7 @@ class LoginController extends GeneralMethod
             'uname' => $user_vips->name,
             'point' => $user_vips->point,
             'type' => UserVipsEnums\VipType::from($user_vips->vip_type)->label(),
-            'avatar' => getImageUrl($user_vips->avatar),
+            'avatar' => !empty($user_vips->avatar) ? getImageUrl($user_vips->avatar) : getImageUrl('shop-config/supreme.png'),
             'link' => !empty($config['live-streaming-link']) ? $config['live-streaming-link'] : 'javascript:;',
             'icon' => [
                 'pay_log' => getImageUrl('icon/pay_log.png'),
