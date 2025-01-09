@@ -3,6 +3,7 @@
 namespace process;
 
 use app\core\LoginPublicMethods;
+use app\core\UserPublicMethods;
 use app\model\PaymentRecords;
 use app\model\ShopConfig;
 use app\model\UserVips;
@@ -323,48 +324,13 @@ class Bilibili
                             0
                         );
                         // 上舰
-                        $config = ShopConfig::where('title', 'listening-open-vip')->first([
-                            'content' => 'content'
-                        ]);
-                        if (isset($config->content) && $config->content == 1) {
-                            $user_vip = UserVips::where('uid', $payload['payload']['data']['uid'])->first();
-                            if (empty($user_vip)) {
-                                LoginPublicMethods::userRegister($payload['payload']['data']['uid']);
-                                $user_vip = UserVips::where('uid', $payload['payload']['data']['uid'])->first();
-                            }
-                            if (!empty($user_vip)) {
-                                switch (intval($payload['payload']['data']['guard_level'])) {
-                                    case 1: // 总督
-                                        $point = ShopConfig::where('title', 'vip-lv3-bonus-points')->first([
-                                            'content' => 'content'
-                                        ]);
-                                        $vip_type = PaymentRecordsEnums\VipType::Lv3->value;
-                                        break;
-                                    case 2: // 提督
-                                        $point = ShopConfig::where('title', 'vip-lv2-bonus-points')->first([
-                                            'content' => 'content'
-                                        ]);
-                                        $vip_type = PaymentRecordsEnums\VipType::Lv2->value;
-                                        break;
-                                    case 3: // 舰长
-                                        $point = ShopConfig::where('title', 'vip-lv1-bonus-points')->first([
-                                            'content' => 'content'
-                                        ]);
-                                        $vip_type = PaymentRecordsEnums\VipType::Lv1->value;
-                                        break;
-                                }
-                                $payment_records = new PaymentRecords();
-                                $payment_records->user_id = $user_vip->user_id;
-                                $payment_records->vip_type = $vip_type;
-                                $payment_records->amount = intval($payload['payload']['data']['price'] / 10);
-                                $payment_records->point = $point->content;
-                                $payment_records->pre_point = $user_vip->point;
-                                $payment_records->after_point = $payment_records->pre_point + $point->content;
-                                $payment_records->live_key = !empty(Redis::get('bilibili_live_key')) ? Redis::get('bilibili_live_key') : null;
-                                $payment_records->payment_at = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
-                                $payment_records->save();
-                            }
-                        }
+                        $uid = $payload['payload']['data']['uid'];
+                        $name = $payload['payload']['data']['username'];
+                        $guard_level = $payload['payload']['data']['guard_level'];
+                        $amount = intval($payload['payload']['data']['price'] / 10);
+                        $payment_at = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
+                        $live_key = !empty(Redis::get('bilibili_live_key')) ? Redis::get('bilibili_live_key') : null;
+                        UserPublicMethods::userOpensVip($uid, $name, $guard_level, $amount, $payment_at, $live_key);
                         break;
                     case 'INTERACT_WORD': // 直播间互动
                         switch (intval($payload['payload']['data']['msg_type'])) {
