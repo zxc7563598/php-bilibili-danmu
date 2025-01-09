@@ -184,6 +184,12 @@ function pageToArray($list): array
  */
 function writeLinesToFile($filePath, $line)
 {
+    $directory = dirname($filePath);
+    if (!is_dir($directory)) {
+        if (!mkdir($directory, 0777, true) && !is_dir($directory)) {
+            throw new \Exception("无法创建目录: " . $directory);
+        }
+    }
     $file = fopen($filePath, 'w');
     if ($file === false) {
         throw new \Exception("无法打开文件: " . $filePath);
