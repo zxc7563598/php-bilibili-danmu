@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Phinx\Db\Adapter\MysqlAdapter;
 use Phinx\Migration\AbstractMigration;
 
-final class CreateGoods extends AbstractMigration
+final class CreateLives extends AbstractMigration
 {
     /**
      * Migrate Up.
