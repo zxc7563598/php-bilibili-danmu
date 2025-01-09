@@ -191,3 +191,123 @@ function writeLinesToFile($filePath, $line)
     fwrite($file, $line . PHP_EOL);
     fclose($file);
 }
+
+/**
+ * 读取文件并统计发言次数
+ *
+ * @param string $filePath 文本文件路径
+ * @param integer $num 需要获取多少名
+ * 
+ * @return array 
+ */
+function getTopSpeakers(string $filePath, int $num): array
+{
+    if (!file_exists($filePath)) {
+        throw new Exception("文件不存在: $filePath");
+    }
+
+    $userStats = []; // 用户统计数据
+    // 打开文件逐行读取
+    $file = fopen($filePath, 'r');
+    if ($file === false) {
+        throw new Exception("无法打开文件: $filePath");
+    }
+    $count = 0;
+    while (($line = fgets($file)) !== false) {
+        $data = json_decode(trim($line), true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            continue; // 跳过解析失败的行
+        }
+        $uid = $data['uid'];
+        $uname = $data['uname'];
+        $time = $data['time'];
+        if (!isset($userStats[$uid])) {
+            // 初始化用户数据
+            $userStats[$uid] = [
+                'uid' => $uid,
+                'uname' => $uname,
+                'count' => 0,
+                'firstTime' => $time,
+            ];
+        }
+        // 更新发言次数和最早时间
+        $userStats[$uid]['count']++;
+        if ($time < $userStats[$uid]['firstTime']) {
+            $userStats[$uid]['firstTime'] = $time;
+        }
+        $count++;
+    }
+    fclose($file);
+    // 按发言次数降序排序，如果次数相同按最早时间升序
+    usort($userStats, function ($a, $b) {
+        if ($a['count'] === $b['count']) {
+            return $a['firstTime'] <=> $b['firstTime'];
+        }
+        return $b['count'] <=> $a['count'];
+    });
+    // 返回数据
+    return [
+        'count' => $count,
+        'rankings' => array_slice($userStats, 0, $num)
+    ];
+}
+
+/**
+ * 读取文件并统计总金额
+ *
+ * @param string $filePath 文本文件路径
+ * @param integer $num 需要获取多少名
+ * 
+ * @return array 
+ */
+function getTopSpenders(string $filePath, int $num): array
+{
+    if (!file_exists($filePath)) {
+        throw new Exception("文件不存在: $filePath");
+    }
+    $userStats = []; // 用户统计数据
+    // 打开文件逐行读取
+    $file = fopen($filePath, 'r');
+    if ($file === false) {
+        throw new Exception("无法打开文件: $filePath");
+    }
+    $count = 0;
+    while (($line = fgets($file)) !== false) {
+        $data = json_decode(trim($line), true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            continue; // 跳过解析失败的行
+        }
+        $uid = $data['uid'];
+        $uname = $data['uname'];
+        $price = $data['price'];
+        $time = $data['time'];
+        if (!isset($userStats[$uid])) {
+            // 初始化用户数据
+            $userStats[$uid] = [
+                'uid' => $uid,
+                'uname' => $uname,
+                'totalPrice' => 0,
+                'firstTime' => $time,
+            ];
+        }
+        // 累加金额和更新最早时间
+        $userStats[$uid]['totalPrice'] += $price;
+        if ($time < $userStats[$uid]['firstTime']) {
+            $userStats[$uid]['firstTime'] = $time;
+        }
+        $count++;
+    }
+    fclose($file);
+    // 按总金额降序排序，如果金额相同按最早时间升序
+    usort($userStats, function ($a, $b) {
+        if ($a['totalPrice'] === $b['totalPrice']) {
+            return $a['firstTime'] <=> $b['firstTime'];
+        }
+        return $b['totalPrice'] <=> $a['totalPrice'];
+    });
+    // 返回数据
+    return [
+        'count' => $count,
+        'rankings' => array_slice($userStats, 0, $num)
+    ];
+}
