@@ -246,9 +246,9 @@ class Bilibili
                     case 'ROOM_LOCK': // 直播间被封
                     case 'PREPARING': // 下播
                         $config = ShopConfig::whereIn('title', [
-                            'enable-aggregate-mail' => 'enable-aggregate-mail',
-                            'email-address' => 'email-address',
-                            'address-as' => 'address-as'
+                            'enable-aggregate-mail',
+                            'email-address',
+                            'address-as'
                         ])->get([
                             'title' => 'title',
                             'content' => 'content'
