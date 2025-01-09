@@ -173,3 +173,21 @@ function pageToArray($list): array
     $result['data'] = $data['data']; // 数据
     return $result;
 }
+
+/**
+ * 逐行写入文件
+ * 
+ * @param string $filePath 文件路径
+ * @param string $line 内容
+ * 
+ * @return void 
+ */
+function writeLinesToFile($filePath, $line)
+{
+    $file = fopen($filePath, 'w');
+    if ($file === false) {
+        throw new \Exception("无法打开文件: " . $filePath);
+    }
+    fwrite($file, $line . PHP_EOL);
+    fclose($file);
+}
