@@ -5,6 +5,7 @@ namespace app\core;
 use app\controller\GeneralMethod;
 use app\model\Goods;
 use app\model\GoodSubs;
+use app\model\Lives;
 use app\model\PaymentRecords;
 use app\model\RedemptionRecords;
 use app\model\ShopConfig;
@@ -175,15 +176,13 @@ class UserPublicMethods extends GeneralMethod
     /**
      * 下播邮件发送
      * 
-     * @param string $bilibili_live_key live_key
-     * @param string $starting_time 直播开始时间
-     * @param string $end_time 直播结束时间
+     * @param string $live_id 直播记录id
      * 
      * @return void 
      */
-    public static function aggregateMail($bilibili_live_key, $starting_time, $end_time)
+    public static function aggregateMail($live_id)
     {
-
+        // 获取配置信息
         $config = ShopConfig::whereIn('title', [
             'enable-aggregate-mail',
             'email-address',
@@ -198,36 +197,66 @@ class UserPublicMethods extends GeneralMethod
         }
         if (!empty($shop_config['enable-aggregate-mail']) && $shop_config['enable-aggregate-mail']) {
             if (!empty($shop_config['email-address']) && !empty($shop_config['address-as'])) {
-                // 获取数据
-                $open_list = [];
-                if (!empty($bilibili_live_key)) {
-                    $payment_records = PaymentRecords::join('bl_user_vips', 'bl_user_vips.user_id', '=', 'bl_payment_records.user_id')
-                        ->where('bl_payment_records.live_key', $bilibili_live_key)
-                        ->get([
-                            'uid' => 'bl_user_vips.uid',
-                            'name' => 'bl_user_vips.name',
-                            'time' => 'bl_payment_records.payment_at as time',
-                            'type' => 'bl_payment_records.vip_type as type'
-                        ]);
-                    foreach ($payment_records as $_payment_records) {
-                        $open_list[] = [
-                            'uid' => $_payment_records->uid,
-                            'name' => $_payment_records->name,
-                            'time' => Carbon::parse($_payment_records->time)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
-                            'type' => PaymentRecordsEnums\VipType::from($_payment_records->type)->label()
-                        ];
-                    }
-                }
                 // 获取直播信息
+                $lives = Lives::where('live_id', $live_id)->first([
+                    'live_id' => 'live_id',
+                    'live_key' => 'live_key',
+                    'created_at' => 'created_at',
+                    'end_time' => 'end_time',
+                    'danmu_path' => 'danmu_path',
+                    'gift_path' => 'gift_path'
+                ]);
+                // 获取大航海数据
+                $open_list = [];
+                $payment_records = PaymentRecords::join('bl_user_vips', 'bl_user_vips.user_id', '=', 'bl_payment_records.user_id')
+                    ->where('bl_payment_records.live_key', $lives->live_key)
+                    ->get([
+                        'uid' => 'bl_user_vips.uid',
+                        'name' => 'bl_user_vips.name',
+                        'time' => 'bl_payment_records.payment_at as time',
+                        'type' => 'bl_payment_records.vip_type as type'
+                    ]);
+                foreach ($payment_records as $_payment_records) {
+                    $open_list[] = [
+                        'uid' => $_payment_records->uid,
+                        'name' => $_payment_records->name,
+                        'time' => Carbon::parse($_payment_records->time)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
+                        'type' => PaymentRecordsEnums\VipType::from($_payment_records->type)->label()
+                    ];
+                }
+                // 分析弹幕数据
+                $danmu_list = [];
+                $getTopSpeakers = getTopSpeakers(base_path() . '/' . $lives->danmu_path, 10);
+                foreach ($getTopSpeakers['rankings'] as $_getTopSpeakers) {
+                    $danmu_list[] = [
+                        'uid' => $_getTopSpeakers['uid'],
+                        'uname' => $_getTopSpeakers['uname'],
+                        'count' => $_getTopSpeakers['count']
+                    ];
+                }
+                // 分析礼物数据
+                $gift_list = [];
+                $getTopSpenders = getTopSpenders(base_path() . '/' . $lives->gift_path, 10);
+                foreach ($getTopSpenders['rankings'] as $_getTopSpenders) {
+                    $gift_list[] = [
+                        'uid' => $_getTopSpenders['uid'],
+                        'uname' => $_getTopSpenders['uname'],
+                        'count' => round(($_getTopSpenders['totalPrice'] / 10), 2)
+                    ];
+                }
                 // 发送邮件
                 Tools\HttpClient::sendPostRequest('https://bilibili-email-xdobqxxrfo.cn-hongkong.fcapp.run/goods-email', [
                     'Content-Type: application/json'
                 ], json_encode([
                     'mail' => $shop_config['email-address'],
                     'name' => $shop_config['address-as'],
-                    'starting_time' => Carbon::parse($starting_time)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
-                    'end_time' => Carbon::parse($end_time)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
-                    'open_list' => $open_list
+                    'starting_time' => $lives->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
+                    'end_time' => Carbon::parse($lives->end_time)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
+                    'open_list' => $open_list,
+                    'danmu_list' => $danmu_list,
+                    'danmu_count' => $getTopSpeakers['count'],
+                    'gift_list' => $gift_list,
+                    'gift_count' => $getTopSpenders['count']
                 ]));
             }
         }

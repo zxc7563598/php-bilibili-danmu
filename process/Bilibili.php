@@ -248,8 +248,8 @@ class Bilibili
                         if (empty($lives)) {
                             $lives = new Lives();
                             $lives->live_key = $payload['payload']['live_key'];
-                            $lives->danmu_path = base_path() . '/runtime/logs/直播弹幕记录/' . $payload['payload']['live_key'] . '.log';
-                            $lives->gift_path = base_path() . '/runtime/logs/直播礼物记录/' . $payload['payload']['live_key'] . '.log';
+                            $lives->danmu_path = 'runtime/lives/直播弹幕记录/' . $payload['payload']['live_key'] . '.log';
+                            $lives->gift_path = 'runtime/lives/直播礼物记录/' . $payload['payload']['live_key'] . '.log';
                             $lives->save();
                         }
                         break;
@@ -262,14 +262,14 @@ class Bilibili
                             if (empty($lives)) {
                                 $lives = new Lives();
                                 $lives->live_key = Redis::get('bilibili_live_key');
-                                $lives->danmu_path = base_path() . '/runtime/logs/直播弹幕记录/' . Redis::get('bilibili_live_key') . '.log';
-                                $lives->gift_path = base_path() . '/runtime/logs/直播礼物记录/' . Redis::get('bilibili_live_key') . '.log';
+                                $lives->danmu_path = 'runtime/lives/直播弹幕记录/' . Redis::get('bilibili_live_key') . '.log';
+                                $lives->gift_path = 'runtime/lives/直播礼物记录/' . Redis::get('bilibili_live_key') . '.log';
                                 $lives->save();
                             }
                             $lives->end_time = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
                             $lives->save();
                             // 发送下播邮件
-                            UserPublicMethods::aggregateMail(Redis::get('bilibili_live_key'), $lives->created_at->timezone(config('app')['default_timezone'])->timestamp, $lives->end_time);
+                            UserPublicMethods::aggregateMail($lives->live_id);
                         }
                         // 清空下播信息
                         Redis::del('bilibili_live_key');
@@ -291,14 +291,15 @@ class Bilibili
                         );
                         // 记录信息
                         if (Redis::get('bilibili_live_key')) {
-                            $filePath = base_path() . '/runtime/logs/直播礼物记录/' . Redis::get('bilibili_live_key') . '.log';
+                            $filePath = base_path() . '/runtime/lives/直播礼物记录/' . Redis::get('bilibili_live_key') . '.log';
                             $line = json_encode([
                                 'uid' => $payload['payload']['data']['uid'],
                                 'uname' => $payload['payload']['data']['uname'],
                                 'gift_id' => $payload['payload']['data']['giftId'],
                                 'gift_name' => $payload['payload']['data']['giftName'],
                                 'price' => intval($payload['payload']['data']['price'] / 100),
-                                'num' => $payload['payload']['data']['num']
+                                'num' => $payload['payload']['data']['num'],
+                                'time' => Carbon::now()->timezone(config('app')['default_timezone'])->timestamp
                             ], JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION);
                             writeLinesToFile($filePath, $line);
                         }
@@ -326,14 +327,15 @@ class Bilibili
                         UserPublicMethods::userOpensVip($uid, $name, $guard_level, $amount, $payment_at, $live_key);
                         // 记录信息
                         if (Redis::get('bilibili_live_key')) {
-                            $filePath = base_path() . '/runtime/logs/直播礼物记录/' . Redis::get('bilibili_live_key') . '.log';
+                            $filePath = base_path() . '/runtime/lives/直播礼物记录/' . Redis::get('bilibili_live_key') . '.log';
                             $line = json_encode([
                                 'uid' => $payload['payload']['data']['uid'],
                                 'uname' => $payload['payload']['data']['username'],
                                 'gift_id' => $payload['payload']['data']['gift_id'],
                                 'gift_name' => $payload['payload']['data']['gift_name'],
                                 'price' => intval($payload['payload']['data']['price'] / 100),
-                                'num' => $payload['payload']['data']['num']
+                                'num' => $payload['payload']['data']['num'],
+                                'time' => Carbon::now()->timezone(config('app')['default_timezone'])->timestamp
                             ], JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION);
                             writeLinesToFile($filePath, $line);
                         }
@@ -376,7 +378,7 @@ class Bilibili
                         );
                         // 记录信息
                         if (Redis::get('bilibili_live_key')) {
-                            $filePath = base_path() . '/runtime/logs/直播弹幕记录/' . Redis::get('bilibili_live_key') . '.log';
+                            $filePath = base_path() . '/runtime/lives/直播弹幕记录/' . Redis::get('bilibili_live_key') . '.log';
                             $line = json_encode([
                                 'uid' => $payload['payload']['info'][2][0],
                                 'uname' => $payload['payload']['info'][2][1],
