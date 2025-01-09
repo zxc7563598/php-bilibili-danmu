@@ -7,11 +7,13 @@ use app\model\Goods;
 use app\model\GoodSubs;
 use app\model\PaymentRecords;
 use app\model\RedemptionRecords;
+use app\model\ShopConfig;
 use app\model\UserAddress;
 use app\model\UserVips;
 use resource\enums\GoodsEnums;
 use resource\enums\UserVipsEnums;
 use resource\enums\UserAddressEnums;
+use resource\enums\PaymentRecordsEnums;
 use resource\enums\RedemptionRecordsEnums;
 use yzh52521\mailer\Mailer;
 
@@ -101,32 +103,64 @@ class UserPublicMethods extends GeneralMethod
      *
      * @param string $uid uid
      * @param string $name 名称
-     * @param string $vip_type 开通类型
+     * @param string $guard_level 开通类型
      * @param string $amount 金额
-     * @param string $point 增加积分
      * @param string $payment_at 上舰时间
+     * @param string $live_key 上舰时间
      * 
      * @return void
      */
-    public static function userOpensVip($uid, $name, $vip_type, $amount, $point, $payment_at)
+    public static function userOpensVip($uid, $name, $guard_level, $amount, $payment_at, $live_key)
     {
-        $user_vips = UserVips::where('uid', $uid)->first();
-        if (empty($user_vips)) {
-            LoginPublicMethods::userRegister($uid, $name);
-            $user_vips = UserVips::where('uid', $uid)->first();
+        $config = ShopConfig::whereIn('title', [
+            'listening-open-vip',
+            'vip-lv3-bonus-points',
+            'vip-lv2-bonus-points',
+            'vip-lv1-bonus-points'
+        ])->get([
+            'title' => 'title',
+            'content' => 'content'
+        ]);
+        $shop_config = [];
+        foreach ($config as $_config) {
+            $shop_config[$_config->title] = $_config->content;
         }
-        $user_vips->name = $name;
-        $user_vips->save();
-        // 增加兑换记录
-        $payment_records = new PaymentRecords();
-        $payment_records->user_id = $user_vips->user_id;
-        $payment_records->vip_type = $vip_type;
-        $payment_records->amount = $amount;
-        $payment_records->point = $point;
-        $payment_records->pre_point = $user_vips->point;
-        $payment_records->after_point = $user_vips->point + $payment_records->point;
-        $payment_records->payment_at = $payment_at;
-        $payment_records->save();
+        if (!empty($shop_config['listening-open-vip']) && $shop_config['listening-open-vip'] == 1) {
+            $user_vips = UserVips::where('uid', $uid)->first();
+            if (empty($user_vips)) {
+                LoginPublicMethods::userRegister($uid, $name);
+                $user_vips = UserVips::where('uid', $uid)->first();
+            }
+            $user_vips->name = $name;
+            $user_vips->save();
+            // 获取需要增加的积分
+            $point = 0;
+            switch ($guard_level) {
+                case 1: // 总督
+                    $point = !empty($shop_config['vip-lv3-bonus-points']) ? $shop_config['vip-lv3-bonus-points'] : 0;
+                    $vip_type = PaymentRecordsEnums\VipType::Lv3->value;
+                    break;
+                case 2: // 提督
+                    $point = !empty($shop_config['vip-lv2-bonus-points']) ? $shop_config['vip-lv2-bonus-points'] : 0;
+                    $vip_type = PaymentRecordsEnums\VipType::Lv2->value;
+                    break;
+                case 3: // 舰长
+                    $point = !empty($shop_config['vip-lv1-bonus-points']) ? $shop_config['vip-lv1-bonus-points'] : 0;
+                    $vip_type = PaymentRecordsEnums\VipType::Lv1->value;
+                    break;
+            }
+            // 增加兑换记录
+            $payment_records = new PaymentRecords();
+            $payment_records->user_id = $user_vips->user_id;
+            $payment_records->vip_type = $vip_type;
+            $payment_records->amount = intval($amount);
+            $payment_records->point = $point;
+            $payment_records->pre_point = $user_vips->point;
+            $payment_records->after_point = $payment_records->pre_point + $point;
+            $payment_records->live_key = $live_key;
+            $payment_records->payment_at = $payment_at;
+            $payment_records->save();
+        }
         // 返回成功
         return true;
     }
