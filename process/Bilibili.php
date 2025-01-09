@@ -188,7 +188,7 @@ class Bilibili
                 echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "连续websocket心跳发送" . "\n";
             }
         });
-        $this->sendMessageTimer = Timer::add(3, function () {
+        $this->sendMessageTimer = Timer::add(5, function () {
             SendMessage::processQueue();
         });
         if ($this->reconnectTimer !== null) {
