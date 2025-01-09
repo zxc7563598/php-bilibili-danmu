@@ -229,13 +229,13 @@ function getTopSpeakers(string $filePath, int $num): array
                 'count' => 0,
                 'firstTime' => $time,
             ];
+            $count++;
         }
         // 更新发言次数和最早时间
         $userStats[$uid]['count']++;
         if ($time < $userStats[$uid]['firstTime']) {
             $userStats[$uid]['firstTime'] = $time;
         }
-        $count++;
     }
     fclose($file);
     // 按发言次数降序排序，如果次数相同按最早时间升序
@@ -289,13 +289,13 @@ function getTopSpenders(string $filePath, int $num): array
                 'totalPrice' => 0,
                 'firstTime' => $time,
             ];
+            $count++;
         }
         // 累加金额和更新最早时间
         $userStats[$uid]['totalPrice'] += $price;
         if ($time < $userStats[$uid]['firstTime']) {
             $userStats[$uid]['firstTime'] = $time;
         }
-        $count++;
     }
     fclose($file);
     // 按总金额降序排序，如果金额相同按最早时间升序
