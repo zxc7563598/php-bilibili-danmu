@@ -239,12 +239,60 @@ class Bilibili
                 switch ($payload['payload']['cmd']) {
                     case 'LIVE': // 直播开始
                         Redis::set('bilibili_live_key', $payload['payload']['live_key']);
+                        Redis::set('bilibili_live_create', Carbon::now()->timezone(config('app')['default_timezone'])->timestamp);
                         Redis::del('bilibili_send_sequence');
                         break;
                     case 'CUT_OFF': // 直播被超管切断
                     case 'ROOM_LOCK': // 直播间被封
                     case 'PREPARING': // 下播
+                        $config = ShopConfig::whereIn('title', [
+                            'enable-aggregate-mail' => 'enable-aggregate-mail',
+                            'email-address' => 'email-address',
+                            'address-as' => 'address-as'
+                        ])->get([
+                            'title' => 'title',
+                            'content' => 'content'
+                        ]);
+                        $shop_config = [];
+                        foreach ($config as $_config) {
+                            $shop_config[$_config->title] = $_config->content;
+                        }
+                        if (!empty($shop_config['enable-aggregate-mail']) && $shop_config['enable-aggregate-mail']) {
+                            if (!empty($shop_config['email-address']) && !empty($shop_config['address-as'])) {
+                                // 获取数据
+                                $open_list = [];
+                                if (!empty(Redis::get('bilibili_live_key'))) {
+                                    $payment_records = PaymentRecords::join('bl_user_vips', 'bl_user_vips.user_id', '=', 'bl_payment_records.user_id')
+                                        ->where('bl_payment_records.live_key', Redis::get('bilibili_live_key'))
+                                        ->get([
+                                            'uid' => 'bl_user_vips.uid',
+                                            'name' => 'bl_user_vips.name',
+                                            'time' => 'bl_payment_records.payment_at as time',
+                                            'type' => 'bl_payment_records.vip_type as type'
+                                        ]);
+                                    foreach ($payment_records as $_payment_records) {
+                                        $open_list[] = [
+                                            'uid' => $_payment_records->uid,
+                                            'name' => $_payment_records->name,
+                                            'time' => Carbon::parse($_payment_records->time)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
+                                            'type' => PaymentRecordsEnums\VipType::from($_payment_records->type)->label()
+                                        ];
+                                    }
+                                }
+                                // 发送邮件
+                                Tools\HttpClient::sendPostRequest('https://bilibili-email-xdobqxxrfo.cn-hongkong.fcapp.run/goods-email', [
+                                    'Content-Type: application/json'
+                                ], json_encode([
+                                    'mail' => $shop_config['email-address'],
+                                    'name' => $shop_config['address-as'],
+                                    'starting_time' => Carbon::parse(Redis::get('bilibili_live_create'))->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
+                                    'end_time' => Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
+                                    'open_list' => $open_list
+                                ]));
+                            }
+                        }
                         Redis::del('bilibili_live_key');
+                        Redis::del('bilibili_live_create');
                         Redis::del('bilibili_send_sequence');
                         break;
                     case 'SEND_GIFT': // 赠送礼物
@@ -312,6 +360,7 @@ class Bilibili
                                 $payment_records->point = $point->content;
                                 $payment_records->pre_point = $user_vip->point;
                                 $payment_records->after_point = $payment_records->pre_point + $point->content;
+                                $payment_records->live_key = !empty(Redis::get('bilibili_live_key')) ? Redis::get('bilibili_live_key') : null;
                                 $payment_records->payment_at = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
                                 $payment_records->save();
                             }
