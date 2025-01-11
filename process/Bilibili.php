@@ -266,6 +266,8 @@ class Bilibili
                                 $lives->gift_path = 'runtime/lives/直播礼物记录/' . Redis::get('bilibili_live_key') . '.log';
                                 $lives->save();
                             }
+                            $lives->danmu_num = countFileLines(base_path() . '/' . $lives->danmu_path);
+                            $lives->gift_num = countFileLines(base_path() . '/' . $lives->gift_path);
                             $lives->end_time = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
                             $lives->save();
                             // 发送下播邮件
