@@ -190,7 +190,7 @@ function writeLinesToFile($filePath, $line)
             throw new \Exception("无法创建目录: " . $directory);
         }
     }
-    $file = fopen($filePath, 'w');
+    $file = fopen($filePath, 'a');
     if ($file === false) {
         throw new \Exception("无法打开文件: " . $filePath);
     }
