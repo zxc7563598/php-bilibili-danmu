@@ -317,3 +317,31 @@ function getTopSpenders(string $filePath, int $num): array
         'rankings' => array_slice($userStats, 0, $num)
     ];
 }
+
+/**
+ * 获取文件行数
+ *
+ * @param string $filePath 文本文件路径
+ * 
+ * @return integer 
+ */
+function countFileLines(string $filePath)
+{
+    if (!file_exists($filePath)) {
+        throw new Exception("文件不存在: $filePath");
+    }
+    // 打开文件逐行读取
+    $file = fopen($filePath, 'r');
+    if ($file === false) {
+        throw new Exception("无法打开文件: $filePath");
+    }
+    $count = 0;
+    while (($line = fgets($file)) !== false) {
+        json_decode(trim($line), true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            continue; // 跳过解析失败的行
+        }
+        $count++;
+    }
+    return $count;
+}
