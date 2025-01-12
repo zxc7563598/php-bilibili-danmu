@@ -230,7 +230,7 @@ class UserPublicMethods extends GeneralMethod
                 foreach ($getTopSpeakers['rankings'] as $_getTopSpeakers) {
                     $danmu_list[] = [
                         'uid' => $_getTopSpeakers['uid'],
-                        'uname' => $_getTopSpeakers['uname'],
+                        'name' => $_getTopSpeakers['uname'],
                         'count' => $_getTopSpeakers['count']
                     ];
                 }
@@ -240,7 +240,7 @@ class UserPublicMethods extends GeneralMethod
                 foreach ($getTopSpenders['rankings'] as $_getTopSpenders) {
                     $gift_list[] = [
                         'uid' => $_getTopSpenders['uid'],
-                        'uname' => $_getTopSpenders['uname'],
+                        'name' => $_getTopSpenders['uname'],
                         'count' => round(($_getTopSpenders['totalPrice'] / 10), 2)
                     ];
                 }
