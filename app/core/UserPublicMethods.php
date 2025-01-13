@@ -5,15 +5,25 @@ namespace app\core;
 use app\controller\GeneralMethod;
 use app\model\Goods;
 use app\model\GoodSubs;
+use app\model\Lives;
 use app\model\PaymentRecords;
 use app\model\RedemptionRecords;
+use app\model\ShopConfig;
 use app\model\UserAddress;
 use app\model\UserVips;
+use Carbon\Carbon;
+use Carbon\Exceptions\InvalidFormatException;
+use Carbon\Exceptions\InvalidTimeZoneException;
 use resource\enums\GoodsEnums;
 use resource\enums\UserVipsEnums;
 use resource\enums\UserAddressEnums;
+use resource\enums\PaymentRecordsEnums;
 use resource\enums\RedemptionRecordsEnums;
-use yzh52521\mailer\Mailer;
+use Hejunjie\Tools;
+use RuntimeException;
+use InvalidArgumentException;
+use ValueError;
+use TypeError;
 
 class UserPublicMethods extends GeneralMethod
 {
@@ -101,33 +111,154 @@ class UserPublicMethods extends GeneralMethod
      *
      * @param string $uid uid
      * @param string $name 名称
-     * @param string $vip_type 开通类型
+     * @param string $guard_level 开通类型
      * @param string $amount 金额
-     * @param string $point 增加积分
      * @param string $payment_at 上舰时间
+     * @param string $live_key 上舰时间
      * 
      * @return void
      */
-    public static function userOpensVip($uid, $name, $vip_type, $amount, $point, $payment_at)
+    public static function userOpensVip($uid, $name, $guard_level, $amount, $payment_at, $live_key)
     {
-        $user_vips = UserVips::where('uid', $uid)->first();
-        if (empty($user_vips)) {
-            LoginPublicMethods::userRegister($uid, $name);
-            $user_vips = UserVips::where('uid', $uid)->first();
+        $config = ShopConfig::whereIn('title', [
+            'listening-open-vip',
+            'vip-lv3-bonus-points',
+            'vip-lv2-bonus-points',
+            'vip-lv1-bonus-points'
+        ])->get([
+            'title' => 'title',
+            'content' => 'content'
+        ]);
+        $shop_config = [];
+        foreach ($config as $_config) {
+            $shop_config[$_config->title] = $_config->content;
         }
-        $user_vips->name = $name;
-        $user_vips->save();
-        // 增加兑换记录
-        $payment_records = new PaymentRecords();
-        $payment_records->user_id = $user_vips->user_id;
-        $payment_records->vip_type = $vip_type;
-        $payment_records->amount = $amount;
-        $payment_records->point = $point;
-        $payment_records->pre_point = $user_vips->point;
-        $payment_records->after_point = $user_vips->point + $payment_records->point;
-        $payment_records->payment_at = $payment_at;
-        $payment_records->save();
+        if (!empty($shop_config['listening-open-vip']) && $shop_config['listening-open-vip'] == 1) {
+            $user_vips = UserVips::where('uid', $uid)->first();
+            if (empty($user_vips)) {
+                LoginPublicMethods::userRegister($uid, $name);
+                $user_vips = UserVips::where('uid', $uid)->first();
+            }
+            $user_vips->name = $name;
+            $user_vips->save();
+            // 获取需要增加的积分
+            $point = 0;
+            switch ($guard_level) {
+                case 1: // 总督
+                    $point = !empty($shop_config['vip-lv3-bonus-points']) ? $shop_config['vip-lv3-bonus-points'] : 0;
+                    $vip_type = PaymentRecordsEnums\VipType::Lv3->value;
+                    break;
+                case 2: // 提督
+                    $point = !empty($shop_config['vip-lv2-bonus-points']) ? $shop_config['vip-lv2-bonus-points'] : 0;
+                    $vip_type = PaymentRecordsEnums\VipType::Lv2->value;
+                    break;
+                case 3: // 舰长
+                    $point = !empty($shop_config['vip-lv1-bonus-points']) ? $shop_config['vip-lv1-bonus-points'] : 0;
+                    $vip_type = PaymentRecordsEnums\VipType::Lv1->value;
+                    break;
+            }
+            // 增加兑换记录
+            $payment_records = new PaymentRecords();
+            $payment_records->user_id = $user_vips->user_id;
+            $payment_records->vip_type = $vip_type;
+            $payment_records->amount = intval($amount);
+            $payment_records->point = $point;
+            $payment_records->pre_point = $user_vips->point;
+            $payment_records->after_point = $payment_records->pre_point + $point;
+            $payment_records->live_key = $live_key;
+            $payment_records->payment_at = $payment_at;
+            $payment_records->save();
+        }
         // 返回成功
         return true;
+    }
+
+    /**
+     * 下播邮件发送
+     * 
+     * @param string $live_id 直播记录id
+     * 
+     * @return void 
+     */
+    public static function aggregateMail($live_id)
+    {
+        // 获取配置信息
+        $config = ShopConfig::whereIn('title', [
+            'enable-aggregate-mail',
+            'email-address',
+            'address-as'
+        ])->get([
+            'title' => 'title',
+            'content' => 'content'
+        ]);
+        $shop_config = [];
+        foreach ($config as $_config) {
+            $shop_config[$_config->title] = $_config->content;
+        }
+        if (!empty($shop_config['enable-aggregate-mail']) && $shop_config['enable-aggregate-mail']) {
+            if (!empty($shop_config['email-address']) && !empty($shop_config['address-as'])) {
+                // 获取直播信息
+                $lives = Lives::where('live_id', $live_id)->first([
+                    'live_id' => 'live_id',
+                    'live_key' => 'live_key',
+                    'created_at' => 'created_at',
+                    'end_time' => 'end_time',
+                    'danmu_path' => 'danmu_path',
+                    'gift_path' => 'gift_path'
+                ]);
+                // 获取大航海数据
+                $open_list = [];
+                $payment_records = PaymentRecords::join('bl_user_vips', 'bl_user_vips.user_id', '=', 'bl_payment_records.user_id')
+                    ->where('bl_payment_records.live_key', $lives->live_key)
+                    ->get([
+                        'uid' => 'bl_user_vips.uid',
+                        'name' => 'bl_user_vips.name',
+                        'time' => 'bl_payment_records.payment_at as time',
+                        'type' => 'bl_payment_records.vip_type as type'
+                    ]);
+                foreach ($payment_records as $_payment_records) {
+                    $open_list[] = [
+                        'uid' => $_payment_records->uid,
+                        'name' => $_payment_records->name,
+                        'time' => Carbon::parse($_payment_records->time)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
+                        'type' => PaymentRecordsEnums\VipType::from($_payment_records->type)->label()
+                    ];
+                }
+                // 分析弹幕数据
+                $danmu_list = [];
+                $getTopSpeakers = getTopSpeakers(base_path() . '/' . $lives->danmu_path, 10);
+                foreach ($getTopSpeakers['rankings'] as $_getTopSpeakers) {
+                    $danmu_list[] = [
+                        'uid' => $_getTopSpeakers['uid'],
+                        'name' => $_getTopSpeakers['uname'],
+                        'count' => $_getTopSpeakers['count']
+                    ];
+                }
+                // 分析礼物数据
+                $gift_list = [];
+                $getTopSpenders = getTopSpenders(base_path() . '/' . $lives->gift_path, 10);
+                foreach ($getTopSpenders['rankings'] as $_getTopSpenders) {
+                    $gift_list[] = [
+                        'uid' => $_getTopSpenders['uid'],
+                        'name' => $_getTopSpenders['uname'],
+                        'count' => round(($_getTopSpenders['totalPrice'] / 10), 2)
+                    ];
+                }
+                // 发送邮件
+                Tools\HttpClient::sendPostRequest('https://bilibili-email-xdobqxxrfo.cn-hongkong.fcapp.run/goods-email', [
+                    'Content-Type: application/json'
+                ], json_encode([
+                    'mail' => $shop_config['email-address'],
+                    'name' => $shop_config['address-as'],
+                    'starting_time' => $lives->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
+                    'end_time' => Carbon::parse($lives->end_time)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
+                    'open_list' => $open_list,
+                    'danmu_list' => $danmu_list,
+                    'danmu_count' => $getTopSpeakers['count'],
+                    'gift_list' => $gift_list,
+                    'gift_count' => $getTopSpenders['count']
+                ]));
+            }
+        }
     }
 }
