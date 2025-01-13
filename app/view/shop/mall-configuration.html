@@ -127,6 +127,44 @@
                     <div class="column is-full">
                         <div class="card">
                             <header class="card-header">
+                                <p class="card-header-title">邮件通知</p>
+                            </header>
+                            <div class="card-content">
+                                <div class="field">
+                                    <label class="label">是否开启下播邮件</label>
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            <select v-model="form.enable_aggregate_mail">
+                                                <option :value="null" disabled>请选择</option>
+                                                <option value="0">否</option>
+                                                <option value="1">是</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <p class="help">开启后，下播时将发送邮件，展示本场直播直播机器人统计到的数据</p>
+                                    <p class="help"><b>建议开启该功能以核对本场直播上舰用户均有被记录，如果出现漏记的情况及时手动为用户增加积分</b></p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">邮箱</label>
+                                    <div class="control">
+                                        <input class="input" type="text" v-model="form.email_address"
+                                            placeholder="邮箱地址">
+                                    </div>
+                                    <p class="help">指用于接受邮件的邮箱地址</p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">称呼</label>
+                                    <div class="control">
+                                        <input class="input" type="text" v-model="form.address_as" placeholder="称呼">
+                                    </div>
+                                    <p class="help">指希望在邮件中如何称呼你</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-full">
+                        <div class="card">
+                            <header class="card-header">
                                 <p class="card-header-title">用户相关</p>
                             </header>
                             <div class="card-content">
@@ -519,7 +557,10 @@
                     tribute_gift_order_successful_content: null, // 贡品下单成功内容
                     tribute_gift_order_successful_button: null, // 贡品下单成功按钮
                     tribute_gift_order_successful_rankings: null, // 贡品下单成功是否开启排名
-                    tribute_gift_order_successful_rankingslist: null // 贡品下单成功排名列表
+                    tribute_gift_order_successful_rankingslist: null, // 贡品下单成功排名列表
+                    enable_aggregate_mail: null, // 是否开启下播邮件
+                    email_address: null, // 邮箱地址
+                    address_as: null // 称呼
                 }
             };
         },

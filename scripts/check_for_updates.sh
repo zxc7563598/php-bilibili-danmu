@@ -120,6 +120,9 @@ if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
         exit 1
     fi
 
+    # 安装composer
+    composer install >> $LOG_FILE 2>&1 &
+
     # 启动 Webman 服务
     log_message "启动项目..."
     nohup php start.php start -d >> $LOG_FILE 2>&1 &

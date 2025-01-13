@@ -4,6 +4,7 @@ namespace process;
 
 use Carbon\Carbon;
 use Workerman\Crontab\Crontab;
+use Hejunjie\Tools;
 
 class Task
 {
@@ -49,7 +50,7 @@ class Task
         $dir = base_path() . '/runtime/logs/' . Carbon::now()->subDays(8)->timezone(config('app')['default_timezone'])->format('Y-m-d');
         sublog('定时任务', '初始化', '删除路径:' . $dir);
         if (is_dir($dir)) {
-            $fileDelete = fileDelete($dir);
+            $fileDelete = Tools\FileUtils::fileDelete($dir);
             if ($fileDelete) {
                 sublog('定时任务', '初始化', '删除成功');
             } else {
