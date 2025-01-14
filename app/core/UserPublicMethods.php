@@ -114,12 +114,20 @@ class UserPublicMethods extends GeneralMethod
      * @param string $guard_level 开通类型
      * @param string $amount 金额
      * @param string $payment_at 上舰时间
-     * @param string $live_key 上舰时间
+     * @param string $live_key 直播间key
      * 
      * @return void
      */
     public static function userOpensVip($uid, $name, $guard_level, $amount, $payment_at, $live_key)
     {
+        sublog('舰长付费', '舰长付费', [
+            'uid' => $uid,
+            'name' => $name,
+            'guard_level' => $guard_level,
+            'amount' => $amount,
+            'payment_at' => $payment_at,
+            'live_key' => $live_key
+        ]);
         $config = ShopConfig::whereIn('title', [
             'listening-open-vip',
             'vip-lv3-bonus-points',
@@ -161,7 +169,7 @@ class UserPublicMethods extends GeneralMethod
             $payment_records = new PaymentRecords();
             $payment_records->user_id = $user_vips->user_id;
             $payment_records->vip_type = $vip_type;
-            $payment_records->amount = intval($amount);
+            $payment_records->amount = round(($amount / 100), 2);
             $payment_records->point = $point;
             $payment_records->pre_point = $user_vips->point;
             $payment_records->after_point = $payment_records->pre_point + $point;
