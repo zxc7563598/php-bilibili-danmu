@@ -325,7 +325,7 @@ class Bilibili
                         $guard_level = $payload['payload']['data']['guard_level'];
                         $amount = intval($payload['payload']['data']['price'] / 10);
                         $payment_at = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
-                        $live_key = !empty(Redis::get('bilibili_live_key')) ? Redis::get('bilibili_live_key') : null;
+                        $live_key = Redis::get('bilibili_live_key') ? Redis::get('bilibili_live_key') : null;
                         UserPublicMethods::userOpensVip($uid, $name, $guard_level, $amount, $payment_at, $live_key);
                         // 记录信息
                         if (Redis::get('bilibili_live_key')) {
