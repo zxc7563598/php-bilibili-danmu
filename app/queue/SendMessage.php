@@ -128,12 +128,15 @@ class SendMessage
                 // 获取数据是否存在
                 $exist = false;
                 $cursor = 0;
+                sublog('逻辑检测', '信息加入队列', '开始检测');
                 do {
                     list($cursor, $tasks) = Redis::zScan(self::$queueKey, $cursor);
                     // 遍历扫描到的任务
                     if ($tasks) {
                         foreach ($tasks as $task) {
                             $taskData = json_decode($task, true);
+                            sublog('逻辑检测', '信息加入队列', $taskData);
+                            sublog('逻辑检测', '信息加入队列', '----------------');
                             if ($taskData['uid'] == $uid) {
                                 $exist = true;
                                 break 2; // 找到后退出循环
