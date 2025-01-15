@@ -162,7 +162,7 @@ class SendMessage
                 $current_message = Redis::hGet(self::$mergeKey, $uid) ?: '';
                 $new_message = json_encode($extra);
                 if ($current_message) {
-                    $new_message = json_encode(array_merge(json_decode($current_message, true), $extra));
+                    $new_message = json_encode(array_merge(json_decode($current_message, true), [$extra]));
                 }
                 Redis::hSet(self::$mergeKey, $uid, $new_message);
             } else {
