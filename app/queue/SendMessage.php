@@ -131,11 +131,13 @@ class SendMessage
                 do {
                     list($cursor, $tasks) = Redis::zScan(self::$queueKey, $cursor);
                     // 遍历扫描到的任务
-                    foreach ($tasks as $task) {
-                        $taskData = json_decode($task, true);
-                        if ($taskData['uid'] == $uid) {
-                            $exist = true;
-                            break 2; // 找到后退出循环
+                    if (count($tasks)) {
+                        foreach ($tasks as $task) {
+                            $taskData = json_decode($task, true);
+                            if ($taskData['uid'] == $uid) {
+                                $exist = true;
+                                break 2; // 找到后退出循环
+                            }
                         }
                     }
                 } while ($cursor != 0);
