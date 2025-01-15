@@ -145,6 +145,14 @@ class SendMessage
                 if (!$exist) {
                     $bilibili_send_sequence = Redis::get('bilibili_send_sequence');
                     $score = $priority - $bilibili_send_sequence * 0.000001;
+                    sublog('逻辑检测', '信息加入队列', [
+                        'message' => $message,
+                        'score' => $score,
+                        'timestamp' => Carbon::parse($timestamp)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
+                        'type' => $type,
+                        'uid' => $uid,
+                        'name' => $uname
+                    ]);
                     $task = json_encode([
                         'message' => $message,
                         'score' => $score,
