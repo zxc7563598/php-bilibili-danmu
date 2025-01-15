@@ -198,6 +198,9 @@ class SendMessage
     public static function processQueue(): void
     {
         $currentTimestamp = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
+        if (Redis::get('bilibili_stop_message')) {
+            return;
+        }
         while (true) {
             // 获取优先级最高的任务
             $taskData = Redis::zRange(self::$queueKey, 0, 0);
@@ -224,11 +227,13 @@ class SendMessage
                         foreach ($message as $_message) {
                             echo "发送优先级为" . $task['score'] . "的弹幕: " . $_message . PHP_EOL;
                             // BiliLive\Live::sendMsg($room_id, $cookie, $_message);
+                            Redis::setEx('bilibili_stop_message', 4, 1);
                             sublog('逻辑检测', '信息发送', [
                                 'message' => $_message,
                                 'score' => $task['score'],
                                 'timestamp' => Carbon::parse($task['timestamp'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s')
                             ]);
+                            sleep(5);
                         }
                     }
                 } else {
