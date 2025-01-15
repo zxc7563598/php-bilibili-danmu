@@ -48,7 +48,7 @@ class SendMessage
         $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
         $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
         $message_list = [];
-        $current_message = Redis::hGet(self::$merge_key, $uid) ?: '';
+        $current_message = Redis::hGet(self::$mergeKey, $uid) ?: '';
         $extra = json_decode($current_message, true);
         // 初始化一个空数组用于存储分类数据
         $gift = [];
@@ -158,12 +158,12 @@ class SendMessage
                     Redis::incr('bilibili_send_sequence');
                 }
                 // 额外信息存入缓存区
-                $current_message = Redis::hGet(self::$merge_key, $uid) ?: '';
+                $current_message = Redis::hGet(self::$mergeKey, $uid) ?: '';
                 $new_message = json_encode($extra);
                 if ($current_message) {
                     $new_message = json_encode(array_merge(json_decode($current_message), $extra));
                 }
-                Redis::hSet(self::$merge_key, $uid, $new_message);
+                Redis::hSet(self::$mergeKey, $uid, $new_message);
             } else {
                 // 获取直播间最大发言长度
                 $length = self::getBilibiliSpeakLength($room_id, $cookie);
