@@ -147,7 +147,7 @@ class Autoresponders
             if (!empty($text)) {
                 // 加入消息发送队列
                 $text = self::template($content[mt_rand(0, (count($content) - 1))], $args);
-                SendMessage::push($text, 15);
+                SendMessage::push($text, 'Autoresponders');
                 sublog('逻辑检测', '自动回复', '发送数据：' . $text);
             }
         }

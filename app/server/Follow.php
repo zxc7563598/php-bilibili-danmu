@@ -114,7 +114,7 @@ class Follow
             if (!empty($text)) {
                 // 加入消息发送队列
                 $text = self::template($content[mt_rand(0, (count($content) - 1))], $args);
-                SendMessage::push($text, 5);
+                SendMessage::push($text, 'Follow');
                 sublog('逻辑检测', '感谢关注', '发送数据：' . $text);
             }
         }
