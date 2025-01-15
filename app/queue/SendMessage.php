@@ -12,17 +12,31 @@ class SendMessage
 {
     protected static $queueKey = 'bilibili_send_message';
 
+    private static function getPriority($input)
+    {
+        return match ($input) {
+            'Autoresponders' => 15,
+            'Enter' => 5,
+            'Follow' => 5,
+            'Present' => 20,
+            'Share' => 5,
+            'Timing' => 10,
+            default => 1,
+        };
+    }
+
     /**
      * 投递消息到队列
      * 
      * @param string $message 消息信息
-     * @param int $priority 优先级，数字越大越优先发送
+     * @param int $priority 消息类型
+     * @param string $uid 用户uid
      * 
      * @return void 
      * @throws Exception 
      * @throws InvalidTimeZoneException 
      */
-    public static function push(string $message, int $priority = 0): void
+    public static function push(string $message, string $type = '', string $uid = ''): void
     {
         $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
         $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
@@ -46,6 +60,9 @@ class SendMessage
             if (!Redis::get('bilibili_send_sequence')) {
                 Redis::set('bilibili_send_sequence', 1);
             }
+            // 获取优先级
+            $priority = self::getPriority($type);
+            // 处理数据
             foreach ($message_list as $item) {
                 $bilibili_send_sequence = Redis::get('bilibili_send_sequence');
                 $score = $priority - $bilibili_send_sequence * 0.000001;

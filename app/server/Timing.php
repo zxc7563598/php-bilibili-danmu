@@ -112,7 +112,7 @@ class Timing
                     $lockExpiration = 60;
                 }
                 if (!Redis::get($lockKey)) {
-                    SendMessage::push($text, 10);
+                    SendMessage::push($text, 'Timing');
                     // 设置锁，过期时间为 $lockExpiration - 1 秒
                     Redis::setEx($lockKey, $lockExpiration - 1, 'locked');
                     sublog('逻辑检测', '定时广告', '发送数据：' . $text);
