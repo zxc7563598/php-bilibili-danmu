@@ -159,10 +159,4 @@ Route::post('/reload-timing', function (Request $request) {
     return response($response);
 });
 
-Route::get('/test', function (Request $request) {
-    $data = json_decode('{"uid":4325051,"name":"哎呀又胖辣","guard_level":2,"amount":199800,"payment_at":1736868092,"live_key":"576930226618733507"}', true);
-    $res = UserPublicMethods::userOpensVip($data['uid'], $data['name'], $data['guard_level'], $data['amount'], $data['payment_at'], $data['live_key']);
-    return success($request, ['res' => $res]);
-});
-
 Route::disableDefaultRoute(); // 关闭默认路由

@@ -193,6 +193,7 @@ class UserPublicMethods extends GeneralMethod
         // 获取配置信息
         $config = ShopConfig::whereIn('title', [
             'enable-aggregate-mail',
+            'listening-open-vip',
             'email-address',
             'address-as'
         ])->get([
@@ -260,6 +261,7 @@ class UserPublicMethods extends GeneralMethod
                     'name' => $shop_config['address-as'],
                     'starting_time' => $lives->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
                     'end_time' => Carbon::parse($lives->end_time)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
+                    'listening_open_vip' => $shop_config['listening-open-vip'],
                     'open_list' => $open_list,
                     'danmu_list' => $danmu_list,
                     'danmu_count' => $getTopSpeakers['count'],
