@@ -49,7 +49,6 @@ class SendMessage
         $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
         $message_list = [];
         $current_message = Redis::hGet(self::$mergeKey, $uid) ?: '';
-        echo json_encode($current_message, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION);
         $extra = json_decode($current_message, true);
         // 初始化一个空数组用于存储分类数据
         $gift = [];

@@ -171,7 +171,13 @@ Route::get('/test', function (Request $request) {
         json_decode('{"uid":12316490,"uname":"牛奶fa生糖","gift_id":34003,"gift_name":"人气票","price":1,"num":1,"anchor_id":3494365156608185,"ruid":3494365156608185,"guard_level":3,"level":26}', true),
         json_decode('{"uid":12316490,"uname":"牛奶fa生糖","gift_id":34003,"gift_name":"人气票","price":1,"num":1,"anchor_id":3494365156608185,"ruid":3494365156608185,"guard_level":3,"level":26}', true),
         json_decode('{"uid":12316490,"uname":"牛奶fa生糖","gift_id":34003,"gift_name":"人气票","price":1,"num":1,"anchor_id":3494365156608185,"ruid":3494365156608185,"guard_level":3,"level":26}', true),
-        json_decode('{"uid":12316490,"uname":"牛奶fa生糖","gift_id":34003,"gift_name":"人气票","price":1,"num":1,"anchor_id":3494365156608185,"ruid":3494365156608185,"guard_level":3,"level":26}', true)
+        json_decode('{"uid":12316490,"uname":"牛奶fa生糖","gift_id":34003,"gift_name":"人气票","price":1,"num":1,"anchor_id":3494365156608185,"ruid":3494365156608185,"guard_level":3,"level":26}', true),
+        json_decode('{"uid":12316490,"uname":"牛奶fa生糖","gift_id":32281,"gift_name":"绮彩权杖","price":400,"num":1,"anchor_id":3494365156608185,"ruid":3494365156608185,"guard_level":3,"level":26}', true),
+        json_decode('{"uid":12316490,"uname":"牛奶fa生糖","gift_id":32281,"gift_name":"绮彩权杖","price":400,"num":1,"anchor_id":3494365156608185,"ruid":3494365156608185,"guard_level":3,"level":26}', true),
+        json_decode('{"uid":12316490,"uname":"牛奶fa生糖","gift_id":32281,"gift_name":"绮彩权杖","price":400,"num":1,"anchor_id":3494365156608185,"ruid":3494365156608185,"guard_level":3,"level":26}', true),
+        json_decode('{"uid":12316490,"uname":"牛奶fa生糖","gift_id":32128,"gift_name":"爱心抱枕","price":160,"num":1,"anchor_id":3494365156608185,"ruid":3494365156608185,"guard_level":3,"level":26}', true),
+        json_decode('{"uid":12316490,"uname":"牛奶fa生糖","gift_id":32128,"gift_name":"爱心抱枕","price":160,"num":1,"anchor_id":3494365156608185,"ruid":3494365156608185,"guard_level":3,"level":26}', true),
+        json_decode('{"uid":12316490,"uname":"牛奶fa生糖","gift_id":32128,"gift_name":"爱心抱枕","price":160,"num":1,"anchor_id":3494365156608185,"ruid":3494365156608185,"guard_level":3,"level":26}', true)
     ];
     foreach ($data as $_data) {
         Present::processing($_data['uid'], $_data['uname'], $_data['gift_id'], $_data['gift_name'], $_data['price'], $_data['num'], $_data['anchor_id'], $_data['ruid'], $_data['guard_level'], $_data['level']);
