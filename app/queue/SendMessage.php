@@ -271,7 +271,7 @@ class SendMessage
                             $message = self::getGiftMessage($task['uid'], $task['name'], $task['message'], $number);
                             foreach ($message as $_message) {
                                 echo "发送优先级为" . $task['score'] . "的弹幕: " . $_message . PHP_EOL;
-                                // BiliLive\Live::sendMsg($room_id, $cookie, $_message);
+                                BiliLive\Live::sendMsg($room_id, $cookie, $_message);
                                 Redis::setEx('bilibili_stop_message', 4, 1);
                                 sublog('逻辑检测', '信息发送', [
                                     'message' => $_message,
@@ -286,7 +286,7 @@ class SendMessage
                         // 直接发送
                         echo "发送优先级为" . $task['score'] . "的弹幕: " . $task['message'] . PHP_EOL;
                         if ($cookie && $room_id) {
-                            // BiliLive\Live::sendMsg($room_id, $cookie, $task['message']);
+                            BiliLive\Live::sendMsg($room_id, $cookie, $task['message']);
                             sublog('逻辑检测', '信息发送', [
                                 'message' => $task['message'],
                                 'score' => $task['score'],
