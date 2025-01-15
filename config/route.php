@@ -16,6 +16,7 @@
 use app\core\UserPublicMethods;
 use app\server\core\KeywordEvaluator;
 use app\server\core\KeywordMatcher;
+use app\server\Present;
 use Webman\Route;
 use support\Request;
 
@@ -157,6 +158,22 @@ Route::post('/reload-timing', function (Request $request) {
     $response = fread($socket, 1024);
     fclose($socket);
     return response($response);
+});
+
+Route::get('/test', function (Request $request) {
+    $data = [
+        json_decode('{"uid":12316490,"uname":"牛奶fa生糖","gift_id":34003,"gift_name":"人气票","price":1,"num":1,"anchor_id":3494365156608185,"ruid":3494365156608185,"guard_level":3,"level":26}', true),
+        json_decode('{"uid":12316490,"uname":"牛奶fa生糖","gift_id":34003,"gift_name":"人气票","price":1,"num":1,"anchor_id":3494365156608185,"ruid":3494365156608185,"guard_level":3,"level":26}', true),
+        json_decode('{"uid":12316490,"uname":"牛奶fa生糖","gift_id":34003,"gift_name":"人气票","price":1,"num":1,"anchor_id":3494365156608185,"ruid":3494365156608185,"guard_level":3,"level":26}', true),
+        json_decode('{"uid":12316490,"uname":"牛奶fa生糖","gift_id":34003,"gift_name":"人气票","price":1,"num":1,"anchor_id":3494365156608185,"ruid":3494365156608185,"guard_level":3,"level":26}', true),
+        json_decode('{"uid":12316490,"uname":"牛奶fa生糖","gift_id":34003,"gift_name":"人气票","price":1,"num":1,"anchor_id":3494365156608185,"ruid":3494365156608185,"guard_level":3,"level":26}', true),
+        json_decode('{"uid":12316490,"uname":"牛奶fa生糖","gift_id":34003,"gift_name":"人气票","price":1,"num":1,"anchor_id":3494365156608185,"ruid":3494365156608185,"guard_level":3,"level":26}', true),
+        json_decode('{"uid":12316490,"uname":"牛奶fa生糖","gift_id":34003,"gift_name":"人气票","price":1,"num":1,"anchor_id":3494365156608185,"ruid":3494365156608185,"guard_level":3,"level":26}', true),
+        json_decode('{"uid":12316490,"uname":"牛奶fa生糖","gift_id":34003,"gift_name":"人气票","price":1,"num":1,"anchor_id":3494365156608185,"ruid":3494365156608185,"guard_level":3,"level":26}', true)
+    ];
+    foreach ($data as $_data) {
+        Present::processing($_data['uid'], $_data['uname'], $_data['gift_id'], $_data['gift_name'], $_data['price'], $_data['num'], $_data['anchor_id'], $_data['ruid'], $_data['guard_level'], $_data['level']);
+    }
 });
 
 Route::disableDefaultRoute(); // 关闭默认路由

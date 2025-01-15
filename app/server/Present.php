@@ -100,11 +100,10 @@ class Present
             if ($is_message) {
                 sublog('逻辑检测', '礼物答谢', '数据匹配成功');
                 self::sendMessage($present_content, [
-                    'name' => $uname,
                     'giftName' => $gift_name,
                     'price' => $price,
                     'num' => $num
-                ]);
+                ], (string)$uid, $uname);
                 sublog('逻辑检测', '礼物答谢', '----------');
             } else {
                 sublog('逻辑检测', '礼物答谢', '数据未匹配');
@@ -123,7 +122,7 @@ class Present
      * @throws Exception 
      * @throws InvalidTimeZoneException 
      */
-    public static function sendMessage(string $content, array $args)
+    public static function sendMessage(string $content, array $args, string $uid, string $name)
     {
         // 拆分要发送的内容
         $content = splitAndFilterLines($content);
@@ -131,26 +130,12 @@ class Present
             $text = $content[mt_rand(0, (count($content) - 1))];
             if (!empty($text)) {
                 // 加入消息发送队列
-                $text = self::template($content[mt_rand(0, (count($content) - 1))], $args);
-                SendMessage::push($text, 'Present');
+                SendMessage::push($text, 'Present', $uid, $name, [
+                    'name' => $name,
+                    'gift' => $args
+                ]);
                 sublog('逻辑检测', '礼物答谢', '发送数据：' . $text);
             }
         }
-    }
-
-    /**
-     * 短信模板转换
-     *
-     * @param string $text 文本信息
-     * @param array $args 要替换的模版
-     * 
-     * @return string
-     */
-    private static function template(string $text = '', array $args = []): string
-    {
-        foreach ($args as $key => $replace) {
-            $text = preg_replace('/(@' . $key . '@)/i', $replace, $text);
-        }
-        return $text;
     }
 }
