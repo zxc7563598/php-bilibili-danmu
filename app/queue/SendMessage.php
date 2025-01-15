@@ -131,7 +131,7 @@ class SendMessage
                 do {
                     list($cursor, $tasks) = Redis::zScan(self::$queueKey, $cursor);
                     // 遍历扫描到的任务
-                    if (count($tasks)) {
+                    if ($tasks) {
                         foreach ($tasks as $task) {
                             $taskData = json_decode($task, true);
                             if ($taskData['uid'] == $uid) {
