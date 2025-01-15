@@ -13,6 +13,13 @@ class SendMessage
     protected static $queueKey = 'bilibili_send_message';
     protected static $mergeKey = 'bilibili_send_message_merge';
 
+    /**
+     * 获取优先级
+     * 
+     * @param mixed $input 输入
+     * 
+     * @return int 
+     */
     private static function getPriority($input): int
     {
         return match ($input) {
@@ -26,6 +33,14 @@ class SendMessage
         };
     }
 
+    /**
+     * 获取直播间最大发言长度
+     * 
+     * @param mixed $room_id 房间号
+     * @param mixed $cookie 登录cookir
+     * 
+     * @return int 
+     */
     private static function getBilibiliSpeakLength($room_id = null, $cookie = null): int
     {
         $room_id = $room_id ?: intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
@@ -40,7 +55,7 @@ class SendMessage
             }
         }
         if (empty($length)) {
-            $length = 30;
+            $length = 20;
         }
         return $length;
     }
@@ -105,6 +120,17 @@ class SendMessage
         return mb_str_split($message, $length, 'UTF-8');
     }
 
+    /**
+     * 合并投递消息到队列
+     * 
+     * @param string $message 消息信息
+     * @param string $uid 用户uid
+     * @param string $uname 用户名
+     * @param int $number 是否展示数量
+     * @param array $extra 额外信息
+     * 
+     * @return void 
+     */
     public static function mergePush(string $message, string $uid = '', string $uname = '', int $number = 0, array $extra = []): void
     {
         $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
