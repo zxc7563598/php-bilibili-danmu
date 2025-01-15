@@ -13,6 +13,7 @@
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
+use app\core\UserPublicMethods;
 use app\server\core\KeywordEvaluator;
 use app\server\core\KeywordMatcher;
 use Webman\Route;
@@ -159,34 +160,9 @@ Route::post('/reload-timing', function (Request $request) {
 });
 
 Route::get('/test', function (Request $request) {
-    $param = $request->all();
-    $msg = isset($param['msg']) ? $param['msg'] : '';
-    // 处理数据
-    $autoresponders = readFileContent(runtime_path() . '/tmp/autoresponders.cfg');
-    if ($autoresponders) {
-        $autoresponders = json_decode($autoresponders, true);
-    }
-    // 开启自动回复
-    $autoresponders_content = $autoresponders['content']; // 内容
-    $result = count($autoresponders_content) . '条数据' . "<br>";
-    $result .= '--------------------------' . "<br>";
-    // 确认链接直播间的情况]
-    // 验证是否有需要发送的内容
-    foreach ($autoresponders_content as $item) {
-        $result .= $item['keywords'] . "<br>";
-        // 解析表达式
-        $matcher = new KeywordMatcher($item['keywords']);
-        $parsedTree = $matcher->parse();
-        // 输出解析后的表达式树
-        $result .= json_encode($parsedTree, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION) . "<br>";
-        // 检查弹幕是否匹配
-        $evaluator = new KeywordEvaluator($parsedTree, $msg);
-        $result .= ($evaluator->evaluate() ? '命中' : '未命中')  . "<br>";;
-        $result .= '--------------------------' . "<br>";
-    }
-
-
-    return response($result);
+    $data = json_decode('{"uid":4325051,"name":"哎呀又胖辣","guard_level":2,"amount":199800,"payment_at":1736868092,"live_key":"576930226618733507"}', true);
+    $res = UserPublicMethods::userOpensVip($data['uid'], $data['name'], $data['guard_level'], $data['amount'], $data['payment_at'], $data['live_key']);
+    return success($request, ['res' => $res]);
 });
 
 Route::disableDefaultRoute(); // 关闭默认路由
