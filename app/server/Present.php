@@ -129,11 +129,8 @@ class Present
         if (count($content)) {
             $text = $content[mt_rand(0, (count($content) - 1))];
             if (!empty($text)) {
-                // 加入消息发送队列
-                SendMessage::push($text, 'Present', $uid, $name, [
-                    'name' => $name,
-                    'gift' => $args
-                ]);
+                // 加入消 息发送队列
+                SendMessage::push($text, 'Present', $uid, $name, $args);
                 sublog('逻辑检测', '礼物答谢', '发送数据：' . $text);
             }
         }
