@@ -110,7 +110,7 @@ class SendMessage
      * @throws Exception 
      * @throws InvalidTimeZoneException 
      */
-    public static function push(string $message, string $type = '', string $uid = '', string $uname, array $extra = []): void
+    public static function push(string $message, string $type = '', string $uid = '', string $uname = '', array $extra = []): void
     {
         $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
         $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
