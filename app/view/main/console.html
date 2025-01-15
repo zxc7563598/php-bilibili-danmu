@@ -566,7 +566,6 @@
                                             <li><b>送礼人名称：</b>@name@</li>
                                             <li><b>礼物名称：</b>@giftName@</li>
                                             <li><b>礼物单价：</b>@price@</li>
-                                            <li><b>赠送数量：</b>@num@</li>
                                         </ul>
                                     </div>
                             </article>
@@ -650,6 +649,40 @@
                                                 <button type="button" class="button toggle-button"
                                                     :class="config.present.type == 2 ? 'is-active' : ''"
                                                     @click="configSwitch('present-type',2)">仅答谢航海</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">礼物合并</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <div class="button-group">
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.present.merge == 0 ? 'is-active' : ''"
+                                                    @click="configSwitch('present-merge',0)">不合并</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.present.merge == 1 ? 'is-active' : ''"
+                                                    @click="configSwitch('present-merge',1)">合并</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">数量</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <div class="button-group">
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.present.number == 0 ? 'is-active' : ''"
+                                                    @click="configSwitch('present-number',0)">不展示</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.present.number == 1 ? 'is-active' : ''"
+                                                    @click="configSwitch('present-number',1)">展示</button>
                                             </div>
                                         </div>
                                     </div>
@@ -1100,6 +1133,8 @@
                         },
                         present: { // 礼物答谢
                             opens: false,
+                            number: null, // 数量：0-不展示，1-展示
+                            merge: null, // 礼物合并：0-不合并，1-合并
                             price: null, // 起始感谢电池数
                             status: 0, // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
                             type: 0, // 类型：0=全部答谢，1=仅答谢牌子，2=仅答谢航海
@@ -1184,6 +1219,12 @@
                             break;
                         case 'present-type':
                             this.config.present.type = opens
+                            break;
+                        case 'present-number':
+                            this.config.present.number = opens
+                            break;
+                        case 'present-merge':
+                            this.config.present.merge = opens
                             break;
                         case 'enter':
                             this.config.enter.opens = opens

@@ -53,12 +53,14 @@ class Present
             $present_type = intval($present['type']); // 类型
             $present_status = intval($present['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
             $present_content = $present['content']; // 内容
+            $present_merge = $present['merge']; // 是否合并
+            $present_number = $present['number']; // 展示数量
             // 确认链接直播间的情况
             $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
             $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
             if ($cookie && $room_id) {
                 // 验证是否达到可以感谢的电池数
-                if ($present_price >= $price) {
+                if ($price >= $present_price) {
                     // 验证牌子
                     $medal = false;
                     switch ($present_type) {
@@ -102,8 +104,14 @@ class Present
                 self::sendMessage($present_content, [
                     'giftName' => $gift_name,
                     'price' => $price,
+                    'name' => $uname,
                     'num' => $num
-                ], (string)$uid, $uname);
+                ], [
+                    'uid' => $uid,
+                    'uname' => $uname,
+                    'merge' => $present_merge,
+                    'number' => $present_number
+                ]);
                 sublog('逻辑检测', '礼物答谢', '----------');
             } else {
                 sublog('逻辑检测', '礼物答谢', '数据未匹配');
@@ -122,17 +130,43 @@ class Present
      * @throws Exception 
      * @throws InvalidTimeZoneException 
      */
-    public static function sendMessage(string $content, array $args, string $uid, string $name)
+    public static function sendMessage(string $content, array $args, array $extra = [])
     {
         // 拆分要发送的内容
         $content = splitAndFilterLines($content);
         if (count($content)) {
             $text = $content[mt_rand(0, (count($content) - 1))];
             if (!empty($text)) {
-                // 加入消 息发送队列
-                SendMessage::push($text, 'Present', $uid, $name, $args);
-                sublog('逻辑检测', '礼物答谢', '发送数据：' . $text);
+                if (isset($extra['merge']) && $extra['merge'] == 1) {
+                    SendMessage::mergePush($text, $extra['uid'], $extra['uname'], $extra['number'], $args);
+                    sublog('逻辑检测', '礼物答谢', '合并数据发送：' . json_encode($args, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
+                } else {
+                    $text = self::template($content[mt_rand(0, (count($content) - 1))], $extra['number'], $args);
+                    SendMessage::push($text, 'Present');
+                    sublog('逻辑检测', '礼物答谢', '发送数据：' . $text);
+                }
             }
         }
+    }
+
+    /**
+     * 短信模板转换
+     *
+     * @param string $text 文本信息
+     * @param integer $number 是否展示数量
+     * @param array $args 要替换的模版
+     * 
+     * @return string
+     */
+    private static function template(string $text = '', int $number = 0, array $args = []): string
+    {
+        foreach ($args as $key => $replace) {
+            if ($number == 1 && $key == 'giftName') {
+                $text = preg_replace('/(@' . $key . '@)/i', $number . '个' . $replace, $text);
+            } else {
+                $text = preg_replace('/(@' . $key . '@)/i', $replace, $text);
+            }
+        }
+        return $text;
     }
 }
