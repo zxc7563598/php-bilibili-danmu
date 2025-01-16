@@ -116,6 +116,8 @@ class SendMessage
         }
         // 获取直播间最大发言长度
         $length = self::getBilibiliSpeakLength();
+        // 删除累计信息
+        Redis::hDel(self::$mergeKey, $uid);
         // 返回切割后的消息列表
         return mb_str_split($message, $length, 'UTF-8');
     }
