@@ -84,9 +84,13 @@ class Task
         $silent_user = SilentUser::where('silent_minute', '<', $silent_minute)->get();
         foreach ($silent_user as $item) {
             sublog('定时任务', '解除禁言', '用户:' . $item->tname . ' - ' . $item->tuid);
-            Bililive\Live::delSilentUser($room_id, $cookie, $item->black_id);
-            $item->delete();
-            sublog('定时任务', '解除禁言', '解除成功');
+            try {
+                Bililive\Live::delSilentUser($room_id, $cookie, $item->black_id);
+                $item->delete();
+                sublog('定时任务', '解除禁言', '解除成功');
+            } catch (\Exception $e) {
+                sublog('定时任务', '解除禁言', '解除失败:' . $e->getMessage());
+            }
             sublog('定时任务', '解除禁言', '==========');
         }
     }
