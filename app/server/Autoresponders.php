@@ -155,44 +155,48 @@ class Autoresponders
             // 添加禁言
             $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
             $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
-            Bililive\Live::addSilentUser($room_id, $cookie, $uid, $msg);
-            // 获取black_id
-            $black_id = '';
-            $getSilentUserList = Bililive\Live::getSilentUserList($room_id, $cookie, 1);
-            if (isset($getSilentUserList['total_page'])) {
-                // 确认第一页是否存在用户
-                if (isset($getSilentUserList['data'])) {
-                    foreach ($getSilentUserList['data'] as $item) {
-                        if ($item['tuid'] == $uid) {
-                            $black_id = $item['id'];
-                            break;
+            try {
+                Bililive\Live::addSilentUser($room_id, $cookie, $uid, $msg);
+                // 获取black_id
+                $black_id = '';
+                $getSilentUserList = Bililive\Live::getSilentUserList($room_id, $cookie, 1);
+                if (isset($getSilentUserList['total_page'])) {
+                    // 确认第一页是否存在用户
+                    if (isset($getSilentUserList['data'])) {
+                        foreach ($getSilentUserList['data'] as $item) {
+                            if ($item['tuid'] == $uid) {
+                                $black_id = $item['id'];
+                                break;
+                            }
                         }
                     }
-                }
-                // 确认其他页是否存在用户
-                if (empty($black_id)) {
-                    for ($i = $getSilentUserList['total_page']; $i > 1; $i--) {
-                        $getSilentUserList = Bililive\Live::getSilentUserList($room_id, $cookie, $i);
-                        if (isset($getSilentUserList['data'])) {
-                            foreach ($getSilentUserList['data'] as $item) {
-                                if ($item['tuid'] == $uid) {
-                                    $black_id = $item['id'];
-                                    break;
+                    // 确认其他页是否存在用户
+                    if (empty($black_id)) {
+                        for ($i = $getSilentUserList['total_page']; $i > 1; $i--) {
+                            $getSilentUserList = Bililive\Live::getSilentUserList($room_id, $cookie, $i);
+                            if (isset($getSilentUserList['data'])) {
+                                foreach ($getSilentUserList['data'] as $item) {
+                                    if ($item['tuid'] == $uid) {
+                                        $black_id = $item['id'];
+                                        break;
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-            // 记录数据
-            if (!empty($black_id)) {
-                $silent_user = new SilentUser();
-                $silent_user->tuid = $uid;
-                $silent_user->tname = $uname;
-                $silent_user->silent_minute = $silent_minute > 0 ? Carbon::now()->timezone(config('app')['default_timezone'])->addMinutes($silent_minute)->timestamp : Carbon::now()->timezone(config('app')['default_timezone'])->addYears(1)->timestamp;
-                $silent_user->ransom_amount = $ransom_amount;
-                $silent_user->black_id = $black_id;
-                $silent_user->save();
+                // 记录数据
+                if (!empty($black_id)) {
+                    $silent_user = new SilentUser();
+                    $silent_user->tuid = $uid;
+                    $silent_user->tname = $uname;
+                    $silent_user->silent_minute = $silent_minute > 0 ? Carbon::now()->timezone(config('app')['default_timezone'])->addMinutes($silent_minute)->timestamp : Carbon::now()->timezone(config('app')['default_timezone'])->addYears(1)->timestamp;
+                    $silent_user->ransom_amount = $ransom_amount;
+                    $silent_user->black_id = $black_id;
+                    $silent_user->save();
+                }
+            } catch (Exception $e) {
+                sublog('逻辑检测', '自动回复', '禁言操作失败：' . $e->getMessage());
             }
         }
         // 拆分要发送的内容

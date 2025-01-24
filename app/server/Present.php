@@ -121,9 +121,14 @@ class Present
             if (!empty($silent_user)) {
                 if ($silent_user->ransom_amount > 0) {
                     if ($price >= $silent_user->ransom_amount) {
-                        sublog('逻辑检测', '礼物答谢', '解除禁言：' . $silent_user->tname . ' - ' . $silent_user->tuid);
-                        Bililive\Live::delSilentUser($room_id, $cookie, $silent_user->black_id);
-                        $silent_user->delete();
+                        sublog('逻辑检测', '礼物答谢', '用户:' . $silent_user->tname . ' - ' . $silent_user->tuid);
+                        try {
+                            Bililive\Live::delSilentUser($room_id, $cookie, $silent_user->black_id);
+                            $silent_user->delete();
+                            sublog('逻辑检测', '礼物答谢', '解除成功');
+                        } catch (\Exception $e) {
+                            sublog('逻辑检测', '礼物答谢', '解除失败:' . $e->getMessage());
+                        }
                     }
                 }
             }
