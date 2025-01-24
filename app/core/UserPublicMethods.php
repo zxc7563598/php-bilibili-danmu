@@ -12,18 +12,12 @@ use app\model\ShopConfig;
 use app\model\UserAddress;
 use app\model\UserVips;
 use Carbon\Carbon;
-use Carbon\Exceptions\InvalidFormatException;
-use Carbon\Exceptions\InvalidTimeZoneException;
 use resource\enums\GoodsEnums;
 use resource\enums\UserVipsEnums;
 use resource\enums\UserAddressEnums;
 use resource\enums\PaymentRecordsEnums;
 use resource\enums\RedemptionRecordsEnums;
 use Hejunjie\Tools;
-use RuntimeException;
-use InvalidArgumentException;
-use ValueError;
-use TypeError;
 
 class UserPublicMethods extends GeneralMethod
 {

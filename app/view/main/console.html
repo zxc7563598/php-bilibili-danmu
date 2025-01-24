@@ -990,7 +990,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="field is-horizontal">
                             <div class="field-label is-normal">
                                 <label class="label">安全词</label>
@@ -1016,6 +1015,82 @@
                                                 </p>
                                                 <p>
                                                     与关键词的逻辑相同，可以设置多个词语，通过 <b>&&</b> 以及 <b>||</b> 来区分
+                                                </p>
+                                            </div>
+                                    </article>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">禁言</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="button-group">
+                                        <button type="button" class="button toggle-button"
+                                            :class="!config.autoresponders.edit.silent ? 'is-active' : ''"
+                                            @click="configSwitch('autoresponders-silent',false)">不开启</button>
+                                        <button type="button" class="button toggle-button"
+                                            :class="config.autoresponders.edit.silent ? 'is-active' : ''"
+                                            @click="configSwitch('autoresponders-silent',true)">开启</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field is-horizontal" v-if="config.autoresponders.edit.silent">
+                            <div class="field-label is-normal">
+                                <label class="label">禁言时间</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <input class="input" type="number" placeholder="禁言多少分钟，为0则永久禁言"
+                                        v-model="config.autoresponders.edit.silent_minute">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field is-horizontal" v-if="config.autoresponders.edit.silent">
+                            <div class="field-label is-normal">
+                                <label class="label">赎金</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <input class="input" type="number" placeholder="电池数，为0则不允许解除"
+                                        v-model="config.autoresponders.edit.ransom_amount">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field is-horizontal" v-if="config.autoresponders.edit.silent">
+                            <div class="field-label is-normal">
+                                <label class="label"></label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <article class="message is-small">
+                                        <div class="message-body">
+                                            <div class="content is-small">
+                                                <p>
+                                                    开启禁言后会在自动回复的同时对用户进行禁言
+                                                </p>
+                                                <p>
+                                                    禁言的时间最短为1分钟，通过<b>禁言时间</b>设置，如果需要长期禁言则设置为0
+                                                </p>
+                                                <p>
+                                                    用户在被禁言后可以通过刷礼物的方式解除自己的禁言，当赠送高于赎金的礼物时会解除禁言
+                                                </p>
+                                                <p>
+                                                    <b>注意：需要礼物价格高于赎金时才会解除禁言，即：赎金设置为10时，需要赠送单价 > 10的礼物，而不是总价</b>
+                                                </p>
+                                                <p>
+                                                    <b>赠送10个单价为1的小花花并不能解除禁言</b>
+                                                </p>
+                                            </div>
+                                    </article>
+                                    <article class="message is-small">
+                                        <div class="message-body">
+                                            <div class="content is-small">
+                                                <p>
+                                                    机器人只能够解除由自己发起的禁言，其余房管/主播发起的禁言无法通过上述方法解除
                                                 </p>
                                             </div>
                                     </article>
@@ -1163,30 +1238,14 @@
                                 keywords: '', // 关键字
                                 safeword: '', // 屏蔽字
                                 text: '', // 内容
+                                silent: false, // 是否开启禁言
+                                silent_minute: 0, // 禁言时长(分钟)
+                                ransom_amount: 0 // 赎回金额(电池)
                             },
                             opens: false,
                             status: 0, // 状态
                             type: 0, // 类型：0=全部响应，1=仅响应牌子，2=仅响应航海
-                            content: [
-                                {
-                                    keywords: '机器人', // 关键字
-                                    safeword: '', // 屏蔽字
-                                    text: '你骂谁机器人，你才是机器人', // 内容
-                                    enable: true // 是否启用
-                                },
-                                {
-                                    keywords: '原神', // 关键字
-                                    safeword: '', // 屏蔽字
-                                    text: '原神！启动！', // 内容
-                                    enable: true // 是否启用
-                                },
-                                {
-                                    keywords: '没钱', // 关键字
-                                    safeword: '', // 屏蔽字
-                                    text: '没钱的话就去钓两个富婆去！看什么直播！', // 内容
-                                    enable: true // 是否启用
-                                }
-                            ]
+                            content: [] // 内容
                         },
                         localVersion: '',
                         remoteVersion: ''
@@ -1262,6 +1321,9 @@
                         case 'autoresponders-type':
                             this.config.autoresponders.type = opens
                             break;
+                        case 'autoresponders-silent':
+                            this.config.autoresponders.edit.silent = opens
+                            break;
                     }
                 },
                 // 切换自动回复是否启用按钮
@@ -1278,6 +1340,9 @@
                         keywords: '',
                         safeword: '',
                         text: '',
+                        silent: false,
+                        silent_minute: 0,
+                        ransom_amount: 0,
                         enable: true
                     });
                     this.openModel((this.config.autoresponders.content.length - 1))
@@ -1289,6 +1354,9 @@
                         this.config.autoresponders.edit.keywords = this.config.autoresponders.content[this.modalKey].keywords;
                         this.config.autoresponders.edit.safeword = this.config.autoresponders.content[this.modalKey].safeword;
                         this.config.autoresponders.edit.text = this.config.autoresponders.content[this.modalKey].text;
+                        this.config.autoresponders.edit.silent = this.config.autoresponders.content[this.modalKey].silent;
+                        this.config.autoresponders.edit.silent_minute = this.config.autoresponders.content[this.modalKey].silent_minute;
+                        this.config.autoresponders.edit.ransom_amount = this.config.autoresponders.content[this.modalKey].ransom_amount;
                     }
                     this.showModal = true;
                 },
@@ -1355,6 +1423,9 @@
                         this.config.autoresponders.content[this.modalKey].keywords = this.config.autoresponders.edit.keywords;
                         this.config.autoresponders.content[this.modalKey].safeword = this.config.autoresponders.edit.safeword;
                         this.config.autoresponders.content[this.modalKey].text = this.config.autoresponders.edit.text;
+                        this.config.autoresponders.content[this.modalKey].silent = this.config.autoresponders.edit.silent;
+                        this.config.autoresponders.content[this.modalKey].silent_minute = this.config.autoresponders.edit.silent_minute;
+                        this.config.autoresponders.content[this.modalKey].ransom_amount = this.config.autoresponders.edit.ransom_amount;
                     }
                     this.showModal = false;
                 },
