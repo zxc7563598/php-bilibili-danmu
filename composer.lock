@@ -770,16 +770,16 @@
         },
         {
             "name": "hejunjie/bililive",
-            "version": "v1.0.2",
+            "version": "v1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zxc7563598/php-bilibili-danmu-core.git",
-                "reference": "613449daf8bb4d7a96c287a31794aea24c110c98"
+                "reference": "e38743c03bd3fe913be2947b17eac6e6e54710fa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zxc7563598/php-bilibili-danmu-core/zipball/613449daf8bb4d7a96c287a31794aea24c110c98",
-                "reference": "613449daf8bb4d7a96c287a31794aea24c110c98",
+                "url": "https://api.github.com/repos/zxc7563598/php-bilibili-danmu-core/zipball/e38743c03bd3fe913be2947b17eac6e6e54710fa",
+                "reference": "e38743c03bd3fe913be2947b17eac6e6e54710fa",
                 "shasum": ""
             },
             "require": {
@@ -811,9 +811,9 @@
             ],
             "support": {
                 "issues": "https://github.com/zxc7563598/php-bilibili-danmu-core/issues",
-                "source": "https://github.com/zxc7563598/php-bilibili-danmu-core/tree/v1.0.2"
+                "source": "https://github.com/zxc7563598/php-bilibili-danmu-core/tree/v1.0.3"
             },
-            "time": "2024-12-14T06:13:47+00:00"
+            "time": "2025-01-24T06:33:26+00:00"
         },
         {
             "name": "hejunjie/hardware-monitor",
@@ -4290,12 +4290,12 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.2"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }
