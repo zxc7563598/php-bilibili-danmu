@@ -122,6 +122,7 @@ if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
 
     # 安装composer
     composer install >> $LOG_FILE 2>&1 &
+    composer update hejunjie/bililive >> $LOG_FILE 2>&1 &
 
     # 启动 Webman 服务
     log_message "启动项目..."
