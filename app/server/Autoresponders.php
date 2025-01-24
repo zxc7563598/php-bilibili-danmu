@@ -2,9 +2,11 @@
 
 namespace app\server;
 
+use app\model\SilentUser;
 use app\queue\SendMessage;
 use app\server\core\KeywordEvaluator;
 use app\server\core\KeywordMatcher;
+use Carbon\Carbon;
 use Hejunjie\Bililive;
 use Exception;
 use Carbon\Exceptions\InvalidTimeZoneException;
@@ -48,6 +50,9 @@ class Autoresponders
             $autoresponders_status = intval($autoresponders['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
             $autoresponders_content = $autoresponders['content']; // 内容
             $message = '';
+            $silent = false;
+            $silent_minute = 0;
+            $ransom_amount = 0;
             // 确认链接直播间的情况
             $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
             $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
@@ -108,6 +113,9 @@ class Autoresponders
                                     }
                                 }
                                 $message = $item['text'];
+                                $silent = isset($item['silent']) ? $item['silent'] : false;
+                                $silent_minute = isset($item['silent_minute']) ? $item['silent_minute'] : 0;
+                                $ransom_amount = isset($item['ransom_amount']) ? $item['ransom_amount'] : 0;
                             }
                             break;
                         }
@@ -119,7 +127,7 @@ class Autoresponders
                 sublog('逻辑检测', '自动回复', '数据匹配成功');
                 self::sendMessage($message, [
                     'name' => $uname
-                ]);
+                ], $msg, $silent, $silent_minute, $ransom_amount, (string)$uid, $uname);
                 sublog('逻辑检测', '自动回复', '----------');
             } else {
                 sublog('逻辑检测', '自动回复', '数据未匹配');
@@ -138,8 +146,55 @@ class Autoresponders
      * @throws Exception 
      * @throws InvalidTimeZoneException 
      */
-    public static function sendMessage(string $content, array $args)
+    public static function sendMessage(string $content, array $args, string $msg, bool $silent, int $silent_minute, int $ransom_amount, string $uid, string $uname)
     {
+        // 加入禁言
+        if ($silent) {
+            // 创建数据
+            SilentUser::where('tuid', $uid)->delete();
+            // 添加禁言
+            $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
+            $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
+            Bililive\Live::addSilentUser($room_id, $cookie, $uid, $msg);
+            // 获取black_id
+            $black_id = '';
+            $getSilentUserList = Bililive\Live::getSilentUserList($room_id, $cookie, 1);
+            if (isset($getSilentUserList['total_page'])) {
+                // 确认第一页是否存在用户
+                if (isset($getSilentUserList['data'])) {
+                    foreach ($getSilentUserList['data'] as $item) {
+                        if ($item['tuid'] == $uid) {
+                            $black_id = $item['id'];
+                            break;
+                        }
+                    }
+                }
+                // 确认其他页是否存在用户
+                if (empty($black_id)) {
+                    for ($i = $getSilentUserList['total_page']; $i > 1; $i--) {
+                        $getSilentUserList = Bililive\Live::getSilentUserList($room_id, $cookie, $i);
+                        if (isset($getSilentUserList['data'])) {
+                            foreach ($getSilentUserList['data'] as $item) {
+                                if ($item['tuid'] == $uid) {
+                                    $black_id = $item['id'];
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            // 记录数据
+            if (!empty($black_id)) {
+                $silent_user = new SilentUser();
+                $silent_user->tuid = $uid;
+                $silent_user->tname = $uname;
+                $silent_user->silent_minute = $silent_minute > 0 ? Carbon::now()->timezone(config('app')['default_timezone'])->addMinutes($silent_minute)->timestamp : Carbon::now()->timezone(config('app')['default_timezone'])->addYears(1)->timestamp;
+                $silent_user->ransom_amount = $ransom_amount;
+                $silent_user->black_id = $black_id;
+                $silent_user->save();
+            }
+        }
         // 拆分要发送的内容
         $content = splitAndFilterLines($content);
         if (count($content)) {

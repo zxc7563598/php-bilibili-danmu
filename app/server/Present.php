@@ -2,7 +2,9 @@
 
 namespace app\server;
 
+use app\model\SilentUser;
 use app\queue\SendMessage;
+use Hejunjie\Bililive;
 use Exception;
 use Carbon\Exceptions\InvalidTimeZoneException;
 use support\Redis;
@@ -42,23 +44,22 @@ class Present
             'guard_level' => $guard_level,
             'level' => $level
         ]);
-        // 获取礼物答谢配置
-        $present = readFileContent(runtime_path() . '/tmp/present.cfg');
-        if ($present) {
-            $present = json_decode($present, true);
-        }
-        // 开启礼物答谢
-        if (isset($present['opens']) && $present['opens']) {
-            $present_price = $present['price']; // 起始感谢电池数
-            $present_type = intval($present['type']); // 类型
-            $present_status = intval($present['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
-            $present_content = $present['content']; // 内容
-            $present_merge = $present['merge']; // 是否合并
-            $present_number = $present['number']; // 展示数量
-            // 确认链接直播间的情况
-            $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
-            $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
-            if ($cookie && $room_id) {
+        $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
+        $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
+        if ($cookie && $room_id) {
+            // 获取礼物答谢配置
+            $present = readFileContent(runtime_path() . '/tmp/present.cfg');
+            if ($present) {
+                $present = json_decode($present, true);
+            }
+            // 开启礼物答谢
+            if (isset($present['opens']) && $present['opens']) {
+                $present_price = $present['price']; // 起始感谢电池数
+                $present_type = intval($present['type']); // 类型
+                $present_status = intval($present['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
+                $present_content = $present['content']; // 内容
+                $present_merge = $present['merge']; // 是否合并
+                $present_number = $present['number']; // 展示数量
                 // 验证是否达到可以感谢的电池数
                 if ($price >= $present_price) {
                     // 验证牌子
@@ -97,27 +98,37 @@ class Present
                         }
                     }
                 }
+                // 如果发送的话
+                if ($is_message) {
+                    sublog('逻辑检测', '礼物答谢', '数据匹配成功');
+                    self::sendMessage($present_content, [
+                        'giftName' => $gift_name,
+                        'price' => $price,
+                        'name' => $uname,
+                        'num' => $num
+                    ], [
+                        'uid' => $uid,
+                        'uname' => $uname,
+                        'merge' => $present_merge,
+                        'number' => $present_number
+                    ]);
+                } else {
+                    sublog('逻辑检测', '礼物答谢', '数据未匹配');
+                }
             }
-            // 如果发送的话
-            if ($is_message) {
-                sublog('逻辑检测', '礼物答谢', '数据匹配成功');
-                self::sendMessage($present_content, [
-                    'giftName' => $gift_name,
-                    'price' => $price,
-                    'name' => $uname,
-                    'num' => $num
-                ], [
-                    'uid' => $uid,
-                    'uname' => $uname,
-                    'merge' => $present_merge,
-                    'number' => $present_number
-                ]);
-                sublog('逻辑检测', '礼物答谢', '----------');
-            } else {
-                sublog('逻辑检测', '礼物答谢', '数据未匹配');
-                sublog('逻辑检测', '礼物答谢', '----------');
+            // 检测禁言是否需要解除
+            $silent_user = SilentUser::where('tuid', $uid)->first();
+            if (!empty($silent_user)) {
+                if ($silent_user->ransom_amount > 0) {
+                    if ($price >= $silent_user->ransom_amount) {
+                        sublog('逻辑检测', '礼物答谢', '解除禁言：' . $silent_user->tname . ' - ' . $silent_user->tuid);
+                        Bililive\Live::delSilentUser($room_id, $cookie, $silent_user->black_id);
+                        $silent_user->delete();
+                    }
+                }
             }
         }
+        sublog('逻辑检测', '礼物答谢', '----------');
     }
 
     /**
