@@ -12,18 +12,12 @@ use app\model\ShopConfig;
 use app\model\UserAddress;
 use app\model\UserVips;
 use Carbon\Carbon;
-use Carbon\Exceptions\InvalidFormatException;
-use Carbon\Exceptions\InvalidTimeZoneException;
 use resource\enums\GoodsEnums;
 use resource\enums\UserVipsEnums;
 use resource\enums\UserAddressEnums;
 use resource\enums\PaymentRecordsEnums;
 use resource\enums\RedemptionRecordsEnums;
 use Hejunjie\Tools;
-use RuntimeException;
-use InvalidArgumentException;
-use ValueError;
-use TypeError;
 
 class UserPublicMethods extends GeneralMethod
 {
@@ -114,12 +108,20 @@ class UserPublicMethods extends GeneralMethod
      * @param string $guard_level 开通类型
      * @param string $amount 金额
      * @param string $payment_at 上舰时间
-     * @param string $live_key 上舰时间
+     * @param string $live_key 直播间key
      * 
      * @return void
      */
     public static function userOpensVip($uid, $name, $guard_level, $amount, $payment_at, $live_key)
     {
+        sublog('舰长付费', '舰长付费', [
+            'uid' => $uid,
+            'name' => $name,
+            'guard_level' => $guard_level,
+            'amount' => $amount,
+            'payment_at' => $payment_at,
+            'live_key' => $live_key
+        ]);
         $config = ShopConfig::whereIn('title', [
             'listening-open-vip',
             'vip-lv3-bonus-points',
@@ -161,7 +163,7 @@ class UserPublicMethods extends GeneralMethod
             $payment_records = new PaymentRecords();
             $payment_records->user_id = $user_vips->user_id;
             $payment_records->vip_type = $vip_type;
-            $payment_records->amount = intval($amount);
+            $payment_records->amount = round(($amount / 100), 2);
             $payment_records->point = $point;
             $payment_records->pre_point = $user_vips->point;
             $payment_records->after_point = $payment_records->pre_point + $point;
@@ -185,6 +187,7 @@ class UserPublicMethods extends GeneralMethod
         // 获取配置信息
         $config = ShopConfig::whereIn('title', [
             'enable-aggregate-mail',
+            'listening-open-vip',
             'email-address',
             'address-as'
         ])->get([
@@ -252,6 +255,7 @@ class UserPublicMethods extends GeneralMethod
                     'name' => $shop_config['address-as'],
                     'starting_time' => $lives->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
                     'end_time' => Carbon::parse($lives->end_time)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
+                    'listening_open_vip' => $shop_config['listening-open-vip'],
                     'open_list' => $open_list,
                     'danmu_list' => $danmu_list,
                     'danmu_count' => $getTopSpeakers['count'],
