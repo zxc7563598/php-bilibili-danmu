@@ -2,9 +2,11 @@
 
 namespace process;
 
+use app\model\SilentUser;
 use Carbon\Carbon;
 use Workerman\Crontab\Crontab;
 use Hejunjie\Tools;
+use Hejunjie\Bililive;
 
 class Task
 {
@@ -14,6 +16,11 @@ class Task
         new Crontab('0 0 * * *', function () {
             self::logDeletion();
             self::logTransfer();
+        });
+
+        // 每分钟执行一次
+        new Crontab('0 */1 * * * *', function () {
+            self::removeSilent();
         });
     }
 
@@ -60,5 +67,31 @@ class Task
             sublog('定时任务', '初始化', '路径不存在');
         }
         sublog('定时任务', '初始化', '==========');
+    }
+
+    /**
+     * 解除禁言
+     * 
+     * @return void 
+     */
+    private static function removeSilent(): void
+    {
+        // 获取凭证
+        $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
+        $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
+        // 获取可以解除禁言的数据
+        $silent_minute = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
+        $silent_user = SilentUser::where('silent_minute', '<', $silent_minute)->get();
+        foreach ($silent_user as $item) {
+            sublog('定时任务', '解除禁言', '用户:' . $item->tname . ' - ' . $item->tuid);
+            try {
+                Bililive\Live::delSilentUser($room_id, $cookie, $item->black_id);
+                $item->delete();
+                sublog('定时任务', '解除禁言', '解除成功');
+            } catch (\Exception $e) {
+                sublog('定时任务', '解除禁言', '解除失败:' . $e->getMessage());
+            }
+            sublog('定时任务', '解除禁言', '==========');
+        }
     }
 }
