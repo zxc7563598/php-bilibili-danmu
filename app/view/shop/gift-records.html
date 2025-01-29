@@ -5,14 +5,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>积分商城控制台</title>
-    <script src="/js/vue.3.5.12.js"></script>
-    <script src="/js/axios.min.js"></script>
     <?php include 'layout/style.php'; ?>
+    <style>
+        .table-container {
+            overflow-x: auto;
+            white-space: nowrap;
+            /* 禁止内容换行 */
+        }
+
+        .table-container::-webkit-scrollbar {
+            height: 8px;
+            /* 滚动条高度 */
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 
 <body>
     <!-- 顶部 Navbar -->
-    <?php $currentPage = 'complaint-management'; ?>
+    <?php $currentPage = 'gift-records'; ?>
     <?php include 'layout/navbar.php'; ?>
     <!-- 主要区域 -->
     <div class="columns menu-container" id="app">
@@ -38,27 +53,49 @@
                                 <div class="columns is-multiline">
                                     <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
                                         <div class="field">
-                                            <label class="label">用户UID</label>
+                                            <label class="label">UID</label>
                                             <div class="control">
-                                                <input class="input" type="text" placeholder="" v-model="form.uid">
+                                                <input class="input" type="text" placeholder="支持模糊查询"
+                                                    v-model="form.uid">
                                             </div>
                                         </div>
                                     </div>
                                     <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
                                         <div class="field">
-                                            <label class="label">用户名称</label>
+                                            <label class="label">名称</label>
                                             <div class="control">
-                                                <input class="input" type="text" placeholder="" v-model="form.uname">
+                                                <input class="input" type="text" placeholder="支持模糊查询"
+                                                    v-model="form.uname">
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile"
+                                    <div class="column is-one-third-desktop is-half-tablet is-full-mobile"
                                         style="display: flex;">
                                         <button class="button is-link" style="flex:1" @click="searchData">搜索</button>
                                         <div style="width: 1rem;"></div>
                                         <button class="button is-light" style="flex:1" @click="emptyData">重置</button>
+                                        <div style="width: 1rem;"></div>
+                                        <button class="button is-light" style="flex:1" @click="addUser">新增</button>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="columns is-multiline">
+                    <div class="column is-half-desktop is-half-tablet is-full-mobile">
+                        <div class="card has-text-centered">
+                            <div class="card-content">
+                                <p class="title is-4">总计数量</p>
+                                <p class="title is-2 has-text-link">{{num}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-half-desktop is-half-tablet is-full-mobile">
+                        <div class="card has-text-centered">
+                            <div class="card-content">
+                                <p class="title is-4">总计金额</p>
+                                <p class="title is-2 has-text-link">{{total_price}}</p>
                             </div>
                         </div>
                     </div>
@@ -70,26 +107,25 @@
                                 <table class="table is-fullwidth is-striped is-hoverable">
                                     <thead>
                                         <tr>
-                                            <th>用户UID</th>
-                                            <th>用户名称</th>
-                                            <th>投诉标题</th>
-                                            <th>投诉事件</th>
-                                            <th>操作</th>
+                                            <th>UID</th>
+                                            <th>名称</th>
+                                            <th>礼物名称</th>
+                                            <th>数量</th>
+                                            <th>金额</th>
+                                            <th>时间</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr v-if="list.data && list.data.length == 0">
-                                            <td colspan="5" style="text-align: center;">无数据</td>
+                                            <td colspan="6" style="text-align: center;">无数据</td>
                                         </tr>
                                         <tr v-for="(item,index) in list.data">
-                                            <td class="is-vcentered">{{item.uid}}</td>
-                                            <td class="is-vcentered">{{item.user_name}}</td>
-                                            <td class="is-vcentered">{{item.title}}</td>
-                                            <td class="is-vcentered">{{item.create_time}}</td>
-                                            <td class="is-vcentered">
-                                                <button class="button is-light is-small"
-                                                    @click="getDataDetails(item.complaint_id)">查看</button>
-                                            </td>
+                                            <td>{{item.uid}}</td>
+                                            <td>{{item.uname}}</td>
+                                            <td>{{item.gift_name}}</td>
+                                            <td>{{item.num}}</td>
+                                            <td>{{item.total_price}}</td>
+                                            <td>{{item.create_time}}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -114,25 +150,6 @@
                 </div>
             </div>
         </div>
-        <div class="modal" :class="active ? 'is-active' : ''">
-            <div class="modal-background"></div>
-            <div class="modal-card">
-                <header class="modal-card-head">
-                    <p class="modal-card-title">{{complaint.title}}</p>
-                    <button class="delete" aria-label="close" @click="this.active = false"></button>
-                </header>
-                <section class="modal-card-body">
-                    <div class="content" style="white-space: pre-wrap;">
-                        {{complaint.content}}
-                    </div>
-                </section>
-                <footer class="modal-card-foot">
-                    <div class="buttons">
-                        <button class="button" @click="this.active = false">关闭</button>
-                    </div>
-                </footer>
-            </div>
-        </div>
     </div>
     <!-- 底部 Footer -->
     <?php include 'layout/footer.php'; ?>
@@ -145,19 +162,14 @@
                 isNotificationVisible: false,
                 notificationMessage: null,
                 notificationType: '',
-                active: false,
                 form: {
                     uid: null,
                     uname: null,
                     page: '<?php echo $page ?>'
                 },
                 list: [],
-                complaint: {
-                    complaint_id: null,
-                    title: null,
-                    content: null,
-                    read: null
-                }
+                num: 0,
+                total_price: 0
             };
         },
         created() {
@@ -219,6 +231,7 @@
                 this.isNotificationVisible = true;
                 this.notificationMessage = message;
                 this.notificationType = this.getNotificationClass(type);
+
                 setTimeout(this.hideNotification, 3000);
             },
 
@@ -250,24 +263,23 @@
                 return result;
             },
 
-            // 变更页码
+            async getData() {
+                const data = this.form;
+                const result = await this.apiRequest('/api/points-mall/gift-records-management/get-data', data);
+                if (result) {
+                    this.num = result.num;
+                    this.list = result.list;
+                    this.total_price = result.total_price;
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('main-content-body').style.display = 'block';
+                }
+            },
+
             handlePageChange(page) {
                 if (page < 1) page = 1;
                 if (page > this.list.total_page) page = this.list.total_page;
                 this.form.page = page;
                 this.getData();
-            },
-
-            // 分页数据处理
-            addEllipsis(pages) {
-                const result = [];
-                for (let i = 0; i < pages.length; i++) {
-                    if (i > 0 && pages[i] - pages[i - 1] > 1) {
-                        result.push('...');
-                    }
-                    result.push(pages[i]);
-                }
-                return result;
             },
 
             searchData() {
@@ -280,28 +292,11 @@
                 this.form.uname = null;
                 this.form.page = 1;
                 this.getData();
-            },
-
-            async getData() {
-                const data = this.form;
-                const result = await this.apiRequest('/api/points-mall/complaint-management/get-data', data);
-                if (result) {
-                    this.list = result.list;
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('main-content-body').style.display = 'block';
-                }
-            },
-
-            async getDataDetails(complaint_id) {
-                this.active = true;
-                const result = await this.apiRequest('/api/points-mall/complaint-management/get-data-details', { complaint_id: complaint_id });
-                if (result) {
-                    this.complaint = result.complaint;
-                }
             }
         }
     });
     app.mount('#app');
 </script>
+
 
 </html>
