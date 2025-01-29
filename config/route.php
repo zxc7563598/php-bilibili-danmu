@@ -33,6 +33,7 @@ Route::group('/points-mall', function () {
     Route::get('/shipping-management', [app\controller\shop\ManagementController::class, 'pageShippingManagement']); // 发货管理
     Route::get('/complaint-management', [app\controller\shop\ManagementController::class, 'pageComplaintManagement']); // 投诉管理
     Route::get('/feedback', [app\controller\shop\ManagementController::class, 'pageFeedback']); // 问题反馈
+    Route::get('/gift-records', [app\controller\shop\ManagementController::class, 'pageGiftRecords']); // 礼物记录
 })->middleware([
     app\middleware\BasicAuthMiddleware::class
 ]);
@@ -59,6 +60,7 @@ Route::group('/api/points-mall', function () {
     Route::any('/shipping-management/set-data-details', [app\controller\shop\management\ShippingManagementController::class, 'setDataDetails']);
     Route::any('/complaint-management/get-data', [app\controller\shop\management\ComplaintManagementController::class, 'getData']);
     Route::any('/complaint-management/get-data-details', [app\controller\shop\management\ComplaintManagementController::class, 'getDataDetails']);
+    Route::any('/gift-records-management/get-data', [app\controller\shop\management\GiftRecordsManagementController::class, 'getData']);
 })->middleware([
     app\middleware\AccessControl::class,
     app\middleware\SignatureMiddleware::class
@@ -161,8 +163,6 @@ Route::post('/reload-timing', function (Request $request) {
     return response($response);
 });
 
-Route::get('/test', function (Request $request) {
-
-});
+Route::get('/test', function (Request $request) {});
 
 Route::disableDefaultRoute(); // 关闭默认路由

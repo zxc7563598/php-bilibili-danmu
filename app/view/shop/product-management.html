@@ -116,7 +116,7 @@
                                     </div>
                                     <div class="column is-one-third-desktop is-half-tablet is-full-mobile"
                                         style="display: flex;">
-                                        <button class="button is-success" style="flex:1" @click="searchData">搜索</button>
+                                        <button class="button is-link" style="flex:1" @click="searchData">搜索</button>
                                         <div style="width: 1rem;"></div>
                                         <button class="button is-light" style="flex:1" @click="emptyData">重置</button>
                                         <div style="width: 1rem;"></div>
@@ -383,7 +383,7 @@
                 </section>
                 <footer class="modal-card-foot">
                     <div class="buttons">
-                        <button class="button is-success" @click="saveGoods"
+                        <button class="button is-link" @click="saveGoods"
                             :class="loading ? 'is-loading' : ''">存储</button>
                         <button class=" button" @click="this.goods_active = false">取消</button>
                     </div>

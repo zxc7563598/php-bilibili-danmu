@@ -24,7 +24,8 @@
         </ul>
         <p class="menu-label">其他</p>
         <ul class="menu-list">
-            <li><a href="https://hejunjie.life/posts/b06795f9.html" class="<?php echo ($currentPage === 'feedback') ? 'is-active' : ''; ?>">救命！我有问题</a></li>
+        <li><a href="https://hejunjie.life/posts/b06795f9.html" class="<?php echo ($currentPage === 'feedback') ? 'is-active' : ''; ?>">救命！我有问题</a></li>
+        <li><a href="/points-mall/gift-records" class="<?php echo ($currentPage === 'gift-records') ? 'is-active' : ''; ?>">礼物记录</a></li>
             <li><a href="/">回到控制台</a></li>
         </ul>
     </aside>
