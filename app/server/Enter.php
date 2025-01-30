@@ -30,13 +30,15 @@ class Enter
             'ruid' => $ruid,
             'guard_level' => $guard_level
         ]);
+        // 不处理自己发送的消息
+        $robot_uid = strval(readFileContent(runtime_path() . '/tmp/uid.cfg'));
         // 获取进房欢迎配置
         $enter = readFileContent(runtime_path() . '/tmp/enter.cfg');
         if ($enter) {
             $enter = json_decode($enter, true);
         }
         // 开启进房欢迎
-        if (isset($enter['opens']) && $enter['opens']) {
+        if (isset($enter['opens']) && $enter['opens'] && $uid != $robot_uid) {
             $enter_type = intval($enter['type']); // 类型
             $enter_status = intval($enter['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
             $enter_content = $enter['content']; // 内容
