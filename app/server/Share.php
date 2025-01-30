@@ -30,13 +30,15 @@ class Share
             'ruid' => $ruid,
             'guard_level' => $guard_level
         ]);
+        // 不处理自己发送的消息
+        $robot_uid = strval(readFileContent(runtime_path() . '/tmp/uid.cfg'));
         // 获取感谢分享配置
         $share = readFileContent(runtime_path() . '/tmp/share.cfg');
         if ($share) {
             $share = json_decode($share, true);
         }
         // 开启感谢分享
-        if (isset($share['opens']) && $share['opens']) {
+        if (isset($share['opens']) && $share['opens'] && $uid != $robot_uid) {
             $share_type = intval($share['type']); // 类型
             $share_status = intval($share['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
             $share_content = $share['content']; // 内容
