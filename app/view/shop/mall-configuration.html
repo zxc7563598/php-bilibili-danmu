@@ -169,6 +169,20 @@
                             </header>
                             <div class="card-content">
                                 <div class="field">
+                                    <label class="label">是否开启礼物记录</label>
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            <select v-model="form.gift_records">
+                                                <option :value="null" disabled>请选择</option>
+                                                <option value="0">否</option>
+                                                <option value="1">是</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <p class="help">开启后，系统会记录监听到的用户赠送礼物的信息，可在<b>其他 - 礼物记录</b>中查看</p>
+                                    <p class="help"><b>注意：需要在控制台监听房间后才可生效</b></p>
+                                </div>
+                                <div class="field">
                                     <label class="label">大航海监听</label>
                                     <div class="control">
                                         <div class="select is-fullwidth">
@@ -540,6 +554,7 @@
                     protocols_name: null, // 协议名称
                     protocols_signature: [], // 协议人签名
                     protocols_content: null, // 协议内容
+                    gift_records: null, // 是否开启礼物记录
                     listening_open_vip: null, // 大航海监听
                     vip_lv1_bonus_points: null, // 开通舰长奖励积分
                     vip_lv2_bonus_points: null, // 开通提督奖励积分

@@ -104,4 +104,18 @@ class ManagementController extends GeneralMethod
             'complaint' => $complaint
         ]);
     }
+    public function pageGiftRecords(Request $request, $page = null)
+    {
+        // 获取未发货数量
+        $records = RedemptionRecords::where('status', RedemptionRecordsEnums\Status::NoShipment->value)->count();
+        // 获取投诉数量
+        $complaint = Complaint::where('read', ComplaintEnums\Read::Unread->value)->count();
+        $page = !empty($page) ? $page : 1;
+        return view('shop/gift-records', [
+            'secretKey' => getenv('SECURE_API_KEY'),
+            'page' => $page,
+            'records' => $records,
+            'complaint' => $complaint
+        ]);
+    }
 }
