@@ -312,7 +312,7 @@ class Bilibili
                             $payload['payload']['data']['username'],
                             $payload['payload']['data']['gift_id'],
                             $payload['payload']['data']['gift_name'],
-                            $payload['payload']['data']['price'],
+                            ($payload['payload']['data']['price'] / 100),
                             $payload['payload']['data']['num'],
                             0,
                             0,

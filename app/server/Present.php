@@ -2,6 +2,8 @@
 
 namespace app\server;
 
+use app\model\GiftRecords;
+use app\model\ShopConfig;
 use app\model\SilentUser;
 use app\queue\SendMessage;
 use Hejunjie\Bililive;
@@ -133,6 +135,19 @@ class Present
                 }
             }
         }
+        // 记录礼物信息
+        $shop_config = self::getShopConfig();
+        if (isset($shop_config['gift-records']) && $shop_config['gift-records'] == 1) {
+            $gift_records = new GiftRecords();
+            $gift_records->uid = $uid;
+            $gift_records->uname = $uname;
+            $gift_records->gift_id = $gift_id;
+            $gift_records->gift_name = $gift_name;
+            $gift_records->price = ($price / 10);
+            $gift_records->num = $num;
+            $gift_records->total_price = ($gift_records->price * $gift_records->num);
+            $gift_records->save();
+        }
         sublog('逻辑检测', '礼物答谢', '----------');
     }
 
@@ -184,5 +199,26 @@ class Present
             }
         }
         return $text;
+    }
+
+    /**
+     * 获取商城配置信息
+     * 
+     * @return array 
+     */
+    private static function getShopConfig(): array
+    {
+        $config = Redis::get(config('app')['app_name'] . ':config');
+        if (empty($config)) {
+            $shop_config = ShopConfig::get();
+            $data = [];
+            foreach ($shop_config as $_shop_config) {
+                $data[$_shop_config->title] = $_shop_config->content;
+            }
+            Redis::set(config('app')['app_name'] . ':config', json_encode($data));
+        } else {
+            $data = json_decode($config, true);
+        }
+        return $data;
     }
 }
