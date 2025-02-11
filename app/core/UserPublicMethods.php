@@ -27,12 +27,17 @@ class UserPublicMethods extends GeneralMethod
      * @param string $user_id 用户id
      * @param string $goods_id 商品id
      * @param array $sub_id 款式
+     * @param string $email 邮箱地址
      * 
      * @return bool|integer
      */
-    public static function redeemingGoods($user_id, $goods_id, $sub_id): bool|int
+    public static function redeemingGoods($user_id, $goods_id, $sub_id, $email): bool|int
     {
         $user_vips = UserVips::where('user_id', $user_id)->first();
+        if (!empty($email)) {
+            $user_vips->email = $email;
+            $user_vips->save();
+        }
         $goods = Goods::where('goods_id', $goods_id)->where('status', GoodsEnums\Status::Normal->value)->first();
         if (empty($goods)) {
             return 800006;
@@ -75,6 +80,7 @@ class UserPublicMethods extends GeneralMethod
         $redemption_records->shipping_address = $shipping_address;
         $redemption_records->shipping_name = $shipping_name;
         $redemption_records->shipping_phone = $shipping_phone;
+        $redemption_records->shipping_email = $email;
         $redemption_records->save();
         // 发送邮件
         $subject = UserVipsEnums\VipType::from($user_vips->vip_type)->label() . $user_vips->name . ', uid:' . $user_vips->uid . '兑换商品';
@@ -87,15 +93,6 @@ class UserPublicMethods extends GeneralMethod
         $set_html_body .= '<p>详细信息请进入积分商城查看</p>';
         sublog('邮件发送', '商品兑换', $subject);
         sublog('邮件发送', '商品兑换', $set_html_body);
-        // $mailer = Mailer::setFrom(['992182040@qq.com' => "商品兑换"])
-        //     ->setTo('junjie.he.925@gmail.com')
-        //     ->setCc('482335887@qq.com')
-        //     ->setSubject($subject)
-        //     ->setHtmlBody($set_html_body)
-        //     ->send();
-        // sublog('邮件发送', '商品兑换', '发送结果');
-        // sublog('邮件发送', '商品兑换', $mailer);
-        // sublog('邮件发送', '商品兑换', '----------');
         // 返回成功
         return true;
     }
