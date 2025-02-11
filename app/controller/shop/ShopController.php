@@ -166,6 +166,8 @@ class ShopController extends GeneralMethod
                 'amount' => round($goods->amount),
                 'commodity_type' => implode(',', $commodity_type),
                 'address' => ($goods->type == GoodsEnums\Type::Entity->value) ? true : false,
+                'mail' => ($goods->type != GoodsEnums\Type::Entity->value) ? true : false,
+                'email' => $user_vips->email,
                 'protocols' => !empty($user_vips->sign_image) ? true : false,
                 'details' => [
                     ['key' => '运费', 'value' => '主包包邮'],
@@ -181,6 +183,7 @@ class ShopController extends GeneralMethod
      *
      * @param integer $goods_id 产品id
      * @param string $sub_id 子集id
+     * @param string $email 邮箱地址
      * 
      * @return Response
      */
@@ -194,12 +197,13 @@ class ShopController extends GeneralMethod
         // 获取参数
         $goods_id = $param['goods_id'];
         $sub_id = explode(',', $param['sub_id']);
+        $email = !empty($param['email']) ? $param['email'] : null;
         // 获取商品
         $goods = Goods::where('goods_id', $goods_id)->first([
             'type' => 'type'
         ]);
         // 兑换商品
-        $redeemingGoods = UserPublicMethods::redeemingGoods($user_vips->user_id, $goods_id, $sub_id);
+        $redeemingGoods = UserPublicMethods::redeemingGoods($user_vips->user_id, $goods_id, $sub_id, $email);
         if (is_int($redeemingGoods)) {
             return fail($request, $redeemingGoods);
         }
