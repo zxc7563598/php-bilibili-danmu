@@ -149,6 +149,9 @@ function isDocker(): bool
  */
 function getImageUrl($str): string
 {
+    if(!$str){
+        return '';
+    }
     if (strpos($str, 'http://') === false && strpos($str, 'https://') === false) {
         $str = config('app')['image_url'] . '/' . $str;
     }
