@@ -157,7 +157,7 @@ class ShippingManagementController extends GeneralMethod
                 'name' => $user_vips->name
             ],
             'shipping_email' => $redemption_records->shipping_email,
-            'shipping_address' => $redemption_records->shipping_address,
+            'shipping_address' => implode(" ", explode('/', $redemption_records->shipping_address)),
             'shipping_name' => $redemption_records->shipping_name,
             'shipping_phone' => $redemption_records->shipping_phone,
             'tracking_number' => $redemption_records->tracking_number,
