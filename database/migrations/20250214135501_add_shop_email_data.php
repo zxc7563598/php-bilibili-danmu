@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Phinx\Migration\AbstractMigration;
 use support\Redis;
 
-final class AddShopConfigEmailData extends AbstractMigration
+final class AddShopEmailData extends AbstractMigration
 {
     /**
      * Migrate Up.
