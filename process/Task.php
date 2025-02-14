@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Workerman\Crontab\Crontab;
 use Hejunjie\Tools;
 use Hejunjie\Bililive;
+use support\Redis;
 
 class Task
 {
@@ -16,6 +17,7 @@ class Task
         new Crontab('0 0 * * *', function () {
             self::logDeletion();
             self::logTransfer();
+            Redis::del(config('app')['app_name'] . ':config');
         });
 
         // 每分钟执行一次

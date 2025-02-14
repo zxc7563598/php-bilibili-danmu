@@ -78,6 +78,7 @@ class MallConfigurationController extends GeneralMethod
             'tribute_gift_order_successful_rankings' => $data['tribute-gift-order-successful-rankings'], // 贡品下单成功是否开启排名
             'tribute_gift_order_successful_rankingslist' => $data['tribute-gift-order-successful-rankingslist'], // 贡品下单成功排名列表
             'enable_aggregate_mail' => $data['enable-aggregate-mail'], // 是否开启下播邮件
+            'enable_shop_mail' => $data['enable-shop-mail'], // 是否开启兑换邮件
             'email_address' => $data['email-address'], // 邮箱地址
             'address_as' => $data['address-as'], // 称呼
         ]);
@@ -116,6 +117,7 @@ class MallConfigurationController extends GeneralMethod
      * @param string $tribute_gift_order_successful_rankings 贡品下单成功是否开启排名
      * @param string $tribute_gift_order_successful_rankingslist 贡品下单成功排名列表
      * @param string $enable_aggregate_mail 是否开启下播邮件
+     * @param string $enable_shop_mail 是否开启兑换邮件
      * @param string $email_address 邮箱地址
      * @param string $address_as 称呼
      * 
@@ -155,6 +157,7 @@ class MallConfigurationController extends GeneralMethod
         $input['tribute-gift-order-successful-rankings'] = $param['tribute_gift_order_successful_rankings'];
         $input['tribute-gift-order-successful-rankingslist'] = $param['tribute_gift_order_successful_rankingslist'];
         $input['enable-aggregate-mail'] = $param['enable_aggregate_mail'];
+        $input['enable-shop-mail'] = $param['enable_shop_mail'];
         $input['email-address'] = $param['email_address'];
         $input['address-as'] = $param['address_as'];
         // 获取数据

@@ -83,6 +83,49 @@ class UserPublicMethods extends GeneralMethod
         $redemption_records->shipping_email = $email;
         $redemption_records->save();
         // 发送邮件
+        $shop_config = self::getShopConfig();
+        if ($shop_config['enable-shop-mail'] && $shop_config['email-address'] && $shop_config['address-as']) {
+            // 获取用户历史兑换
+            $history = [];
+            $redemption_records_logs = RedemptionRecords::where('user_id', $user_id)->orderBy('created_at', 'desc')->get([
+                'goods_id' => 'goods_id',
+                'sub_id' => 'sub_id',
+                'created_at' => 'created_at'
+            ]);
+            foreach ($redemption_records_logs as $_redemption_records_logs) {
+                $goods = Goods::where('goods_id', $_redemption_records_logs->goods_id)->first([
+                    'name' => 'name'
+                ]);
+                $subs = GoodSubs::whereIn('sub_id', explode(',', $_redemption_records_logs->sub_id))->get([
+                    'name' => 'name'
+                ]);
+                $subs_name = [];
+                foreach ($subs as $_subs) {
+                    $subs_name[] = $_subs->name;
+                }
+                $history[] = [
+                    'goods_name' => $goods->name,
+                    'sub_name' => implode(',', $subs_name),
+                    'time' => $_redemption_records_logs->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s')
+                ];
+            }
+            // 发送邮件
+            Tools\HttpClient::sendPostRequest('https://bilibili-email-xdobqxxrfo.cn-hongkong.fcapp.run/shop-email', [
+                'Content-Type: application/json'
+            ], json_encode([
+                'mail' => $shop_config['email-address'],
+                'name' => $shop_config['address-as'],
+                'uid' => $user_vips->uid,
+                'uname' => $user_vips->name,
+                'gift_type' => $goods->type,
+                'gift_name' => $goods->name,
+                'sub_name' => implode(',', $sub_name),
+                'point' => $redemption_records->after_point,
+                'history' => $history
+            ]));
+        }
+
+
         $subject = UserVipsEnums\VipType::from($user_vips->vip_type)->label() . $user_vips->name . ', uid:' . $user_vips->uid . '兑换商品';
         $set_html_body = '<p>兑换商品：' . $goods->name . '</p>';
         $set_html_body .= '<p>兑换规格：' . implode(',', $sub_name) . '</p>';
