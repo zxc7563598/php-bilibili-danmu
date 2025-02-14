@@ -69,6 +69,24 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
+                                        <div class="field">
+                                            <label class="label">起始日期</label>
+                                            <div class="control">
+                                                <input class="input" type="text" placeholder="输入类似 2021-01-01 的日期"
+                                                    v-model="form.start_time">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
+                                        <div class="field">
+                                            <label class="label">截止日期</label>
+                                            <div class="control">
+                                                <input class="input" type="text" placeholder="输入类似 2021-01-01 的日期"
+                                                    v-model="form.end_time">
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="column is-one-third-desktop is-half-tablet is-full-mobile"
                                         style="display: flex;">
                                         <button class="button is-link" style="flex:1" @click="searchData">搜索</button>
@@ -165,6 +183,8 @@
                 form: {
                     uid: null,
                     uname: null,
+                    start_time: null,
+                    end_time: null,
                     page: '<?php echo $page ?>'
                 },
                 list: [],
