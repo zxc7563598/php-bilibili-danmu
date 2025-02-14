@@ -17,7 +17,6 @@ final class AddShopEmailData extends AbstractMigration
             ['config_id' => 33, 'title' => 'enable-shop-mail', 'description' => '是否开启兑换通知', 'content' => '1', 'created_at' => time(), 'updated_at' => time()]
         ]);
         $tableAdd->saveData();
-        Redis::del(config('app')['app_name'] . ':config');
     }
 
     /**
