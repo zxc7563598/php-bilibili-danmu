@@ -6,12 +6,13 @@ use support\Request;
 use support\Response;
 use app\controller\GeneralMethod;
 use app\model\GiftRecords;
+use Carbon\Carbon;
 use support\Db;
 
 class GiftRecordsManagementController extends GeneralMethod
 {
     /**
-     * 获取用户列表
+     * 获取礼物记录数据
      * 
      * @param integer $page 页码
      * @param string $uid 用户UID
@@ -26,6 +27,8 @@ class GiftRecordsManagementController extends GeneralMethod
         $page = $param['page'];
         $uid = $param['uid'] ?? null;
         $uname = $param['uname'] ?? null;
+        $start_time = $param['start_time'] ?? null;
+        $end_time = $param['end_time'] ?? null;
         // 获取数据
         $records = GiftRecords::query();
         $records_total = GiftRecords::query();
@@ -36,6 +39,16 @@ class GiftRecordsManagementController extends GeneralMethod
         if (!is_null($uname)) {
             $records->where('uname', 'like', '%' . $uname . '%');
             $records_total->where('uname', 'like', '%' . $uname . '%');
+        }
+        if (!is_null($start_time)) {
+            $start_time = Carbon::parse($start_time)->timezone(config('app')['default_timezone'])->timestamp;
+            $records->where('created_at', '>=', $start_time);
+            $records_total->where('created_at', '>=', $start_time);
+        }
+        if (!is_null($end_time)) {
+            $end_time = Carbon::parse($end_time)->timezone(config('app')['default_timezone'])->timestamp;
+            $records->where('created_at', '<', $end_time);
+            $records_total->where('created_at', '<', $end_time);
         }
         $records = $records->orderBy('created_at', 'desc')
             ->paginate(100, [
