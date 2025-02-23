@@ -143,10 +143,27 @@ class UserManagementController extends GeneralMethod
         $user->uid = $uid;
         $user->name = $name;
         if (!is_null($password)) {
-            $user->password = $password;
+            $user->salt = mt_rand(1000, 9999);
+            $user->password = sha1(sha1($password) . $user->salt);
         }
         $user->vip_type = $vip_type;
         $user->save();
+        // 返回数据
+        return success($request, []);
+    }
+
+    /**
+     * 清空所有用户密码
+     * 
+     * @return Response 
+     */
+    public function resetPassword(Request $request)
+    {
+        // 处理数据
+        UserVips::where('created_at', '>', 0)->update([
+            'password' => null,
+            'salt' => null
+        ]);
         // 返回数据
         return success($request, []);
     }

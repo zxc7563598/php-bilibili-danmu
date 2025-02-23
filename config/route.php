@@ -49,6 +49,7 @@ Route::group('/api/points-mall', function () {
     Route::any('/user-management/get-user-data', [app\controller\shop\management\UserManagementController::class, 'getUserData']);
     Route::any('/user-management/get-user-info', [app\controller\shop\management\UserManagementController::class, 'getUserInfo']);
     Route::any('/user-management/set-data', [app\controller\shop\management\UserManagementController::class, 'setData']);
+    Route::any('/user-management/reset-password', [app\controller\shop\management\UserManagementController::class, 'resetPassword']);
     Route::any('/user-management/get-user-records', [app\controller\shop\management\UserManagementController::class, 'getUserRecords']);
     Route::any('/user-management/set-user-point', [app\controller\shop\management\UserManagementController::class, 'setUserPoint']);
     Route::any('/product-management/get-data', [app\controller\shop\management\ProductManagementController::class, 'getData']);
