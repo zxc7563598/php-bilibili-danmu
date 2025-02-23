@@ -153,6 +153,22 @@ class UserManagementController extends GeneralMethod
     }
 
     /**
+     * 清空所有用户密码
+     * 
+     * @return Response 
+     */
+    public function resetPassword(Request $request)
+    {
+        // 处理数据
+        UserVips::updated([
+            'password' => null,
+            'salt' => null
+        ]);
+        // 返回数据
+        return success($request, []);
+    }
+
+    /**
      * 获取用户航海开通记录
      * 
      * @param integer $user_id 用户ID
