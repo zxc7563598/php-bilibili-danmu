@@ -76,6 +76,9 @@
                                         <button class="button is-light" style="flex:1" @click="emptyData">重置</button>
                                         <div style="width: 1rem;"></div>
                                         <button class="button is-light" style="flex:1" @click="addUser">新增</button>
+                                        <div style="width: 1rem;"></div>
+                                        <button class="button is-danger is-light" style="flex:1"
+                                            @click="confirmRemake">大赦天下</button>
                                     </div>
                                 </div>
                             </div>
@@ -264,6 +267,25 @@
                 </footer>
             </div>
         </div>
+        <div class="modal" :class="confirm_remake_active ? 'is-active' : ''">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">大赦天下</p>
+                    <button class="delete" aria-label="close" @click="this.confirm_remake_active = false"></button>
+                </header>
+                <section class="modal-card-body">
+                    <p>确认后，将重置所有用户密码</p>
+                    <p>真的要这么做吗？</p>
+                </section>
+                <footer class="modal-card-foot">
+                    <div class="buttons">
+                        <button class="button is-link" @click="resetConfirmation">确认重置</button>
+                        <button class="button" @click="this.confirm_remake_active = false">我点错了</button>
+                    </div>
+                </footer>
+            </div>
+        </div>
     </div>
     <!-- 底部 Footer -->
     <?php include 'layout/footer.php'; ?>
@@ -289,6 +311,7 @@
                 list: [],
                 records: [],
                 userinfo_active: false,
+                confirm_remake_active: false,
                 records_active: false,
                 add_user_records_active: false,
                 uid_error: false,
@@ -426,6 +449,10 @@
                 this.userinfo_active = true;
             },
 
+            confirmRemake() {
+                this.confirm_remake_active = true;
+            },
+
             async userEdit(user_id) {
                 this.userinfo_active = true;
                 const result = await this.apiRequest('/api/points-mall/user-management/get-user-data', { user_id: user_id });
@@ -441,6 +468,14 @@
                     this.resetUser();
                     this.userinfo_active = false;
                     this.getData();
+                }
+            },
+
+            async resetConfirmation() {
+                const result = await this.apiRequest('/api/points-mall/user-management/reset-password', this.user);
+                if (result) {
+                    this.showNotification('操作成功', 'success');
+                    this.confirm_remake_active = false;
                 }
             },
 
