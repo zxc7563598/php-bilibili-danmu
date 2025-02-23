@@ -160,7 +160,7 @@ class UserManagementController extends GeneralMethod
     public function resetPassword(Request $request)
     {
         // 处理数据
-        UserVips::where('1', '=', '1')->update([
+        UserVips::where('created_at', '>', 0)->update([
             'password' => null,
             'salt' => null
         ]);
