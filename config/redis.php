@@ -16,7 +16,7 @@
 return [
     'default' => [
         'host' => getenv('REDIS_HOST'),
-        'password' => null,
+        'password' => getenv('DB_PASSWORD'),
         'port' => getenv('REDIS_PORT'),
         'database' => 0,
     ],
