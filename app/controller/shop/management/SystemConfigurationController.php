@@ -26,24 +26,24 @@ class SystemConfigurationController extends GeneralMethod
         // 返回数据
         return success($request, [
             'shop' => $shop,
-            'shop_name' => getenv('SHOP_NAME', ''),
-            'shop_url' => getenv('SHOP_URL', ''),
-            'system_api_url' => getenv('SYSTEM_API_URL', ''),
-            'system_aes_key' => getenv('SYSTEM_AES_KEY', ''),
-            'system_aes_iv' => getenv('SYSTEM_AES_IV', ''),
-            'system_key' => getenv('SYSTEM_KEY', ''),
-            'host' => getenv('HOST', ''),
-            'listen' => getenv('LISTEN', ''),
-            're_open_host' => getenv('RE_OPEN_HOST', ''),
-            'secure_api_key' => getenv('SECURE_API_KEY', ''),
-            'redis_host' => getenv('REDIS_HOST', ''),
-            'redis_port' => getenv('REDIS_PORT', ''),
-            'redis_password' => getenv('REDIS_PASSWORD', ''),
-            'db_host' => getenv('DB_HOST', ''),
-            'db_port' => getenv('DB_PORT', ''),
-            'db_name' => getenv('DB_NAME', ''),
-            'db_user' => getenv('DB_USER', ''),
-            'db_password' => getenv('DB_PASSWORD', '')
+            'shop_name' => getenv('SHOP_NAME'),
+            'shop_url' => getenv('SHOP_URL'),
+            'system_api_url' => getenv('SYSTEM_API_URL'),
+            'system_aes_key' => getenv('SYSTEM_AES_KEY'),
+            'system_aes_iv' => getenv('SYSTEM_AES_IV'),
+            'system_key' => getenv('SYSTEM_KEY'),
+            'host' => getenv('HOST'),
+            'listen' => getenv('LISTEN'),
+            're_open_host' => getenv('RE_OPEN_HOST'),
+            'secure_api_key' => getenv('SECURE_API_KEY'),
+            'redis_host' => getenv('REDIS_HOST'),
+            'redis_port' => getenv('REDIS_PORT'),
+            'redis_password' => getenv('REDIS_PASSWORD') ? getenv('REDIS_PASSWORD') : '',
+            'db_host' => getenv('DB_HOST'),
+            'db_port' => getenv('DB_PORT'),
+            'db_name' => getenv('DB_NAME'),
+            'db_user' => getenv('DB_USER'),
+            'db_password' => getenv('DB_PASSWORD')
         ]);
     }
 
