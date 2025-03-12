@@ -38,6 +38,7 @@ class SystemConfigurationController extends GeneralMethod
             'secure_api_key' => getenv('SECURE_API_KEY', ''),
             'redis_host' => getenv('REDIS_HOST', ''),
             'redis_port' => getenv('REDIS_PORT', ''),
+            'redis_password' => getenv('REDIS_PASSWORD', ''),
             'db_host' => getenv('DB_HOST', ''),
             'db_port' => getenv('DB_PORT', ''),
             'db_name' => getenv('DB_NAME', ''),
@@ -89,6 +90,7 @@ class SystemConfigurationController extends GeneralMethod
      * @param string $secure_api_key 重启密钥 
      * @param string $redis_host Redis地址 
      * @param string $redis_port Redis端口 
+     * @param string $redis_password Redis密码
      * @param string $db_host 数据库地址 
      * @param string $db_port 数据库端口 
      * @param string $db_name 数据库账号 
@@ -114,6 +116,7 @@ class SystemConfigurationController extends GeneralMethod
             'secure_api_key',
             'redis_host',
             'redis_port',
+            'redis_password',
             'db_host',
             'db_port',
             'db_name',
