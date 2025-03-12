@@ -24,6 +24,7 @@ class SendMessage
     {
         return match ($input) {
             'Autoresponders' => 15,
+            'CheckIn' => 15,
             'Enter' => 5,
             'Follow' => 5,
             'Present' => 20,
