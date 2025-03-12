@@ -24,12 +24,6 @@ class Share
     public static function processing($uid, $uname, $ruid, $guard_level)
     {
         $is_message = false;
-        sublog('逻辑检测', '感谢分享', [
-            'uid' => $uid,
-            'uname' => $uname,
-            'ruid' => $ruid,
-            'guard_level' => $guard_level
-        ]);
         // 不处理自己发送的消息
         $robot_uid = strval(readFileContent(runtime_path() . '/tmp/uid.cfg'));
         // 获取感谢分享配置
@@ -39,6 +33,12 @@ class Share
         }
         // 开启感谢分享
         if (isset($share['opens']) && $share['opens'] && $uid != $robot_uid) {
+            sublog('逻辑检测', '感谢分享', [
+                'uid' => $uid,
+                'uname' => $uname,
+                'ruid' => $ruid,
+                'guard_level' => $guard_level
+            ]);
             $share_type = intval($share['type']); // 类型
             $share_status = intval($share['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
             $share_content = $share['content']; // 内容

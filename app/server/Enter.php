@@ -24,12 +24,6 @@ class Enter
     public static function processing($uid, $uname, $ruid, $guard_level)
     {
         $is_message = false;
-        sublog('逻辑检测', '进房欢迎', [
-            'uid' => $uid,
-            'uname' => $uname,
-            'ruid' => $ruid,
-            'guard_level' => $guard_level
-        ]);
         // 不处理自己发送的消息
         $robot_uid = strval(readFileContent(runtime_path() . '/tmp/uid.cfg'));
         // 获取进房欢迎配置
@@ -39,6 +33,12 @@ class Enter
         }
         // 开启进房欢迎
         if (isset($enter['opens']) && $enter['opens'] && $uid != $robot_uid) {
+            sublog('逻辑检测', '进房欢迎', [
+                'uid' => $uid,
+                'uname' => $uname,
+                'ruid' => $ruid,
+                'guard_level' => $guard_level
+            ]);
             $enter_type = intval($enter['type']); // 类型
             $enter_status = intval($enter['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
             $enter_content = $enter['content']; // 内容
