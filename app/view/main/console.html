@@ -212,6 +212,146 @@
             </div>
             <div class="columns is-multiline">
                 <div class="column is-full-touch is-half-desktop">
+                    <!-- 签到 -->
+                    <div class="card">
+                        <div class="card-content">
+                            <h5 class="title is-5" style="display: flex;align-items: center;">
+                                签到
+                                <div class="button-group" style="margin-left: auto;">
+                                    <button type="button" class="button is-small toggle-button"
+                                        :class="config.check_in.opens ? 'is-active' : ''"
+                                        @click="configSwitch('check_in',true)">开启</button>
+                                    <button type="button" class="button is-small toggle-button"
+                                        :class="!config.check_in.opens ? 'is-active' : ''"
+                                        @click="configSwitch('check_in',false)">关闭</button>
+                                </div>
+                            </h5>
+                            <article class="message is-small">
+                                <div class="message-body">
+                                    <div class="content is-small">
+                                        <h3>可以使用的动态信息</h3>
+                                        <p>
+                                            这些内容可以加入到签到成功&查询成功的回复里，实际发送时会被替换成对应内容
+                                        </p>
+                                        <ul>
+                                            <li><b>名称：</b>@name@</li>
+                                            <li><b>总计签到天数：</b>@total@</li>
+                                            <li><b>连续签到天数：</b>@serial@</li>
+                                        </ul>
+                                        <p>
+                                            说实话没想好这个功能做出来之后要实际怎么应用
+                                        </p>
+                                        <p>
+                                            签到到底有什么用处？奖励商城积分？还是什么？奖励积分用于兑换积分商城的奖品吗？那岂不是给了人白嫖的机会
+                                        </p>
+                                        <p>
+                                            或者单独开一套跟商城积分相对独立的货币体系？感觉有点复杂
+                                        </p>
+                                        <p>
+                                            总之因为有人要这个东西，所以就先做了，他也没交代更多，具体怎么用还要再想想，有什么问题跟建议可以直接在 <a
+                                                href="https://hejunjie.life/posts/b06795f9.html">这里这里点我</a>
+                                            下面评论，我会看到，也会回复
+                                        </p>
+                                    </div>
+                            </article>
+                            <form>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">状态</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <div class="button-group">
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.check_in.status == 0 ? 'is-active' : ''"
+                                                    @click="configSwitch('check_in-status',0)">不论何时</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.check_in.status == 1 ? 'is-active' : ''"
+                                                    @click="configSwitch('check_in-status',1)">仅在直播时</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.check_in.status == 2 ? 'is-active' : ''"
+                                                    @click="configSwitch('check_in-status',2)">仅在非直播时</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">过滤</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <div class="button-group">
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.check_in.type == 0 ? 'is-active' : ''"
+                                                    @click="configSwitch('check_in-type',0)">全部</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.check_in.type == 1 ? 'is-active' : ''"
+                                                    @click="configSwitch('check_in-type',1)">仅牌子</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.check_in.type == 2 ? 'is-active' : ''"
+                                                    @click="configSwitch('check_in-type',2)">仅航海</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">签到词</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <div class="field has-addons">
+                                                <p class="control" style="flex: 1;">
+                                                    <input class="input" type="text" placeholder="建议加符号避免误触，例如：#签到"
+                                                        v-model="config.check_in.keywords">
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">查询词</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <div class="field has-addons">
+                                                <p class="control" style="flex: 1;">
+                                                    <input class="input" type="text" placeholder="建议加符号避免误触，例如：#查询"
+                                                        v-model="config.check_in.select">
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">签到成功</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <textarea class="textarea has-fixed-size"
+                                                placeholder="签到成功回复内容，例如：@name@签到成功啦～" rows="5"
+                                                v-model="config.check_in.success"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">查询成功</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <textarea class="textarea has-fixed-size"
+                                                placeholder="查询成功回复内容，例如：@name@已连续签到@day@天～" rows="5"
+                                                v-model="config.check_in.reply"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                     <!-- 定时广告 -->
                     <div class="card">
                         <div class="card-content">
@@ -379,7 +519,7 @@
                                     <div class="field-body">
                                         <div class="field">
                                             <textarea class="textarea has-fixed-size"
-                                                placeholder="欢迎内容，例如：欢迎@name@来到直播间～" rows="10"
+                                                placeholder="欢迎内容，例如：欢迎@name@来到直播间～" rows="5"
                                                 v-model="config.enter.content"></textarea>
                                         </div>
                                     </div>
@@ -487,7 +627,7 @@
                                     <div class="field-body">
                                         <div class="field">
                                             <textarea class="textarea has-fixed-size" placeholder="感谢内容，例如：感谢@name@的分享～"
-                                                rows="10" v-model="config.share.content"></textarea>
+                                                rows="5" v-model="config.share.content"></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -1206,6 +1346,15 @@
                             status: 0, // 状态
                             content: null // 内容
                         },
+                        check_in: { // 签到
+                            opens: false, // 是否开启
+                            status: 0, // 状态
+                            type: 0, // 类型：0=全部感谢，1=仅感谢牌子，2=仅感谢航海
+                            keywords: null, // 签到词
+                            select: null, // 查询词
+                            success: null, // 成功回复
+                            reply: null // 查询回复
+                        },
                         present: { // 礼物答谢
                             opens: false,
                             number: null, // 数量：0-不展示，1-展示
@@ -1269,6 +1418,15 @@
                             break;
                         case 'timing-status':
                             this.config.timing.status = opens
+                            break;
+                        case 'check_in':
+                            this.config.check_in.opens = opens
+                            break;
+                        case 'check_in-status':
+                            this.config.check_in.status = opens
+                            break;
+                        case 'check_in-type':
+                            this.config.check_in.type = opens
                             break;
                         case 'present':
                             this.config.present.opens = opens
@@ -1494,6 +1652,7 @@
                             this.config.autoresponders.status = response.data.data.autoresponders.status;
                             this.config.autoresponders.type = response.data.data.autoresponders.type;
                             this.config.autoresponders.content = response.data.data.autoresponders.content;
+                            this.config.check_in = response.data.data.check_in;
                             this.update = response.data.data.update;
                         } else {
                             this.showNotification(response.data.message, 'error');
@@ -1508,7 +1667,8 @@
                         enter: this.config.enter,
                         follow: this.config.follow,
                         share: this.config.share,
-                        autoresponders: this.config.autoresponders
+                        autoresponders: this.config.autoresponders,
+                        check_in: this.config.check_in
                     }
                     let signature = CryptoJS.HmacSHA256(JSON.stringify(data), this.secretKey).toString();
                     axios.post('/api/robot/set-config', data, {
