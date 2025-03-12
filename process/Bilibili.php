@@ -10,6 +10,7 @@ use app\model\ShopConfig;
 use app\model\UserVips;
 use app\queue\SendMessage;
 use app\server\Autoresponders;
+use app\server\CheckIn;
 use app\server\Enter;
 use app\server\Follow;
 use app\server\Present;
@@ -371,6 +372,13 @@ class Bilibili
                         }
                         break;
                     case 'DANMU_MSG': // 弹幕信息
+                        CheckIn::processing(
+                            $payload['payload']['info'][2][0],
+                            $payload['payload']['info'][2][1],
+                            isset($payload['payload']['info'][3][12]) ? $payload['payload']['info'][3][12] : null,
+                            isset($payload['payload']['info'][3][10]) ? $payload['payload']['info'][3][10] : null,
+                            $payload['payload']['info'][1]
+                        );
                         Autoresponders::processing(
                             $payload['payload']['info'][1],
                             $payload['payload']['info'][2][0],

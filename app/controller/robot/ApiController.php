@@ -179,6 +179,24 @@ class ApiController
             Tools\FileUtils::writeToFile(runtime_path() . '/tmp/share.cfg', json_encode($share));
         }
         // 获取自动回复配置
+        $checkIn = readFileContent(runtime_path() . '/tmp/check-in.cfg');
+        if ($checkIn) {
+            $checkIn = json_decode($checkIn, true);
+        }
+        if (!$checkIn) {
+            $checkIn = [
+                'opens' => false, // 是否开启
+                'status' => 0, // 状态
+                'type' => 0, // 类型：0=全部感谢，1=仅感谢牌子，2=仅感谢航海
+                'keywords' => null, // 签到词
+                'select' => null, // 查询词
+                'success' => null, // 成功回复
+                'reply' => null // 查询回复
+            ];
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/check-in.cfg');
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/check-in.cfg', json_encode($checkIn));
+        }
+        // 获取自动回复配置
         $autoresponders = readFileContent(runtime_path() . '/tmp/autoresponders.cfg');
         if ($autoresponders) {
             $autoresponders = json_decode($autoresponders, true);
@@ -208,6 +226,7 @@ class ApiController
             'follow' => $follow,
             'share' => $share,
             'autoresponders' => $autoresponders,
+            'check_in' => $checkIn,
             'update' => $update
         ]);
     }
@@ -221,6 +240,7 @@ class ApiController
      * @param array $follow 感谢关注配置
      * @param array $share 感谢分享配置
      * @param array $autoresponders 自动回复配置
+     * @param array $check_in 签到配置
      * 
      * @return Response 
      */
@@ -233,6 +253,7 @@ class ApiController
         $follow = !empty($param['follow']) ? $param['follow'] : false;
         $share = !empty($param['share']) ? $param['share'] : false;
         $autoresponders = !empty($param['autoresponders']) ? $param['autoresponders'] : false;
+        $check_in = !empty($param['check_in']) ? $param['check_in'] : false;
         // 存储数据
         if ($timing) {
             Tools\FileUtils::fileDelete(runtime_path() . '/tmp/timing.cfg');
@@ -257,6 +278,10 @@ class ApiController
         if ($autoresponders) {
             Tools\FileUtils::fileDelete(runtime_path() . '/tmp/autoresponders.cfg');
             Tools\FileUtils::writeToFile(runtime_path() . '/tmp/autoresponders.cfg', json_encode($autoresponders, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
+        }
+        if ($check_in) {
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/check-in.cfg');
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/check-in.cfg', json_encode($check_in, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
         }
         // 重启定时广告
         restartTiming();
@@ -401,6 +426,22 @@ class ApiController
             ];
         }
         // 获取自动回复配置
+        $check_in = readFileContent(runtime_path() . '/tmp/check-in.cfg');
+        if ($check_in) {
+            $check_in = json_decode($check_in, true);
+        }
+        if (!$check_in) {
+            $check_in = [
+                'opens' => false, // 是否开启
+                'status' => 0, // 状态
+                'type' => 0, // 类型：0=全部感谢，1=仅感谢牌子，2=仅感谢航海
+                'keywords' => null, // 签到词
+                'select' => null, // 查询词
+                'success' => null, // 成功回复
+                'reply' => null // 查询回复
+            ];
+        }
+        // 获取自动回复配置
         $autoresponders = readFileContent(runtime_path() . '/tmp/autoresponders.cfg');
         if ($autoresponders) {
             $autoresponders = json_decode($autoresponders, true);
@@ -420,7 +461,8 @@ class ApiController
             'enter' => $enter,
             'follow' => $follow,
             'share' => $share,
-            'autoresponders' => $autoresponders
+            'autoresponders' => $autoresponders,
+            'check_in' => $check_in
         ], JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
         // 返回数据
         return success($request, [
@@ -451,6 +493,7 @@ class ApiController
         $follow = isset($data['follow']) ? $data['follow'] : false;
         $share = isset($data['share']) ? $data['share'] : false;
         $autoresponders = isset($data['autoresponders']) ? $data['autoresponders'] : false;
+        $check_in = isset($data['check_in']) ? $data['check_in'] : false;
         // 存储数据
         if ($timing) {
             Tools\FileUtils::fileDelete(runtime_path() . '/tmp/timing.cfg');
@@ -475,6 +518,10 @@ class ApiController
         if ($autoresponders) {
             Tools\FileUtils::fileDelete(runtime_path() . '/tmp/autoresponders.cfg');
             Tools\FileUtils::writeToFile(runtime_path() . '/tmp/autoresponders.cfg', json_encode($autoresponders, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
+        }
+        if ($check_in) {
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/check-in.cfg');
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/check-in.cfg', json_encode($check_in, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
         }
         // 重启定时广告
         restartTiming();
