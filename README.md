@@ -30,6 +30,10 @@
 - 自动更新
 - 零配置部署
 
+文字教程：[点击查看](https://hejunjie.life/posts/b06795f9.html)
+
+视频教程：[点击查看](https://www.bilibili.com/video/BV1PBrSYxEQn)
+
 ### 2. 手动部署（适合服务器环境）
 
 #### **环境要求**
