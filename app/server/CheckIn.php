@@ -88,7 +88,7 @@ class CheckIn
                     $check_in_content = $check_in['success'];
                     $next = true;
                 } else {
-                    $check_in_content = "@name@，已经签到过了，请明天再来哦！\r\n@name@你已经签到啦@";
+                    $check_in_content = "@name@你已经签到啦";
                     $next = true;
                 }
             }
