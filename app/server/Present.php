@@ -34,18 +34,6 @@ class Present
     public static function processing($uid, $uname, $gift_id, $gift_name, $price, $num, $anchor_id, $ruid, $guard_level, $level)
     {
         $is_message = false;
-        sublog('逻辑检测', '礼物答谢', [
-            'uid' => $uid,
-            'uname' => $uname,
-            'gift_id' => $gift_id,
-            'gift_name' => $gift_name,
-            'price' => $price,
-            'num' => $num,
-            'anchor_id' => $anchor_id,
-            'ruid' => $ruid,
-            'guard_level' => $guard_level,
-            'level' => $level
-        ]);
         $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
         $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
         if ($cookie && $room_id) {
@@ -56,6 +44,18 @@ class Present
             }
             // 开启礼物答谢
             if (isset($present['opens']) && $present['opens']) {
+                sublog('逻辑检测', '礼物答谢', [
+                    'uid' => $uid,
+                    'uname' => $uname,
+                    'gift_id' => $gift_id,
+                    'gift_name' => $gift_name,
+                    'price' => $price,
+                    'num' => $num,
+                    'anchor_id' => $anchor_id,
+                    'ruid' => $ruid,
+                    'guard_level' => $guard_level,
+                    'level' => $level
+                ]);
                 $present_price = $present['price']; // 起始感谢电池数
                 $present_type = intval($present['type']); // 类型
                 $present_status = intval($present['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时

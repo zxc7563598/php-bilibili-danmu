@@ -24,12 +24,6 @@ class Follow
     public static function processing($uid, $uname, $ruid, $guard_level)
     {
         $is_message = false;
-        sublog('逻辑检测', '感谢关注', [
-            'uid' => $uid,
-            'uname' => $uname,
-            'ruid' => $ruid,
-            'guard_level' => $guard_level
-        ]);
         // 不处理自己发送的消息
         $robot_uid = strval(readFileContent(runtime_path() . '/tmp/uid.cfg'));
         // 获取感谢关注配置
@@ -39,6 +33,12 @@ class Follow
         }
         // 开启感谢关注
         if (isset($follow['opens']) && $follow['opens'] && $uid != $robot_uid) {
+            sublog('逻辑检测', '感谢关注', [
+                'uid' => $uid,
+                'uname' => $uname,
+                'ruid' => $ruid,
+                'guard_level' => $guard_level
+            ]);
             $follow_type = intval($follow['type']); // 类型
             $follow_status = intval($follow['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
             $follow_content = $follow['content']; // 内容
