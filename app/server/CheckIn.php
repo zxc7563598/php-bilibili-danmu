@@ -56,7 +56,7 @@ class CheckIn
             if (!empty($check_in['keywords']) && $check_in['keywords'] == $msg) {
                 // 确认当天是否签到
                 $today = UserCheckIn::where('uid', $uid)->where('created_at', '>=', Carbon::today()->timezone(config('app')['default_timezone'])->timestamp)->count();
-                if ($today > 0) {
+                if ($today == 0) {
                     // 记录签到
                     $user_check_in = new UserCheckIn();
                     $user_check_in->uid = $uid;
