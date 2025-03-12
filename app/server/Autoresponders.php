@@ -30,13 +30,6 @@ class Autoresponders
     public static function processing($msg, $uid, $uname, $ruid, $guard_level)
     {
         $is_message = false;
-        sublog('逻辑检测', '自动回复', [
-            'msg' => $msg,
-            'uid' => $uid,
-            'uname' => $uname,
-            'ruid' => $ruid,
-            'guard_level' => $guard_level
-        ]);
         // 不处理自己发送的消息
         $robot_uid = strval(readFileContent(runtime_path() . '/tmp/uid.cfg'));
         // 获取自动回复配置
@@ -46,6 +39,13 @@ class Autoresponders
         }
         // 开启自动回复
         if (isset($autoresponders['opens']) && $autoresponders['opens'] && $uid != $robot_uid) {
+            sublog('逻辑检测', '自动回复', [
+                'msg' => $msg,
+                'uid' => $uid,
+                'uname' => $uname,
+                'ruid' => $ruid,
+                'guard_level' => $guard_level
+            ]);
             $autoresponders_type = intval($autoresponders['type']); // 类型
             $autoresponders_status = intval($autoresponders['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
             $autoresponders_content = $autoresponders['content']; // 内容
