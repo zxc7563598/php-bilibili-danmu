@@ -34,8 +34,7 @@ class UserManagementController extends GeneralMethod
         $uid = $param['uid'] ?? null;
         $uname = $param['uname'] ?? null;
         // 获取数据
-        // $users = UserVips::query();
-        $users = (object)[];
+        $users = UserVips::query();
         if (!is_null($uid)) {
             $users->where('uid', 'like', '%' . $uid . '%');
         }
