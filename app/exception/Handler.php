@@ -15,11 +15,13 @@
 
 namespace app\exception;
 
+use Carbon\Carbon;
 use Throwable;
 use Webman\Exception\ExceptionHandler;
 use Webman\Http\Request;
 use Webman\Http\Response;
 use support\exception\BusinessException;
+use Hejunjie\Tools\Log;
 
 /**
  * Class Handler
@@ -38,14 +40,35 @@ class Handler extends ExceptionHandler
 
     public function render(Request $request, Throwable $exception): Response
     {
-        if (($exception instanceof BusinessException) && ($response = $exception->render($request))) {
-            return $response;
-        }
-        $code = $exception->getCode();
-        $json = ['code' => $code ?: 500, 'message' => $this->debug ? $exception->getMessage() : 'Server internal error', 'data' => (object)[]];
-        if (config('app.debug')) {
-            $json['data'] = $exception->getTrace();
-        }
+        $trace = $exception->getTrace();
+        $simplifiedTrace = array_map(function ($frame) {
+            return [
+                'file' => $frame['file'] ?? null,
+                'line' => $frame['line'] ?? null
+            ];
+        }, $trace);
+        // 获取更简化的异常信息，避免递归
+        $cleanedException = [
+            'message' => $exception->getMessage(),
+            'file' => $exception->getFile(),
+            'line' => $exception->getLine(),
+            'trace' => $simplifiedTrace
+        ];
+        // 记录错误日志
+        $date = Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d');
+        $log = new Log\Logger([
+            new Log\Handlers\FileHandler(runtime_path("logs/{$date}/重点关注")),
+            new Log\Handlers\RemoteApiHandler('http://8.210.141.97:9999/write')
+        ]);
+        $log->error('未定义异常', $exception->getMessage(), [
+            'ip' => $request->getRealIp(),
+            'method' => $request->method(),
+            'full_url' => $request->fullUrl(),
+            'trace' => $cleanedException
+        ]);
+        // 返回数据
+        $code = $exception->getCode() == 0 ? 500 : $exception->getCode();
+        $json = ['code' => $code, 'message' => config('app')['debug'] ? $exception->getMessage() : 'Server internal error', 'data' => config('app')['debug'] ? $cleanedException : (object)[]];
         return new Response(200, ['Content-Type' => 'application/json'], json_encode($json, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
     }
 }

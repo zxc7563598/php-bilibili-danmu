@@ -7,8 +7,6 @@ use app\model\ShopConfig;
 use app\model\SilentUser;
 use app\queue\SendMessage;
 use Hejunjie\Bililive;
-use Exception;
-use Carbon\Exceptions\InvalidTimeZoneException;
 use support\Redis;
 
 /**
@@ -44,7 +42,7 @@ class Present
             }
             // 开启礼物答谢
             if (isset($present['opens']) && $present['opens']) {
-                sublog('逻辑检测', '礼物答谢', [
+                sublog('核心业务', '礼物答谢', "入参检测", [
                     'uid' => $uid,
                     'uname' => $uname,
                     'gift_id' => $gift_id,
@@ -102,7 +100,15 @@ class Present
                 }
                 // 如果发送的话
                 if ($is_message) {
-                    sublog('逻辑检测', '礼物答谢', '数据匹配成功');
+                    sublog('核心业务', '礼物答谢', "数据匹配成功", [
+                        'message' => $present_content,
+                        'args' => [
+                            'giftName' => $gift_name,
+                            'price' => $price,
+                            'name' => $uname,
+                            'num' => $num
+                        ]
+                    ]);
                     self::sendMessage($present_content, [
                         'giftName' => $gift_name,
                         'price' => $price,
@@ -115,7 +121,7 @@ class Present
                         'number' => $present_number
                     ]);
                 } else {
-                    sublog('逻辑检测', '礼物答谢', '数据未匹配');
+                    sublog('核心业务', '礼物答谢', '数据未匹配', []);
                 }
             }
             // 检测禁言是否需要解除
@@ -123,14 +129,10 @@ class Present
             if (!empty($silent_user)) {
                 if ($silent_user->ransom_amount > 0) {
                     if ($price >= $silent_user->ransom_amount) {
-                        sublog('逻辑检测', '礼物答谢', '用户:' . $silent_user->tname . ' - ' . $silent_user->tuid);
-                        try {
-                            Bililive\Live::delSilentUser($room_id, $cookie, $silent_user->black_id);
-                            $silent_user->delete();
-                            sublog('逻辑检测', '礼物答谢', '解除成功');
-                        } catch (\Exception $e) {
-                            sublog('逻辑检测', '礼物答谢', '解除失败:' . $e->getMessage());
-                        }
+                        sublog('核心业务', '礼物答谢', "用户:{$silent_user->tuid}解除黑名单", []);
+                        Bililive\Live::delSilentUser($room_id, $cookie, $silent_user->black_id);
+                        $silent_user->delete();
+                        sublog('核心业务', '礼物答谢', "解除成功", []);
                     }
                 }
             }
@@ -148,7 +150,7 @@ class Present
             $gift_records->total_price = ($gift_records->price * $gift_records->num);
             $gift_records->save();
         }
-        sublog('逻辑检测', '礼物答谢', '----------');
+        sublog('核心业务', '礼物答谢', '----------', []);
     }
 
     /**
@@ -158,8 +160,6 @@ class Present
      * @param array $args 要替换的模版
      * 
      * @return void 
-     * @throws Exception 
-     * @throws InvalidTimeZoneException 
      */
     public static function sendMessage(string $content, array $args, array $extra = [])
     {
@@ -170,11 +170,9 @@ class Present
             if (!empty($text)) {
                 if (isset($extra['merge']) && $extra['merge'] == 1) {
                     SendMessage::mergePush($text, $extra['uid'], $extra['uname'], $extra['number'], $args);
-                    sublog('逻辑检测', '礼物答谢', '合并数据发送：' . json_encode($args, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
                 } else {
                     $text = self::template($content[mt_rand(0, (count($content) - 1))], $extra['number'], $args);
                     SendMessage::push($text, 'Present');
-                    sublog('逻辑检测', '礼物答谢', '发送数据：' . $text);
                 }
             }
         }

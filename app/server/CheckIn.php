@@ -7,8 +7,6 @@ use app\model\UserCheckIn;
 use app\model\UserVips;
 use app\queue\SendMessage;
 use Carbon\Carbon;
-use Exception;
-use Carbon\Exceptions\InvalidTimeZoneException;
 use support\Redis;
 
 /**
@@ -39,7 +37,7 @@ class CheckIn
         }
         // 开启感谢关注
         if (isset($check_in['opens']) && $check_in['opens'] && $uid != $robot_uid) {
-            sublog('逻辑检测', '用户签到', [
+            sublog('核心业务', '用户签到', "入参检测", [
                 'uid' => $uid,
                 'uname' => $uname,
                 'ruid' => $ruid,
@@ -150,16 +148,23 @@ class CheckIn
                 }
                 // 如果发送的话
                 if ($is_message) {
-                    sublog('逻辑检测', '用户签到', '完成');
+                    sublog('核心业务', '用户签到', "数据匹配成功", [
+                        'message' => $check_in_content,
+                        'args' => [
+                            'name' => $uname,
+                            'total' => $total,
+                            'serial' => $serial
+                        ]
+                    ]);
                     self::sendMessage($check_in_content, [
                         'name' => $uname,
                         'total' => $total,
                         'serial' => $serial
                     ]);
-                    sublog('逻辑检测', '用户签到', '----------');
+                    sublog('核心业务', '用户签到', "----------", []);
                 } else {
-                    sublog('逻辑检测', '用户签到', '数据未匹配');
-                    sublog('逻辑检测', '用户签到', '----------');
+                    sublog('核心业务', '用户签到', "数据未匹配", []);
+                    sublog('核心业务', '用户签到', "----------", []);
                 }
             }
         }
@@ -172,8 +177,6 @@ class CheckIn
      * @param array $args 要替换的模版
      * 
      * @return void 
-     * @throws Exception 
-     * @throws InvalidTimeZoneException 
      */
     public static function sendMessage(string $content, array $args)
     {
@@ -185,7 +188,6 @@ class CheckIn
                 // 加入消息发送队列
                 $text = self::template($content[mt_rand(0, (count($content) - 1))], $args);
                 SendMessage::push($text, 'CheckIn');
-                sublog('逻辑检测', '用户签到', '发送数据：' . $text);
             }
         }
     }

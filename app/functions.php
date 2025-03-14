@@ -4,6 +4,7 @@ use Carbon\Carbon;
 use Carbon\Exceptions\InvalidTimeZoneException;
 use Hejunjie\Tools;
 use support\Response;
+use Hejunjie\Tools\Log;
 
 /**
  * Api响应成功
@@ -109,20 +110,18 @@ function splitAndFilterLines($text)
  * 日志信息存储
  *
  * @param string $paths 存储路径
- * @param string $filename 存储名称
+ * @param string $title 存储名称
  * @param string $contents 存储内容
  * 
  * @return void
  */
-function sublog($paths, $filename, $contents): void
+function sublog($paths, $title, $message, $context): void
 {
-    $dir = base_path() . '/runtime/logs/' . Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d') . '/' . $paths . '/';
-    if (!is_dir($dir)) {
-        mkdir($dir, 0777, true);
-    }
-    $file = $dir . $filename . ".log";
-    $content = Carbon::now()->timezone(config('app')['default_timezone'])->format('H:i:s') . "        " . json_encode($contents, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION) . "\r\n";
-    file_put_contents($file, $content, FILE_APPEND);
+    $date = Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d');
+    $log = new Log\Logger([
+        new Log\Handlers\FileHandler(runtime_path("logs/{$date}/{$paths}"))
+    ]);
+    $log->info($title, $message, $context);
 }
 
 /**
@@ -149,7 +148,7 @@ function isDocker(): bool
  */
 function getImageUrl($str): string
 {
-    if(!$str){
+    if (!$str) {
         return '';
     }
     if (strpos($str, 'http://') === false && strpos($str, 'https://') === false) {
