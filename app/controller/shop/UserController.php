@@ -9,7 +9,6 @@ use app\model\Goods;
 use app\model\GoodSubs;
 use app\model\Complaint;
 use Webman\Http\Response;
-use app\model\ShopConfig;
 use app\model\UserAddress;
 use app\model\PaymentRecords;
 use app\model\RedemptionRecords;
@@ -27,9 +26,6 @@ class UserController extends GeneralMethod
      */
     public function getBackground(Request $request): Response
     {
-        $param = $request->data;
-        sublog('积分商城', '获取个人中心&意见反馈页背景图片', $param);
-        sublog('积分商城', '获取个人中心&意见反馈页背景图片', '===================');
         // 获取数据
         $config = self::getShopConfig();
         // 返回数据
@@ -47,9 +43,6 @@ class UserController extends GeneralMethod
     {
         $param = $request->data;
         $user_vips = $request->user_vips;
-        sublog('积分商城', '获取用户地址列表', $user_vips);
-        sublog('积分商城', '获取用户地址列表', $param);
-        sublog('积分商城', '获取用户地址列表', '===================');
         // 获取参数
         $user_address = UserAddress::where('user_id', $user_vips->user_id)->get([
             'id' => 'id',
@@ -78,9 +71,6 @@ class UserController extends GeneralMethod
     {
         $param = $request->data;
         $user_vips = $request->user_vips;
-        sublog('积分商城', '获取用户地址详情', $user_vips);
-        sublog('积分商城', '获取用户地址详情', $param);
-        sublog('积分商城', '获取用户地址详情', '===================');
         // 获取参数
         $id = !empty($param['id']) ? $param['id'] : null;
         // 获取数据
@@ -120,9 +110,6 @@ class UserController extends GeneralMethod
     {
         $param = $request->data;
         $user_vips = $request->user_vips;
-        sublog('积分商城', '变更用户地址', $user_vips);
-        sublog('积分商城', '变更用户地址', $param);
-        sublog('积分商城', '变更用户地址', '===================');
         // 获取参数
         $id = !empty($param['id']) ? $param['id'] : null;
         $name = $param['name'];
@@ -160,9 +147,6 @@ class UserController extends GeneralMethod
     {
         $param = $request->data;
         $user_vips = $request->user_vips;
-        sublog('积分商城', '选择地址信息', $user_vips);
-        sublog('积分商城', '选择地址信息', $param);
-        sublog('积分商城', '选择地址信息', '===================');
         // 获取参数
         $id = $param['id'];
         // 把所有地址的选择去掉
@@ -186,9 +170,6 @@ class UserController extends GeneralMethod
     {
         $param = $request->data;
         $user_vips = $request->user_vips;
-        sublog('积分商城', '获取地址信息', $user_vips);
-        sublog('积分商城', '获取地址信息', $param);
-        sublog('积分商城', '获取地址信息', '===================');
         // 获取参数
         $goods_id = $param['goods_id'];
         // 获取数据
@@ -223,8 +204,6 @@ class UserController extends GeneralMethod
     {
         $param = $request->data;
         $user_vips = $request->user_vips;
-        sublog('积分商城', '签名上传', $user_vips);
-        sublog('积分商城', '签名上传', '===================');
         // 获取参数
         $base64 = $param['base64'];
         // base64存储图片 
@@ -248,8 +227,6 @@ class UserController extends GeneralMethod
     public function getConsumers(Request $request): Response
     {
         $user_vips = $request->user_vips;
-        sublog('积分商城', '获取开通记录', $user_vips);
-        sublog('积分商城', '获取开通记录', '===================');
         // 获取数据
         $payment_records = PaymentRecords::join('bl_user_vips', 'bl_user_vips.user_id', '=', 'bl_payment_records.user_id')
             ->where('bl_payment_records.user_id', $user_vips->user_id)
@@ -279,8 +256,6 @@ class UserController extends GeneralMethod
     public function getRedeeming(Request $request): Response
     {
         $user_vips = $request->user_vips;
-        sublog('积分商城', '获取兑换记录', $user_vips);
-        sublog('积分商城', '获取兑换记录', '===================');
         // 获取数据
         $redemption_records = RedemptionRecords::join('bl_user_vips', 'bl_user_vips.user_id', '=', 'bl_redemption_records.user_id')
             ->where('bl_redemption_records.user_id', $user_vips->user_id)
@@ -352,8 +327,6 @@ class UserController extends GeneralMethod
     {
         $param = $request->data;
         $user_vips = $request->user_vips;
-        sublog('积分商城', '上传投诉', $user_vips);
-        sublog('积分商城', '上传投诉', '===================');
         // 获取参数
         $title = $param['title'];
         $content = $param['complaint'];

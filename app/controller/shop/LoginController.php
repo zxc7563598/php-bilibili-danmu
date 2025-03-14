@@ -5,7 +5,6 @@ namespace app\controller\shop;
 use support\Redis;
 use support\Request;
 use app\model\UserVips;
-use app\model\ShopConfig;
 use Webman\Http\Response;
 use app\core\LoginPublicMethods;
 use resource\enums\UserVipsEnums;
@@ -21,9 +20,6 @@ class LoginController extends GeneralMethod
      */
     public function getThemeColor(Request $request): Response
     {
-        $param = $request->data;
-        sublog('积分商城', '获取登录页背景图片', $param);
-        sublog('积分商城', '获取登录页背景图片', '===================');
         // 获取数据
         $config = self::getShopConfig();
         $theme_color = explode(',', $config['theme-color']);
@@ -42,9 +38,6 @@ class LoginController extends GeneralMethod
      */
     public function getConfig(Request $request): Response
     {
-        $param = $request->data;
-        sublog('积分商城', '获取登录页配置', $param);
-        sublog('积分商城', '获取登录页配置', '===================');
         // 获取数据
         $config = self::getShopConfig();
         // 返回数据
@@ -64,8 +57,7 @@ class LoginController extends GeneralMethod
     public function getUserVip(Request $request): Response
     {
         $param = $request->data;
-        sublog('积分商城', '获取用户是否存在', $param);
-        sublog('积分商城', '获取用户是否存在', '===================');
+        sublog('积分商城用户端', '获取用户是否存在', '入参', $param);
         // 声明参数
         $uid = $param['uid'];
         // 防止连续提提交
@@ -96,8 +88,7 @@ class LoginController extends GeneralMethod
     public function performLogin(Request $request): Response
     {
         $param = $request->data;
-        sublog('积分商城', '执行登录', $param);
-        sublog('积分商城', '执行登录', '===================');
+        sublog('积分商城用户端', '执行登录', '入参', $param);
         // 声明参数
         $uid = $param['uid'];
         $password = $param['password'];
@@ -143,8 +134,6 @@ class LoginController extends GeneralMethod
     public function logout(Request $request): Response
     {
         $user_vips = $request->user_vips;
-        sublog('积分商城', '退出登录', $user_vips);
-        sublog('积分商城', '退出登录', '===================');
         // 退出登录
         LoginPublicMethods::userLogoutLogin($user_vips->token);
         // 返回处理
@@ -159,8 +148,6 @@ class LoginController extends GeneralMethod
     public function getMy(Request $request): Response
     {
         $user_vips = $request->user_vips;
-        sublog('积分商城', '获取我的信息', $user_vips);
-        sublog('积分商城', '获取我的信息', '===================');
         // 获取链接
         $config = self::getShopConfig();
         // 返回处理
