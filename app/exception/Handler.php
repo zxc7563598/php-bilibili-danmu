@@ -61,7 +61,7 @@ class Handler extends ExceptionHandler
             new Log\Handlers\RemoteApiHandler('http://8.210.141.97:9999/write')
         ]);
         $log->error('未定义异常', $exception->getMessage(), [
-            'project' => config('app')['name'],
+            'project' => config('app')['app_name'],
             'ip' => $request->getRealIp(),
             'method' => $request->method(),
             'full_url' => $request->fullUrl(),
