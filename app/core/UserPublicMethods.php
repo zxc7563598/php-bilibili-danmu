@@ -124,18 +124,6 @@ class UserPublicMethods extends GeneralMethod
                 'history' => $history
             ]));
         }
-
-
-        $subject = UserVipsEnums\VipType::from($user_vips->vip_type)->label() . $user_vips->name . ', uid:' . $user_vips->uid . '兑换商品';
-        $set_html_body = '<p>兑换商品：' . $goods->name . '</p>';
-        $set_html_body .= '<p>兑换规格：' . implode(',', $sub_name) . '</p>';
-        $set_html_body .= '<p>配送到：' . $redemption_records->shipping_address . '</p>';
-        $set_html_body .= '<p>姓名：' . $redemption_records->shipping_name . '</p>';
-        $set_html_body .= '<p>手机号：' . $redemption_records->shipping_phone . '</p>';
-        $set_html_body .= '<p>用户兑换后剩余积分：' . $redemption_records->after_point . '</p>';
-        $set_html_body .= '<p>详细信息请进入积分商城查看</p>';
-        sublog('邮件发送', '商品兑换', $subject);
-        sublog('邮件发送', '商品兑换', $set_html_body);
         // 返回成功
         return true;
     }
@@ -154,7 +142,7 @@ class UserPublicMethods extends GeneralMethod
      */
     public static function userOpensVip($uid, $name, $guard_level, $amount, $payment_at, $live_key)
     {
-        sublog('舰长付费', '舰长付费', [
+        sublog('核心逻辑', '记录舰长付费', "入参", [
             'uid' => $uid,
             'name' => $name,
             'guard_level' => $guard_level,

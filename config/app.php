@@ -16,7 +16,7 @@
 use support\Request;
 
 return [
-    'debug' => true,
+    'debug' => false,
     'error_reporting' => E_ALL,
     'default_timezone' => 'Asia/Shanghai',
     'request_class' => Request::class,
