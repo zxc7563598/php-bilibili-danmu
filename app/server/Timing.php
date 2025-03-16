@@ -4,10 +4,8 @@ namespace app\server;
 
 use app\queue\SendMessage;
 use Carbon\Carbon;
-use Workerman\Crontab\Crontab;
 use Workerman\Timer;
 use Workerman\Worker;
-use Hejunjie\Bililive;
 use support\Redis;
 
 /**
@@ -115,9 +113,13 @@ class Timing
                     SendMessage::push($text, 'Timing');
                     // 设置锁，过期时间为 $lockExpiration - 1 秒
                     Redis::setEx($lockKey, $lockExpiration - 1, 'locked');
-                    sublog('逻辑检测', '定时广告', '发送数据：' . $text);
+                    sublog('核心业务', '定时广告', "发送数据", [
+                        'text' => $text
+                    ]);
                 } else {
-                    sublog('逻辑检测', '定时广告', '死锁：' . $text);
+                    sublog('核心业务', '定时广告', "死锁", [
+                        'text' => $text
+                    ]);
                 }
             }
         }

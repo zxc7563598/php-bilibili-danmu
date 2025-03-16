@@ -7,7 +7,6 @@ use app\model\Goods;
 use support\Request;
 use app\model\GoodSubs;
 use Webman\Http\Response;
-use app\model\ShopConfig;
 use app\model\UserAddress;
 use resource\enums\GoodsEnums;
 use app\core\UserPublicMethods;
@@ -26,9 +25,6 @@ class ShopController extends GeneralMethod
      */
     public function getGoods(Request $request): Response
     {
-        $param = $request->data;
-        sublog('积分商城', '获取商品列表', $param);
-        sublog('积分商城', '获取商品列表', '===================');
         // 获取商品
         $goods = Goods::where('status', GoodsEnums\Status::Normal->value)->orderBy('sort', 'asc')->get([
             'goods_id' => 'goods_id',
@@ -55,8 +51,6 @@ class ShopController extends GeneralMethod
     public function getGoodsDetails(Request $request): Response
     {
         $param = $request->data;
-        sublog('积分商城', '获取商品列表', $param);
-        sublog('积分商城', '获取商品列表', '===================');
         // 获取参数
         $goods_id = $param['goods_id'];
         // 获取商品
@@ -126,9 +120,7 @@ class ShopController extends GeneralMethod
     {
         $param = $request->data;
         $user_vips = $request->user_vips;
-        sublog('积分商城', '获取确认订单信息', $user_vips);
-        sublog('积分商城', '获取确认订单信息', $param);
-        sublog('积分商城', '获取确认订单信息', '===================');
+        sublog('积分商城用户端', '获取确认订单信息', "用户:{$user_vips->uid}", $param);
         // 获取参数
         $goods_id = $param['goods_id'];
         $sub_id = explode(',', $param['sub_id']);
@@ -191,9 +183,7 @@ class ShopController extends GeneralMethod
     {
         $param = $request->data;
         $user_vips = $request->user_vips;
-        sublog('积分商城', '确认下单', $user_vips);
-        sublog('积分商城', '确认下单', $param);
-        sublog('积分商城', '确认下单', '===================');
+        sublog('积分商城用户端', '确认下单', "用户:{$user_vips->uid}", $param);
         // 获取参数
         $goods_id = $param['goods_id'];
         $sub_id = explode(',', $param['sub_id']);
@@ -224,9 +214,6 @@ class ShopController extends GeneralMethod
     {
         $user_vips = $request->user_vips;
         $param = $request->data;
-        sublog('积分商城', '获取交易成功页面信息', $user_vips);
-        sublog('积分商城', '获取交易成功页面信息', $param);
-        sublog('积分商城', '获取交易成功页面信息', '===================');
         // 获取参数
         $type = $param['type'];
         // 声明数据

@@ -3,8 +3,6 @@
 namespace app\server;
 
 use app\queue\SendMessage;
-use Exception;
-use Carbon\Exceptions\InvalidTimeZoneException;
 use support\Redis;
 
 /**
@@ -33,7 +31,7 @@ class Enter
         }
         // 开启进房欢迎
         if (isset($enter['opens']) && $enter['opens'] && $uid != $robot_uid) {
-            sublog('逻辑检测', '进房欢迎', [
+            sublog('核心业务', '进房欢迎', "入参检测", [
                 'uid' => $uid,
                 'uname' => $uname,
                 'ruid' => $ruid,
@@ -85,14 +83,19 @@ class Enter
             }
             // 如果发送的话
             if ($is_message) {
-                sublog('逻辑检测', '进房欢迎', '数据匹配成功');
+                sublog('核心业务', '进房欢迎', "数据匹配成功", [
+                    'message' => $enter_content,
+                    'args' => [
+                        'name' => $uname
+                    ]
+                ]);
                 self::sendMessage($enter_content, [
                     'name' => $uname
                 ]);
-                sublog('逻辑检测', '进房欢迎', '----------');
+                sublog('核心业务', '进房欢迎', '----------', []);
             } else {
-                sublog('逻辑检测', '进房欢迎', '数据未匹配');
-                sublog('逻辑检测', '进房欢迎', '----------');
+                sublog('核心业务', '进房欢迎', '数据未匹配', []);
+                sublog('核心业务', '进房欢迎', '----------', []);
             }
         }
     }
@@ -104,8 +107,6 @@ class Enter
      * @param array $args 要替换的模版
      * 
      * @return void 
-     * @throws Exception 
-     * @throws InvalidTimeZoneException 
      */
     public static function sendMessage(string $content, array $args)
     {
@@ -117,7 +118,6 @@ class Enter
                 // 加入消息发送队列
                 $text = self::template($content[mt_rand(0, (count($content) - 1))], $args);
                 SendMessage::push($text, 'Enter');
-                sublog('逻辑检测', '进房欢迎', '发送数据：' . $text);
             }
         }
     }

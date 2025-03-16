@@ -164,6 +164,9 @@ Route::post('/reload-timing', function (Request $request) {
     return response($response);
 });
 
-Route::any('/test', function (Request $request) {});
+Route::any('/test', function (Request $request) {
+    $data = $request->all();
+    echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+});
 
 Route::disableDefaultRoute(); // 关闭默认路由

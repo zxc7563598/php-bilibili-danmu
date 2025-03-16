@@ -3,8 +3,6 @@
 namespace app\server;
 
 use app\queue\SendMessage;
-use Exception;
-use Carbon\Exceptions\InvalidTimeZoneException;
 use support\Redis;
 
 /**
@@ -33,7 +31,7 @@ class Follow
         }
         // 开启感谢关注
         if (isset($follow['opens']) && $follow['opens'] && $uid != $robot_uid) {
-            sublog('逻辑检测', '感谢关注', [
+            sublog('核心业务', '感谢关注', "入参检测", [
                 'uid' => $uid,
                 'uname' => $uname,
                 'ruid' => $ruid,
@@ -85,14 +83,19 @@ class Follow
             }
             // 如果发送的话
             if ($is_message) {
-                sublog('逻辑检测', '感谢关注', '数据匹配成功');
+                sublog('核心业务', '感谢关注', "数据匹配成功", [
+                    'message' => $follow_content,
+                    'args' => [
+                        'name' => $uname
+                    ]
+                ]);
                 self::sendMessage($follow_content, [
                     'name' => $uname
                 ]);
-                sublog('逻辑检测', '感谢关注', '----------');
+                sublog('核心业务', '感谢关注', '----------', []);
             } else {
-                sublog('逻辑检测', '感谢关注', '数据未匹配');
-                sublog('逻辑检测', '感谢关注', '----------');
+                sublog('核心业务', '感谢关注', '数据未匹配', []);
+                sublog('核心业务', '感谢关注', '----------', []);
             }
         }
     }
@@ -104,8 +107,6 @@ class Follow
      * @param array $args 要替换的模版
      * 
      * @return void 
-     * @throws Exception 
-     * @throws InvalidTimeZoneException 
      */
     public static function sendMessage(string $content, array $args)
     {
@@ -117,7 +118,6 @@ class Follow
                 // 加入消息发送队列
                 $text = self::template($content[mt_rand(0, (count($content) - 1))], $args);
                 SendMessage::push($text, 'Follow');
-                sublog('逻辑检测', '感谢关注', '发送数据：' . $text);
             }
         }
     }
