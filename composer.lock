@@ -857,16 +857,16 @@
         },
         {
             "name": "hejunjie/tools",
-            "version": "v1.0.6",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zxc7563598/php-tools.git",
-                "reference": "7134f3fdf6571fff25766f0f3780b4c93bc55264"
+                "reference": "2bbbbabc32809d869d79a52c8854657ae29a90a4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zxc7563598/php-tools/zipball/7134f3fdf6571fff25766f0f3780b4c93bc55264",
-                "reference": "7134f3fdf6571fff25766f0f3780b4c93bc55264",
+                "url": "https://api.github.com/repos/zxc7563598/php-tools/zipball/2bbbbabc32809d869d79a52c8854657ae29a90a4",
+                "reference": "2bbbbabc32809d869d79a52c8854657ae29a90a4",
                 "shasum": ""
             },
             "require": {
@@ -896,9 +896,9 @@
             ],
             "support": {
                 "issues": "https://github.com/zxc7563598/php-tools/issues",
-                "source": "https://github.com/zxc7563598/php-tools/tree/v1.0.6"
+                "source": "https://github.com/zxc7563598/php-tools/tree/v1.1.0"
             },
-            "time": "2024-12-15T02:30:50+00:00"
+            "time": "2025-03-21T14:58:19+00:00"
         },
         {
             "name": "illuminate/bus",
@@ -4290,12 +4290,12 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.2"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "plugin-api-version": "2.6.0"
 }
