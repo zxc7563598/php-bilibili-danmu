@@ -12,8 +12,8 @@ return [
         "development" => [
             "adapter" => "mysql",
             "host" => $_SERVER['DB_HOST'],
-            "name" => $_SERVER['DB_USER'],
-            "user" => $_SERVER['DB_NAME'],
+            "name" => $_SERVER['DB_NAME'],
+            "user" => $_SERVER['DB_USER'],
             "pass" => $_SERVER['DB_PASSWORD'],
             "port" => $_SERVER['DB_PORT'],
             "charset" => "utf8mb4"

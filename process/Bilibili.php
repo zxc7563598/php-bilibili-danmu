@@ -398,6 +398,12 @@ class Bilibili
                             writeLinesToFile($filePath, $line);
                         }
                         break;
+                    case 'PK_BATTLE_START_NEW': // PK马上开始
+                        sublog('测试业务', 'PK播报', '即将于' . $payload['payload']['data']['uname'] . '进行PK', $payload['payload']);
+                        $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
+                        $getOnlineGoldRank = Bililive\Live::getOnlineGoldRank($payload['payload']['data']['uid'], $payload['payload']['data']['room_id'], $cookie);
+                        sublog('测试业务', 'PK播报', '信息获取完成', $getOnlineGoldRank);
+                        break;
                 }
             }
         }
