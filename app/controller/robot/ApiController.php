@@ -148,6 +148,19 @@ class ApiController
             Tools\FileUtils::fileDelete(runtime_path() . '/tmp/enter.cfg');
             Tools\FileUtils::writeToFile(runtime_path() . '/tmp/enter.cfg', json_encode($enter));
         }
+        // 获取PK播报配置
+        $pk = readFileContent(runtime_path() . '/tmp/pk.cfg');
+        if ($pk) {
+            $pk = json_decode($pk, true);
+        }
+        if (!$pk) {
+            $pk = [
+                'opens' => false, // 是否开启
+                'content' => null // 内容
+            ];
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/pk.cfg');
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/pk.cfg', json_encode($pk));
+        }
         // 获取感谢关注配置
         $follow = readFileContent(runtime_path() . '/tmp/follow.cfg');
         if ($follow) {
@@ -211,23 +224,17 @@ class ApiController
             Tools\FileUtils::fileDelete(runtime_path() . '/tmp/autoresponders.cfg');
             Tools\FileUtils::writeToFile(runtime_path() . '/tmp/autoresponders.cfg', json_encode($autoresponders));
         }
-        // 获取是否提示版本更新
-        $update = false;
-        if (isDocker()) {
-            if (trim(shell_exec('git rev-parse HEAD')) != trim(shell_exec('git ls-remote origin -h refs/heads/main | cut -f1'))) {
-                $update = true;
-            }
-        }
         // 返回数据
         return success($request, [
             'timing' => $timing,
             'present' => $present,
             'enter' => $enter,
+            'pk' => $pk,
             'follow' => $follow,
             'share' => $share,
             'autoresponders' => $autoresponders,
             'check_in' => $checkIn,
-            'update' => $update
+            'update' => false
         ]);
     }
 
@@ -237,6 +244,7 @@ class ApiController
      * @param array $timing 定时广告配置
      * @param array $present 礼物答谢配置
      * @param array $enter 进房欢迎配置
+     * @param array $pk PK播报配置
      * @param array $follow 感谢关注配置
      * @param array $share 感谢分享配置
      * @param array $autoresponders 自动回复配置
@@ -250,6 +258,7 @@ class ApiController
         $timing = !empty($param['timing']) ? $param['timing'] : false;
         $present = !empty($param['present']) ? $param['present'] : false;
         $enter = !empty($param['enter']) ? $param['enter'] : false;
+        $pk = !empty($param['pk']) ? $param['pk'] : false;
         $follow = !empty($param['follow']) ? $param['follow'] : false;
         $share = !empty($param['share']) ? $param['share'] : false;
         $autoresponders = !empty($param['autoresponders']) ? $param['autoresponders'] : false;
@@ -266,6 +275,10 @@ class ApiController
         if ($enter) {
             Tools\FileUtils::fileDelete(runtime_path() . '/tmp/enter.cfg');
             Tools\FileUtils::writeToFile(runtime_path() . '/tmp/enter.cfg', json_encode($enter, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
+        }
+        if ($pk) {
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/pk.cfg');
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/pk.cfg', json_encode($pk, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
         }
         if ($follow) {
             Tools\FileUtils::fileDelete(runtime_path() . '/tmp/follow.cfg');
@@ -399,6 +412,17 @@ class ApiController
                 'content' => null // 内容
             ];
         }
+        // 获取PK播报配置
+        $pk = readFileContent(runtime_path() . '/tmp/pk.cfg');
+        if ($pk) {
+            $pk = json_decode($pk, true);
+        }
+        if (!$pk) {
+            $pk = [
+                'opens' => false, // 是否开启
+                'content' => null // 内容
+            ];
+        }
         // 获取感谢关注配置
         $follow = readFileContent(runtime_path() . '/tmp/follow.cfg');
         if ($follow) {
@@ -459,6 +483,7 @@ class ApiController
             'timing' => $timing,
             'present' => $present,
             'enter' => $enter,
+            'pk' => $pk,
             'follow' => $follow,
             'share' => $share,
             'autoresponders' => $autoresponders,
@@ -490,6 +515,7 @@ class ApiController
         $timing = isset($data['timing']) ? $data['timing'] : false;
         $present = isset($data['present']) ? $data['present'] : false;
         $enter = isset($data['enter']) ? $data['enter'] : false;
+        $pk = isset($data['pk']) ? $data['pk'] : false;
         $follow = isset($data['follow']) ? $data['follow'] : false;
         $share = isset($data['share']) ? $data['share'] : false;
         $autoresponders = isset($data['autoresponders']) ? $data['autoresponders'] : false;
@@ -506,6 +532,10 @@ class ApiController
         if ($enter) {
             Tools\FileUtils::fileDelete(runtime_path() . '/tmp/enter.cfg');
             Tools\FileUtils::writeToFile(runtime_path() . '/tmp/enter.cfg', json_encode($enter, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
+        }
+        if ($pk) {
+            Tools\FileUtils::fileDelete(runtime_path() . '/tmp/pk.cfg');
+            Tools\FileUtils::writeToFile(runtime_path() . '/tmp/pk.cfg', json_encode($pk, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
         }
         if ($follow) {
             Tools\FileUtils::fileDelete(runtime_path() . '/tmp/follow.cfg');

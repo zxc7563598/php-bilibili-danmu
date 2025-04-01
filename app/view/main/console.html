@@ -704,6 +704,78 @@
                 </div>
                 <!-- 第二列 -->
                 <div class="column is-full-touch is-half-desktop">
+                    <!-- PK播报 -->
+                    <div class="card">
+                        <div class="card-content">
+                            <h5 class="title is-5" style="display: flex;align-items: center;">
+                                PK播报
+                                <div class="button-group" style="margin-left: auto;">
+                                    <button type="button" class="button is-small toggle-button"
+                                        :class="config.pk.opens ? 'is-active' : ''"
+                                        @click="configSwitch('pk',true)">开启</button>
+                                    <button type="button" class="button is-small toggle-button"
+                                        :class="!config.pk.opens ? 'is-active' : ''"
+                                        @click="configSwitch('pk',false)">关闭</button>
+                                </div>
+                            </h5>
+                            <article class="message is-small">
+                                <div class="message-body">
+                                    <div class="content is-small">
+                                        <h3>可以使用的动态信息</h3>
+                                        <p>
+                                            这些内容可以加入到句子里，实际发送时会被替换成对应内容
+                                        </p>
+                                        <ul>
+                                            <li><b>对方主播名称：</b>@uname@</li>
+                                            <li><b>对方高能榜人数：</b>@online_num@</li>
+                                            <li><b>对方高能榜总计贡献度：</b>@online_score@</li>
+                                            <li><b>对方高能榜前三名贡献度：</b>@top_three_score@</li>
+                                        </ul>
+                                    </div>
+                            </article>
+                            <form>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">内容</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <textarea class="textarea has-fixed-size" placeholder="播报内容,PK前发送"
+                                                rows="10" v-model="config.pk.content"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label"></label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <article class="message is-small">
+                                                <div class="message-body">
+                                                    <div class="content is-small">
+                                                        <p>
+                                                            PK播报会在PK前十秒接收到信息，而机器人弹幕发送间隔需要在秒以上否则会被限制发言，因此通常播报要控制在3条消息以内
+                                                        </p>
+                                                        <p>
+                                                            配置中的多行内容并非会随机发送，而是会在pk前按顺序发送，因此建议可以设置成类似：
+                                                        </p>
+                                                        <p>
+                                                            即将于@uname@进行PK<br>
+                                                            对方直播间@online_num@人<br>
+                                                            前三名贡献了@top_three_score@
+                                                        </p>
+                                                        <p>
+                                                            通常建议留言发言长度，过长的信息会被分成多条发送，因发言频率限制可能会影响体验
+                                                        </p>
+                                                    </div>
+                                            </article>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                     <!-- 礼物答谢 -->
                     <div class="card">
                         <div class="card-content">
@@ -1393,6 +1465,10 @@
                             type: 0, // 类型：0=全部欢迎，1=仅欢迎牌子，2=仅欢迎航海
                             content: null // 内容
                         },
+                        pk:{ // PK播报
+                            opens: false,
+                            content: null // 内容
+                        },
                         follow: { // 感谢关注
                             opens: false,
                             status: 0, // 状态
@@ -1474,6 +1550,9 @@
                             break;
                         case 'enter-type':
                             this.config.enter.type = opens
+                            break;
+                        case 'pk':
+                            this.config.pk.opens = opens
                             break;
                         case 'follow':
                             this.config.follow.opens = opens
@@ -1669,6 +1748,7 @@
                             this.config.timing = response.data.data.timing;
                             this.config.present = response.data.data.present;
                             this.config.enter = response.data.data.enter;
+                            this.config.pk = response.data.data.pk;
                             this.config.follow = response.data.data.follow;
                             this.config.share = response.data.data.share;
                             this.config.autoresponders.opens = response.data.data.autoresponders.opens;
@@ -1688,6 +1768,7 @@
                         timing: this.config.timing,
                         present: this.config.present,
                         enter: this.config.enter,
+                        pk:this.config.pk,
                         follow: this.config.follow,
                         share: this.config.share,
                         autoresponders: this.config.autoresponders,
