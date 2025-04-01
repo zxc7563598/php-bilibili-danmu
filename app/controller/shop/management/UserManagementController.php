@@ -199,6 +199,7 @@ class UserManagementController extends GeneralMethod
         $system_change_point_records = SystemChangePointRecords::where('user_id', $user_id)->get([
             'type' => 'type',
             'point' => 'point',
+            'source' => 'source',
             'after_point' => 'after_point',
             'created_at' => 'created_at'
         ]);
@@ -228,7 +229,7 @@ class UserManagementController extends GeneralMethod
             $type = $_system_change_point_records->type == SystemChangePointRecordsEnums\Type::Up->value ? '+' : '-';
             $data[] = [
                 'icon' => getImageUrl('shop-config/supreme.png'),
-                'name' => '主播变更',
+                'name' => SystemChangePointRecordsEnums\Source::from($_system_change_point_records->source)->label(),
                 'point' => $type . ' ' . $_system_change_point_records->point,
                 'after_point' => $_system_change_point_records->after_point,
                 'date' => $_system_change_point_records->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
@@ -276,6 +277,7 @@ class UserManagementController extends GeneralMethod
         $system_change_point_records->user_id = $user_id;
         $system_change_point_records->type = $type;
         $system_change_point_records->point = $point;
+        $system_change_point_records->source = SystemChangePointRecordsEnums\Source::AnchorChange->value;
         $system_change_point_records->pre_point = $user_vips->point;
         $system_change_point_records->after_point = $type === SystemChangePointRecordsEnums\Type::Up->value ? $user_vips->point + $point : $user_vips->point - $point;
         $system_change_point_records->save();

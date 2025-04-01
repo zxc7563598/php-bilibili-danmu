@@ -459,6 +459,7 @@ class ApiController
                 'opens' => false, // 是否开启
                 'status' => 0, // 状态
                 'type' => 0, // 类型：0=全部感谢，1=仅感谢牌子，2=仅感谢航海
+                'points' => 0, // 赠送积分
                 'keywords' => null, // 签到词
                 'select' => null, // 查询词
                 'success' => null, // 成功回复
