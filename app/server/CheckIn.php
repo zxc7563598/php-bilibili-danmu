@@ -3,11 +3,13 @@
 namespace app\server;
 
 use app\core\LoginPublicMethods;
+use app\model\SystemChangePointRecords;
 use app\model\UserCheckIn;
 use app\model\UserVips;
 use app\queue\SendMessage;
 use Carbon\Carbon;
 use support\Redis;
+use resource\enums\SystemChangePointRecordsEnums;
 
 /**
  * 签到，优先级15
@@ -46,6 +48,7 @@ class CheckIn
             ]);
             $check_in_type = intval($check_in['type']); // 类型
             $check_in_status = intval($check_in['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
+            $check_in_points = intval($check_in['points'] ?? 0); // 赠送积分
             $check_in_content = '';
             $next = false;
             $total = 0;
@@ -61,6 +64,7 @@ class CheckIn
                     $user_check_in->name = $uname;
                     $user_check_in->ruid = $ruid;
                     $user_check_in->guard_level = $guard_level;
+                    $user_check_in->points = $check_in_points;
                     $user_check_in->save();
                     // 获取用户信息
                     $user_vips = UserVips::where('uid', $uid)->first();
@@ -81,6 +85,17 @@ class CheckIn
                         $user_vips->serial_check_in = 1;
                     }
                     $user_vips->save();
+                    // 增加积分
+                    if ($user_check_in->points > 0) {
+                        $system_change_point_records = new SystemChangePointRecords();
+                        $system_change_point_records->user_id = $user_vips->user_id;
+                        $system_change_point_records->type = SystemChangePointRecordsEnums\Type::Up->value;
+                        $system_change_point_records->source = SystemChangePointRecordsEnums\Source::SignIn->value;
+                        $system_change_point_records->point = $user_check_in->points;
+                        $system_change_point_records->pre_point = $user_vips->point;
+                        $system_change_point_records->after_point = $user_vips->point + $user_check_in->points;
+                        $system_change_point_records->save();
+                    }
                     $total = $user_vips->total_check_in;
                     $serial = $user_vips->serial_check_in;
                     $check_in_content = $check_in['success'];
