@@ -46,7 +46,7 @@ if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
     log_message "本地提交 ($LOCAL_COMMIT) 与远程提交 ($REMOTE_COMMIT). 不匹配，需要获取最新更改."
 
     # 拉取最新代码
-    git fetch origin
+    git fetch origin >> $LOG_FILE 2>&1
     git reset --hard origin/main >> $LOG_FILE 2>&1
     if [ $? -ne 0 ]; then
         log_message "Git获取失败 - 退出."
