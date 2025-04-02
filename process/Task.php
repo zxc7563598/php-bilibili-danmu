@@ -18,6 +18,28 @@ class Task
             self::logDeletion();
             self::logTransfer();
             Redis::del(config('app')['app_name'] . ':config');
+            // 获取配置信息
+            $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
+            $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
+            if ($room_id && $cookie) {
+                // 获取登录信息配置
+                $user_info = Bililive\Login::getUserInfo($cookie);
+                $uid = $user_info['uid'] ?? 0;
+                $uname = $user_info['uname'] ?? '';
+                // 获取直播间信息配置
+                $live_info = Bililive\Live::getRealRoomInfo($room_id, $cookie);
+                $room_id = $live_info['data']['room_id'] ?? 0;
+                $room_uname = $live_info['data']['uname'] ?? '';
+                if ($uid > 0 && $room_id > 0) {
+                    $url = 'https://tools.api.hejunjie.life/bilibilidanmu-api/active';
+                    Tools\HttpClient::sendPostRequest($url, [], [
+                        "room_id" => $room_id,
+                        "room_uname" => $room_uname,
+                        "uid" => $uid,
+                        "uname" => $uname
+                    ]);
+                }
+            }
         });
         // 每分钟执行一次
         new Crontab('0 */1 * * * *', function () {

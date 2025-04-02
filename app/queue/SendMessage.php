@@ -30,6 +30,7 @@ class SendMessage
             'Present' => 20,
             'Share' => 5,
             'Timing' => 10,
+            'PkLiveReport' => 30,
             default => 1,
         };
     }

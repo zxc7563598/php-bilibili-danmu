@@ -2,30 +2,24 @@
 
 namespace process;
 
-use app\core\LoginPublicMethods;
 use app\core\UserPublicMethods;
 use app\model\Lives;
-use app\model\PaymentRecords;
-use app\model\ShopConfig;
-use app\model\UserVips;
 use app\queue\SendMessage;
 use app\server\Autoresponders;
 use app\server\CheckIn;
 use app\server\Enter;
 use app\server\Follow;
+use app\server\PkLiveReport;
 use app\server\Present;
 use app\server\Share;
 use Carbon\Carbon;
-use Exception;
 use Workerman\Worker;
 use Hejunjie\Bililive;
 use Workerman\Timer;
 use Workerman\Connection\AsyncTcpConnection;
 use Workerman\Protocols\Ws;
 use Hejunjie\Tools;
-use Random\RandomException;
 use support\Redis;
-use resource\enums\PaymentRecordsEnums;
 
 class Bilibili
 {
@@ -48,7 +42,6 @@ class Bilibili
      * 启动 Unix Worker
      * 
      * @return void 
-     * @throws Exception 
      */
     private function startUnixWorker()
     {
@@ -72,8 +65,6 @@ class Bilibili
      * 连接到 WebSocket 服务器
      * 
      * @return void 
-     * @throws Exception 
-     * @throws RandomException 
      */
     private function connectToWebSocket()
     {
@@ -100,7 +91,6 @@ class Bilibili
      * @param string $token 直播间认证密钥
      * 
      * @return void 
-     * @throws RandomException 
      */
     private function setupConnection(AsyncTcpConnection $con, int $roomId, string $token)
     {
@@ -228,7 +218,6 @@ class Bilibili
      * @param mixed $data 消息信息
      * 
      * @return void 
-     * @throws Exception 
      */
     private function onMessageReceived($data)
     {
@@ -399,10 +388,7 @@ class Bilibili
                         }
                         break;
                     case 'PK_BATTLE_PRE_NEW': // PK马上开始
-                        sublog('测试业务', 'PK播报', '即将于' . $payload['payload']['data']['uname'] . '进行PK', $payload['payload']);
-                        $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
-                        $getOnlineGoldRank = Bililive\Live::getOnlineGoldRank($payload['payload']['data']['uid'], $payload['payload']['data']['room_id'], $cookie);
-                        sublog('测试业务', 'PK播报', '信息获取完成', $getOnlineGoldRank);
+                        PkLiveReport::processing($payload['payload']['data']['uid'], $payload['payload']['data']['uname'], $payload['payload']['data']['room_id']);
                         break;
                 }
             }
