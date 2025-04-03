@@ -77,6 +77,7 @@ Route::group('/api/robot', function () {
     Route::any('/set-config', [app\controller\robot\ApiController::class, 'setConfig']);
     Route::any('/connect-out', [app\controller\robot\ApiController::class, 'connectOut']);
     Route::any('/export-config', [app\controller\robot\ApiController::class, 'exportConfig']);
+    Route::any('/update-read', [app\controller\robot\ApiController::class, 'updateRead']);
 })->middleware([
     app\middleware\SignatureMiddleware::class
 ]);
