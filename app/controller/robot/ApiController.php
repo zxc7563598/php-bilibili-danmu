@@ -224,6 +224,14 @@ class ApiController
             Tools\FileUtils::fileDelete(runtime_path() . '/tmp/autoresponders.cfg');
             Tools\FileUtils::writeToFile(runtime_path() . '/tmp/autoresponders.cfg', json_encode($autoresponders));
         }
+        // 更新说明
+        $session = $request->session();
+        $version_update = $session->get('version_update') == 1 ? false : true;
+        $update_html = '<p><b>更新日期: 2025-04-02</b></p><br>
+            <p><b>​签到积分自由设定</b></p>
+            <p>主播可在控制台设置签到奖励积分(默认0分, 设为0则不奖励)</p><br>
+            <p><b>新增PK对手数据播报</b></p>
+            <p>大乱斗开始时自动播报对方直播间在线人数和高能榜信息(需在控制台提前开启)</p>';
         // 返回数据
         return success($request, [
             'timing' => $timing,
@@ -234,8 +242,21 @@ class ApiController
             'share' => $share,
             'autoresponders' => $autoresponders,
             'check_in' => $checkIn,
-            'update' => false
+            'update' => $version_update,
+            'update_html' => $update_html
         ]);
+    }
+
+    /**
+     * 关闭更新窗口
+     * 
+     * @return void 
+     */
+    public function updateRead(Request $request)
+    {
+        $session = $request->session();
+        $session->set('version_update', 1);
+        return success($request, []);
     }
 
     /**
