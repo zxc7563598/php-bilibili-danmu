@@ -4,7 +4,7 @@ namespace app\controller\shop\management;
 
 use app\controller\GeneralMethod;
 use Exception;
-use Hejunjie\Tools;
+use Hejunjie\Utils;
 use support\Request;
 use support\Response;
 use Endroid\QrCode\Builder\Builder;
@@ -126,7 +126,7 @@ class SystemConfigurationController extends GeneralMethod
         // 组装需要修改的环境变量数据
         $data = array_map(fn($key) => ['key' => strtoupper($key), 'value' => $param[$key]], $configKeys);
         // 读取 .env 文件内容
-        $env = Tools\FileUtils::readFile(base_path() . '/.env');
+        $env = Utils\FileUtils::readFile(base_path() . '/.env');
         // 需要重新构建VUE的关键配置项
         $shouldExecuteCode = false;
         $keysToCheck = ['SYSTEM_API_URL', 'SYSTEM_AES_KEY', 'SYSTEM_AES_IV', 'SYSTEM_KEY', 'SHOP_NAME', 'SHOP_URL'];
@@ -147,7 +147,7 @@ class SystemConfigurationController extends GeneralMethod
                 : $env .= "\n" . $_data['key'] . "=" . $_data['value']; // 不存在则添加
         }
         // 写回 .env 文件
-        Tools\FileUtils::writeToFile(base_path() . '/.env', $env);
+        Utils\FileUtils::writeToFile(base_path() . '/.env', $env);
         // 重启系统（发送信号）
         posix_kill(posix_getppid(), SIGUSR1);
         // 重新构建VUE

@@ -6,7 +6,7 @@ use app\controller\GeneralMethod;
 use app\model\UserVips;
 use Carbon\Carbon;
 use resource\enums\UserVipsEnums;
-use Hejunjie\Tools;
+use Hejunjie\Utils;
 
 class LoginPublicMethods extends GeneralMethod
 {
@@ -77,7 +77,7 @@ class LoginPublicMethods extends GeneralMethod
         $user_vips = UserVips::where('uid', $uid)->first();
         if (!empty($user_vips)) {
             // 获取用户名称与头像
-            $getMasterInfo = Tools\HttpClient::sendGetRequest('https://api.live.bilibili.com/live_user/v1/Master/info?uid=' . $user_vips->uid, [
+            $getMasterInfo = Utils\HttpClient::sendGetRequest('https://api.live.bilibili.com/live_user/v1/Master/info?uid=' . $user_vips->uid, [
                 "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
                 "Origin: https://live.bilibili.com",
             ], 10);
@@ -89,9 +89,9 @@ class LoginPublicMethods extends GeneralMethod
                     $user_vips->name = $getMasterInfoData['data']['info']['uname'];
                 }
                 $file_name = pathinfo($getMasterInfoData['data']['info']['face'], PATHINFO_FILENAME);
-                $path = public_path('attachment/user-info/' . implode('/', str_split(Tools\Str::padString(0, $user_vips->user_id), 2)) . '/avatar/');
-                $image_path = Tools\Img::downloadImageFromUrl($getMasterInfoData['data']['info']['face'], $path, $file_name);
-                $user_vips->avatar = Tools\Str::replaceFirst(public_path() . '/attachment/', '', $image_path);
+                $path = public_path('attachment/user-info/' . implode('/', str_split(Utils\Str::padString(0, $user_vips->user_id), 2)) . '/avatar/');
+                $image_path = Utils\Img::downloadImageFromUrl($getMasterInfoData['data']['info']['face'], $path, $file_name);
+                $user_vips->avatar = Utils\Str::replaceFirst(public_path() . '/attachment/', '', $image_path);
                 $user_vips->save();
             }
         }
