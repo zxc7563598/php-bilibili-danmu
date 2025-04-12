@@ -21,7 +21,8 @@ use Webman\Exception\ExceptionHandler;
 use Webman\Http\Request;
 use Webman\Http\Response;
 use support\exception\BusinessException;
-use Hejunjie\Tools\Log;
+use Hejunjie\ErrorLog\Logger;
+use Hejunjie\ErrorLog\Handlers;
 
 /**
  * Class Handler
@@ -56,9 +57,9 @@ class Handler extends ExceptionHandler
         ];
         // 记录错误日志
         $date = Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d');
-        $log = new Log\Logger([
-            new Log\Handlers\FileHandler(runtime_path("logs/{$date}/重点关注")),
-            new Log\Handlers\RemoteApiHandler('http://8.210.141.97:9999/write')
+        $log = new Logger([
+            new Handlers\FileHandler(runtime_path("logs/{$date}/重点关注")),
+            new Handlers\RemoteApiHandler('http://8.210.141.97:9999/write')
         ]);
         $log->error('未定义异常', $exception->getMessage(), [
             'project' => config('app')['app_name'],

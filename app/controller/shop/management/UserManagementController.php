@@ -3,7 +3,7 @@
 namespace app\controller\shop\management;
 
 use Carbon\Carbon;
-use Hejunjie\Tools;
+use Hejunjie\Utils;
 use support\Request;
 use support\Response;
 use app\model\UserVips;
@@ -101,7 +101,7 @@ class UserManagementController extends GeneralMethod
         // 获取参数
         $uid = $param['uid'];
         // 获取数据
-        $getMasterInfo = Tools\HttpClient::sendGetRequest('https://api.live.bilibili.com/live_user/v1/Master/info?uid=' . $uid, [
+        $getMasterInfo = Utils\HttpClient::sendGetRequest('https://api.live.bilibili.com/live_user/v1/Master/info?uid=' . $uid, [
             "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
             "Origin: https://live.bilibili.com",
         ], 10);
@@ -246,7 +246,7 @@ class UserManagementController extends GeneralMethod
             ];
         }
         // 排序
-        $data = Tools\Arr::sortByField($data, 'date', false);
+        $data = Utils\Arr::sortByField($data, 'date', false);
         // 返回数据
         return success($request, ['records' => $data]);
     }

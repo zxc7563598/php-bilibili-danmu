@@ -4,7 +4,7 @@ namespace app\controller\shop\management;
 
 use app\controller\GeneralMethod;
 use app\model\ShopConfig;
-use Hejunjie\Tools;
+use Hejunjie\Utils;
 use support\Redis;
 use support\Request;
 use support\Response;
@@ -236,8 +236,8 @@ class MallConfigurationController extends GeneralMethod
                 $path = public_path('attachment/shop-config/tribute-gift-order-successful-icon/');
                 break;
         }
-        $base64ToImage = Tools\Img::base64ToImage($base64, $path);
-        $image_path = Tools\Str::replaceFirst(public_path() . '/attachment/', '', $base64ToImage);
+        $base64ToImage = Utils\Img::base64ToImage($base64, $path);
+        $image_path = Utils\Str::replaceFirst(public_path() . '/attachment/', '', $base64ToImage);
         // 返回数据
         return success($request, [
             'path' => $image_path,
