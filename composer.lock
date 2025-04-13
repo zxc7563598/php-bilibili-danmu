@@ -837,16 +837,16 @@
         },
         {
             "name": "hejunjie/cache",
-            "version": "v1.0.0",
+            "version": "v1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zxc7563598/php-cache.git",
-                "reference": "07139c3c5e890cd2f2666fff2693877350ef7171"
+                "reference": "a7dd27f8608771d2a1ef0445557264ed28e60978"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zxc7563598/php-cache/zipball/07139c3c5e890cd2f2666fff2693877350ef7171",
-                "reference": "07139c3c5e890cd2f2666fff2693877350ef7171",
+                "url": "https://api.github.com/repos/zxc7563598/php-cache/zipball/a7dd27f8608771d2a1ef0445557264ed28e60978",
+                "reference": "a7dd27f8608771d2a1ef0445557264ed28e60978",
                 "shasum": ""
             },
             "require": {
@@ -871,9 +871,9 @@
             "description": "基于装饰器模式实现的多层缓存系统，支持内存、文件、本地与远程缓存组合，提升缓存命中率，简化缓存管理逻辑。",
             "support": {
                 "issues": "https://github.com/zxc7563598/php-cache/issues",
-                "source": "https://github.com/zxc7563598/php-cache/tree/v1.0.0"
+                "source": "https://github.com/zxc7563598/php-cache/tree/v1.0.1"
             },
-            "time": "2025-04-12T05:56:50+00:00"
+            "time": "2025-04-12T09:05:58+00:00"
         },
         {
             "name": "hejunjie/china-division",
@@ -1082,16 +1082,16 @@
         },
         {
             "name": "hejunjie/utils",
-            "version": "v1.0.0",
+            "version": "v1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zxc7563598/php-utils.git",
-                "reference": "34a7c7bca9200de9e61059062b3807fa36eb691c"
+                "reference": "b5548ae2ff6540039337bc6fefc8af795bba38e4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zxc7563598/php-utils/zipball/34a7c7bca9200de9e61059062b3807fa36eb691c",
-                "reference": "34a7c7bca9200de9e61059062b3807fa36eb691c",
+                "url": "https://api.github.com/repos/zxc7563598/php-utils/zipball/b5548ae2ff6540039337bc6fefc8af795bba38e4",
+                "reference": "b5548ae2ff6540039337bc6fefc8af795bba38e4",
                 "shasum": ""
             },
             "require": {
@@ -1116,9 +1116,9 @@
             "description": "包含文件、字符串、数组、网络请求等常用函数的工具类集合，提升开发效率，适用于日常 PHP 项目辅助功能。",
             "support": {
                 "issues": "https://github.com/zxc7563598/php-utils/issues",
-                "source": "https://github.com/zxc7563598/php-utils/tree/v1.0.0"
+                "source": "https://github.com/zxc7563598/php-utils/tree/v1.0.1"
             },
-            "time": "2025-04-12T05:56:48+00:00"
+            "time": "2025-04-13T01:52:36+00:00"
         },
         {
             "name": "illuminate/bus",
