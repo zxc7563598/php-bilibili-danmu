@@ -5,7 +5,7 @@ namespace process;
 use app\model\SilentUser;
 use Carbon\Carbon;
 use Workerman\Crontab\Crontab;
-use Hejunjie\Tools;
+use Hejunjie\Utils;
 use Hejunjie\Bililive;
 use support\Redis;
 
@@ -32,7 +32,7 @@ class Task
                 $room_uname = $live_info['data']['uname'] ?? '';
                 if ($uid > 0 && $room_id > 0) {
                     $url = 'https://tools.api.hejunjie.life/bilibilidanmu-api/active';
-                    Tools\HttpClient::sendPostRequest($url, [], [
+                    Utils\HttpClient::sendPostRequest($url, [], [
                         "room_id" => $room_id,
                         "room_uname" => $room_uname,
                         "uid" => $uid,
@@ -82,7 +82,7 @@ class Task
             'dir' => $dir
         ]);
         if (is_dir($dir)) {
-            $fileDelete = Tools\FileUtils::fileDelete($dir);
+            $fileDelete = Utils\FileUtils::fileDelete($dir);
             if ($fileDelete) {
                 sublog('每日任务', '初始化', "日志删除成功", []);
             } else {

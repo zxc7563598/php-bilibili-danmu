@@ -2,7 +2,7 @@
 
 namespace app\controller\shop\management;
 
-use Hejunjie\Tools;
+use Hejunjie\Utils;
 use support\Request;
 use app\model\Goods;
 use support\Response;
@@ -152,8 +152,8 @@ class ProductManagementController extends GeneralMethod
         ];
         $path = $pathMap[$type] ?? 'attachment/shop-config/';
         // 转换base64为图片
-        $base64ToImage = Tools\Img::base64ToImage($base64, public_path($path));
-        $image_path = Tools\Str::replaceFirst(public_path() . '/attachment/', '', $base64ToImage);
+        $base64ToImage = Utils\Img::base64ToImage($base64, public_path($path));
+        $image_path = Utils\Str::replaceFirst(public_path() . '/attachment/', '', $base64ToImage);
         return success($request, [
             'path' => $image_path,
             'url' => getImageUrl($image_path)

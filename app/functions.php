@@ -2,9 +2,10 @@
 
 use Carbon\Carbon;
 use Carbon\Exceptions\InvalidTimeZoneException;
-use Hejunjie\Tools;
 use support\Response;
-use Hejunjie\Tools\Log;
+use Hejunjie\Utils;
+use Hejunjie\ErrorLog\Logger;
+use Hejunjie\ErrorLog\Handlers;
 
 /**
  * Api响应成功
@@ -52,7 +53,7 @@ function fail($request, $code = 500, $data = [], $message = ''): Response
  */
 function readFileContent(string $path): ?string
 {
-    return (file_exists($path) && is_readable($path)) ? Tools\FileUtils::readFile($path) : null;
+    return (file_exists($path) && is_readable($path)) ? Utils\FileUtils::readFile($path) : null;
 }
 
 /**
@@ -65,7 +66,7 @@ function restartBilibili()
 {
     $url = getenv('RE_OPEN_HOST') . ':' . getenv('LISTEN') . '/reload-bilibili';
     $timestamp = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
-    Tools\HttpClient::sendPostRequest($url, [], [
+    Utils\HttpClient::sendPostRequest($url, [], [
         'api_key' => md5(getenv('SECURE_API_KEY') . $timestamp),
         'timestamp' => $timestamp
     ]);
@@ -81,7 +82,7 @@ function restartTiming()
 {
     $url = getenv('RE_OPEN_HOST') . ':' . getenv('LISTEN') . '/reload-timing';
     $timestamp = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
-    Tools\HttpClient::sendPostRequest($url, [], [
+    Utils\HttpClient::sendPostRequest($url, [], [
         'api_key' => md5(getenv('SECURE_API_KEY') . $timestamp),
         'timestamp' => $timestamp
     ]);
@@ -118,8 +119,8 @@ function splitAndFilterLines($text)
 function sublog($paths, $title, $message, $context): void
 {
     $date = Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d');
-    $log = new Log\Logger([
-        new Log\Handlers\FileHandler(runtime_path("logs/{$date}/{$paths}"))
+    $log = new Logger([
+        new Handlers\FileHandler(runtime_path("logs/{$date}/{$paths}"))
     ]);
     $log->info($title, $message, $context);
 }

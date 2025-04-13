@@ -17,7 +17,7 @@ use resource\enums\UserVipsEnums;
 use resource\enums\UserAddressEnums;
 use resource\enums\PaymentRecordsEnums;
 use resource\enums\RedemptionRecordsEnums;
-use Hejunjie\Tools;
+use Hejunjie\Utils;
 
 class UserPublicMethods extends GeneralMethod
 {
@@ -110,7 +110,7 @@ class UserPublicMethods extends GeneralMethod
                 ];
             }
             // 发送邮件
-            Tools\HttpClient::sendPostRequest('https://bilibili-email-xdobqxxrfo.cn-hongkong.fcapp.run/shop-email', [
+            Utils\HttpClient::sendPostRequest('https://bilibili-email-xdobqxxrfo.cn-hongkong.fcapp.run/shop-email', [
                 'Content-Type: application/json'
             ], json_encode([
                 'mail' => $shop_config['email-address'],
@@ -276,7 +276,7 @@ class UserPublicMethods extends GeneralMethod
                     ];
                 }
                 // 发送邮件
-                Tools\HttpClient::sendPostRequest('https://bilibili-email-xdobqxxrfo.cn-hongkong.fcapp.run/goods-email', [
+                Utils\HttpClient::sendPostRequest('https://bilibili-email-xdobqxxrfo.cn-hongkong.fcapp.run/goods-email', [
                     'Content-Type: application/json'
                 ], json_encode([
                     'mail' => $shop_config['email-address'],

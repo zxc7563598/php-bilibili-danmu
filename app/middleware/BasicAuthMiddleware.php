@@ -5,7 +5,7 @@ namespace app\middleware;
 use Webman\MiddlewareInterface;
 use Webman\Http\Response;
 use Webman\Http\Request;
-use Hejunjie\Tools;
+use Hejunjie\Utils;
 
 class BasicAuthMiddleware implements MiddlewareInterface
 {
@@ -31,8 +31,8 @@ class BasicAuthMiddleware implements MiddlewareInterface
                 $account = json_decode($account, true);
             } else {
                 $account = ['username' => $username, 'password' => $password];
-                Tools\FileUtils::fileDelete(runtime_path() . '/tmp/account.cfg');
-                Tools\FileUtils::writeToFile(runtime_path() . '/tmp/account.cfg', json_encode($account, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
+                Utils\FileUtils::fileDelete(runtime_path() . '/tmp/account.cfg');
+                Utils\FileUtils::writeToFile(runtime_path() . '/tmp/account.cfg', json_encode($account, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
             }
             return $username === $account['username'] && $password === $account['password'];
         }

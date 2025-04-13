@@ -3,7 +3,7 @@
 namespace app\controller\shop;
 
 use Carbon\Carbon;
-use Hejunjie\Tools;
+use Hejunjie\Utils;
 use support\Request;
 use app\model\Goods;
 use app\model\GoodSubs;
@@ -173,7 +173,7 @@ class UserController extends GeneralMethod
         // 获取参数
         $goods_id = $param['goods_id'];
         // 获取数据
-        $sn = $user_vips->created_at->timezone(config('app')['default_timezone'])->format('Ymd') . Tools\Str::padString(0, $user_vips->user_id);
+        $sn = $user_vips->created_at->timezone(config('app')['default_timezone'])->format('Ymd') . Utils\Str::padString(0, $user_vips->user_id);
         // 获取配置信息
         $config = self::getShopConfig();
         // 返回信息
@@ -207,9 +207,9 @@ class UserController extends GeneralMethod
         // 获取参数
         $base64 = $param['base64'];
         // base64存储图片 
-        $path = public_path('attachment/user-info/' . implode('/', str_split(Tools\Str::padString(0, $user_vips->user_id), 2)) . '/signing/');
-        $base64ToImage = Tools\Img::base64ToImage($base64, $path);
-        $image_path = Tools\Str::replaceFirst(public_path() . '/attachment/', '', $base64ToImage);
+        $path = public_path('attachment/user-info/' . implode('/', str_split(Utils\Str::padString(0, $user_vips->user_id), 2)) . '/signing/');
+        $base64ToImage = Utils\Img::base64ToImage($base64, $path);
+        $image_path = Utils\Str::replaceFirst(public_path() . '/attachment/', '', $base64ToImage);
         $user_vips->sign_image = $image_path;
         $user_vips->save();
         // 返回数据

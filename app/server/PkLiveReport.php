@@ -37,11 +37,11 @@ class PkLiveReport
             // 获取PK信息
             $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
             $getOnlineGoldRank = Bililive\Live::getOnlineGoldRank($uid, $room_id, $cookie);
-            $online_num = $getOnlineGoldRank['data']['online_num'] ?? 0;
+            $online_num = $getOnlineGoldRank['online_num'] ?? 0;
             $online_score = 0;
             $top_three_score = 0;
             $i = 0;
-            foreach ($getOnlineGoldRank['data']['online_item'] as $online_item) {
+            foreach ($getOnlineGoldRank['online_item'] as $online_item) {
                 if ($i < 3) {
                     $top_three_score += $online_item['score'];
                 }
