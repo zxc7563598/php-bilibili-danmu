@@ -110,7 +110,7 @@ class UserPublicMethods extends GeneralMethod
                 ];
             }
             // 发送邮件
-            Utils\HttpClient::sendPostRequest('https://bilibili-email-xdobqxxrfo.cn-hongkong.fcapp.run/shop-email', [
+            Utils\HttpClient::sendPostRequest('https://tools.api.hejunjie.life/bilibilidanmu-api/shop-email', [
                 'Content-Type: application/json'
             ], json_encode([
                 'mail' => $shop_config['email-address'],
@@ -276,7 +276,7 @@ class UserPublicMethods extends GeneralMethod
                     ];
                 }
                 // 发送邮件
-                Utils\HttpClient::sendPostRequest('https://bilibili-email-xdobqxxrfo.cn-hongkong.fcapp.run/goods-email', [
+                Utils\HttpClient::sendPostRequest('https://tools.api.hejunjie.life/bilibilidanmu-api/live-end-email', [
                     'Content-Type: application/json'
                 ], json_encode([
                     'mail' => $shop_config['email-address'],
