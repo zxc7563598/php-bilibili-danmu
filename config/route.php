@@ -13,11 +13,6 @@
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
-use app\core\UserPublicMethods;
-use app\server\core\KeywordEvaluator;
-use app\server\core\KeywordMatcher;
-use app\server\Present;
-use support\Redis;
 use Webman\Route;
 use support\Request;
 use support\Response;
