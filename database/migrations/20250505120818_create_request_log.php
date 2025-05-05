@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Phinx\Db\Adapter\MysqlAdapter;
 use Phinx\Migration\AbstractMigration;
 
-final class CreateUserCheckIn extends AbstractMigration
+final class CreateRequestLog extends AbstractMigration
 {
     /**
      * Migrate Up.
