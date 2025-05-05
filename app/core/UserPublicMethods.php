@@ -245,12 +245,18 @@ class UserPublicMethods extends GeneralMethod
                         'uid' => 'bl_user_vips.uid',
                         'name' => 'bl_user_vips.name',
                         'time' => 'bl_payment_records.payment_at as time',
-                        'type' => 'bl_payment_records.vip_type as type'
+                        'type' => 'bl_payment_records.vip_type as type',
+                        'point' => 'bl_payment_records.point as point',
+                        'pre_point' => 'bl_payment_records.pre_point as pre_point',
+                        'after_point' => 'bl_payment_records.after_point as after_point',
                     ]);
                 foreach ($payment_records as $_payment_records) {
                     $open_list[] = [
                         'uid' => $_payment_records->uid,
                         'name' => $_payment_records->name,
+                        'pre_point' => $_payment_records->pre_point,
+                        'point' => $_payment_records->point,
+                        'after_point' => $_payment_records->after_point,
                         'time' => Carbon::parse($_payment_records->time)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
                         'type' => PaymentRecordsEnums\VipType::from($_payment_records->type)->label()
                     ];
