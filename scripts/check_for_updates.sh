@@ -8,134 +8,181 @@ LOG_FILE="/var/log/check_for_updates.log"
 LOCK_FILE="/tmp/check_for_updates.lock"
 # Webman 服务端口
 PORT=7776
+# Webman PID 文件路径
+PID_FILE="$PROJECT_DIR/runtime/webman.pid"
 
 # 设置 PATH，确保环境变量完整
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
-# 函数：写入日志
+# 日志辅助函数
 log_message() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> $LOG_FILE
 }
+log_stage() {
+    log_message "=== 阶段: $1 ==="
+}
+log_step() {
+    log_message "--- $1 ---"
+}
+log_info() {
+    log_message "[INFO] $1"
+}
+log_warn() {
+    log_message "[WARN] $1"
+}
+log_error() {
+    log_message "[ERROR] $1"
+}
+
+# 占位：发送失败邮件（你自己实现）
+send_email() {
+    MESSAGE="$1"
+
+    ACCOUNT_FILE="/opt/bilibili-robots/php/runtime/tmp/account.cfg"
+    UID_FILE="/opt/bilibili-robots/php/runtime/tmp/uid.cfg"
+
+    if [ -s "$ACCOUNT_FILE" ]; then
+        ACCOUNT=$(cat "$ACCOUNT_FILE")
+    else
+        ACCOUNT="unknown"
+    fi
+
+    if [ -s "$UID_FILE" ]; then
+        UID=$(cat "$UID_FILE")
+    else
+        UID="unknown"
+    fi
+
+    # JSON 中转义双引号
+    ESCAPED_MSG=$(echo "$MESSAGE" | sed 's/"/\\"/g')
+    ESCAPED_ACC=$(echo "$ACCOUNT" | sed 's/"/\\"/g')
+    ESCAPED_UID=$(echo "$UID" | sed 's/"/\\"/g')
+
+    JSON="{\"message\":\"$ESCAPED_MSG\",\"account\":\"$ESCAPED_ACC\",\"uid\":\"$ESCAPED_UID\"}"
+
+    curl -s -X POST https://tools.api.hejunjie.life/bilibilidanmu-api/update-error-email \
+        -H "Content-Type: application/json" \
+        -d "$JSON" >> $LOG_FILE 2>&1
+}
+
 
 log_message "=============================="
 
 # 检查锁文件
 if [ -f "$LOCK_FILE" ]; then
-    log_message "脚本已经在运行 - 退出."
+    log_warn "脚本已经在运行 - 退出."
     exit 1
 fi
 
 # 创建锁文件
 touch $LOCK_FILE
-# 确保删除锁文件，即使脚本中断
 trap 'rm -f "$LOCK_FILE"' EXIT
 
-log_message "启动检查和更新程序."
+log_stage "启动检查和更新程序"
 
-# 进入项目目录
-cd $PROJECT_DIR || { log_message "将执行目录更改为 $PROJECT_DIR"; exit 1; }
+cd $PROJECT_DIR || { log_error "进入目录 $PROJECT_DIR 失败"; exit 1; }
 
-# 获取当前本地 Git 提交 ID
+log_step "对比提交版本"
 LOCAL_COMMIT=$(git rev-parse HEAD)
-
-# 获取远程 Git 提交 ID
 REMOTE_COMMIT=$(git ls-remote origin -h refs/heads/main | cut -f1)
+log_info "本地提交 ID: $LOCAL_COMMIT"
+log_info "远程提交 ID: $REMOTE_COMMIT"
 
-# 比较本地和远程的提交 ID
 if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
-    log_message "本地提交 ($LOCAL_COMMIT) 与远程提交 ($REMOTE_COMMIT). 不匹配，需要获取最新更改."
-
-    # 拉取最新代码
+    log_stage "执行 Git 更新"
     git fetch origin >> $LOG_FILE 2>&1
-    git reset --hard origin/main >> $LOG_FILE 2>&1
-    if [ $? -ne 0 ]; then
-        log_message "Git获取失败 - 退出."
-        exit 1
-    fi
+    git reset --hard origin/main >> $LOG_FILE 2>&1 || { log_error "Git 更新失败"; exit 1; }
+    log_info "Git 更新成功"
 
-    log_message "成功获取最新代码."
-
-    # 更新数据库
+    log_stage "执行数据库迁移"
     vendor/bin/phinx migrate >> $LOG_FILE 2>&1
 
-    log_message "数据库完成更新."
-
-    # 停止 Webman 服务
-    log_message "停止项目..."
+    log_stage "停止 Webman 服务"
+    log_step "尝试优雅停止"
     php start.php stop >> $LOG_FILE 2>&1
-    if [ $? -ne 0 ]; then
-        log_message "使用 'php start.php stop' 停止失败。继续强制停止."
-    fi
 
-    # 强制停止 Webman 进程
-    log_message "确保停止所有与项目相关的进程."
-    PIDS=$(pgrep -f "php start.php")
-    if [ -n "$PIDS" ]; then
-        log_message "发现与项目相关的进程: $PIDS"
-        echo $PIDS | xargs kill -9 >> $LOG_FILE 2>&1
-        if [ $? -ne 0 ]; then
-            log_message "相关进程关闭失败: $PIDS"
+    RETRY=5
+    while [ $RETRY -gt 0 ]; do
+        if ! pgrep -f "work" >/dev/null 2>&1; then
+            log_info "Webman 服务已成功停止"
+            break
         else
-            log_message "成功关闭相关进程: $PIDS"
+            log_warn "服务仍在运行，等待 2 秒重试..."
+            sleep 2
+            RETRY=$((RETRY - 1))
         fi
-    else
-        log_message "未能找到与项目相关进程."
+    done
+
+    if pgrep -f "work" >/dev/null 2>&1; then
+        log_warn "优雅停止失败，执行强杀..."
+        PIDS=$(pgrep -f "work")
+        log_info "强杀进程: $PIDS"
+        echo "$PIDS" | xargs kill -9 >> $LOG_FILE 2>&1
+        sleep 2
     fi
 
-    # 检查端口是否被占用
-    log_message "确保端口 $PORT 当前未被使用."
+    if pgrep -f "work" >/dev/null 2>&1; then
+        log_error "进程仍未关闭，触发告警通知"
+        send_email "进程仍未关闭，触发告警通知"
+        exit 1
+    else
+        log_info "所有 Webman 相关进程已停止"
+    fi
+
+    log_step "清理残留 PID 文件"
+    if [ -f "$PID_FILE" ]; then
+        log_info "发现 PID 文件，删除中: $PID_FILE"
+        rm -f "$PID_FILE"
+        log_info "PID 文件删除完成"
+    fi
+
+    log_step "检查端口占用"
     if netstat -tuln | grep ":$PORT " >/dev/null 2>&1; then
-        log_message "通过杀死相关进程强制释放 $PORT ."
+        log_warn "端口 $PORT 被占用，尝试释放..."
         PID=$(netstat -tulnp 2>/dev/null | grep ":$PORT " | awk '{print $7}' | cut -d'/' -f1)
         if [ -n "$PID" ]; then
-            log_message "发现使用端口的进程 $PORT: $PID"
-            kill -9 $PID >> $LOG_FILE 2>&1
-            if [ $? -ne 0 ]; then
-                log_message "使用端口 $PID 关闭进程 $PORT 失败."
-            else
-                log_message "使用端口 $PID 成功关闭进程 $PORT."
-            fi
-        else
-            log_message "未找到使用端口的进程 $PORT."
+            log_info "杀死占用端口 $PORT 的进程 $PID"
+            kill -9 "$PID" >> $LOG_FILE 2>&1
         fi
-    else
-        log_message "端口 $PORT 已经空闲."
     fi
 
-    # 再次检查端口是否仍在使用
-    log_message "检查 $PORT 端口是否仍在使用中..."
-    RETRY_COUNT=10  # 最多重试次数
+    RETRY_COUNT=10
     while [ $RETRY_COUNT -gt 0 ]; do
         if netstat -tuln | grep ":$PORT " >/dev/null 2>&1; then
-            log_message "端口 $PORT 仍在使用中，2秒后重试..."
+            log_warn "端口 $PORT 仍被占用，等待释放..."
             sleep 2
             RETRY_COUNT=$((RETRY_COUNT - 1))
         else
-            log_message "端口 $PORT 已经空闲."
+            log_info "端口 $PORT 已释放"
             break
         fi
     done
 
     if [ $RETRY_COUNT -eq 0 ]; then
-        log_message "等待端口 $PORT 释放超时 - 退出."
+        log_error "端口 $PORT 长时间未释放，触发告警"
+        send_email "端口 $PORT 长时间未释放，触发告警"
         exit 1
     fi
 
-    # 安装composer
+    log_stage "安装 Composer 依赖"
     composer install >> $LOG_FILE 2>&1 &
     composer update hejunjie/bililive >> $LOG_FILE 2>&1 &
     composer update hejunjie/tools >> $LOG_FILE 2>&1 &
 
-    # 启动 Webman 服务
-    log_message "启动项目..."
+    log_stage "启动 Webman 服务"
     nohup php start.php start -d >> $LOG_FILE 2>&1 &
-    if [ $? -ne 0 ]; then
-        log_message "项目启动失败 - 退出."
+    sleep 2
+
+    if ! pgrep -f "work" >/dev/null 2>&1; then
+        log_error "Webman 启动失败，触发告警"
+        send_email "Webman 启动失败，触发告警"
         exit 1
     fi
 
+    log_info "Webman 启动成功"
 else
-    log_message "本地提交与远程提交一致，无需更新."
+    log_info "提交一致，无需更新"
 fi
 
-log_message "检查和更新过程已成功完成."
+log_stage "更新流程完成"
+exit 0
