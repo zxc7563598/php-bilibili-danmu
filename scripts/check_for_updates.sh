@@ -3,7 +3,7 @@
 # 项目目录路径
 PROJECT_DIR="/var/www/bilibili_danmu"
 # 日志文件路径
-LOG_FILE="/var/log/check_for_updates.log"
+LOG_FILE="/var/www/bilibili_danmu/runtime/check_for_updates.log"
 # 锁文件路径
 LOCK_FILE="/tmp/check_for_updates.lock"
 # Webman 服务端口
@@ -38,8 +38,9 @@ log_error() {
 send_email() {
     MESSAGE="$1"
 
-    ACCOUNT_FILE="/opt/bilibili-robots/php/runtime/tmp/account.cfg"
-    UID_FILE="/opt/bilibili-robots/php/runtime/tmp/uid.cfg"
+    ACCOUNT_FILE="/var/www/bilibili_danmu/runtime/tmp/account.cfg"
+    UID_FILE="/var/www/bilibili_danmu/runtime/tmp/uid.cfg"
+    MAIL="junjie.he.925@gmail.com"
 
     if [ -s "$ACCOUNT_FILE" ]; then
         ACCOUNT=$(cat "$ACCOUNT_FILE")
@@ -57,8 +58,9 @@ send_email() {
     ESCAPED_MSG=$(echo "$MESSAGE" | sed 's/"/\\"/g')
     ESCAPED_ACC=$(echo "$ACCOUNT" | sed 's/"/\\"/g')
     ESCAPED_UID=$(echo "$UID" | sed 's/"/\\"/g')
+    ESCAPED_MAIL=$(echo "$MAIL" | sed 's/"/\\"/g')
 
-    JSON="{\"message\":\"$ESCAPED_MSG\",\"account\":\"$ESCAPED_ACC\",\"uid\":\"$ESCAPED_UID\"}"
+    JSON="{\"message\":\"$ESCAPED_MSG\",\"account\":\"$ESCAPED_ACC\",\"uid\":\"$ESCAPED_UID\",\"mail\":\"$ESCAPED_MAIL\"}"
 
     curl -s -X POST https://tools.api.hejunjie.life/bilibilidanmu-api/update-error-email \
         -H "Content-Type: application/json" \
@@ -165,9 +167,9 @@ if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
     fi
 
     log_stage "安装 Composer 依赖"
-    composer install >> $LOG_FILE 2>&1 &
-    composer update hejunjie/bililive >> $LOG_FILE 2>&1 &
-    composer update hejunjie/tools >> $LOG_FILE 2>&1 &
+    composer install >> $LOG_FILE 2>&1
+    composer update hejunjie/bililive >> $LOG_FILE 2>&1
+    composer update hejunjie/tools >> $LOG_FILE 2>&1
 
     log_stage "启动 Webman 服务"
     nohup php start.php start -d >> $LOG_FILE 2>&1 &
