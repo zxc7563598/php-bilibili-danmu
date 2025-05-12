@@ -41,7 +41,7 @@ class ReceiveMessage implements Consumer
         $danmu->badge_name = $param['badge_name'];
         $danmu->badge_level = $param['badge_level'];
         $danmu->badge_type = $param['badge_type'] ?: 0;
-        $danmu->send_at = $param['send_at'];
+        $danmu->send_at = $param['time'];
         $danmu->save();
     }
 
