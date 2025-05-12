@@ -248,13 +248,16 @@ Route::options('[{path:.+}]', function () {
         ]);
 });
 
-Route::fallback(function () {
-    $json = [
-        'code' => 0,
-        'message' => '别看了哥们，没这个页面',
-        'data' => (object)[]
-    ];
-    return new Response(200, ['Content-Type' => 'application/json'], json_encode($json, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+Route::fallback(function (Request $request) {
+    $path = $request->path();
+    if (!str_starts_with($path, '/dist/')) {
+        $json = [
+            'code' => 0,
+            'message' => '别看了哥们，没这个页面',
+            'data' => (object)[]
+        ];
+        return new Response(200, ['Content-Type' => 'application/json'], json_encode($json, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+    }
 });
 
 Route::disableDefaultRoute(); // 关闭默认路由
