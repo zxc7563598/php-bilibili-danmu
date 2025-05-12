@@ -176,12 +176,9 @@
                                     <div class="column is-col-min-32">
                                         <p>
                                             <b>开播时间：</b>
-                                            <span class="tag ml-2"
-                                                :class="live_info.live_status.type">{{live_info.live_status.value}}</span>
-                                            <a class="tag is-info is-light ml-2"
-                                                :href="'https://live.bilibili.com/'+live_info.room_id">点击前往直播间</a>
-                                            <span class="ml-2">{{live_info.live_time ? live_info.live_time :
-                                                '当前暂未开播'}}</span>
+                                            <span class="tag ml-2" :class="live_info.live_status.type">{{live_info.live_status.value}}</span>
+                                            <a class="tag is-info is-light ml-2" :href="'https://live.bilibili.com/'+live_info.room_id">点击前往直播间</a>
+                                            <span class="ml-2">{{live_info.live_time ? live_info.live_time : '当前暂未开播'}}</span>
                                         </p>
                                     </div>
                                 </div>
