@@ -35,22 +35,27 @@ class ApiAuthCheck implements MiddlewareInterface
         $route = $request->route;
         $path = $route->getPath();
         $param = $request->all();
-        // 验证时间是否正确
-        $difference = Carbon::now()->timezone(config('app')['default_timezone'])->diffInSeconds(Carbon::parse((int)$param['timestamp'])->timezone(config('app')['default_timezone']));
-        if ($difference > 300) {
+
+
+
+
+        // 验证签名
+        if (!isset($param['timestamp']) || !isset($param['sign'])) {
             return fail($request, 900001);
         }
         // 验证签名
-        if (md5(config('app')['key'] . $param['timestamp']) != $param['sign']) {
-            return fail($request, 900002, [
-                'str' => config('app')['key'] . $param['timestamp'],
-                'md5' => md5(config('app')['key'] . $param['timestamp'])
-            ]);
+        if (md5(config('app')['sign_key'] . $param['timestamp']) != $param['sign']) {
+            return fail($request, 900002);
+        }
+        // 验证时间是否正确
+        $difference = Carbon::now()->timezone(config('app')['default_timezone'])->diffInSeconds(Carbon::parse((int)$param['timestamp'])->timezone(config('app')['default_timezone']));
+        if ($difference > 60) {
+            return fail($request, 900003);
         }
         // 解密数据
         $data = openssl_decrypt($param['en_data'], 'aes-128-cbc', config('app')['aes_key'], 0, config('app')['aes_iv']);
         if (!$data) {
-            return fail($request, 900003);
+            return fail($request, 900004);
         }
         // 完成签名验证，没问题，透传account_id与appid
         $request->data = json_decode($data, true);
@@ -65,7 +70,7 @@ class ApiAuthCheck implements MiddlewareInterface
         ];
         if (!in_array($path, $whitelisting)) {
             if (empty($token)) {
-                return fail($request, 900006);
+                return fail($request, 900005);
             }
         }
         if (!empty($token)) {

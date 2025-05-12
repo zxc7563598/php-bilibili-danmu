@@ -8,23 +8,16 @@ use Webman\Http\Request;
 
 class AccessControl implements MiddlewareInterface
 {
-    public function process(Request $request, callable $next): Response
+    public function process(Request $request, callable $handler): Response
     {
-        $response = $next($request);
-
-        // 设置 CORS 头
+        $response = $handler($request);
+        // 给响应添加跨域相关的http头
         $response->withHeaders([
+            'Access-Control-Allow-Credentials' => 'true',
             'Access-Control-Allow-Origin' => '*',
             'Access-Control-Allow-Methods' => 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers' => 'Content-Type, Authorization',
-            'Access-Control-Allow-Credentials' => 'true',
+            'Access-Control-Allow-Headers' => 'Content-Type, X-Auth-Token, Accept-Language',
         ]);
-
-        // OPTIONS 预检请求的特殊处理
-        if ($request->method() === 'OPTIONS') {
-            return response('', 204, $response->getHeaders());
-        }
-
         return $response;
     }
 }
