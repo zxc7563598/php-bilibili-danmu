@@ -31,7 +31,7 @@ class ComplaintManagementController extends GeneralMethod
             $complaintQuery->where('bl_user_vips.name', 'like', '%' . $uname . '%');
         }
         if (!is_null($uid)) {
-            $complaintQuery->where('bl_user_vips.uid', 'like', '%' . $uid . '%');
+            $complaintQuery->where('bl_user_vips.uid', $uid);
         }
         // 查询并分页
         $complaints = $complaintQuery->orderBy('bl_complaint.created_at', 'desc')

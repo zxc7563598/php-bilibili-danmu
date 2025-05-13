@@ -31,7 +31,7 @@ class GiftInfoController extends GeneralMethod
         // 获取数据
         $records = new GiftRecords();
         if (!is_null($uid)) {
-            $records = $records->where('uid', 'like', '%' . $uid . '%');
+            $records = $records->where('uid', $uid);
         }
         if (!is_null($uname)) {
             $records = $records->where('uname', 'like', '%' . $uname . '%');

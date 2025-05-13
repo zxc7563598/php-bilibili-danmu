@@ -44,7 +44,7 @@ class ShippingManagementController extends GeneralMethod
             $redemption_records = $redemption_records->where("bl_user_vips.name", 'like', '%' . $user_name . '%');
         }
         if (!is_null($user_uid)) {
-            $redemption_records = $redemption_records->where("bl_user_vips.uid", 'like', '%' . $user_uid . '%');
+            $redemption_records = $redemption_records->where("bl_user_vips.uid", $user_uid);
         }
         if (!is_null($goods_name)) {
             $redemption_records = $redemption_records->where("bl_goods.name", 'like', '%' . $goods_name . '%');
