@@ -35,10 +35,6 @@ class ApiAuthCheck implements MiddlewareInterface
         $route = $request->route;
         $path = $route->getPath();
         $param = $request->all();
-
-
-
-
         // 验证签名
         if (!isset($param['timestamp']) || !isset($param['sign'])) {
             return fail($request, 900001);

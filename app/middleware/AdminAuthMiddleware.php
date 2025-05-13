@@ -18,7 +18,7 @@ class AdminAuthMiddleware implements MiddlewareInterface
         // 如果路由是 /upload，直接跳过认证
         if (in_array($path,[
             '/admin-api/mall-configuration/upload-images',
-            '/admin-api/shop-management/upload-images'
+            '/admin-api/shop-management/product-management/upload-images',
         ])) {
             return $handler($request);
         }
