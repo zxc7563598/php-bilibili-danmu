@@ -20,6 +20,7 @@ use Workerman\Connection\AsyncTcpConnection;
 use Workerman\Protocols\Ws;
 use Hejunjie\Utils;
 use support\Redis;
+use Webman\RedisQueue\Client;
 
 class Bilibili
 {
@@ -238,8 +239,6 @@ class Bilibili
                         if (empty($lives)) {
                             $lives = new Lives();
                             $lives->live_key = $payload['payload']['live_key'];
-                            $lives->danmu_path = 'runtime/lives/直播弹幕记录/' . $payload['payload']['live_key'] . '.log';
-                            $lives->gift_path = 'runtime/lives/直播礼物记录/' . $payload['payload']['live_key'] . '.log';
                             $lives->save();
                         }
                         break;
@@ -252,12 +251,10 @@ class Bilibili
                             if (empty($lives)) {
                                 $lives = new Lives();
                                 $lives->live_key = Redis::get('bilibili_live_key');
-                                $lives->danmu_path = 'runtime/lives/直播弹幕记录/' . Redis::get('bilibili_live_key') . '.log';
-                                $lives->gift_path = 'runtime/lives/直播礼物记录/' . Redis::get('bilibili_live_key') . '.log';
                                 $lives->save();
                             }
-                            $lives->danmu_num = countFileLines(base_path() . '/' . $lives->danmu_path);
-                            $lives->gift_num = countFileLines(base_path() . '/' . $lives->gift_path);
+                            $lives->danmu_num = 0;
+                            $lives->gift_num = 0;
                             $lives->end_time = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
                             $lives->save();
                             // 发送下播邮件
@@ -376,16 +373,19 @@ class Bilibili
                             isset($payload['payload']['info'][3][10]) ? $payload['payload']['info'][3][10] : null
                         );
                         // 记录信息
-                        if (Redis::get('bilibili_live_key')) {
-                            $filePath = base_path() . '/runtime/lives/直播弹幕记录/' . Redis::get('bilibili_live_key') . '.log';
-                            $line = json_encode([
-                                'uid' => $payload['payload']['info'][2][0],
-                                'uname' => $payload['payload']['info'][2][1],
-                                'msg' => $payload['payload']['info'][1],
-                                'time' => Carbon::now()->timezone(config('app')['default_timezone'])->timestamp
-                            ], JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION);
-                            writeLinesToFile($filePath, $line);
-                        }
+                        Client::send('receive-message', [
+                            'live_key' => Redis::get('bilibili_live_key') ?? null,
+                            'uid' => $payload['payload']['info'][2][0],
+                            'uname' => $payload['payload']['info'][2][1],
+                            'msg' => $payload['payload']['info'][1],
+                            'badge_uid' => isset($payload['payload']['info'][3][12]) ? $payload['payload']['info'][3][12] : null,
+                            'badge_uname' => isset($payload['payload']['info'][3][2]) ? $payload['payload']['info'][3][2] : null,
+                            'badge_room_id' => isset($payload['payload']['info'][3][3]) ? $payload['payload']['info'][3][3] : null,
+                            'badge_name' => isset($payload['payload']['info'][3][1]) ? $payload['payload']['info'][3][1] : null,
+                            'badge_level' => isset($payload['payload']['info'][3][0]) ? $payload['payload']['info'][3][0] : null,
+                            'badge_type' => isset($payload['payload']['info'][3][10]) ? $payload['payload']['info'][3][10] : null,
+                            'time' => Carbon::now()->timezone(config('app')['default_timezone'])->timestamp,
+                        ]);
                         break;
                     case 'PK_BATTLE_PRE_NEW': // PK马上开始
                         PkLiveReport::processing($payload['payload']['data']['uid'], $payload['payload']['data']['uname'], $payload['payload']['data']['room_id']);

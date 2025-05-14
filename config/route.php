@@ -16,8 +16,86 @@
 use Webman\Route;
 use support\Request;
 use support\Response;
+use app\controller\admin;
 
-Route::get('/', [app\controller\robot\PageController::class, 'main'])->middleware([app\middleware\BasicAuthMiddleware::class]);
+Route::group('/admin-api', function () { // 后台管理系统接口
+    // 机器人控制相关
+    Route::post('/rebot/get-user-info', [admin\RobotControlController::class, 'getUserInfo'])->name('[机器人控制相关-获取用户信息]');
+    Route::post('/rebot/get-real-room-info', [admin\RobotControlController::class, 'getRealRoomInfo'])->name('[机器人控制相关-获取直播间信息]');
+    Route::post('/rebot/get-config', [admin\RobotControlController::class, 'getConfig'])->name('[机器人控制相关-获取配置信息]');
+    Route::post('/rebot/set-config', [admin\RobotControlController::class, 'setConfig'])->name('[机器人控制相关-存储配置信息]');
+    Route::post('/rebot/get-login-qr', [admin\RobotControlController::class, 'getLoginQr'])->name('[机器人控制相关-获取登录二维码]');
+    Route::post('/rebot/login-check', [admin\RobotControlController::class, 'loginCheck'])->name('[机器人控制相关-验证登录信息]');
+    Route::post('/rebot/login-out', [admin\RobotControlController::class, 'loginOut'])->name('[机器人控制相关-退出登录]');
+    Route::post('/rebot/connect-out', [admin\RobotControlController::class, 'connectOut'])->name('[机器人控制相关-断开直播间链接]');
+    Route::post('/rebot/export-config', [admin\RobotControlController::class, 'exportConfig'])->name('[机器人控制相关-导出配置文件]');
+    Route::post('/rebot/import-config', [admin\RobotControlController::class, 'importConfig'])->name('[机器人控制相关-导入配置文件]');
+    // 配置管理 - 系统配置相关
+    Route::post('/configuration/system-settings/get-data', [admin\configuration\SystemSettingsController::class, 'getData'])->name('[配置管理-系统配置相关-获取配置]');
+    Route::post('/configuration/system-settings/get-data-qrcode', [admin\configuration\SystemSettingsController::class, 'getDataQrCode'])->name('[配置管理-系统配置相关-获取二维码]');
+    Route::post('/configuration/system-settings/set-data', [admin\configuration\SystemSettingsController::class, 'setData'])->name('[配置管理-系统配置相关-存储数据]');
+    // 配置管理 - 商城配置相关
+    Route::post('/mall-configuration/get-data', [admin\configuration\ShopSettingsController::class, 'getData'])->name('[配置管理-商城配置相关-获取商城配置信息]');
+    Route::post('/mall-configuration/set-data', [admin\configuration\ShopSettingsController::class, 'setData'])->name('[配置管理-商城配置相关-存储商城配置信息]');
+    Route::post('/mall-configuration/upload-images', [admin\configuration\ShopSettingsController::class, 'uploadImages'])->name('[配置管理-商城配置相关-上传图片]');
+    // 商城管理 - 商品管理
+    Route::post('/shop-management/product-management/get-data', [admin\shopManagement\ProductManagementController::class, 'getData'])->name('[商城管理-商品管理-获取商品信息]');
+    Route::post('/shop-management/product-management/get-data-details', [admin\shopManagement\ProductManagementController::class, 'getDataDetails'])->name('[商城管理-商品管理-获取商品详细信息]');
+    Route::post('/shop-management/product-management/set-data-details', [admin\shopManagement\ProductManagementController::class, 'setDataDetails'])->name('[商城管理-商品管理-变更商品信息]');
+    Route::post('/shop-management/product-management/upload-images', [admin\shopManagement\ProductManagementController::class, 'uploadImages'])->name('[商城管理-商品管理-上传图片]');
+    // 商城管理 - 用户管理
+    Route::post('/shop-management/user-management/get-data', [admin\shopManagement\UserManagementController::class, 'getData'])->name('[商城管理-用户管理-获取用户列表]');
+    Route::post('/shop-management/user-management/get-user-data', [admin\shopManagement\UserManagementController::class, 'getUserData'])->name('[商城管理-用户管理-获取用户详细信息]');
+    Route::post('/shop-management/user-management/get-user-info', [admin\shopManagement\UserManagementController::class, 'getUserInfo'])->name('[商城管理-用户管理-根据UID查询用户数据]');
+    Route::post('/shop-management/user-management/set-data', [admin\shopManagement\UserManagementController::class, 'setData'])->name('[商城管理-用户管理-存储用户信息]');
+    Route::post('/shop-management/user-management/reset-password', [admin\shopManagement\UserManagementController::class, 'resetPassword'])->name('[商城管理-用户管理-清空所有用户密码]');
+    Route::post('/shop-management/user-management/get-user-records', [admin\shopManagement\UserManagementController::class, 'getUserRecords'])->name('[商城管理-用户管理-获取用户航海开通记录]');
+    Route::post('/shop-management/user-management/set-user-point', [admin\shopManagement\UserManagementController::class, 'setUserPoint'])->name('[商城管理-用户管理-变更用户积分]');
+    // 商城管理 - 发货管理
+    Route::post('/shop-management/shipping-management/get-data', [admin\shopManagement\ShippingManagementController::class, 'getData'])->name('[商城管理-发货管理-获取发货列表数据]');
+    Route::post('/shop-management/shipping-management/get-data-details', [admin\shopManagement\ShippingManagementController::class, 'getDataDetails'])->name('[商城管理-发货管理-获取发货详情]');
+    Route::post('/shop-management/shipping-management/set-data-details', [admin\shopManagement\ShippingManagementController::class, 'setDataDetails'])->name('[商城管理-发货管理-变更发货信息]');
+    // 其他 - 礼物信息
+    Route::post('/others/gift-info/get-data', [admin\others\GiftInfoController::class, 'getData'])->name('[其他-礼物信息-获取列表数据]');
+    Route::post('/others/gift-info/get-statistic-data', [admin\others\GiftInfoController::class, 'getStatisticData'])->name('[其他-礼物信息-获取统计数据]');
+    // 其他 - 弹幕信息
+    Route::post('/others/danmaku-info/get-data', [admin\others\DanmakuInfoController::class, 'getData'])->name('[其他-弹幕信息-获取列表数据]');
+    // 其他 - 投诉管理
+    Route::any('/others/complaint-management/get-data', [admin\others\ComplaintManagementController::class, 'getData'])->name('[其他-投诉管理-获取投诉数据列表]');
+    Route::any('/others/complaint-management/get-data-details', [admin\others\ComplaintManagementController::class, 'getDataDetails'])->name('[其他-投诉管理-获取投诉详情]');
+    // 认证相关
+    Route::post('/auth/login', [admin\framework\AuthenticationController::class, 'login'])->name('[认证相关-登录]');
+    Route::post('/auth/logout', [admin\framework\AuthenticationController::class, 'logout'])->name('[认证相关-退出登录]');
+    Route::post('/auth/switch-role', [admin\framework\AuthenticationController::class, 'switchRole'])->name('[认证相关-切换角色]');
+    Route::post('/auth/update-password', [admin\framework\AuthenticationController::class, 'updatePassword'])->name('[认证相关-修改密码]');
+    // 用户管理
+    Route::post('/users/list', [admin\framework\AdminUserController::class, 'list'])->name('[用户管理-获取管理员列表（分页）]');
+    Route::post('/users/detail', [admin\framework\AdminUserController::class, 'detail'])->name('[用户管理-获取管理员详情]');
+    Route::post('/users/create-or-update', [admin\framework\AdminUserController::class, 'createOrUpdate'])->name('[用户管理-创建或更新管理员信息]');
+    Route::post('/users/delete', [admin\framework\AdminUserController::class, 'delete'])->name('[用户管理-删除管理员]');
+    Route::post('/users/update-password', [admin\framework\AdminUserController::class, 'updatePassword'])->name('[用户管理-修改管理员密码]');
+    Route::post('/users/update-profile', [admin\framework\AdminUserController::class, 'updateProfile'])->name('[用户管理-修改管理员个人信息]');
+    // 角色管理
+    Route::post('/roles/list', [admin\framework\AdminRoleController::class, 'list'])->name('[角色管理-获取角色列表（分页）]');
+    Route::post('/roles/all', [admin\framework\AdminRoleController::class, 'all'])->name('[角色管理-获取所有角色列表]');
+    Route::post('/roles/create-or-update', [admin\framework\AdminRoleController::class, 'createOrUpdate'])->name('[角色管理-创建或更新角色]');
+    Route::post('/roles/delete', [admin\framework\AdminRoleController::class, 'delete'])->name('[角色管理-删除角色]');
+    Route::post('/roles/permissions', [admin\framework\AdminRoleController::class, 'permissions'])->name('[角色管理-获取角色的菜单权限树]');
+    // 权限管理
+    Route::post('/permissions/menu', [admin\framework\AdminPermissionController::class, 'menu'])->name('[权限管理-获取全部菜单]');
+    Route::post('/permissions/menu/validate', [admin\framework\AdminPermissionController::class, 'validateMenu'])->name('[权限管理-验证菜单是否存在]');
+    Route::post('/permissions/menu/buttons', [admin\framework\AdminPermissionController::class, 'buttons'])->name('[权限管理-获取菜单下的按钮]');
+    Route::post('/permissions/menu/create-or-update', [admin\framework\AdminPermissionController::class, 'createOrUpdateMenu'])->name('[权限管理-添加或修改菜单]');
+    Route::post('/permissions/menu/toggle', [admin\framework\AdminPermissionController::class, 'toggleMenu'])->name('[权限管理-快速切换菜单的启用状态]');
+    Route::post('/permissions/menu/delete', [admin\framework\AdminPermissionController::class, 'deleteMenu'])->name('[权限管理-删除菜单]');
+    Route::post('/permissions/role/users', [admin\framework\AdminPermissionController::class, 'assignUsersToRole'])->name('[权限管理-角色与用户绑定]');
+})->middleware([
+    app\middleware\AccessControl::class,
+    app\middleware\LangMiddleware::class,
+    app\middleware\AdminAuthMiddleware::class
+]);
+Route::get('/', [app\controller\robot\PageController::class, 'init'])->middleware([app\middleware\BasicAuthMiddleware::class]);
+// Route::get('/', [app\controller\robot\PageController::class, 'main'])->middleware([app\middleware\BasicAuthMiddleware::class]);
 Route::get('/login', [app\controller\robot\PageController::class, 'login'])->middleware([app\middleware\BasicAuthMiddleware::class]);
 
 // 积分商城
@@ -36,8 +114,10 @@ Route::group('/points-mall', function () {
 
 Route::group('/api/points-mall', function () {
     Route::any('/system-configuration/get-data', [app\controller\shop\management\SystemConfigurationController::class, 'getData']);
+    Route::any('/system-configuration/get-init-data', [app\controller\shop\management\SystemConfigurationController::class, 'getInitData']);
     Route::any('/system-configuration/get-data-qrcode', [app\controller\shop\management\SystemConfigurationController::class, 'getDataQrCode']);
     Route::any('/system-configuration/set-data', [app\controller\shop\management\SystemConfigurationController::class, 'setData']);
+    Route::any('/system-configuration/set-init-data', [app\controller\shop\management\SystemConfigurationController::class, 'setInitData']);
     Route::any('/mall-configuration/get-data', [app\controller\shop\management\MallConfigurationController::class, 'getData']);
     Route::any('/mall-configuration/set-data', [app\controller\shop\management\MallConfigurationController::class, 'setData']);
     Route::any('/mall-configuration/upload-images', [app\controller\shop\management\MallConfigurationController::class, 'uploadImages']);
@@ -161,18 +241,38 @@ Route::post('/reload-timing', function (Request $request) {
     return response($response);
 });
 
-Route::any('/test', function (Request $request) {
-    $data = $request->all();
-    echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+// 允许所有的options请求
+Route::options('[{path:.+}]', function () {
+    return response('', 204)
+        ->withHeaders([
+            'Access-Control-Allow-Credentials' => 'true',
+            'Access-Control-Allow-Origin' => '*',
+            'Access-Control-Allow-Methods' => 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers' => 'Content-Type, X-Auth-Token, Accept-Language',
+        ]);
 });
 
-Route::fallback(function () {
-    $json = [
+Route::fallback(function (Request $request) {
+    $path = $request->path();
+    // 如果是 dist 静态资源
+    if (str_starts_with($path, 'dist/')) {
+        $filePath = public_path() . '/' . $path;
+        if (is_file($filePath)) {
+            return response()->file($filePath);
+        }
+        return response('File not found', 404);
+    }
+    // 如果是前端路由（非 API），统一返回 index.html
+    $indexPath = public_path() . '/dist/index.html';
+    if (is_file($indexPath)) {
+        return response()->file($indexPath);
+    }
+    // 最后兜底
+    return json([
         'code' => 0,
         'message' => '别看了哥们，没这个页面',
         'data' => (object)[]
-    ];
-    return new Response(200, ['Content-Type' => 'application/json'], json_encode($json, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+    ]);
 });
 
 Route::disableDefaultRoute(); // 关闭默认路由

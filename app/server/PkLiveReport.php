@@ -81,7 +81,7 @@ class PkLiveReport
         if (count($content)) {
             foreach ($content as $text) {
                 // 加入消息发送队列
-                $text = self::template($content[mt_rand(0, (count($content) - 1))], $args);
+                $text = self::template($text, $args);
                 SendMessage::push($text, 'PkLiveReport');
             }
         }

@@ -11,6 +11,7 @@ use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\Exception\ValidationException;
+use support\Redis;
 
 class SystemConfigurationController extends GeneralMethod
 {
@@ -44,6 +45,40 @@ class SystemConfigurationController extends GeneralMethod
             'db_name' => getenv('DB_NAME'),
             'db_user' => getenv('DB_USER'),
             'db_password' => getenv('DB_PASSWORD')
+        ]);
+    }
+
+    /**
+     * 获取用于构建的配置信息
+     * 
+     * @return void 
+     */
+    public function getInitData(Request $request)
+    {
+        // 获取 shop 文件夹是否存在
+        $is_path = false;
+        $loading = false;
+        $path = '/dist/index.html';
+        if (is_dir(public_path('dist'))) {
+            $is_path = true;
+        } else {
+            // 是否真在构建？
+            $redis = Redis::get(config('app')['app_name'] . ':system_build');
+            if (!empty($redis)) {
+                $loading = true;
+            }
+        };
+        // 返回数据
+        return success($request, [
+            'is_path' => $is_path,
+            'path' => $path,
+            'loading' => $loading,
+            'shop_name' => getenv('SHOP_NAME'),
+            'shop_url' => getenv('SHOP_URL'),
+            'system_api_url' => getenv('SYSTEM_API_URL'),
+            'system_aes_key' => getenv('SYSTEM_AES_KEY'),
+            'system_aes_iv' => getenv('SYSTEM_AES_IV'),
+            'system_key' => getenv('SYSTEM_KEY')
         ]);
     }
 
@@ -160,6 +195,61 @@ class SystemConfigurationController extends GeneralMethod
             exec($command);
             $shell = true;
         }
+        // 返回数据
+        return success($request, [
+            'shell' => $shell
+        ]);
+    }
+
+    /**
+     * 设置系统配置数据
+     * 
+     * @param string $shop_name 商城名称 
+     * @param string $shop_url 商城链接 
+     * @param string $system_api_url 项目地址 
+     * @param string $system_aes_key AES加密KEY 
+     * @param string $system_aes_iv AES加密IV 
+     * @param string $system_key 签名KEY 
+     * 
+     * @return Response 
+     */
+    public function setInitData(Request $request)
+    {
+        // 获取请求参数
+        $param = $request->all();
+        $configKeys = [
+            'shop_name',
+            'shop_url',
+            'system_api_url',
+            'system_aes_key',
+            'system_aes_iv',
+            'system_key'
+        ];
+        // 组装需要修改的环境变量数据
+        $data = array_map(fn($key) => ['key' => strtoupper($key), 'value' => $param[$key]], $configKeys);
+        // 读取 .env 文件内容
+        $env = Utils\FileUtils::readFile(base_path() . '/.env');
+        // 更新环境变量
+        foreach ($data as $_data) {
+            // 检查环境变量是否存在并更新
+            $env = strpos($env, $_data['key'] . "=") !== false
+                ? preg_replace("/^" . $_data['key'] . "=.*/m", $_data['key'] . "=" . $_data['value'], $env)
+                : $env .= "\n" . $_data['key'] . "=" . $_data['value']; // 不存在则添加
+        }
+        // 写回 .env 文件
+        Utils\FileUtils::writeToFile(base_path() . '/.env', $env);
+        // 重启系统（发送信号）
+        posix_kill(posix_getppid(), SIGUSR1);
+        // 重新构建VUE
+        $shell = false;
+        // 定义脚本路径
+        $scriptPath = base_path() . '/scripts/build_vue.sh';
+        // 将脚本放到后台执行
+        $command = "sh $scriptPath > /dev/null 2>&1 &";
+        exec($command);
+        $shell = true;
+        // 限制
+        Redis::setEx(config('app')['app_name'] . ':system_build', 600, 1);
         // 返回数据
         return success($request, [
             'shell' => $shell

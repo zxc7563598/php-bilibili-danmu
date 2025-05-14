@@ -17,6 +17,14 @@ class PageController
         ]);
     }
 
+
+    public function init(Request $request)
+    {
+        return view('main/init', [
+            'secretKey' => getenv('SECURE_API_KEY')
+        ]);
+    }
+
     public function login(Request $request)
     {
         // 获取登录信息

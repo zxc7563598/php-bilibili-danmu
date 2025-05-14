@@ -10,6 +10,7 @@
 /public/qrcode/
 /public/config/
 /public/shop/
+/public/dist/
 .htaccess
 /public/.well-known/
 .DS_Store

@@ -19,8 +19,8 @@ function success($request, $data = [], $message = ''): Response
 {
     $request->res = [
         'code' => 0,
-        'message' => !empty($message) ? $message : config('code')[0],
-        'data' => empty($data) ? (object)[] : $data
+        'message' => !empty($message) ? $message : (trans(config('code')[0]) ?? 'error'),
+        'data' => empty($data) ? [] : $data
     ];
     return json($request->res, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION);
 }
@@ -38,8 +38,8 @@ function fail($request, $code = 500, $data = [], $message = ''): Response
     // 记录错误信息
     $request->res = [
         'code' => $code,
-        'message' => !empty($message) ? $message : config('code')[$code],
-        'data' => empty($data) ? (object)[] : $data
+        'message' => !empty($message) ? $message : (trans(config('code')[$code]) ?? 'error'),
+        'data' => empty($data) ? [] : $data
     ];
     return json($request->res, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION);
 }
@@ -347,4 +347,49 @@ function countFileLines(string $filePath)
         $count++;
     }
     return $count;
+}
+
+
+/**
+ * 构建树形结构
+ *
+ * @param array $data 
+ * @return array 
+ */
+function buildTree(array $elements, int $parentId = 0): array
+{
+    // 过滤出所有的子项
+    $branch = array_filter($elements, fn($el) => $el['parentId'] === $parentId);
+
+    // 按 order 排序
+    usort($branch, fn($a, $b) => $a['order'] <=> $b['order']);
+
+    // 递归构建子树
+    foreach ($branch as &$item) {
+        $item['children'] = buildTree($elements, $item['id']);
+    }
+
+    return array_values($branch);
+}
+
+/**
+ * 递归对树形结构进行排序
+ *
+ * @param array $tree 
+ * @return array 
+ */
+function sortTree(array $tree): array
+{
+    // 对当前层级的节点按 order 排序
+    usort($tree, function ($a, $b) {
+        return $a['order'] <=> $b['order'];
+    });
+
+    // 递归对子节点排序
+    foreach ($tree as &$node) {
+        if (!empty($node['children'])) {
+            $node['children'] = sortTree($node['children']);
+        }
+    }
+    return $tree;
 }
