@@ -253,14 +253,25 @@ Route::options('[{path:.+}]', function () {
 
 Route::fallback(function (Request $request) {
     $path = $request->path();
-    if (!str_starts_with($path, '/dist/')) {
-        $json = [
-            'code' => 0,
-            'message' => '别看了哥们，没这个页面',
-            'data' => (object)[]
-        ];
-        return new Response(200, ['Content-Type' => 'application/json'], json_encode($json, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+    // 如果是 dist 静态资源
+    if (str_starts_with($path, 'dist/')) {
+        $filePath = public_path() . '/' . $path;
+        if (is_file($filePath)) {
+            return response()->file($filePath);
+        }
+        return response('File not found', 404);
     }
+    // 如果是前端路由（非 API），统一返回 index.html
+    $indexPath = public_path() . '/dist/index.html';
+    if (is_file($indexPath)) {
+        return response()->file($indexPath);
+    }
+    // 最后兜底
+    return json([
+        'code' => 0,
+        'message' => '别看了哥们，没这个页面',
+        'data' => (object)[]
+    ]);
 });
 
 Route::disableDefaultRoute(); // 关闭默认路由
