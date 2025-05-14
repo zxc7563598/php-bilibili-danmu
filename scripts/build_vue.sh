@@ -71,6 +71,7 @@ ADMIN_BUILD_DIR="$ROOT_DIR/public/dist_build"
 ADMIN_DIST_DIR="$ROOT_DIR/public/dist"
 
 run_command "删除旧后台目录" rm -rf "$ADMIN_DIST_DIR"
+run_command "删除旧后台构建目录" rm -rf "$ADMIN_BUILD_DIR"
 run_command "克隆后台项目" git clone "$ADMIN_REPO" "$ADMIN_BUILD_DIR"
 cp "$ADMIN_BUILD_DIR/.env.example" "$ADMIN_BUILD_DIR/.env"
 
