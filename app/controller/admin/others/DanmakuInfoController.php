@@ -59,11 +59,11 @@ class DanmakuInfoController extends GeneralMethod
                 'send_at' => 'send_at'
             ], 'page', $pageNo);
         // 格式化数据
-        foreach ($danmu_logs as $_danmu_logs) {
+        foreach ($danmu_logs as &$_danmu_logs) {
             // $_danmu_logs->badge_type = DanmuLogsEnums\BadgeType::from($_danmu_logs->badge_type)->label();
             $_danmu_logs->live = DanmuLogsEnums\Live::from($_danmu_logs->live)->label();
-            $_danmu_logs->send_time = Carbon::parse(intval($_danmu_logs->send_at))->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s');
-            unset($complaint->send_at);
+            $_danmu_logs->send_time = Carbon::parse((int)$_danmu_logs->send_at)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
+            unset($_danmu_logs->send_at);
         }
         $data = is_array($danmu_logs) ? $danmu_logs : $danmu_logs->toArray();
         // 返回数据

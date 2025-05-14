@@ -40,7 +40,7 @@ class ApiAuthCheck implements MiddlewareInterface
             return fail($request, 900001);
         }
         // 验证签名
-        if (md5(config('app')['sign_key'] . $param['timestamp']) != $param['sign']) {
+        if (md5(config('app')['key'] . $param['timestamp']) != $param['sign']) {
             return fail($request, 900002);
         }
         // 验证时间是否正确

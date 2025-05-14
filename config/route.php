@@ -57,6 +57,7 @@ Route::group('/admin-api', function () { // 后台管理系统接口
     Route::post('/shop-management/shipping-management/set-data-details', [admin\shopManagement\ShippingManagementController::class, 'setDataDetails'])->name('[商城管理-发货管理-变更发货信息]');
     // 其他 - 礼物信息
     Route::post('/others/gift-info/get-data', [admin\others\GiftInfoController::class, 'getData'])->name('[其他-礼物信息-获取列表数据]');
+    Route::post('/others/gift-info/get-statistic-data', [admin\others\GiftInfoController::class, 'getStatisticData'])->name('[其他-礼物信息-获取统计数据]');
     // 其他 - 弹幕信息
     Route::post('/others/danmaku-info/get-data', [admin\others\DanmakuInfoController::class, 'getData'])->name('[其他-弹幕信息-获取列表数据]');
     // 其他 - 投诉管理
