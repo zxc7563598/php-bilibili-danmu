@@ -33,7 +33,7 @@ final class CreateDanmuLogs extends AbstractMigration
             ->addColumn('badge_name', 'string', ['null' => true, 'comment' => '牌子名称'])
             ->addColumn('badge_level', 'integer', ['limit' => MysqlAdapter::INT_TINY, 'null' => true, 'comment' => '牌子等级'])
             ->addColumn('badge_type', 'integer', ['limit' => MysqlAdapter::INT_TINY, 'null' => true, 'comment' => '牌子航海类型'])
-            ->addColumn('send_at', 'string', ['null' => true, 'comment' => '弹幕发送时间'])
+            ->addColumn('send_at', 'integer', ['limit' => MysqlAdapter::INT_BIG, 'null' => true, 'comment' => '弹幕发送时间'])
             ->addColumn('created_at', 'integer', ['limit' => MysqlAdapter::INT_BIG, 'null' => false, 'comment' => '创建时间'])
             ->addColumn('updated_at', 'integer', ['limit' => MysqlAdapter::INT_BIG, 'null' => true, 'comment' => '更新时间'])
             ->addColumn('deleted_at', 'integer', ['limit' => MysqlAdapter::INT_BIG, 'null' => true, 'comment' => '逻辑删除'])
