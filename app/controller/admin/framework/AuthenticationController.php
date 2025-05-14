@@ -33,7 +33,8 @@ class AuthenticationController
         }
         // 返回数据
         return success($request, [
-            'accessToken' => $token
+            'accessToken' => $token,
+            'init' => ($password == '123456')
         ]);
     }
 
