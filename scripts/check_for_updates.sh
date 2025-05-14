@@ -182,6 +182,14 @@ if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
     fi
 
     log_info "Webman 启动成功"
+    
+    if [ -f "scripts/build_vue.sh" ]; then
+        log_info "开始执行 build_vue.sh 脚本"
+        sh scripts/build_vue.sh >> $LOG_FILE 2>&1
+        log_info "build_vue.sh 执行完毕"
+    else
+        log_warn "build_vue.sh 脚本未找到，跳过执行"
+    fi
 else
     log_info "提交一致，无需更新"
 fi
