@@ -66,31 +66,31 @@ run_command "构建商城项目" npm run build
 
 # ---------- 后台项目 ----------
 
-ADMIN_REPO="https://github.com/zxc7563598/vue-bilibili-danmu-admin.git"
-ADMIN_BUILD_DIR="$ROOT_DIR/public/dist_build"
-ADMIN_DIST_DIR="$ROOT_DIR/public/dist"
+# ADMIN_REPO="https://github.com/zxc7563598/vue-bilibili-danmu-admin.git"
+# ADMIN_BUILD_DIR="$ROOT_DIR/public/dist_build"
+# ADMIN_DIST_DIR="$ROOT_DIR/public/dist"
 
-run_command "删除旧后台目录" rm -rf "$ADMIN_DIST_DIR"
-run_command "删除旧后台构建目录" rm -rf "$ADMIN_BUILD_DIR"
-run_command "克隆后台项目" git clone "$ADMIN_REPO" "$ADMIN_BUILD_DIR"
-cp "$ADMIN_BUILD_DIR/.env.example" "$ADMIN_BUILD_DIR/.env"
+# run_command "删除旧后台目录" rm -rf "$ADMIN_DIST_DIR"
+# run_command "删除旧后台构建目录" rm -rf "$ADMIN_BUILD_DIR"
+# run_command "克隆后台项目" git clone "$ADMIN_REPO" "$ADMIN_BUILD_DIR"
+# cp "$ADMIN_BUILD_DIR/.env.example" "$ADMIN_BUILD_DIR/.env"
 
-# 替换后台 .env 配置
-replace_in_env "$ADMIN_BUILD_DIR/.env" "^VITE_PUBLIC_PATH=.*" "VITE_PUBLIC_PATH=/dist"
-replace_in_env "$ADMIN_BUILD_DIR/.env" "^VITE_AXIOS_BASE_URL=.*" "VITE_AXIOS_BASE_URL=$SYSTEM_API_URL/admin-api"
-replace_in_env "$ADMIN_BUILD_DIR/.env" "^VITE_PROXY_TARGET=.*" "VITE_PROXY_TARGET=$SYSTEM_API_URL"
-replace_in_env "$ADMIN_BUILD_DIR/.env" "^VITE_AES_KEY=.*" "VITE_AES_KEY=$SYSTEM_AES_KEY"
-replace_in_env "$ADMIN_BUILD_DIR/.env" "^VITE_AES_IV=.*" "VITE_AES_IV=$SYSTEM_AES_IV"
-replace_in_env "$ADMIN_BUILD_DIR/.env" "^VITE_SIGN_KEY=.*" "VITE_SIGN_KEY=$SYSTEM_KEY"
+# # 替换后台 .env 配置
+# replace_in_env "$ADMIN_BUILD_DIR/.env" "^VITE_PUBLIC_PATH=.*" "VITE_PUBLIC_PATH=/dist"
+# replace_in_env "$ADMIN_BUILD_DIR/.env" "^VITE_AXIOS_BASE_URL=.*" "VITE_AXIOS_BASE_URL=$SYSTEM_API_URL/admin-api"
+# replace_in_env "$ADMIN_BUILD_DIR/.env" "^VITE_PROXY_TARGET=.*" "VITE_PROXY_TARGET=$SYSTEM_API_URL"
+# replace_in_env "$ADMIN_BUILD_DIR/.env" "^VITE_AES_KEY=.*" "VITE_AES_KEY=$SYSTEM_AES_KEY"
+# replace_in_env "$ADMIN_BUILD_DIR/.env" "^VITE_AES_IV=.*" "VITE_AES_IV=$SYSTEM_AES_IV"
+# replace_in_env "$ADMIN_BUILD_DIR/.env" "^VITE_SIGN_KEY=.*" "VITE_SIGN_KEY=$SYSTEM_KEY"
 
-cd "$ADMIN_BUILD_DIR" || { echo "❌ 无法进入目录 $ADMIN_BUILD_DIR" >> "$LOG_FILE"; exit 1; }
-run_command "安装后台依赖" npm install
-run_command "构建后台项目" npm run build
+# cd "$ADMIN_BUILD_DIR" || { echo "❌ 无法进入目录 $ADMIN_BUILD_DIR" >> "$LOG_FILE"; exit 1; }
+# run_command "安装后台依赖" npm install
+# run_command "构建后台项目" npm run build
 
-# 替换 dist 目录
-cd "$ROOT_DIR/../.." || exit
-run_command "替换 dist 目录" cp -R "$ADMIN_BUILD_DIR/dist" "$ADMIN_DIST_DIR"
-run_command "清理构建目录" rm -rf "$ADMIN_BUILD_DIR"
+# # 替换 dist 目录
+# cd "$ROOT_DIR/../.." || exit
+# run_command "替换 dist 目录" cp -R "$ADMIN_BUILD_DIR/dist" "$ADMIN_DIST_DIR"
+# run_command "清理构建目录" rm -rf "$ADMIN_BUILD_DIR"
 
 # 部署成功
 echo -e "\n✅ 项目部署完成：$(date '+%Y-%m-%d %H:%M:%S')" >> "$LOG_FILE"
