@@ -1,0 +1,35 @@
+<?php
+
+return [
+    "Success" => "Success",
+
+    "You're making requests too frequently — slow down a bit." => "You're making requests too frequently — slow down a bit.",
+    "Incorrect password. Try again." => "Incorrect password. Try again.",
+    "Session expired — please log in again." => "Session expired — please log in again.",
+    "Session expired — please log in again." => "Session expired — please log in again.",
+    "UID lookup failed — consider contacting the owner." => "UID lookup failed — consider contacting the owner.",
+    "Stop looking, the product is off the shelves, check out something else" => "Stop looking, the product is off the shelves, check out something else",
+    "Hold up — you don't have enough points!" => "Hold up — you don't have enough points!",
+    "Style error — please reselect your preferred style." => "Style error — please reselect your preferred style.",
+    "Date error — double-check your date input." => "Date error — double-check your date input.",
+    "Uh... don’t mess around." => "Uh... don’t mess around.",
+    "Some information is still incomplete — please fill in the product details." => "Some information is still incomplete — please fill in the product details.",
+    "This user already exists — cannot add again!" => "This user already exists — cannot add again!",
+    "Something’s off — data not found." => "Something’s off — data not found.",
+    "Complaint record does not exist." => "Complaint record does not exist.",
+    "Complaint ID cannot be empty." => "Complaint ID cannot be empty.",
+    "Too fast, do not save continuously, wait 30 seconds before saving again" => "Too fast, do not save continuously, wait 30 seconds before saving again",
+    "Please upload the image file" => "Please upload the image file",
+
+    "Invalid request parameters." => "Invalid request parameters.",
+    "Signature verification failed." => "Signature verification failed.",
+    "Expired access." => "Expired access.",
+    "Data parsing error." => "Data parsing error.",
+    "Account login has expired." => "Account login has expired.",
+    "Incorrect username or password." => "Incorrect username or password.",
+    "Account has been deactivated." => "Account has been deactivated.",
+    "Invalid verification code." => "Invalid verification code.",
+    "Authentication failed." => "Authentication failed.",
+    "Role does not exist." => "Role does not exist.",
+    "Permission does not exist." => "Permission does not exist.",
+];
