@@ -94,9 +94,8 @@ Route::group('/admin-api', function () { // 后台管理系统接口
     app\middleware\LangMiddleware::class,
     app\middleware\AdminAuthMiddleware::class
 ]);
-
-
-Route::get('/', [app\controller\robot\PageController::class, 'main'])->middleware([app\middleware\BasicAuthMiddleware::class]);
+Route::get('/', [app\controller\robot\PageController::class, 'init'])->middleware([app\middleware\BasicAuthMiddleware::class]);
+// Route::get('/', [app\controller\robot\PageController::class, 'main'])->middleware([app\middleware\BasicAuthMiddleware::class]);
 Route::get('/login', [app\controller\robot\PageController::class, 'login'])->middleware([app\middleware\BasicAuthMiddleware::class]);
 
 // 积分商城
@@ -115,8 +114,10 @@ Route::group('/points-mall', function () {
 
 Route::group('/api/points-mall', function () {
     Route::any('/system-configuration/get-data', [app\controller\shop\management\SystemConfigurationController::class, 'getData']);
+    Route::any('/system-configuration/get-init-data', [app\controller\shop\management\SystemConfigurationController::class, 'getInitData']);
     Route::any('/system-configuration/get-data-qrcode', [app\controller\shop\management\SystemConfigurationController::class, 'getDataQrCode']);
     Route::any('/system-configuration/set-data', [app\controller\shop\management\SystemConfigurationController::class, 'setData']);
+    Route::any('/system-configuration/set-init-data', [app\controller\shop\management\SystemConfigurationController::class, 'setInitData']);
     Route::any('/mall-configuration/get-data', [app\controller\shop\management\MallConfigurationController::class, 'getData']);
     Route::any('/mall-configuration/set-data', [app\controller\shop\management\MallConfigurationController::class, 'setData']);
     Route::any('/mall-configuration/upload-images', [app\controller\shop\management\MallConfigurationController::class, 'uploadImages']);
