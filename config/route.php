@@ -94,8 +94,8 @@ Route::group('/admin-api', function () { // 后台管理系统接口
     app\middleware\LangMiddleware::class,
     app\middleware\AdminAuthMiddleware::class
 ]);
-Route::get('/', [app\controller\robot\PageController::class, 'init'])->middleware([app\middleware\BasicAuthMiddleware::class]);
-// Route::get('/', [app\controller\robot\PageController::class, 'main'])->middleware([app\middleware\BasicAuthMiddleware::class]);
+// Route::get('/', [app\controller\robot\PageController::class, 'init'])->middleware([app\middleware\BasicAuthMiddleware::class]);
+Route::get('/', [app\controller\robot\PageController::class, 'main'])->middleware([app\middleware\BasicAuthMiddleware::class]);
 Route::get('/login', [app\controller\robot\PageController::class, 'login'])->middleware([app\middleware\BasicAuthMiddleware::class]);
 
 // 积分商城
