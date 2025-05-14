@@ -58,7 +58,7 @@ class SystemConfigurationController extends GeneralMethod
         // 获取 shop 文件夹是否存在
         $is_path = false;
         $loading = false;
-        $path = '/dist/index.html';
+        $path = config('app')['api_url'] . '/dist/index.html';
         if (is_dir(public_path('dist'))) {
             $is_path = true;
         } else {
