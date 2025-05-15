@@ -1422,6 +1422,8 @@
                     confirmUpdate: "我已知晓",
                     notificationType: '',
                     secretKey: '<?php echo $secretKey ?>',
+                    is_path: '<?php echo $is_path ?>',
+                    path: '<?php echo $path ?>',
                     user_info: {
                         is_login: false,
                         uid: 0,
@@ -1512,6 +1514,9 @@
                 };
             },
             created() {
+                if (this.is_path) {
+                  window.location.href = this.path;
+                }
                 this.getUserInfo()
                 this.getConfig()
             },
