@@ -64,7 +64,7 @@ cd "$SHOP_DIR" || { echo "❌ 无法进入目录 $SHOP_DIR" >> "$LOG_FILE"; exit
 run_command "安装商城依赖" npm install
 run_command "构建商城项目" npm run build
 
-# ---------- 后台项目 ----------
+# ---------- 后台项目(因服务器性能原因暂时不参与自动构建) ----------
 
 # ADMIN_REPO="https://github.com/zxc7563598/vue-bilibili-danmu-admin.git"
 # ADMIN_BUILD_DIR="$ROOT_DIR/public/dist_build"
