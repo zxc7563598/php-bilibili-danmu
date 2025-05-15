@@ -3,6 +3,8 @@
 namespace app\core;
 
 use app\controller\GeneralMethod;
+use app\model\DanmuLogs;
+use app\model\GiftRecords;
 use app\model\Goods;
 use app\model\GoodSubs;
 use app\model\Lives;
@@ -18,6 +20,7 @@ use resource\enums\UserAddressEnums;
 use resource\enums\PaymentRecordsEnums;
 use resource\enums\RedemptionRecordsEnums;
 use Hejunjie\Utils;
+use support\Db;
 
 class UserPublicMethods extends GeneralMethod
 {
@@ -263,22 +266,42 @@ class UserPublicMethods extends GeneralMethod
                 }
                 // 分析弹幕数据
                 $danmu_list = [];
-                $getTopSpeakers = getTopSpeakers(base_path() . '/' . $lives->danmu_path, 10);
-                foreach ($getTopSpeakers['rankings'] as $_getTopSpeakers) {
-                    $danmu_list[] = [
-                        'uid' => $_getTopSpeakers['uid'],
-                        'name' => $_getTopSpeakers['uname'],
-                        'count' => $_getTopSpeakers['count']
-                    ];
+                $getTopSpeakers = DanmuLogs::whereBetween('send_at', [
+                    $lives->created_at->timezone(config('app')['default_timezone'])->timestamp,
+                    Carbon::parse($lives->end_time)->timezone(config('app')['default_timezone'])->timestamp
+                ])->groupBy('uid')->orderByRaw('count(*) desc')->get([
+                    'uid' => 'uid',
+                    'uname' => 'uname',
+                    'count' => Db::raw('count(*) as count')
+                ]);
+                $danmu_count = 0;
+                foreach ($getTopSpeakers as $_getTopSpeakers) {
+                    $danmu_count += $_getTopSpeakers['count'];
+                    if (count($danmu_list) < 10) {
+                        $danmu_list[] = [
+                            'uid' => $_getTopSpeakers['uid'],
+                            'name' => $_getTopSpeakers['uname'],
+                            'count' => $_getTopSpeakers['count']
+                        ];
+                    }
                 }
                 // 分析礼物数据
                 $gift_list = [];
-                $getTopSpenders = getTopSpenders(base_path() . '/' . $lives->gift_path, 10);
-                foreach ($getTopSpenders['rankings'] as $_getTopSpenders) {
+                $getTopSpenders = GiftRecords::whereBetween('created_at', [
+                    $lives->created_at->timezone(config('app')['default_timezone'])->timestamp,
+                    Carbon::parse($lives->end_time)->timezone(config('app')['default_timezone'])->timestamp
+                ])->groupBy('uid')->orderByRaw('count(*) desc')->get([
+                    'uid' => 'uid',
+                    'uname' => 'uname',
+                    'count' => Db::raw('sum(total_price) as count')
+                ]);
+                $gift_total_price = 0;
+                foreach ($getTopSpenders as $_getTopSpenders) {
+                    $gift_total_price += $_getTopSpenders['count'];
                     $gift_list[] = [
                         'uid' => $_getTopSpenders['uid'],
                         'name' => $_getTopSpenders['uname'],
-                        'count' => round(($_getTopSpenders['totalPrice'] / 10), 2)
+                        'count' => $_getTopSpenders['count'],
                     ];
                 }
                 // 发送邮件
@@ -292,9 +315,9 @@ class UserPublicMethods extends GeneralMethod
                     'listening_open_vip' => $shop_config['listening-open-vip'],
                     'open_list' => $open_list,
                     'danmu_list' => $danmu_list,
-                    'danmu_count' => $getTopSpeakers['count'],
+                    'danmu_count' => $danmu_count,
                     'gift_list' => $gift_list,
-                    'gift_count' => $getTopSpenders['count']
+                    'gift_count' => round($gift_total_price, 2)
                 ]));
             }
         }
