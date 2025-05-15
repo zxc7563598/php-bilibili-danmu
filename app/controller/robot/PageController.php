@@ -12,15 +12,15 @@ class PageController
 {
     public function main(Request $request)
     {
+        // 获取 shop 文件夹是否存在
+        $is_path = false;
+        $path = config('app')['api_url'] . '/dist/index.html';
+        if (is_dir(public_path('dist'))) {
+            $is_path = true;
+        }
         return view('main/console', [
-            'secretKey' => getenv('SECURE_API_KEY')
-        ]);
-    }
-
-
-    public function init(Request $request)
-    {
-        return view('main/init', [
+            'is_path' => $is_path,
+            'path' => $path,
             'secretKey' => getenv('SECURE_API_KEY')
         ]);
     }
