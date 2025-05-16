@@ -22,6 +22,7 @@ Route::group('/admin-api', function () { // 后台管理系统接口
     // 欢迎页
     Route::post('/home/get-update-logs', [admin\HomeController::class, 'getUpdateLogs'])->name('[欢迎页-获取更新日志]');
     Route::post('/home/read-update-logs', [admin\HomeController::class, 'readUpdateLogs'])->name('[欢迎页-更新日志标记已读]');
+    Route::post('/home/download-source-code', [admin\HomeController::class, 'downloadSourceCode'])->name('[欢迎页-由服务器下载后台源码]');
     // 机器人控制相关
     Route::post('/rebot/get-user-info', [admin\RobotControlController::class, 'getUserInfo'])->name('[机器人控制相关-获取用户信息]');
     Route::post('/rebot/get-real-room-info', [admin\RobotControlController::class, 'getRealRoomInfo'])->name('[机器人控制相关-获取直播间信息]');

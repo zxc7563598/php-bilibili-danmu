@@ -11,6 +11,7 @@
 /public/config/
 /public/shop/
 /public/dist/
+/public/distSourceCode/
 .htaccess
 /public/.well-known/
 .DS_Store
