@@ -3,8 +3,6 @@
 <img src="https://img.shields.io/badge/PHP-8.1%2B-purple">
 <img src="https://img.shields.io/badge/WebSocket-Realtime-orange">
 
-基于 [php-bilibili-danmu-core](https://github.com/zxc7563598/php-bilibili-danmu-core) 核心库开发
-
 ---
 
 ## ✨ 核心功能
@@ -22,42 +20,64 @@
 
 ## 🚀 部署方案
 
-### 推荐方案：Docker一键部署
+### 新手推荐方案：Docker一键部署
+
+可能不是最完美的方案，但它一定是对新手最友好的选择：一键配置，命令执行后静待完成，项目会自动拉取、配置并保持更新，全程无需额外操作。
+
+在你的服务器上执行：
 
 ```bash
-# 获取Docker专用版本
-git clone https://github.com/zxc7563598/php-bilibili-danmu-docker.git
-cd php-bilibili-danmu-docker
-sh ./setup.sh
-docker-compose build
-docker-compose up -d
+curl -fsSL https://bilibili-danmu-scripts.oss-cn-hongkong.aliyuncs.com/install-docker.sh | bash 
 ```
 
-点击查看：[视频教程 ](https://www.bilibili.com/video/BV1PBrSYxEQn)| [图文教程](https://hejunjie.life/posts/b06795f9.html)
+> **没有开发基础的用户** 请确保您使用的是 [阿里云](https://cn.aliyun.com) 位于 **香港** 地域的 **Ubuntu  24.04 64位** 版本的服务器。这是一套经过验证的环境，能最大程度减少部署问题
+
+> 其他云服务商或系统版本未做兼容性测试，不排除出现问题的可能性。如果你遇到问题，可以来问我，我乐意帮忙，全当交个朋友。但不保证解决。
+
+> 一键部署脚本写得很简单，不依赖复杂逻辑，有动手能力的用户完全可以自行调整环境。完全不懂的朋友，建议按推荐环境来，别自找麻烦。
 
 ### 手动部署方案
 
-```bash
-# 环境要求：LNMP环境，PHP8.1+、Redis、Brotli、GD扩展
-# Nginx需要设置反向代理，详见官方文档：https://www.workerman.net/doc/webman/others/nginx-proxy.html
-# 手动部署需要自行配置 .env 文件
-git clone https://github.com/zxc7563598/php-bilibili-danmu.git
-cp .env.example .env
-composer install
-php vendor/bin/phinx migrate -e development
-php start.php start -d
-```
+> 以下是手动部署项目的推荐流程，适合具备基本 PHP 环境搭建经验的用户。
 
+* **环境要求**：LNMP 环境，PHP 8.1+，需安装 Redis、Brotli、GD 扩展
+* **项目结构**：标准 PHP 项目，依赖管理采用 Composer，符合现代开发规范。首次运行前请执行 `composer install`​ 安装依赖。
+* **数据库迁移**：使用 Phinx 进行管理。请在完成 `.env`​ 配置及依赖安装后，执行 `php vendor/bin/phinx migrate -e development`​ 进行数据库结构初始化（需提前创建一个 UTF8MB4 编码的数据库）。
+* **运行方式**：基于 Webman 框架，启动流程与官方一致，详细说明可参考[官方文档](https://www.workerman.net/doc/webman/others/nginx-proxy.html)
+    ```bash
+    git clone https://github.com/zxc7563598/php-bilibili-danmu.git ./
+    cp .env.example .env
+    # 修改 .env 配置，参考 .env.example 填写
+    composer install
+    php vendor/bin/phinx migrate -e development
+    php start.php start -d
+    ```
 
-## 👀预览
+积分商城端：[Github仓库](https://github.com/zxc7563598/vue-bilibili-danmu-shop)
+后台管理端：[Github仓库](https://github.com/zxc7563598/vue-bilibili-danmu-admin)
 
+* **环境要求**：本地 NodeJs 环境
+* **项目结构**：基于 Vite 构建的 Vue 标准项目，首次使用请先通过 `npm install`​ 安装依赖。
+* **运行方式**：所有 npm 命令均保持默认配置，通过 `npm run dev` 启动开发模式，通过 `npm run build` 打包生产版本。配置文件通过 `.env` 管理，可参考 `.env.example`
+    ```bash
+    git clone 对应的仓库 ./
+    cp .env.example .env
+    # 修改 .env 配置，参考 .env.example 填写
+    npm install
+    npm run build
+    ```
 
-<img src="https://raw.githubusercontent.com/zxc7563598/php-bilibili-danmu/main/public/cover.png">
+## 👀预览？
 
-<div style="display: flex; justify-content: space-around;">
-  <img src="https://raw.githubusercontent.com/zxc7563598/php-bilibili-danmu/main/public/iphone_6.png" style="width: 20%;">
-  <img src="https://raw.githubusercontent.com/zxc7563598/php-bilibili-danmu/main/public/iphone_2.png" style="width: 20%;">
-  <img src="https://raw.githubusercontent.com/zxc7563598/php-bilibili-danmu/main/public/iphone_3.png" style="width: 20%;">
-  <img src="https://raw.githubusercontent.com/zxc7563598/php-bilibili-danmu/main/public/iphone_4.png" style="width: 20%;">
-  <img src="https://raw.githubusercontent.com/zxc7563598/php-bilibili-danmu/main/public/iphone_5.png" style="width: 20%;">
-</div>
+有关前端预览内容，请参考对应的前端项目，本仓库不再重复提供相关展示。
+
+[![Admin](https://img.shields.io/badge/vue--bilibili--danmu--admin-前端：管理后台-42b883?style=for-the-badge&logo=vue.js)](https://github.com/zxc7563598/vue-bilibili-danmu-admin)
+[![Shop](https://img.shields.io/badge/vue--bilibili--danmu--shop-前端：移动端积分商城-3eaf7c?style=for-the-badge&logo=vue.js)](https://github.com/zxc7563598/vue-bilibili-danmu-shop)
+
+## 🧩 配套项目
+
+[![Core](https://img.shields.io/badge/php--bilibili--danmu--core-B站交互核心模块-blueviolet?style=for-the-badge&logo=php)](https://github.com/zxc7563598/php-bilibili-danmu-core)
+[![Docker](https://img.shields.io/badge/php--bilibili--danmu--docker-Docker一键部署容器-2496ed?style=for-the-badge&logo=docker)](https://github.com/zxc7563598/php-bilibili-danmu-docker)
+[![API](https://img.shields.io/badge/php--bilibili--danmu-项目本体-007acc?style=for-the-badge&logo=php)](https://github.com/zxc7563598/php-bilibili-danmu)
+[![Admin](https://img.shields.io/badge/vue--bilibili--danmu--admin-前端：管理后台-42b883?style=for-the-badge&logo=vue.js)](https://github.com/zxc7563598/vue-bilibili-danmu-admin)
+[![Shop](https://img.shields.io/badge/vue--bilibili--danmu--shop-前端：移动端积分商城-3eaf7c?style=for-the-badge&logo=vue.js)](https://github.com/zxc7563598/vue-bilibili-danmu-shop)
