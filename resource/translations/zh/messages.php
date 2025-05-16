@@ -20,6 +20,7 @@ return [
     "Complaint ID cannot be empty." => "投诉ID不能为空",
     "Too fast, do not save continuously, wait 30 seconds before saving again" => "太快了，不要连续保存，等30秒再保存",
     "Please upload the image file" => "请上传图片文件",
+    "File download failed, please download the source code manually" => "文件下载失败，请自行下载源码",
 
     "Invalid request parameters." => "请求参数异常",
     "Signature verification failed." => "签名验证异常",
