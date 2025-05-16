@@ -167,9 +167,9 @@ if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
     fi
 
     log_stage "安装 Composer 依赖"
+    composer clear-cache >> $LOG_FILE 2>&1
     composer install >> $LOG_FILE 2>&1
-    composer update hejunjie/bililive >> $LOG_FILE 2>&1
-    composer update hejunjie/tools >> $LOG_FILE 2>&1
+    composer update hejunjie/bililive hejunjie/cache hejunjie/china-division hejunjie/error-log hejunjie/mobile-locator hejunjie/utils hejunjie/address-parser hejunjie/url-signer hejunjie/google-authenticator hejunjie/simple-rule-engine >> $LOG_FILE 2>&1
     
     if [ -f "scripts/build_vue.sh" ]; then
         log_info "开始执行 build_vue.sh 脚本"
