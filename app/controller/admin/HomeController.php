@@ -34,11 +34,11 @@ class HomeController
             'log_id' => 'log_id'
         ])->toArray();
         // 提取所有已读
-        $log_id = array_map(fn($item) => $item->log_id, $update_reads);
+        $log_id = array_map(fn($item) => $item['log_id'], $update_reads);
         // 构建展示数据
         $data = [];
         foreach ($update_logs as $i => $log) {
-            if ($i === 0 || !in_array($log->id, $log_id)) {
+            if ($i === 0 || !in_array($log['id'], $log_id)) {
                 $log['meta'] = Carbon::parse($log['meta'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
                 $data[] = $log;
             }
@@ -61,11 +61,15 @@ class HomeController
         // 获取管理员id
         $id = $request->data['id'];
         $admin_id = $request->admins['id'];
+        // 获取是否已读
+        $is_exist = AdminUpdateReads::where('log_id', $id)->where('admin_id', $admin_id)->count();
         // 增加已读
-        $update_reads = new AdminUpdateReads();
-        $update_reads->log_id = $id;
-        $update_reads->admin_id = $admin_id;
-        $update_reads->save();
+        if (!$is_exist) {
+            $update_reads = new AdminUpdateReads();
+            $update_reads->log_id = $id;
+            $update_reads->admin_id = $admin_id;
+            $update_reads->save();
+        }
         // 返回数据
         return success($request, []);
     }
