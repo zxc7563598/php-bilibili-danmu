@@ -1,4 +1,7 @@
 # 哔哩哔哩直播机器人
+
+⚠️ 本项目仅供学习交流使用，禁止用于商业或非法用途。
+
 <img src="https://img.shields.io/badge/Docker-Support-blue">
 <img src="https://img.shields.io/badge/PHP-8.1%2B-purple">
 <img src="https://img.shields.io/badge/WebSocket-Realtime-orange">
