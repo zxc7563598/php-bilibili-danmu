@@ -225,13 +225,13 @@ class ApiController
             Utils\FileUtils::writeToFile(runtime_path() . '/tmp/autoresponders.cfg', json_encode($autoresponders));
         }
         // 更新说明
-        $session = $request->session();
-        $version_update = $session->get('version_update') == 1 ? false : true;
-        $update_html = '<p><b>更新日期: 2025-04-02</b></p><br>
-            <p><b>​签到积分自由设定</b></p>
-            <p>主播可在控制台设置签到奖励积分(默认0分, 设为0则不奖励)</p><br>
-            <p><b>新增PK对手数据播报</b></p>
-            <p>大乱斗开始时自动播报对方直播间在线人数和高能榜信息(需在控制台提前开启)</p>';
+        $version_update = true;
+        $update_html = '<p><b>更新日期: 2025-05-17</b></p><br>
+            <p>当前你看到的还是旧版后台，功能简单但足够使用。如果你想体验更强大的后台管理系统，我们已经准备好了全新版本！</p><br>
+            <p>📦 新版后台支持更多自定义功能，不过需要你自己部署。我们提供了详细的教学地址，也欢迎联系作者协助，作者并不介意在闲暇时间帮大家搭一搭～</p><br>
+            <p>如果你对这些部署流程比较熟悉，强烈建议试试，体验会更好；</p>
+            <p>当然啦，如果你觉得现在这样也挺好，也可以忽略这条消息，不影响正常使用～</p><br>
+            <p>👉 教学地址：<a href="https://hejunjie.life/posts/b4f053ee.html#%E5%85%B3%E4%BA%8E%E7%8B%AC%E7%AB%8B%E5%90%8E%E5%8F%B0" target="_blank">点击前往</a></p>';
         // 返回数据
         return success($request, [
             'timing' => $timing,
