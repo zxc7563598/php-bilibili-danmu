@@ -1,0 +1,11 @@
+# 统一 shell 脚本和 PHP 文件换行符为 LF
+*.sh text eol=lf
+*.php text eol=lf
+
+# 其他文本文件使用自动换行转换，保持平台兼容
+* text=auto
+
+# 明确声明常见二进制文件不转换换行符
+*.png binary
+*.jpg binary
+*.zip binary
