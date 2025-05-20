@@ -43,5 +43,12 @@ class DanmuLogs extends Model
     public static function boot()
     {
         parent::boot();
+
+        static::created(function ($model) {
+            // 用户信息变更
+            $user_vips = UserVips::where('uid', $model->uid)->first();
+            $user_vips->total_danmu_count += 1;
+            $user_vips->save();
+        });
     }
 }

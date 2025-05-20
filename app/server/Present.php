@@ -145,9 +145,9 @@ class Present
             $gift_records->uname = $uname;
             $gift_records->gift_id = $gift_id;
             $gift_records->gift_name = $gift_name;
-            $gift_records->price = ($price / 10);
+            $gift_records->price = round(($price / 10), 2);
             $gift_records->num = $num;
-            $gift_records->total_price = ($gift_records->price * $gift_records->num);
+            $gift_records->total_price = round(($gift_records->price * $gift_records->num), 2);
             $gift_records->save();
         }
         sublog('核心业务', '礼物答谢', '----------', []);
