@@ -136,36 +136,38 @@ class UserAnalysisController extends GeneralMethod
      */
     public function getWordCloudFromText(Request $request)
     {
-        // 获取数据
         $uid = $request->data['uid'];
-        // 获取词频
-        ini_set('memory_limit', '512M');
-        Jieba::init();
-        Finalseg::init();
-        $danmu_logs = DanmuLogs::where('uid', $uid)->get([
-            'msg' => 'msg',
-        ]);
-        // 初始化词频数组
-        $wordFrequency = [];
-        foreach ($danmu_logs as $_danmu_logs) {
-            if (!str_starts_with($_danmu_logs->msg, '[')) {
-                $words = Jieba::cut($_danmu_logs->msg, true); // 精确模式分词
-                foreach ($words as $word) {
-                    // 跳过标点、空白、停用词
-                    if (mb_strlen($word) < 2) continue;
-                    if (!isset($wordFrequency[$word])) {
-                        $wordFrequency[$word] = 1;
-                    } else {
-                        $wordFrequency[$word]++;
-                    }
-                }
-            }
+        // 从数据库获取弹幕内容
+        $danmu_logs = DanmuLogs::where('uid', $uid)->pluck('msg')->toArray();
+        // 准备 JSON 输入
+        $jsonInput = json_encode($danmu_logs, JSON_UNESCAPED_UNICODE);
+        // 调用 segment.php，并通过 stdin 传数据
+        $descriptorSpec = [
+            0 => ["pipe", "r"], // stdin
+            1 => ["pipe", "w"], // stdout
+            2 => ["pipe", "w"]  // stderr
+        ];
+        $process = proc_open("php " . base_path('scripts/segment.php'), $descriptorSpec, $pipes);
+        if (!is_resource($process)) {
+            return fail($request, 900004);
         }
-        // 排序：按词频从高到低
-        arsort($wordFrequency);
-        // 取前 50 个最常见词
-        $topWords = array_slice($wordFrequency, 0, 50, true);
-        // 输出词频
+        fwrite($pipes[0], $jsonInput);
+        fclose($pipes[0]);
+
+        $output = stream_get_contents($pipes[1]);
+        $errorOutput = stream_get_contents($pipes[2]);
+
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+
+        $returnCode = proc_close($process);
+
+        if ($returnCode !== 0) {
+            return error($request, "分词失败: $errorOutput");
+        }
+
+        $topWords = json_decode($output, true);
+
         $text = [];
         foreach ($topWords as $word => $count) {
             $text[] = [
@@ -173,7 +175,7 @@ class UserAnalysisController extends GeneralMethod
                 'weight' => $count
             ];
         }
-        // 返回数据
+
         return success($request, [
             'text' => $text
         ]);
