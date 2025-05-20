@@ -43,5 +43,11 @@ class UserVips extends Model
     public static function boot()
     {
         parent::boot();
+
+        static::creating(function ($model) {
+            // 用户信息变更
+            $model->total_gift_amount = GiftRecords::where('uid', $model->uid)->sum('total_price');
+            $model->total_danmu_count = DanmuLogs::where('uid', $model->uid)->count();
+        });
     }
 }
