@@ -67,6 +67,7 @@ Route::group('/admin-api', function () { // 后台管理系统接口
     // 其他 - 用户分析
     Route::post('/others/user-analysis/get-data', [admin\others\UserAnalysisController::class, 'getData'])->name('[其他-用户分析-获取列表数据]');
     Route::post('/others/user-analysis/get-daily-active', [admin\others\UserAnalysisController::class, 'getDailyActive'])->name('[其他-用户分析-获取每月分析数据]');
+    Route::post('/others/user-analysis/get-word-cloud-from-text', [admin\others\UserAnalysisController::class, 'getWordCloudFromText'])->name('[其他-用户分析-获取用户弹幕词频]');
     // 其他 - 投诉管理
     Route::any('/others/complaint-management/get-data', [admin\others\ComplaintManagementController::class, 'getData'])->name('[其他-投诉管理-获取投诉数据列表]');
     Route::any('/others/complaint-management/get-data-details', [admin\others\ComplaintManagementController::class, 'getDataDetails'])->name('[其他-投诉管理-获取投诉详情]');
