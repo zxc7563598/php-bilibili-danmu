@@ -1,18 +1,5 @@
 <?php
 
-/**
- * This file is part of webman.
- *
- * Licensed under The MIT License
- * For full copyright and license information, please see the MIT-LICENSE.txt
- * Redistributions of files must retain the above copyright notice.
- *
- * @author    walkor<walkor@workerman.net>
- * @copyright walkor<walkor@workerman.net>
- * @link      http://www.workerman.net/
- * @license   http://www.opensource.org/licenses/mit-license.php MIT License
- */
-
 namespace app\exception;
 
 use Carbon\Carbon;
@@ -37,40 +24,76 @@ class Handler extends ExceptionHandler
     public function report(Throwable $exception)
     {
         parent::report($exception);
-    }
-
-    public function render(Request $request, Throwable $exception): Response
-    {
-        $trace = $exception->getTrace();
-        $simplifiedTrace = array_map(function ($frame) {
-            return [
-                'file' => $frame['file'] ?? null,
-                'line' => $frame['line'] ?? null
-            ];
-        }, $trace);
-        // 获取更简化的异常信息，避免递归
-        $cleanedException = [
-            'message' => $exception->getMessage(),
-            'file' => $exception->getFile(),
-            'line' => $exception->getLine(),
-            'trace' => $simplifiedTrace
-        ];
-        // 记录错误日志
+        if ($this->shouldntReport($exception)) {
+            return;
+        }
+        $request = request();
         $date = Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d');
-        $log = new Logger([
+        (new Logger([
             new Handlers\FileHandler(runtime_path("logs/{$date}/重点关注")),
             new Handlers\RemoteApiHandler('http://8.210.141.97:9999/write')
-        ]);
-        $log->error('未定义异常', $exception->getMessage(), [
+        ]))->error('未定义异常', $exception->getMessage(), [
             'project' => config('app')['app_name'],
             'ip' => $request->getRealIp(),
             'method' => $request->method(),
             'full_url' => $request->fullUrl(),
-            'trace' => $cleanedException
+            'trace' => $this->getDebugData($exception)
         ]);
-        // 返回数据
-        $code = $exception->getCode() == 0 ? 500 : $exception->getCode();
-        $json = ['code' => $code, 'message' => config('app')['debug'] ? $exception->getMessage() : 'Server internal error', 'data' => config('app')['debug'] ? $cleanedException : (object)[]];
-        return new Response(200, ['Content-Type' => 'application/json'], json_encode($json, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+    }
+
+    public function render(Request $request, Throwable $exception): Response
+    {
+        $isDebug = config('app')['debug'] == 1;
+        $statusCode = $this->getHttpStatusCode($exception);
+        $response = [
+            'code' => $this->getErrorCode($exception),
+            'message' => $isDebug ? $exception->getMessage() : 'Server Error',
+            'data' => $isDebug ? $this->getDebugData($exception) : new \stdClass()
+        ];
+        if ($requestId = $request->header('X-Request-ID')) {
+            $response['request_id'] = $requestId;
+        }
+        return new Response(
+            $statusCode,
+            ['Content-Type' => 'application/json'],
+            json_encode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+        );
+    }
+
+    protected function getHttpStatusCode(Throwable $exception): int
+    {
+        $code = $exception->getCode();
+        return ($code >= 100 && $code < 600) ? $code : 500;
+    }
+
+    protected function getErrorCode(Throwable $exception): int
+    {
+        return $exception->getCode() ?: 500;
+    }
+
+    protected function getDebugData(Throwable $exception): array
+    {
+        $trace = $exception->getTrace();
+        $simplifiedTrace = array_map(function ($frame) {
+            return [
+                'file' => $frame['file'] ?? '[internal function]',
+                'line' => $frame['line'] ?? 0,
+                'function' => $frame['function'] ?? null,
+                'class' => $frame['class'] ?? null,
+                'type' => $frame['type'] ?? null
+            ];
+        }, $trace);
+        return [
+            'class' => get_class($exception),
+            'message' => $exception->getMessage(),
+            'code' => $exception->getCode(),
+            'file' => $exception->getFile(),
+            'line' => $exception->getLine(),
+            'trace' => $simplifiedTrace,
+            'previous' => $exception->getPrevious() ? [
+                'class' => get_class($exception->getPrevious()),
+                'message' => $exception->getPrevious()->getMessage()
+            ] : null
+        ];
     }
 }
