@@ -62,13 +62,13 @@ class Handler extends ExceptionHandler
 
     protected function getHttpStatusCode(Throwable $exception): int
     {
-        $code = $exception->getCode();
+        $code = (int)$exception->getCode();
         return ($code >= 100 && $code < 600) ? $code : 500;
     }
 
-    protected function getErrorCode(Throwable $exception): int
+    protected function getErrorCode(Throwable $exception): string
     {
-        return $exception->getCode() ?: 500;
+        return (string)$exception->getCode() ?: '500';
     }
 
     protected function getDebugData(Throwable $exception): array
