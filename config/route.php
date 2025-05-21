@@ -116,6 +116,8 @@ Route::group('/points-mall', function () {
     Route::get('/complaint-management', [app\controller\shop\ManagementController::class, 'pageComplaintManagement']); // 投诉管理
     Route::get('/feedback', [app\controller\shop\ManagementController::class, 'pageFeedback']); // 问题反馈
     Route::get('/gift-records', [app\controller\shop\ManagementController::class, 'pageGiftRecords']); // 礼物记录
+    Route::get('/danmu-records', [app\controller\shop\ManagementController::class, 'pageDanmuRecords']); // 弹幕记录
+    Route::get('/user-analysis', [app\controller\shop\ManagementController::class, 'pageUserAnalysis']); // 用户分析
 })->middleware([
     app\middleware\BasicAuthMiddleware::class
 ]);

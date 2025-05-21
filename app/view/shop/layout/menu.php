@@ -25,7 +25,9 @@
         <p class="menu-label">其他</p>
         <ul class="menu-list">
         <li><a href="https://hejunjie.life/posts/b4f053ee.html" class="<?php echo ($currentPage === 'feedback') ? 'is-active' : ''; ?>">救命！我有问题</a></li>
-        <li><a href="/points-mall/gift-records" class="<?php echo ($currentPage === 'gift-records') ? 'is-active' : ''; ?>">礼物记录</a></li>
+        <li><a href="/points-mall/danmu-records" class="<?php echo ($currentPage === 'danmu-records') ? 'is-active' : ''; ?>">弹幕信息</a></li>
+        <li><a href="/points-mall/gift-records" class="<?php echo ($currentPage === 'gift-records') ? 'is-active' : ''; ?>">礼物信息</a></li>
+        <li><a href="/points-mall/user-analysis" class="<?php echo ($currentPage === 'user-analysis') ? 'is-active' : ''; ?>">用户分析</a></li>
             <li><a href="/">回到控制台</a></li>
         </ul>
     </aside>
