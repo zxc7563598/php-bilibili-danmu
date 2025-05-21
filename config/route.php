@@ -64,6 +64,10 @@ Route::group('/admin-api', function () { // 后台管理系统接口
     Route::post('/others/gift-info/get-statistic-data', [admin\others\GiftInfoController::class, 'getStatisticData'])->name('[其他-礼物信息-获取统计数据]');
     // 其他 - 弹幕信息
     Route::post('/others/danmaku-info/get-data', [admin\others\DanmakuInfoController::class, 'getData'])->name('[其他-弹幕信息-获取列表数据]');
+    // 其他 - 用户分析
+    Route::post('/others/user-analysis/get-data', [admin\others\UserAnalysisController::class, 'getData'])->name('[其他-用户分析-获取列表数据]');
+    Route::post('/others/user-analysis/get-daily-active', [admin\others\UserAnalysisController::class, 'getDailyActive'])->name('[其他-用户分析-获取每月分析数据]');
+    Route::post('/others/user-analysis/get-word-cloud-from-text', [admin\others\UserAnalysisController::class, 'getWordCloudFromText'])->name('[其他-用户分析-获取用户弹幕词频]');
     // 其他 - 投诉管理
     Route::any('/others/complaint-management/get-data', [admin\others\ComplaintManagementController::class, 'getData'])->name('[其他-投诉管理-获取投诉数据列表]');
     Route::any('/others/complaint-management/get-data-details', [admin\others\ComplaintManagementController::class, 'getDataDetails'])->name('[其他-投诉管理-获取投诉详情]');
@@ -112,6 +116,8 @@ Route::group('/points-mall', function () {
     Route::get('/complaint-management', [app\controller\shop\ManagementController::class, 'pageComplaintManagement']); // 投诉管理
     Route::get('/feedback', [app\controller\shop\ManagementController::class, 'pageFeedback']); // 问题反馈
     Route::get('/gift-records', [app\controller\shop\ManagementController::class, 'pageGiftRecords']); // 礼物记录
+    Route::get('/danmu-records', [app\controller\shop\ManagementController::class, 'pageDanmuRecords']); // 弹幕记录
+    Route::get('/user-analysis', [app\controller\shop\ManagementController::class, 'pageUserAnalysis']); // 用户分析
 })->middleware([
     app\middleware\BasicAuthMiddleware::class
 ]);
