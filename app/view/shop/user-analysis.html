@@ -9,7 +9,7 @@
 
   <body>
     <!-- 顶部 Navbar -->
-    <?php $currentPage = 'gift-records'; ?>
+    <?php $currentPage = 'user-analysis'; ?>
     <?php include 'layout/navbar.php'; ?>
     <!-- 主要区域 -->
     <div class="columns menu-container" id="app">
@@ -22,35 +22,24 @@
             <div class="column is-full">
               <div class="card">
                 <div class="card-content">
-                  <p>
-                    该页面用于记录机器人监听的直播间中观众赠送礼物的相关信息
-                  </p>
+                  <p>该页面用于记录机器人监听的直播间中观众行为数据进行分析</p>
                   <br />
 
                   <p>功能包括：</p>
 
+                  <p>&nbsp;&nbsp;·&nbsp;汇总用户的总礼物金额与总弹幕发送数量</p>
+
                   <p>
-                    &nbsp;&nbsp;·&nbsp;记录观众的
-                    UID、昵称、赠送的礼物、数量、消费金额及赠送时间
+                    &nbsp;&nbsp;·&nbsp;支持日历视图，查看用户每日的消费金额与发言次数
                   </p>
 
                   <p>
-                    &nbsp;&nbsp;·&nbsp;支支持通过
-                    UID、昵称关键词、赠送时间范围进行搜索查询
-                  </p>
-
-                  <p>&nbsp;&nbsp;·&nbsp;提供灵活的统计功能，可快速查看：</p>
-                  <p>
-                    &nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;某个时间段的总礼物数量与金额
-                  </p>
-                  <p>&nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;某个观众的赠送记录</p>
-                  <p>
-                    &nbsp;&nbsp;&nbsp;&nbsp;·&nbsp;某个观众在特定时间段内的赠送总量和金额
+                    &nbsp;&nbsp;·&nbsp;提供弹幕内容分析，自动生成词云，帮助了解观众关注点与互动习惯
                   </p>
                   <br />
 
                   <p>
-                    该功能适用于数据分析、观众贡献管理、活动复盘等使用场景。
+                    该功能适用于用户活跃度监测、行为趋势分析及内容互动优化。
                   </p>
                 </div>
               </div>
@@ -83,7 +72,18 @@
             <div class="column is-full">
               <div class="card">
                 <div class="card-content">
-                  <img src="/attachment/default/gift.png" style="width: 100%" />
+                  <img
+                    src="/attachment/default/user-analysis-1.png"
+                    style="width: 100%"
+                  />
+                  <img
+                    src="/attachment/default/user-analysis-2.png"
+                    style="width: 100%"
+                  />
+                  <img
+                    src="/attachment/default/user-analysis-3.png"
+                    style="width: 100%"
+                  />
                 </div>
               </div>
             </div>
