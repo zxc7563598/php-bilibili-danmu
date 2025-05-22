@@ -47,8 +47,10 @@ class GiftRecords extends Model
         static::created(function ($model) {
             // 用户信息变更
             $user_vips = UserVips::where('uid', $model->uid)->first();
-            $user_vips->total_gift_amount += $model->total_price;
-            $user_vips->save();
+            if ($user_vips) {
+                $user_vips->total_gift_amount += $model->total_price;
+                $user_vips->save();
+            }
         });
     }
 }

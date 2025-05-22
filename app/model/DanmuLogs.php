@@ -47,8 +47,10 @@ class DanmuLogs extends Model
         static::created(function ($model) {
             // 用户信息变更
             $user_vips = UserVips::where('uid', $model->uid)->first();
-            $user_vips->total_danmu_count += 1;
-            $user_vips->save();
+            if ($user_vips) {
+                $user_vips->total_danmu_count += 1;
+                $user_vips->save();
+            }
         });
     }
 }
