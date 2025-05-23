@@ -175,6 +175,7 @@ Route::group('/api/shop', function () {
     Route::post('/login/get-my', [app\controller\shop\LoginController::class, 'getMy']); // 获取我的
 
     Route::post('/shop/get-goods', [app\controller\shop\ShopController::class, 'getGoods']); // 获取商品列表
+    Route::post('/shop/get-goods-v2', [app\controller\shop\ShopController::class, 'getGoodsV2']); // 获取商品列表
     Route::post('/shop/get-goods-details', [app\controller\shop\ShopController::class, 'getGoodsDetails']); // 获取商品详情
     Route::post('/shop/get-confirm', [app\controller\shop\ShopController::class, 'getConfirm']); // 获取确认订单信息
 
