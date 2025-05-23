@@ -42,6 +42,36 @@ class ShopController extends GeneralMethod
     }
 
     /**
+     * 获取商品列表 v2
+     * 
+     * @param integer $pageNo 页码
+     * @param integer $pageSize 每页展示数量
+     * 
+     * @return Response 
+     */
+    public function getGoodsV2(Request $request): Response
+    {
+        $pageNo = $request->data['pageNo'];
+        $pageSize = $request->data['pageSize'];
+        // 获取商品
+        $goods = Goods::where('status', GoodsEnums\Status::Normal->value)->orderBy('sort', 'asc')->paginate($pageSize, [
+            'goods_id' => 'goods_id',
+            'name' => 'name',
+            'amount' => 'amount',
+            'cover_image' => 'cover_image'
+        ], 'page', $pageNo);
+        foreach ($goods as &$_goods) {
+            $_goods->cover_image = getImageUrl($_goods->cover_image);
+        }
+        $data = is_array($goods) ? $goods : $goods->toArray();
+        // 返回数据
+        return success($request, [
+            "total" => $data['total'],
+            "pageData" => $data['data']
+        ]);
+    }
+
+    /**
      * 获取商品详情
      *
      * @param integer $goods_id 商品id
