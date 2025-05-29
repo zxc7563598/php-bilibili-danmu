@@ -276,7 +276,7 @@ class UserPublicMethods extends GeneralMethod
                 ]);
                 $danmu_count = 0;
                 foreach ($getTopSpeakers as $_getTopSpeakers) {
-                    $danmu_count += $_getTopSpeakers['count'];
+                    $danmu_count += 1;
                     if (count($danmu_list) < 10) {
                         $danmu_list[] = [
                             'uid' => $_getTopSpeakers['uid'],
