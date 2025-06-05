@@ -2,6 +2,7 @@
 
 namespace app\server;
 
+use app\core\RobotServices;
 use app\model\GiftRecords;
 use app\model\ShopConfig;
 use app\model\SilentUser;
@@ -32,7 +33,7 @@ class Present
     public static function processing($uid, $uname, $gift_id, $gift_name, $price, $num, $anchor_id, $ruid, $guard_level, $level)
     {
         $is_message = false;
-        $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
+        $cookie = RobotServices::getCookie();
         $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
         if ($cookie && $room_id) {
             // 获取礼物答谢配置

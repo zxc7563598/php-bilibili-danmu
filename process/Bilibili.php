@@ -2,6 +2,7 @@
 
 namespace process;
 
+use app\core\RobotServices;
 use app\core\UserPublicMethods;
 use app\model\Lives;
 use app\queue\SendMessage;
@@ -69,7 +70,7 @@ class Bilibili
      */
     private function connectToWebSocket()
     {
-        $this->cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
+        $this->cookie = RobotServices::getCookie();
         $this->roomId = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
         if ($this->cookie && $this->roomId) {
             // 获取真实房间号和WebSocket连接信息
