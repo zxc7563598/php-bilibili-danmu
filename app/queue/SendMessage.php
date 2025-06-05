@@ -2,6 +2,7 @@
 
 namespace app\queue;
 
+use app\core\RobotServices;
 use Carbon\Carbon;
 use Exception;
 use Carbon\Exceptions\InvalidTimeZoneException;
@@ -46,7 +47,7 @@ class SendMessage
     private static function getBilibiliSpeakLength($room_id = null, $cookie = null): int
     {
         $room_id = $room_id ?: intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
-        $cookie = $cookie ?: strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
+        $cookie = $cookie ?: RobotServices::getCookie();
         // 获取直播间最大发言长度
         $length = Redis::get('bilibili_speak_length');
         if (empty($length)) {
@@ -137,7 +138,7 @@ class SendMessage
      */
     public static function mergePush(string $message, string $uid = '', string $uname = '', int $number = 0, array $extra = []): void
     {
-        $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
+        $cookie = RobotServices::getCookie();
         $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
         if ($cookie && $room_id) {
             // 获取优先级
@@ -202,7 +203,7 @@ class SendMessage
      */
     public static function push(string $message, string $type = ''): void
     {
-        $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
+        $cookie = RobotServices::getCookie();
         $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
         if ($cookie && $room_id) {
             // 获取优先级
@@ -260,7 +261,7 @@ class SendMessage
             // 解码任务数据
             $task = json_decode($taskJson, true);
             $timeDifference = $currentTimestamp - $task['timestamp'];
-            $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
+            $cookie = RobotServices::getCookie();
             $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
             // 如果任务时间超过 30 秒，则跳过此任务
             if ($timeDifference > 30) {

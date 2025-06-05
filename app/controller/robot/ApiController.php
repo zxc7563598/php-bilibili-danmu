@@ -2,6 +2,7 @@
 
 namespace app\controller\robot;
 
+use app\core\RobotServices;
 use Carbon\Carbon;
 use Hejunjie\Utils;
 use support\Request;
@@ -19,7 +20,7 @@ class ApiController
     public function getUserInfo(Request $request)
     {
         // 获取登录信息配置
-        $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
+        $cookie = RobotServices::getCookie();
         if ($cookie) {
             $user_info = Bililive\Login::getUserInfo($cookie);
             if (!$user_info['is_login']) {
@@ -60,7 +61,7 @@ class ApiController
             $reconnect = true;
         }
         // 获取直播间信息配置
-        $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
+        $cookie = RobotServices::getCookie();
         $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
         $is_live = false;
         if ($room_id && $cookie) {

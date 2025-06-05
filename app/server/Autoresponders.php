@@ -2,6 +2,7 @@
 
 namespace app\server;
 
+use app\core\RobotServices;
 use app\model\SilentUser;
 use app\queue\SendMessage;
 use app\server\core\KeywordEvaluator;
@@ -52,7 +53,7 @@ class Autoresponders
             $silent_minute = 0;
             $ransom_amount = 0;
             // 确认链接直播间的情况
-            $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
+            $cookie = RobotServices::getCookie();
             $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
             $room_uinfo = !empty(strval(readFileContent(runtime_path() . '/tmp/room_uinfo.cfg'))) ? json_decode(strval(readFileContent(runtime_path() . '/tmp/room_uinfo.cfg')), true) : [];
             if ($cookie && $room_id) {
@@ -151,7 +152,7 @@ class Autoresponders
             // 创建数据
             SilentUser::where('tuid', $uid)->delete();
             // 添加禁言
-            $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
+            $cookie = RobotServices::getCookie();
             $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
 
             Bililive\Live::addSilentUser($room_id, $cookie, $uid, $msg);

@@ -2,6 +2,7 @@
 
 namespace process;
 
+use app\core\RobotServices;
 use app\model\SilentUser;
 use Carbon\Carbon;
 use Workerman\Crontab\Crontab;
@@ -19,7 +20,7 @@ class Task
             self::logTransfer();
             Redis::del(config('app')['app_name'] . ':config');
             // 获取配置信息
-            $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
+            $cookie = RobotServices::getCookie();
             $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
             if ($room_id && $cookie) {
                 // 获取登录信息配置
@@ -102,7 +103,7 @@ class Task
     private static function removeSilent(): void
     {
         // 获取凭证
-        $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
+        $cookie = RobotServices::getCookie();
         $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
         // 获取可以解除禁言的数据
         $silent_minute = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;

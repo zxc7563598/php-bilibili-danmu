@@ -2,6 +2,7 @@
 
 namespace app\server;
 
+use app\core\RobotServices;
 use app\queue\SendMessage;
 use support\Redis;
 
@@ -41,7 +42,7 @@ class Enter
             $enter_status = intval($enter['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
             $enter_content = $enter['content']; // 内容
             // 确认链接直播间的情况
-            $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
+            $cookie = RobotServices::getCookie();
             $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
             $room_uinfo = !empty(strval(readFileContent(runtime_path() . '/tmp/room_uinfo.cfg'))) ? json_decode(strval(readFileContent(runtime_path() . '/tmp/room_uinfo.cfg')), true) : [];
             if ($cookie && $room_id) {
