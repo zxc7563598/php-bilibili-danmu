@@ -843,16 +843,16 @@
         },
         {
             "name": "hejunjie/address-parser",
-            "version": "v1.0.1",
+            "version": "v1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zxc7563598/php-address-parser.git",
-                "reference": "2dba751fb58b7975828aad7980e25bf219457f04"
+                "reference": "b4ec521a1f8d7d07431d47b9b65a63cbf5be53a3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zxc7563598/php-address-parser/zipball/2dba751fb58b7975828aad7980e25bf219457f04",
-                "reference": "2dba751fb58b7975828aad7980e25bf219457f04",
+                "url": "https://api.github.com/repos/zxc7563598/php-address-parser/zipball/b4ec521a1f8d7d07431d47b9b65a63cbf5be53a3",
+                "reference": "b4ec521a1f8d7d07431d47b9b65a63cbf5be53a3",
                 "shasum": ""
             },
             "require": {
@@ -875,25 +875,25 @@
                     "email": "junjie.he.925@gmail.com"
                 }
             ],
-            "description": "An intelligent address parser that extracts name, phone number, ID number, region, and detailed address from unstructured text—perfect for e-commerce, logistics, and CRM systems.",
+            "description": "收货地址智能解析工具，支持从非结构化文本中提取姓名、手机号、身份证号、省市区、详细地址等字段，适用于电商、物流、CRM 等系统 | An intelligent address parser that extracts name, phone number, ID number, region, and detailed address from unstructured text—perfect for e-commerce, logistics, and CRM systems.",
             "support": {
                 "issues": "https://github.com/zxc7563598/php-address-parser/issues",
-                "source": "https://github.com/zxc7563598/php-address-parser/tree/v1.0.1"
+                "source": "https://github.com/zxc7563598/php-address-parser/tree/v1.0.2"
             },
-            "time": "2025-05-04T12:40:03+00:00"
+            "time": "2025-05-27T02:51:15+00:00"
         },
         {
             "name": "hejunjie/bililive",
-            "version": "v1.0.3",
+            "version": "v1.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zxc7563598/php-bilibili-danmu-core.git",
-                "reference": "e38743c03bd3fe913be2947b17eac6e6e54710fa"
+                "reference": "ae990d78affb7a3644aa0ca1caf2dc3401f3bc69"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zxc7563598/php-bilibili-danmu-core/zipball/e38743c03bd3fe913be2947b17eac6e6e54710fa",
-                "reference": "e38743c03bd3fe913be2947b17eac6e6e54710fa",
+                "url": "https://api.github.com/repos/zxc7563598/php-bilibili-danmu-core/zipball/ae990d78affb7a3644aa0ca1caf2dc3401f3bc69",
+                "reference": "ae990d78affb7a3644aa0ca1caf2dc3401f3bc69",
                 "shasum": ""
             },
             "require": {
@@ -925,22 +925,22 @@
             ],
             "support": {
                 "issues": "https://github.com/zxc7563598/php-bilibili-danmu-core/issues",
-                "source": "https://github.com/zxc7563598/php-bilibili-danmu-core/tree/v1.0.3"
+                "source": "https://github.com/zxc7563598/php-bilibili-danmu-core/tree/v1.0.5"
             },
-            "time": "2025-01-24T06:33:26+00:00"
+            "time": "2025-06-05T10:52:58+00:00"
         },
         {
             "name": "hejunjie/cache",
-            "version": "v1.0.2",
+            "version": "v1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zxc7563598/php-cache.git",
-                "reference": "d40c5ea3f7cc9653589d993174ab9f7ceb3e9b11"
+                "reference": "12a7d78f080336de425dce7936eefeb89c1faf00"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zxc7563598/php-cache/zipball/d40c5ea3f7cc9653589d993174ab9f7ceb3e9b11",
-                "reference": "d40c5ea3f7cc9653589d993174ab9f7ceb3e9b11",
+                "url": "https://api.github.com/repos/zxc7563598/php-cache/zipball/12a7d78f080336de425dce7936eefeb89c1faf00",
+                "reference": "12a7d78f080336de425dce7936eefeb89c1faf00",
                 "shasum": ""
             },
             "require": {
@@ -962,25 +962,25 @@
                     "email": "junjie.he.925@gmail.com"
                 }
             ],
-            "description": "A layered caching system built with the decorator pattern. Supports combining memory, file, local, and remote caches to improve hit rates and simplify cache logic.",
+            "description": "基于装饰器模式实现的多层缓存系统，支持内存、文件、本地与远程缓存组合，提升缓存命中率，简化缓存管理逻辑 | A layered caching system built with the decorator pattern. Supports combining memory, file, local, and remote caches to improve hit rates and simplify cache logic.",
             "support": {
                 "issues": "https://github.com/zxc7563598/php-cache/issues",
-                "source": "https://github.com/zxc7563598/php-cache/tree/v1.0.2"
+                "source": "https://github.com/zxc7563598/php-cache/tree/v1.0.3"
             },
-            "time": "2025-05-04T12:40:02+00:00"
+            "time": "2025-05-27T02:51:13+00:00"
         },
         {
             "name": "hejunjie/china-division",
-            "version": "v1.0.3",
+            "version": "v1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zxc7563598/php-china-division.git",
-                "reference": "0bc6a33af1980395d63e6f041ddf85a8d96fa29f"
+                "reference": "5f66118cf41f05905a0a4f1f9ecc3e29a6ffc8bf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zxc7563598/php-china-division/zipball/0bc6a33af1980395d63e6f041ddf85a8d96fa29f",
-                "reference": "0bc6a33af1980395d63e6f041ddf85a8d96fa29f",
+                "url": "https://api.github.com/repos/zxc7563598/php-china-division/zipball/5f66118cf41f05905a0a4f1f9ecc3e29a6ffc8bf",
+                "reference": "5f66118cf41f05905a0a4f1f9ecc3e29a6ffc8bf",
                 "shasum": ""
             },
             "require": {
@@ -1002,25 +1002,25 @@
                     "email": "junjie.he.925@gmail.com"
                 }
             ],
-            "description": "Regularly updated dataset of China's administrative divisions with ID-card address parsing. Distributed via Composer and versioned for use in forms, validation, and address-related features",
+            "description": "定期更新，全国最新省市区划分数据，身份证号码解析地址，支持 Composer 安装与版本控制，适用于表单选项、数据校验、地址解析等场景 | Regularly updated dataset of China's administrative divisions with ID-card address parsing. Distributed via Composer and versioned for use in forms, validation, and address-related features",
             "support": {
                 "issues": "https://github.com/zxc7563598/php-china-division/issues",
-                "source": "https://github.com/zxc7563598/php-china-division/tree/v1.0.3"
+                "source": "https://github.com/zxc7563598/php-china-division/tree/v1.0.4"
             },
-            "time": "2025-05-04T12:40:03+00:00"
+            "time": "2025-05-27T02:51:11+00:00"
         },
         {
             "name": "hejunjie/error-log",
-            "version": "v1.0.1",
+            "version": "v1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zxc7563598/php-error-log.git",
-                "reference": "72a80b66640fdd1f80d1f3d95363a17f9ceb919f"
+                "reference": "5fe91311079e46a53364e0da8289f51e35f306e7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zxc7563598/php-error-log/zipball/72a80b66640fdd1f80d1f3d95363a17f9ceb919f",
-                "reference": "72a80b66640fdd1f80d1f3d95363a17f9ceb919f",
+                "url": "https://api.github.com/repos/zxc7563598/php-error-log/zipball/5fe91311079e46a53364e0da8289f51e35f306e7",
+                "reference": "5fe91311079e46a53364e0da8289f51e35f306e7",
                 "shasum": ""
             },
             "require": {
@@ -1042,25 +1042,25 @@
                     "email": "junjie.he.925@gmail.com"
                 }
             ],
-            "description": "An error logging component using the Chain of Responsibility pattern. Supports multiple output channels like local files, remote APIs, and console logs—ideal for flexible and scalable logging strategies.",
+            "description": "基于责任链模式的错误日志处理组件，支持多通道日志处理（如本地文件、远程 API、控制台输出），适用于复杂日志策略场景 | An error logging component using the Chain of Responsibility pattern. Supports multiple output channels like local files, remote APIs, and console logs—ideal for flexible and scalable logging strategies.",
             "support": {
                 "issues": "https://github.com/zxc7563598/php-error-log/issues",
-                "source": "https://github.com/zxc7563598/php-error-log/tree/v1.0.1"
+                "source": "https://github.com/zxc7563598/php-error-log/tree/v1.0.2"
             },
-            "time": "2025-05-04T12:40:01+00:00"
+            "time": "2025-05-27T02:51:12+00:00"
         },
         {
             "name": "hejunjie/google-authenticator",
-            "version": "v1.0.2",
+            "version": "v1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zxc7563598/php-google-authenticator.git",
-                "reference": "38dd9e9643ad1aba196b74c3278315e799403aa1"
+                "reference": "3da95a7addf7c22e71310c957be3d89872d4dbcd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zxc7563598/php-google-authenticator/zipball/38dd9e9643ad1aba196b74c3278315e799403aa1",
-                "reference": "38dd9e9643ad1aba196b74c3278315e799403aa1",
+                "url": "https://api.github.com/repos/zxc7563598/php-google-authenticator/zipball/3da95a7addf7c22e71310c957be3d89872d4dbcd",
+                "reference": "3da95a7addf7c22e71310c957be3d89872d4dbcd",
                 "shasum": ""
             },
             "require": {
@@ -1083,12 +1083,12 @@
                     "email": "junjie.he.925@gmail.com"
                 }
             ],
-            "description": "A PHP library for generating and verifying Time-Based One-Time Passwords (TOTP). Compatible with Google Authenticator and similar apps, with features like secret generation, QR code creation, and OTP verification.",
+            "description": "一个用于生成和验证时间基础一次性密码（TOTP）的 PHP 包，支持 Google Authenticator 及类似应用。功能包括密钥生成、二维码创建和 OTP 验证 | A PHP library for generating and verifying Time-Based One-Time Passwords (TOTP). Compatible with Google Authenticator and similar apps, with features like secret generation, QR code creation, and OTP verification.",
             "support": {
                 "issues": "https://github.com/zxc7563598/php-google-authenticator/issues",
-                "source": "https://github.com/zxc7563598/php-google-authenticator/tree/v1.0.2"
+                "source": "https://github.com/zxc7563598/php-google-authenticator/tree/v1.0.3"
             },
-            "time": "2025-05-16T04:34:33+00:00"
+            "time": "2025-05-27T02:51:10+00:00"
         },
         {
             "name": "hejunjie/hardware-monitor",
@@ -1132,16 +1132,16 @@
         },
         {
             "name": "hejunjie/mobile-locator",
-            "version": "v1.0.1",
+            "version": "v1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zxc7563598/php-mobile-locator.git",
-                "reference": "89859f3c513d3a5029ef0dd79a5b680e51987f12"
+                "reference": "48bc1055775ef771ff8278decf65b5cc1c84b843"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zxc7563598/php-mobile-locator/zipball/89859f3c513d3a5029ef0dd79a5b680e51987f12",
-                "reference": "89859f3c513d3a5029ef0dd79a5b680e51987f12",
+                "url": "https://api.github.com/repos/zxc7563598/php-mobile-locator/zipball/48bc1055775ef771ff8278decf65b5cc1c84b843",
+                "reference": "48bc1055775ef771ff8278decf65b5cc1c84b843",
                 "shasum": ""
             },
             "require": {
@@ -1163,25 +1163,25 @@
                     "email": "junjie.he.925@gmail.com"
                 }
             ],
-            "description": "A mobile number lookup library based on Chinese carrier rules. Identifies carriers and regions, suitable for registration checks, user profiling, and data archiving.",
+            "description": "基于国内号段规则的手机号码归属地查询库，支持运营商识别与地区定位，适用于注册验证、用户画像、数据归档等场景 | A mobile number lookup library based on Chinese carrier rules. Identifies carriers and regions, suitable for registration checks, user profiling, and data archiving.",
             "support": {
                 "issues": "https://github.com/zxc7563598/php-mobile-locator/issues",
-                "source": "https://github.com/zxc7563598/php-mobile-locator/tree/v1.0.1"
+                "source": "https://github.com/zxc7563598/php-mobile-locator/tree/v1.0.2"
             },
-            "time": "2025-05-04T12:39:58+00:00"
+            "time": "2025-05-27T02:51:09+00:00"
         },
         {
             "name": "hejunjie/simple-rule-engine",
-            "version": "v1.0.1",
+            "version": "v1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zxc7563598/php-simple-rule-engine.git",
-                "reference": "5c2fcdad0e92d85209a3d3fd566913d7ff6d6c38"
+                "reference": "9d166f9128ae9768039bacb40f145fa9c0b50555"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zxc7563598/php-simple-rule-engine/zipball/5c2fcdad0e92d85209a3d3fd566913d7ff6d6c38",
-                "reference": "5c2fcdad0e92d85209a3d3fd566913d7ff6d6c38",
+                "url": "https://api.github.com/repos/zxc7563598/php-simple-rule-engine/zipball/9d166f9128ae9768039bacb40f145fa9c0b50555",
+                "reference": "9d166f9128ae9768039bacb40f145fa9c0b50555",
                 "shasum": ""
             },
             "require": {
@@ -1204,12 +1204,12 @@
                     "email": "junjie.he.925@gmail.com"
                 }
             ],
-            "description": "A lightweight and flexible PHP rule engine supporting complex conditions and dynamic rule execution—ideal for business logic evaluation and data validation.",
+            "description": "一个轻量、易用的 PHP 规则引擎，支持多条件组合与动态规则执行，适用于业务规则判断、数据校验等场景 | A lightweight and flexible PHP rule engine supporting complex conditions and dynamic rule execution—ideal for business logic evaluation and data validation.",
             "support": {
                 "issues": "https://github.com/zxc7563598/php-simple-rule-engine/issues",
-                "source": "https://github.com/zxc7563598/php-simple-rule-engine/tree/v1.0.1"
+                "source": "https://github.com/zxc7563598/php-simple-rule-engine/tree/v1.0.2"
             },
-            "time": "2025-05-04T12:39:54+00:00"
+            "time": "2025-05-27T02:51:08+00:00"
         },
         {
             "name": "hejunjie/tools",
@@ -1259,16 +1259,16 @@
         },
         {
             "name": "hejunjie/url-signer",
-            "version": "v1.0.2",
+            "version": "v1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zxc7563598/php-url-signer.git",
-                "reference": "f99798cee46628f9d5b323417c0dc17324d9b8c3"
+                "reference": "738833e095d6d6f7cfb816cf7980d36e235ca9a4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zxc7563598/php-url-signer/zipball/f99798cee46628f9d5b323417c0dc17324d9b8c3",
-                "reference": "f99798cee46628f9d5b323417c0dc17324d9b8c3",
+                "url": "https://api.github.com/repos/zxc7563598/php-url-signer/zipball/738833e095d6d6f7cfb816cf7980d36e235ca9a4",
+                "reference": "738833e095d6d6f7cfb816cf7980d36e235ca9a4",
                 "shasum": ""
             },
             "require": {
@@ -1290,25 +1290,25 @@
                     "email": "junjie.he.925@gmail.com"
                 }
             ],
-            "description": "A PHP library for generating URLs with encryption and signature protection—useful for secure resource access and tamper-proof links.",
+            "description": "一个用于生成和验证带签名的 URL 的工具类，支持设置有效期与参数加密。可用于接口防篡改、防盗链、下载链接保护等场景 | A PHP library for generating URLs with encryption and signature protection—useful for secure resource access and tamper-proof links.",
             "support": {
                 "issues": "https://github.com/zxc7563598/php-url-signer/issues",
-                "source": "https://github.com/zxc7563598/php-url-signer/tree/v1.0.2"
+                "source": "https://github.com/zxc7563598/php-url-signer/tree/v1.0.3"
             },
-            "time": "2025-05-04T12:39:56+00:00"
+            "time": "2025-05-27T02:51:07+00:00"
         },
         {
             "name": "hejunjie/utils",
-            "version": "v1.1.2",
+            "version": "v1.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zxc7563598/php-utils.git",
-                "reference": "79b0cd89d9028db20b2a56cd2a99b274354d053c"
+                "reference": "cf6cc2211f0ae5131f097efbc67b0c5ffe08dd65"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zxc7563598/php-utils/zipball/79b0cd89d9028db20b2a56cd2a99b274354d053c",
-                "reference": "79b0cd89d9028db20b2a56cd2a99b274354d053c",
+                "url": "https://api.github.com/repos/zxc7563598/php-utils/zipball/cf6cc2211f0ae5131f097efbc67b0c5ffe08dd65",
+                "reference": "cf6cc2211f0ae5131f097efbc67b0c5ffe08dd65",
                 "shasum": ""
             },
             "require": {
@@ -1330,12 +1330,12 @@
                     "email": "junjie.he.925@gmail.com"
                 }
             ],
-            "description": "A lightweight and practical PHP utility library that offers a collection of commonly used helper functions for files, strings, arrays, and HTTP requests—designed to streamline development and support everyday PHP projects.",
+            "description": "一个零碎但实用的 PHP 工具函数集合库。包含文件、字符串、数组、网络请求等常用函数的工具类集合，提升开发效率，适用于日常 PHP 项目辅助功能 | A lightweight and practical PHP utility library that offers a collection of commonly used helper functions for files, strings, arrays, and HTTP requests—designed to streamline development and support everyday PHP projects.",
             "support": {
                 "issues": "https://github.com/zxc7563598/php-utils/issues",
-                "source": "https://github.com/zxc7563598/php-utils/tree/v1.1.2"
+                "source": "https://github.com/zxc7563598/php-utils/tree/v1.1.3"
             },
-            "time": "2025-05-16T03:55:09+00:00"
+            "time": "2025-05-27T02:51:14+00:00"
         },
         {
             "name": "illuminate/bus",
@@ -4960,12 +4960,12 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.2"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }
