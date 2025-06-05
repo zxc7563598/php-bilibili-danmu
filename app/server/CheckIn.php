@@ -50,6 +50,7 @@ class CheckIn
             $check_in_status = intval($check_in['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
             $check_in_points = intval($check_in['points'] ?? 0); // 赠送积分
             $check_in_content = '';
+            $total_point = 0;
             $next = false;
             $total = 0;
             $serial = 0;
@@ -72,6 +73,7 @@ class CheckIn
                         LoginPublicMethods::userRegister($uid, $uname);
                         $user_vips = UserVips::where('uid', $uid)->first();
                     }
+                    $total_point = $user_vips->point;
                     // 查询昨天是否签到
                     $day = UserCheckIn::where('uid', $uid)
                         ->where('created_at', '>=', Carbon::today()->subDays(1)->timezone(config('app')['default_timezone'])->timestamp)
@@ -116,6 +118,7 @@ class CheckIn
                 $total = $user_vips->total_check_in;
                 $serial = $user_vips->serial_check_in;
                 $check_in_content = $check_in['reply'];
+                $total_point = $user_vips->point;
                 $next = true;
             }
             // 回复消息
@@ -166,12 +169,14 @@ class CheckIn
                     sublog('核心业务', '用户签到', "数据匹配成功", [
                         'message' => $check_in_content,
                         'args' => [
+                            'total_point' => $total_point,
                             'name' => $uname,
                             'total' => $total,
                             'serial' => $serial
                         ]
                     ]);
                     self::sendMessage($check_in_content, [
+                        'total_point' => $total_point,
                         'name' => $uname,
                         'total' => $total,
                         'serial' => $serial
