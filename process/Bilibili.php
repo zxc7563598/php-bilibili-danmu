@@ -73,14 +73,20 @@ class Bilibili
         $this->roomId = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
         if ($this->cookie && $this->roomId) {
             // 获取真实房间号和WebSocket连接信息
-            $realRoomId = Bililive\Live::getRealRoomId($this->roomId, $this->cookie);
-            $wsData = Bililive\Live::getInitialWebSocketUrl($realRoomId, $this->cookie);
-            $wsUrl = 'ws://' . $wsData['host'] . ':' . $wsData['wss_port'] . '/sub';
-            $token = $wsData['token'];
-            // 创建 WebSocket 连接
-            $con = new AsyncTcpConnection($wsUrl);
-            $this->setupConnection($con, $realRoomId, $token);
-            $con->connect();
+            try {
+                $realRoomId = Bililive\Live::getRealRoomId($this->roomId, $this->cookie);
+                $wsData = Bililive\Live::getInitialWebSocketUrl($realRoomId, $this->cookie);
+                $wsUrl = 'ws://' . $wsData['host'] . ':' . $wsData['wss_port'] . '/sub';
+                $token = $wsData['token'];
+                // 创建 WebSocket 连接
+                $con = new AsyncTcpConnection($wsUrl);
+                $this->setupConnection($con, $realRoomId, $token);
+                $con->connect();
+            } catch (\Exception $e) {
+                // 断开房间链接
+                Utils\FileUtils::fileDelete(runtime_path() . '/tmp/connect.cfg');
+                restartBilibili();
+            }
         }
     }
 

@@ -21,6 +21,7 @@ return [
     "Too fast, do not save continuously, wait 30 seconds before saving again" => "Too fast, do not save continuously, wait 30 seconds before saving again",
     "Please upload the image file" => "Please upload the image file",
     "File download failed, please download the source code manually" => "File download failed, please download the source code manually",
+    "Bilibili has updated its risk control system. Room links are currently experiencing issues and are being fixed" => "Bilibili has updated its risk control system. Room links are currently experiencing issues and are being fixed",
 
     "Invalid request parameters." => "Invalid request parameters.",
     "Signature verification failed." => "Signature verification failed.",
