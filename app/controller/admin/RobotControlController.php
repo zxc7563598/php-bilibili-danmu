@@ -72,6 +72,11 @@ class RobotControlController
             $is_live = true;
             // 房间连接成功，重启websocket
             if ($live_info['code'] == 0 && $reconnect) {
+                try {
+                    Bililive\Live::getInitialWebSocketUrl($room_id, $cookie);
+                } catch (\Exception $e) {
+                    return fail($request, 800019);
+                }
                 restartBilibili();
                 Utils\FileUtils::fileDelete(runtime_path() . '/tmp/room_uinfo.cfg');
                 Utils\FileUtils::writeToFile(runtime_path() . '/tmp/room_uinfo.cfg', json_encode($live_info['data'], JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));

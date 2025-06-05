@@ -21,6 +21,7 @@ return [
     "Too fast, do not save continuously, wait 30 seconds before saving again" => "太快了，不要连续保存，等30秒再保存",
     "Please upload the image file" => "请上传图片文件",
     "File download failed, please download the source code manually" => "文件下载失败，请自行下载源码",
+    "Bilibili has updated its risk control system. Room links are currently experiencing issues and are being fixed" => "B站风控更新，房间链接异常，正在修复",
 
     "Invalid request parameters." => "请求参数异常",
     "Signature verification failed." => "签名验证异常",
