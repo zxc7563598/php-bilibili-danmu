@@ -3,6 +3,7 @@
 namespace app\server;
 
 use app\core\LoginPublicMethods;
+use app\core\RobotServices;
 use app\model\SystemChangePointRecords;
 use app\model\UserCheckIn;
 use app\model\UserVips;
@@ -124,7 +125,7 @@ class CheckIn
             // 回复消息
             if ($next) {
                 // 确认链接直播间的情况
-                $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
+                $cookie = RobotServices::getCookie();
                 $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
                 $room_uinfo = !empty(strval(readFileContent(runtime_path() . '/tmp/room_uinfo.cfg'))) ? json_decode(strval(readFileContent(runtime_path() . '/tmp/room_uinfo.cfg')), true) : [];
                 if ($cookie && $room_id) {
