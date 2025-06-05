@@ -2,6 +2,7 @@
 
 namespace app\server;
 
+use app\core\RobotServices;
 use app\queue\SendMessage;
 use support\Redis;
 use Hejunjie\Bililive;
@@ -35,7 +36,7 @@ class PkLiveReport
             ]);
             $enter_content = $pk['content']; // 内容
             // 获取PK信息
-            $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
+            $cookie = RobotServices::getCookie();
             $getOnlineGoldRank = Bililive\Live::getOnlineGoldRank($uid, $room_id, $cookie);
             $online_num = $getOnlineGoldRank['online_num'] ?? 0;
             $online_score = 0;

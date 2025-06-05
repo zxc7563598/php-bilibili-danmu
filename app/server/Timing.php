@@ -2,6 +2,7 @@
 
 namespace app\server;
 
+use app\core\RobotServices;
 use app\queue\SendMessage;
 use Carbon\Carbon;
 use Workerman\Timer;
@@ -61,7 +62,7 @@ class Timing
             $content = $timing['content']; // 内容
             Timer::add($intervals, function () use ($status, $content) {
                 // 确认链接直播间的情况
-                $cookie = strval(readFileContent(runtime_path() . '/tmp/cookie.cfg'));
+                $cookie = RobotServices::getCookie();
                 $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
                 if ($cookie && $room_id) {
                     switch ($status) {
