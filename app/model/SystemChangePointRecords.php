@@ -48,7 +48,7 @@ class SystemChangePointRecords extends Model
         static::creating(function ($model) {
             // 用户信息变更
             $user_vips = UserVips::where('user_id', $model->user_id)->first();
-            $user_vips->point = $model->after_point;
+            $user_vips->reward_point = $model->after_point;
             $user_vips->save();
         });
     }
