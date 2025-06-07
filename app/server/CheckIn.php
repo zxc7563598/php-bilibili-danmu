@@ -52,6 +52,7 @@ class CheckIn
             $check_in_points = intval($check_in['points'] ?? 0); // 赠送积分
             $check_in_content = '';
             $total_point = 0;
+            $reward_point = 0;
             $next = false;
             $total = 0;
             $serial = 0;
@@ -75,6 +76,7 @@ class CheckIn
                         $user_vips = UserVips::where('uid', $uid)->first();
                     }
                     $total_point = $user_vips->point;
+                    $reward_point = $user_vips->reward_point;
                     // 查询昨天是否签到
                     $day = UserCheckIn::where('uid', $uid)
                         ->where('created_at', '>=', Carbon::today()->subDays(1)->timezone(config('app')['default_timezone'])->timestamp)
@@ -95,8 +97,8 @@ class CheckIn
                         $system_change_point_records->type = SystemChangePointRecordsEnums\Type::Up->value;
                         $system_change_point_records->source = SystemChangePointRecordsEnums\Source::SignIn->value;
                         $system_change_point_records->point = $user_check_in->points;
-                        $system_change_point_records->pre_point = $user_vips->point;
-                        $system_change_point_records->after_point = $user_vips->point + $user_check_in->points;
+                        $system_change_point_records->pre_point = $user_vips->reward_point;
+                        $system_change_point_records->after_point = $user_vips->reward_point + $user_check_in->points;
                         $system_change_point_records->save();
                     }
                     $total = $user_vips->total_check_in;
@@ -120,6 +122,7 @@ class CheckIn
                 $serial = $user_vips->serial_check_in;
                 $check_in_content = $check_in['reply'];
                 $total_point = $user_vips->point;
+                $reward_point = $user_vips->reward_point;
                 $next = true;
             }
             // 回复消息
@@ -170,6 +173,7 @@ class CheckIn
                     sublog('核心业务', '用户签到', "数据匹配成功", [
                         'message' => $check_in_content,
                         'args' => [
+                            'reward_point' => $reward_point,
                             'total_point' => $total_point,
                             'name' => $uname,
                             'total' => $total,
@@ -177,6 +181,7 @@ class CheckIn
                         ]
                     ]);
                     self::sendMessage($check_in_content, [
+                        'reward_point' => $reward_point,
                         'total_point' => $total_point,
                         'name' => $uname,
                         'total' => $total,
