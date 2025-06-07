@@ -96,6 +96,7 @@ class CheckIn
                         $system_change_point_records->user_id = $user_vips->user_id;
                         $system_change_point_records->type = SystemChangePointRecordsEnums\Type::Up->value;
                         $system_change_point_records->source = SystemChangePointRecordsEnums\Source::SignIn->value;
+                        $system_change_point_records->point_type = SystemChangePointRecordsEnums\PointType::RewardPoint->value;
                         $system_change_point_records->point = $user_check_in->points;
                         $system_change_point_records->pre_point = $user_vips->reward_point;
                         $system_change_point_records->after_point = $user_vips->reward_point + $user_check_in->points;

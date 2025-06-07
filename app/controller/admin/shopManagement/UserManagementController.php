@@ -274,6 +274,7 @@ class UserManagementController extends GeneralMethod
         $system_change_point_records = new SystemChangePointRecords();
         $system_change_point_records->user_id = $user_id;
         $system_change_point_records->type = $type;
+        $system_change_point_records->point_type = SystemChangePointRecordsEnums\PointType::Point->value;
         $system_change_point_records->point = $point;
         $system_change_point_records->source = SystemChangePointRecordsEnums\Source::AnchorChange->value;
         $system_change_point_records->pre_point = $user_vips->point;
