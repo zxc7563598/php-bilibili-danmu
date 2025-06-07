@@ -10,7 +10,7 @@ final class ModifyUserVipsAddRewardPoints extends AbstractMigration
     public function up(): void
     {
         $table = $this->table('bl_user_vips');
-        $table->addColumn('reward_point', 'integer', ['comment' => '签到积分', 'null' => false, 'default' => 0, 'after' => 'point', 'limit' => MysqlAdapter::INT_MEDIUM])
+        $table->addColumn('reward_point', 'integer', ['comment' => '签到积分（硬币）', 'null' => false, 'default' => 0, 'after' => 'point', 'limit' => MysqlAdapter::INT_MEDIUM])
             ->save();
     }
 
