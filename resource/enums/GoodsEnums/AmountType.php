@@ -5,7 +5,7 @@ namespace resource\enums\GoodsEnums;
 /**
  * 商品价格类型
  */
-enum Status: int
+enum AmountType: int
 {
     case Point = 0;
     case Coin = 1;
