@@ -42,6 +42,7 @@ class ProductManagementController extends GeneralMethod
                 'goods_id' => 'goods_id',
                 'name' => 'name',
                 'amount' => 'amount',
+                'amount_type' => 'amount_type',
                 'cover_image' => 'cover_image',
                 'status' => 'status',
                 'type' => 'type',
@@ -49,6 +50,7 @@ class ProductManagementController extends GeneralMethod
             ], 'page', $page);
         // 处理数据
         foreach ($goods as &$_goods) {
+            $_goods->amount_type = GoodsEnums\AmountType::from($_goods->amount_type)->label();
             $_goods->cover_image = getImageUrl($_goods->cover_image);
             $_goods->status = GoodsEnums\Status::from($_goods->status)->label();
             $_goods->type = GoodsEnums\Type::from($_goods->type)->label();
@@ -76,6 +78,7 @@ class ProductManagementController extends GeneralMethod
             'goods_id' => 'goods_id',
             'name' => 'name',
             'amount' => 'amount',
+            'amount_type' => 'amount_type',
             'sub_num' => 'sub_num',
             'tips' => 'tips',
             'cover_image' => 'cover_image',
@@ -112,6 +115,7 @@ class ProductManagementController extends GeneralMethod
                 'goods_id' => $goods->goods_id,
                 'name' => $goods->name,
                 'amount' => $goods->amount,
+                'amount_type' => $goods->amount_type,
                 'sub_num' => $goods->sub_num,
                 'tips' => $goods->tips,
                 'cover_image' => ['url' => getImageUrl($goods->cover_image), 'path' => $goods->cover_image],
@@ -172,6 +176,7 @@ class ProductManagementController extends GeneralMethod
      * @param string $carousel_images 商品展示图（多个）
      * @param string $details_images 详情图（多个）
      * @param string $service_description_images 服务说明图（多个）
+     * @param integer $amount_type 价格类型
      * @param integer $status 状态
      * @param integer $type 商品类型
      * @param integer $sort 排序，从小到大
@@ -194,6 +199,7 @@ class ProductManagementController extends GeneralMethod
         $carousel_images = $param['carousel_images'];
         $details_images = $param['details_images'];
         $service_description_images = $param['service_description_images'];
+        $amount_type = $param['amount_type'];
         $status = $param['status'];
         $type = $param['type'];
         $sort = $param['sort'];
@@ -214,6 +220,7 @@ class ProductManagementController extends GeneralMethod
         $goods->carousel_images = implode('-|-', array_column($carousel_images, 'path'));
         $goods->details_images = implode('-|-', array_column($details_images, 'path'));
         $goods->service_description_images = implode('-|-', array_column($service_description_images, 'path'));
+        $goods->amount_type = $amount_type;
         $goods->status = $status;
         $goods->type = $type;
         $goods->sort = $sort;
