@@ -12,6 +12,7 @@ use app\model\RedemptionRecords;
 use app\controller\GeneralMethod;
 use resource\enums\UserVipsEnums;
 use resource\enums\PaymentRecordsEnums;
+use resource\enums\RedemptionRecordsEnums;
 use app\model\SystemChangePointRecords;
 use resource\enums\SystemChangePointRecordsEnums;
 
@@ -49,7 +50,8 @@ class UserManagementController extends GeneralMethod
                 'vip_type' => 'vip_type',
                 'last_vip_at' => 'last_vip_at',
                 'end_vip_at' => 'end_vip_at',
-                'point' => 'point'
+                'point' => 'point',
+                'coin' => 'coin',
             ], 'page', $page);
         // 处理数据
         foreach ($users as &$_user) {
@@ -169,13 +171,13 @@ class UserManagementController extends GeneralMethod
     }
 
     /**
-     * 获取用户航海开通记录
+     * 获取用户积分记录
      * 
      * @param integer $user_id 用户ID
      * 
      * @return Response 
      */
-    public function getUserRecords(Request $request)
+    public function getUserPointRecords(Request $request)
     {
         $param = $request->all();
         // 获取参数
@@ -189,6 +191,7 @@ class UserManagementController extends GeneralMethod
         ]);
         $redemption_records = RedemptionRecords::join('bl_goods', 'bl_redemption_records.goods_id', '=', 'bl_goods.goods_id')
             ->where('bl_redemption_records.user_id', $user_id)
+            ->where('bl_redemption_records.amount_type', RedemptionRecordsEnums\AmountType::Point->value)
             ->get([
                 'name' => 'bl_goods.name',
                 'cover_image' => 'bl_goods.cover_image',
@@ -196,7 +199,7 @@ class UserManagementController extends GeneralMethod
                 'after_point' => 'bl_redemption_records.after_point',
                 'created_at' => 'bl_redemption_records.created_at'
             ]);
-        $system_change_point_records = SystemChangePointRecords::where('user_id', $user_id)->get([
+        $system_change_point_records = SystemChangePointRecords::where('user_id', $user_id)->where('point_type', SystemChangePointRecordsEnums\PointType::Point->value)->get([
             'type' => 'type',
             'point' => 'point',
             'source' => 'source',
@@ -252,6 +255,65 @@ class UserManagementController extends GeneralMethod
     }
 
     /**
+     * 获取用户硬币记录
+     * 
+     * @param integer $user_id 用户ID
+     * 
+     * @return Response 
+     */
+    public function getUserCoinRecords(Request $request)
+    {
+        $param = $request->all();
+        // 获取参数
+        $user_id = $param['user_id'];
+        // 获取记录
+        $redemption_records = RedemptionRecords::join('bl_goods', 'bl_redemption_records.goods_id', '=', 'bl_goods.goods_id')
+            ->where('bl_redemption_records.user_id', $user_id)
+            ->where('bl_redemption_records.amount_type', RedemptionRecordsEnums\AmountType::Coin->value)
+            ->get([
+                'name' => 'bl_goods.name',
+                'cover_image' => 'bl_goods.cover_image',
+                'point' => 'bl_redemption_records.point',
+                'after_point' => 'bl_redemption_records.after_point',
+                'created_at' => 'bl_redemption_records.created_at'
+            ]);
+        $system_change_point_records = SystemChangePointRecords::where('user_id', $user_id)->where('point_type', SystemChangePointRecordsEnums\PointType::Coin->value)->get([
+            'type' => 'type',
+            'point' => 'point',
+            'source' => 'source',
+            'after_point' => 'after_point',
+            'created_at' => 'created_at'
+        ]);
+        // 处理数据
+        $data = [];
+        // 整合系统变更数据
+        foreach ($system_change_point_records as $_system_change_point_records) {
+            $type = $_system_change_point_records->type == SystemChangePointRecordsEnums\Type::Up->value ? '+' : '-';
+            $data[] = [
+                'icon' => getImageUrl('shop-config/supreme.png'),
+                'name' => SystemChangePointRecordsEnums\Source::from($_system_change_point_records->source)->label(),
+                'point' => $type . ' ' . $_system_change_point_records->point,
+                'after_point' => $_system_change_point_records->after_point,
+                'date' => $_system_change_point_records->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
+            ];
+        }
+        // 整合消费数据
+        foreach ($redemption_records as $_redemption_records) {
+            $data[] = [
+                'icon' => getImageUrl($_redemption_records->cover_image),
+                'name' => $_redemption_records->name,
+                'point' => '- ' . $_redemption_records->point,
+                'after_point' => $_redemption_records->after_point,
+                'date' => $_redemption_records->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
+            ];
+        }
+        // 排序
+        $data = Utils\Arr::sortByField($data, 'date', false);
+        // 返回数据
+        return success($request, ['records' => $data]);
+    }
+
+    /**
      * 变更用户积分
      * 
      * @param integer $type 变更类型 
@@ -276,10 +338,46 @@ class UserManagementController extends GeneralMethod
         $system_change_point_records = new SystemChangePointRecords();
         $system_change_point_records->user_id = $user_id;
         $system_change_point_records->type = $type;
+        $system_change_point_records->point_type = SystemChangePointRecordsEnums\PointType::Point->value;
         $system_change_point_records->point = $point;
         $system_change_point_records->source = SystemChangePointRecordsEnums\Source::AnchorChange->value;
         $system_change_point_records->pre_point = $user_vips->point;
         $system_change_point_records->after_point = $type === SystemChangePointRecordsEnums\Type::Up->value ? $user_vips->point + $point : $user_vips->point - $point;
+        $system_change_point_records->save();
+        // 返回数据
+        return success($request, []);
+    }
+
+    /**
+     * 变更用户硬币
+     * 
+     * @param integer $type 变更类型 
+     * @param integer $point 变更积分 
+     * @param integer $user_id 用户ID 
+     * 
+     * @return Response 
+     */
+    public function setUserCoin(Request $request)
+    {
+        $param = $request->all();
+        // 获取参数
+        $type = $param['type'];
+        $point = $param['point'];
+        $user_id = $param['user_id'];
+        // 获取用户数据
+        $user_vips = UserVips::where('user_id', $user_id)->first();
+        if (empty($user_vips)) {
+            return fail($request, 800013);
+        }
+        // 添加数据
+        $system_change_point_records = new SystemChangePointRecords();
+        $system_change_point_records->user_id = $user_id;
+        $system_change_point_records->type = $type;
+        $system_change_point_records->point_type = SystemChangePointRecordsEnums\PointType::Coin->value;
+        $system_change_point_records->point = $point;
+        $system_change_point_records->source = SystemChangePointRecordsEnums\Source::AnchorChange->value;
+        $system_change_point_records->pre_point = $user_vips->coin;
+        $system_change_point_records->after_point = $type === SystemChangePointRecordsEnums\Type::Up->value ? $user_vips->coin + $point : $user_vips->coin - $point;
         $system_change_point_records->save();
         // 返回数据
         return success($request, []);

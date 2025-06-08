@@ -61,6 +61,7 @@ class ShippingManagementController extends GeneralMethod
                 'goods_name' => 'bl_goods.name as goods_name',
                 'sub_id' => 'bl_redemption_records.sub_id',
                 'point' => 'bl_redemption_records.point',
+                'amount_type' => 'bl_redemption_records.amount_type',
                 'status' => 'bl_redemption_records.status',
                 'created_at' => 'bl_redemption_records.created_at'
             ], 'page', $page);
@@ -82,6 +83,7 @@ class ShippingManagementController extends GeneralMethod
         // 添加子集和状态等字段
         foreach ($redemption_records as &$_redemption_records) {
             $subs = explode(',', $_redemption_records->sub_id);
+            $_redemption_records->amount_type = RedemptionRecordsEnums\AmountType::from($_redemption_records->amount_type)->label();
             $_redemption_records->goods_sub = implode("\r\n", array_map(fn($sub) => $goods_subs[$sub], $subs));
             $_redemption_records->status = RedemptionRecordsEnums\Status::from($_redemption_records->status)->label();
             $_redemption_records->create_time = $_redemption_records->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
