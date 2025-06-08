@@ -59,7 +59,16 @@ class UserPublicMethods extends GeneralMethod
             return 800008;
         }
         $user_address = UserAddress::where('user_id', $user_id)->where('selected', UserAddressEnums\Selected::Yes->value)->first();
-        if (($user_vips->point - $goods->amount) < 0) {
+        $after_point = 0;
+        switch ($goods->amount_type) {
+            case GoodsEnums\AmountType::Point->value:
+                $after_point = $user_vips->point - $goods->amount;
+                break;
+            case GoodsEnums\AmountType::Coin->value:
+                $after_point = $user_vips->reward_point - $goods->amount;
+                break;
+        }
+        if ($after_point < 0) {
             return 800007;
         }
         if ($goods->type == GoodsEnums\Type::Entity->value) {
@@ -76,10 +85,11 @@ class UserPublicMethods extends GeneralMethod
         $redemption_records->user_id = $user_id;
         $redemption_records->goods_id = $goods_id;
         $redemption_records->sub_id = implode(',', $sub);
+        $redemption_records->amount_type = $goods->amount_type;
         $redemption_records->point = $goods->amount;
         $redemption_records->pre_point = $user_vips->point;
         $redemption_records->status = RedemptionRecordsEnums\Status::NoShipment->value;
-        $redemption_records->after_point = $user_vips->point - $goods->amount;
+        $redemption_records->after_point = $after_point;
         $redemption_records->shipping_address = $shipping_address;
         $redemption_records->shipping_name = $shipping_name;
         $redemption_records->shipping_phone = $shipping_phone;
