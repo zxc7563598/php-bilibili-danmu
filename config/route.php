@@ -134,8 +134,10 @@ Route::group('/api/points-mall', function () {
     Route::any('/user-management/get-user-info', [app\controller\shop\management\UserManagementController::class, 'getUserInfo']);
     Route::any('/user-management/set-data', [app\controller\shop\management\UserManagementController::class, 'setData']);
     Route::any('/user-management/reset-password', [app\controller\shop\management\UserManagementController::class, 'resetPassword']);
-    Route::any('/user-management/get-user-records', [app\controller\shop\management\UserManagementController::class, 'getUserRecords']);
+    Route::any('/user-management/get-user-point-records', [app\controller\shop\management\UserManagementController::class, 'getUserPointRecords']);
+    Route::any('/user-management/get-user-coin-records', [app\controller\shop\management\UserManagementController::class, 'getUserCoinRecords']);
     Route::any('/user-management/set-user-point', [app\controller\shop\management\UserManagementController::class, 'setUserPoint']);
+    Route::any('/user-management/set-user-coin', [app\controller\shop\management\UserManagementController::class, 'setUserCoin']);
     Route::any('/product-management/get-data', [app\controller\shop\management\ProductManagementController::class, 'getData']);
     Route::any('/product-management/get-data-details', [app\controller\shop\management\ProductManagementController::class, 'getDataDetails']);
     Route::any('/product-management/set-data-details', [app\controller\shop\management\ProductManagementController::class, 'setDataDetails']);
