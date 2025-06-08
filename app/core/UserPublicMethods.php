@@ -65,7 +65,7 @@ class UserPublicMethods extends GeneralMethod
                 $after_point = $user_vips->point - $goods->amount;
                 break;
             case GoodsEnums\AmountType::Coin->value:
-                $after_point = $user_vips->reward_point - $goods->amount;
+                $after_point = $user_vips->coin - $goods->amount;
                 break;
         }
         if ($after_point < 0) {
