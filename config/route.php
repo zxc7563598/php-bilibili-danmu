@@ -53,8 +53,10 @@ Route::group('/admin-api', function () { // 后台管理系统接口
     Route::post('/shop-management/user-management/get-user-info', [admin\shopManagement\UserManagementController::class, 'getUserInfo'])->name('[商城管理-用户管理-根据UID查询用户数据]');
     Route::post('/shop-management/user-management/set-data', [admin\shopManagement\UserManagementController::class, 'setData'])->name('[商城管理-用户管理-存储用户信息]');
     Route::post('/shop-management/user-management/reset-password', [admin\shopManagement\UserManagementController::class, 'resetPassword'])->name('[商城管理-用户管理-清空所有用户密码]');
-    Route::post('/shop-management/user-management/get-user-records', [admin\shopManagement\UserManagementController::class, 'getUserRecords'])->name('[商城管理-用户管理-获取用户航海开通记录]');
+    Route::post('/shop-management/user-management/get-user-point-records', [admin\shopManagement\UserManagementController::class, 'getUserPointRecords'])->name('[商城管理-用户管理-获取用户积分变更记录]');
+    Route::post('/shop-management/user-management/get-user-coin-records', [admin\shopManagement\UserManagementController::class, 'getUserCoinRecords'])->name('[商城管理-用户管理-获取用户硬币变更记录]');
     Route::post('/shop-management/user-management/set-user-point', [admin\shopManagement\UserManagementController::class, 'setUserPoint'])->name('[商城管理-用户管理-变更用户积分]');
+    Route::post('/shop-management/user-management/set-user-coin', [admin\shopManagement\UserManagementController::class, 'setUserCoin'])->name('[商城管理-用户管理-变更用户硬币]');
     // 商城管理 - 发货管理
     Route::post('/shop-management/shipping-management/get-data', [admin\shopManagement\ShippingManagementController::class, 'getData'])->name('[商城管理-发货管理-获取发货列表数据]');
     Route::post('/shop-management/shipping-management/get-data-details', [admin\shopManagement\ShippingManagementController::class, 'getDataDetails'])->name('[商城管理-发货管理-获取发货详情]');
