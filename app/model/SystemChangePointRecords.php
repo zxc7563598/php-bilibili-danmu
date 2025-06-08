@@ -50,7 +50,7 @@ class SystemChangePointRecords extends Model
             // 用户信息变更
             $user_vips = UserVips::where('user_id', $model->user_id)->first();
             switch ($model->point_type) {
-                case SystemChangePointRecordsEnums\PointType::RewardPoint->value:
+                case SystemChangePointRecordsEnums\PointType::Coin->value:
                     $user_vips->coin = $model->after_point;
                     break;
                 case SystemChangePointRecordsEnums\PointType::Point->value:

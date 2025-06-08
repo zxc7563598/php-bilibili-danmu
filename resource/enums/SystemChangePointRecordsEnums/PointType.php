@@ -8,14 +8,14 @@ namespace resource\enums\SystemChangePointRecordsEnums;
 enum PointType: int
 {
     case Point = 0;
-    case RewardPoint = 1;
+    case Coin = 1;
 
     //定义一个转换函数，用来显示
     public function label(): string
     {
         return match ($this) {
             static::Point => '积分',
-            static::RewardPoint => '奖励积分'
+            static::Coin => '积分'
         };
     }
 
