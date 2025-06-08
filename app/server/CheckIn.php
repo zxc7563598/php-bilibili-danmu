@@ -174,7 +174,7 @@ class CheckIn
                     sublog('核心业务', '用户签到', "数据匹配成功", [
                         'message' => $check_in_content,
                         'args' => [
-                            'coin' => $coin,
+                            'total_coin' => $coin,
                             'total_point' => $total_point,
                             'name' => $uname,
                             'total' => $total,
@@ -182,7 +182,7 @@ class CheckIn
                         ]
                     ]);
                     self::sendMessage($check_in_content, [
-                        'coin' => $coin,
+                        'total_coin' => $coin,
                         'total_point' => $total_point,
                         'name' => $uname,
                         'total' => $total,
