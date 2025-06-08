@@ -30,9 +30,11 @@ class ShopController extends GeneralMethod
             'goods_id' => 'goods_id',
             'name' => 'name',
             'amount' => 'amount',
+            'amount_type' => 'amount_type',
             'cover_image' => 'cover_image'
         ]);
         foreach ($goods as &$_goods) {
+            $_goods->amount_type = GoodsEnums\AmountType::from($_goods->amount_type)->label();
             $_goods->cover_image = getImageUrl($_goods->cover_image);
         }
         // 返回数据
@@ -58,9 +60,11 @@ class ShopController extends GeneralMethod
             'goods_id' => 'goods_id',
             'name' => 'name',
             'amount' => 'amount',
+            'amount_type' => 'amount_type',
             'cover_image' => 'cover_image'
         ], 'page', $pageNo);
         foreach ($goods as &$_goods) {
+            $_goods->amount_type = GoodsEnums\AmountType::from($_goods->amount_type)->label();
             $_goods->cover_image = getImageUrl($_goods->cover_image);
         }
         $data = is_array($goods) ? $goods : $goods->toArray();
@@ -88,6 +92,7 @@ class ShopController extends GeneralMethod
             'goods_id' => 'goods_id',
             'name' => 'name',
             'amount' => 'amount',
+            'amount_type' => 'amount_type',
             'sub_num' => 'sub_num',
             'cover_image' => 'cover_image',
             'carousel_images' => 'carousel_images',
@@ -126,6 +131,7 @@ class ShopController extends GeneralMethod
             'goods_id' => $goods->goods_id,
             'name' => $goods->name,
             'amount' => $goods->amount,
+            'amount_type' => GoodsEnums\AmountType::from($goods->amount_type)->label(),
             'sub_num' => $goods->sub_num,
             'cover_image' => getImageUrl($goods->cover_image),
             'carousel_images' => $carousel_images,
@@ -186,6 +192,7 @@ class ShopController extends GeneralMethod
                 'name' => $goods->name,
                 'cover' => getImageUrl($goods->cover_image),
                 'amount' => round($goods->amount),
+                'amount_type' => GoodsEnums\AmountType::from($goods->amount_type)->label(),
                 'commodity_type' => implode(',', $commodity_type),
                 'address' => ($goods->type == GoodsEnums\Type::Entity->value) ? true : false,
                 'mail' => ($goods->type != GoodsEnums\Type::Entity->value) ? true : false,

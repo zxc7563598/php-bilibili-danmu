@@ -98,6 +98,7 @@
                                             <th>开启时间</th>
                                             <th>到期时间</th>
                                             <th>积分</th>
+                                            <th>硬币</th>
                                             <th>操作</th>
                                         </tr>
                                     </thead>
@@ -112,11 +113,14 @@
                                             <td>{{item.last_vip_at}}</td>
                                             <td>{{item.end_vip_at}}</td>
                                             <td>{{item.point}}</td>
+                                            <td>{{item.coin}}</td>
                                             <td>
                                                 <button class="button is-light mr-2 is-small"
                                                     @click="userEdit(item.user_id)">变更</button>
                                                 <button class="button is-light is-small"
                                                     @click="userRecords(item.user_id)">积分记录</button>
+                                                <button class="button is-light is-small"
+                                                    @click="userRecordsCoin(item.user_id)">硬币记录</button>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -143,12 +147,12 @@
             </div>
         </div>
         <!-- 弹窗 -->
-        <div class="modal" :class="records_active ? 'is-active' : ''">
+        <div class="modal" :class="records_active_point ? 'is-active' : ''">
             <div class="modal-background"></div>
             <div class="modal-card">
                 <header class="modal-card-head">
-                    <p class="modal-card-title">开通记录</p>
-                    <button class="delete" aria-label="close" @click="this.records_active = false"></button>
+                    <p class="modal-card-title">积分变更记录</p>
+                    <button class="delete" aria-label="close" @click="this.records_active_point = false"></button>
                 </header>
                 <section class="modal-card-body">
                     <table class="table is-fullwidth is-striped is-hoverable">
@@ -163,10 +167,10 @@
                         <tbody>
                             <tr>
                                 <td colspan="5"><button class="button is-fullwidth"
-                                        @click="add_user_records_active = true">新增</button>
+                                        @click="add_user_records_active_point = true">新增</button>
                                 </td>
                             </tr>
-                            <tr v-if="add_user_records_active">
+                            <tr v-if="add_user_records_active_point">
                                 <td colspan="2">
                                     <div class="field">
                                         <div class="control">
@@ -188,7 +192,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td><button class="button is-fullwidth is-success" @click="addUserRecords">保存</button>
+                                <td><button class="button is-fullwidth is-success" @click="setUserPoint">保存</button>
                                 </td>
                             </tr>
                             <tr v-for="(item,index) in records">
@@ -207,7 +211,75 @@
                 </section>
                 <footer class="modal-card-foot">
                     <div class="buttons">
-                        <button class="button is-link" @click="saveUser">存储</button>
+                        <button class="button" @click="this.userinfo_active = false">取消</button>
+                    </div>
+                </footer>
+            </div>
+        </div>
+        <div class="modal" :class="records_active_coin ? 'is-active' : ''">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">硬币变更记录</p>
+                    <button class="delete" aria-label="close" @click="this.records_active_coin = false"></button>
+                </header>
+                <section class="modal-card-body">
+                    <table class="table is-fullwidth is-striped is-hoverable">
+                        <thead>
+                            <tr>
+                                <th colspan="2">操作类型</th>
+                                <th>变更硬币</th>
+                                <th>变更后硬币</th>
+                                <th>变更时间</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="5"><button class="button is-fullwidth"
+                                        @click="add_user_records_active_coin = true">新增</button>
+                                </td>
+                            </tr>
+                            <tr v-if="add_user_records_active_coin">
+                                <td colspan="2">
+                                    <div class="field">
+                                        <div class="control">
+                                            <div class="select is-fullwidth">
+                                                <select v-model="set_user_coin.type">
+                                                    <option value="" disabled>请选择</option>
+                                                    <option value="0">增加</option>
+                                                    <option value="1">减少</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td colspan="2">
+                                    <div class="field">
+                                        <div class="control">
+                                            <input class="input" type="number" v-model="set_user_coin.point"
+                                                placeholder="积分">
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><button class="button is-fullwidth is-success" @click="setUserCoin">保存</button>
+                                </td>
+                            </tr>
+                            <tr v-for="(item,index) in records">
+                                <td>
+                                    <figure class="image is-32x32">
+                                        <img :src="item.icon" />
+                                    </figure>
+                                </td>
+                                <td>{{item.name}}</td>
+                                <td>{{item.point}}</td>
+                                <td>{{item.after_point}}</td>
+                                <td>{{item.date}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+                <footer class="modal-card-foot">
+                    <div class="buttons">
                         <button class="button" @click="this.userinfo_active = false">取消</button>
                     </div>
                 </footer>
@@ -308,12 +380,19 @@
                     type: 0,
                     point: 0
                 },
+                set_user_coin: {
+                    user_id: 0,
+                    type: 0,
+                    point: 0
+                },
                 list: [],
                 records: [],
                 userinfo_active: false,
                 confirm_remake_active: false,
-                records_active: false,
-                add_user_records_active: false,
+                records_active_point: false,
+                add_user_records_active_point: false,
+                records_active_coin: false,
+                add_user_records_active_coin: false,
                 uid_error: false,
                 user: {
                     user_id: null,
@@ -490,9 +569,10 @@
             },
 
             async userRecords(user_id) {
-                this.records_active = true;
-                this.add_user_records_active = false;
-                const result = await this.apiRequest('/api/points-mall/user-management/get-user-records', { user_id: user_id });
+                this.records_active_point = true;
+                this.add_user_records_active_point = false;
+                this.records = [];
+                const result = await this.apiRequest('/api/points-mall/user-management/get-user-point-records', { user_id: user_id });
                 if (result) {
                     this.records = result.records;
                     this.set_user_point.user_id = user_id;
@@ -501,11 +581,32 @@
                 }
             },
 
-            async addUserRecords() {
+            async userRecordsCoin(user_id) {
+                this.records_active_coin = true;
+                this.add_user_records_active_coin = false;
+                this.records = [];
+                const result = await this.apiRequest('/api/points-mall/user-management/get-user-coin-records', { user_id: user_id });
+                if (result) {
+                    this.records = result.records;
+                    this.set_user_coin.user_id = user_id;
+                    this.set_user_coin.point = 0;
+                    this.set_user_coin.type = 0;
+                }
+            },
+
+            async setUserPoint() {
                 const result = await this.apiRequest('/api/points-mall/user-management/set-user-point', this.set_user_point);
                 if (result) {
                     this.showNotification('操作成功', 'success');
                     this.userRecords(this.set_user_point.user_id);
+                }
+            },
+
+            async setUserCoin() {
+                const result = await this.apiRequest('/api/points-mall/user-management/set-user-coin', this.set_user_coin);
+                if (result) {
+                    this.showNotification('操作成功', 'success');
+                    this.userRecordsCoin(this.set_user_coin.user_id);
                 }
             },
 

@@ -2,7 +2,6 @@
 
 namespace app\controller\admin\shopManagement;
 
-use Hejunjie\Utils;
 use support\Request;
 use app\model\Goods;
 use support\Response;
@@ -44,6 +43,7 @@ class ProductManagementController extends GeneralMethod
                 'goods_id' => 'goods_id',
                 'name' => 'name',
                 'amount' => 'amount',
+                'amount_type' => 'amount_type',
                 'cover_image' => 'cover_image',
                 'status' => 'status',
                 'type' => 'type',
@@ -51,6 +51,7 @@ class ProductManagementController extends GeneralMethod
             ], 'page', $pageNo);
         // 处理数据
         foreach ($goods as &$_goods) {
+            $_goods->amount_type = GoodsEnums\AmountType::from($_goods->amount_type)->label();
             $_goods->cover_image = getImageUrl($_goods->cover_image);
             $_goods->status = GoodsEnums\Status::from($_goods->status)->label();
             $_goods->type = GoodsEnums\Type::from($_goods->type)->label();
@@ -78,6 +79,7 @@ class ProductManagementController extends GeneralMethod
         $goods = Goods::where('goods_id', $goods_id)->first([
             'goods_id' => 'goods_id',
             'name' => 'name',
+            'amount_type' => 'amount_type',
             'amount' => 'amount',
             'sub_num' => 'sub_num',
             'tips' => 'tips',
@@ -114,6 +116,7 @@ class ProductManagementController extends GeneralMethod
             'goods' => [
                 'goods_id' => $goods->goods_id,
                 'name' => $goods->name,
+                'amount_type' => $goods->amount_type,
                 'amount' => $goods->amount,
                 'sub_num' => $goods->sub_num,
                 'tips' => $goods->tips,
@@ -189,6 +192,7 @@ class ProductManagementController extends GeneralMethod
      * 
      * @param integer $goods_id 商品ID
      * @param string $name 商品名称
+     * @param string $amount_type 价格类型
      * @param string $amount 商品价格
      * @param string $tips 购买说明
      * @param string $cover_image 封面图
@@ -209,6 +213,7 @@ class ProductManagementController extends GeneralMethod
         // 获取参数
         $goods_id = $request->data['goods_id'] ?? null;
         $name = $request->data['name'];
+        $amount_type = $request->data['amount_type'];
         $amount = $request->data['amount'];
         $subs = $request->data['subs'];
         $sub_num = count($request->data['subs']);
@@ -229,6 +234,7 @@ class ProductManagementController extends GeneralMethod
         }
         // 更新商品数据
         $goods->name = $name;
+        $goods->amount_type = $amount_type;
         $goods->amount = $amount;
         $goods->sub_num = $sub_num;
         $goods->tips = $tips;

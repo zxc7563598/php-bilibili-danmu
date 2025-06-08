@@ -264,6 +264,7 @@ class UserController extends GeneralMethod
                 'goods_id' => 'bl_redemption_records.goods_id',
                 'sub_id' => 'bl_redemption_records.sub_id',
                 'point' => 'bl_redemption_records.point',
+                'amount_type' => 'bl_redemption_records.amount_type',
                 'status' => 'bl_redemption_records.status',
                 'created_at' => 'bl_redemption_records.created_at',
                 'name' => 'bl_user_vips.name'

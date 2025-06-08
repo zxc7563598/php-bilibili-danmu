@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use support\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use resource\enums\SystemChangePointRecordsEnums;
 
 class SystemChangePointRecords extends Model
 {
@@ -48,7 +49,14 @@ class SystemChangePointRecords extends Model
         static::creating(function ($model) {
             // 用户信息变更
             $user_vips = UserVips::where('user_id', $model->user_id)->first();
-            $user_vips->point = $model->after_point;
+            switch ($model->point_type) {
+                case SystemChangePointRecordsEnums\PointType::Coin->value:
+                    $user_vips->coin = $model->after_point;
+                    break;
+                case SystemChangePointRecordsEnums\PointType::Point->value:
+                    $user_vips->point = $model->after_point;
+                    break;
+            }
             $user_vips->save();
         });
     }

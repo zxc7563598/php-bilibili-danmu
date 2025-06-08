@@ -154,7 +154,7 @@
                                                 </figure>
                                             </td>
                                             <td class="is-vcentered">{{item.name}}</td>
-                                            <td class="is-vcentered">{{item.amount}}</td>
+                                            <td class="is-vcentered">{{item.amount}}{{item.amount_type}}</td>
                                             <td class="is-vcentered">{{item.status}}</td>
                                             <td class="is-vcentered">{{item.type}}</td>
                                             <td class="is-vcentered">{{item.sort}}</td>
@@ -270,6 +270,20 @@
                             <input class="input" type="text" v-model="goods.tips" placeholder="购买说明">
                         </div>
                         <p class="help">在商品详情页中滚动展示，内容不宜过长</p>
+                    </div>
+                    <div class="field">
+                        <label class="label">商品状态</label>
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select v-model="goods.amount_type">
+                                    <option value="" disabled>价格类型</option>
+                                    <option value="0">积分</option>
+                                    <option value="1">硬币</option>
+                                </select>
+                            </div>
+                        </div>
+                        <p class="help">积分：用户开通大航海后增加</p>
+                        <p class="help">硬币：用户签到增加</p>
                     </div>
                     <div class="field">
                         <label class="label">商品状态</label>
@@ -416,6 +430,7 @@
                     goods_id: null,
                     name: null, // 商品名称
                     amount: null, // 商品价格
+                    amount_type: null, // 商品类型
                     sub_num: null, // 规格选择数量
                     tips: null, // 购买说明
                     cover_image: {
@@ -665,6 +680,7 @@
                 this.goods.carousel_images = []; // 商品展示图（多个）
                 this.goods.details_images = []; // 详情图（多个）
                 this.goods.service_description_images = []; // 服务说明图（多个）
+                this.goods.amount_type = 0; // 价格类型
                 this.goods.status = 1; // 状态
                 this.goods.type = 0; // 商品类型
                 this.goods.sort = ''; // 排序，从小到大
