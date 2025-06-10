@@ -95,7 +95,7 @@ class ShopSettingsController
      * 
      * @param string $login_background_image 登录页面背景图
      * @param string $personal_background_image 个人中心背景图
-     * @param string $theme_color 主题色
+     * @param array $theme_color 主题色
      * @param string $live_streaming_link 直播间链接
      * @param string $user_login_password 用户是否需要密码登录
      * @param string $protocols_surname 协议人姓名
@@ -121,7 +121,7 @@ class ShopSettingsController
      * @param string $tribute_gift_order_successful_content 贡品下单成功内容
      * @param string $tribute_gift_order_successful_button 贡品下单成功按钮
      * @param string $tribute_gift_order_successful_rankings 贡品下单成功是否开启排名
-     * @param string $tribute_gift_order_successful_rankingslist 贡品下单成功排名列表
+     * @param array $tribute_gift_order_successful_rankingslist 贡品下单成功排名列表
      * @param string $enable_aggregate_mail 是否开启下播邮件
      * @param string $enable_shop_mail 是否开启兑换邮件
      * @param string $email_address 邮箱地址
@@ -177,14 +177,6 @@ class ShopSettingsController
             foreach ($input as $title => $content) {
                 if ($_shop_config->title == $title) {
                     switch ($_shop_config->title) {
-                        case 'login-background-image':
-                        case 'personal-background-image':
-                        case 'protocols-signature':
-                        case 'virtual-gift-order-successful-icon':
-                        case 'realism-gift-order-successful-icon':
-                        case 'tribute-gift-order-successful-icon':
-                            $content = $content['path'];
-                            break;
                         case 'theme-color':
                             $content = implode(',', $content);
                             break;
