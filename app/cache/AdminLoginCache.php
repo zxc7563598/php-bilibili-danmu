@@ -13,6 +13,7 @@ class AdminLoginCache  implements \Hejunjie\Cache\Interfaces\DataSourceInterface
      * 获取管理员用户信息
      * 
      * @param string $token 
+     * 
      * @return string|null 
      */
     public function get(string $token): ?string
@@ -42,6 +43,7 @@ class AdminLoginCache  implements \Hejunjie\Cache\Interfaces\DataSourceInterface
      * 
      * @param string $token 登录凭证
      * @param string $admin_json 管理员信息
+     * 
      * @return bool 
      */
     public function set(string $token, string $admin_json): bool
@@ -59,6 +61,7 @@ class AdminLoginCache  implements \Hejunjie\Cache\Interfaces\DataSourceInterface
      * 删除管理员登录信息，不要实现
      * 
      * @param string $token 
+     * 
      * @return void 
      */
     public function del(string $token): void {}
