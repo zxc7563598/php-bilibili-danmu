@@ -25,14 +25,17 @@ use Webman\RedisQueue\Client;
 
 class Bilibili
 {
-    private int $reconnectInterval = 5; // 重连间隔时间（秒）
-    private int $maxReconnectAttempts = 5; // 最大重连次数
-    private int $reconnectAttempts = 0; // 当前重连次数
     private string|null $cookie; // 用户cookie
     private int|null $roomId; // 直播间房间号
     private ?int $heartbeatTimer = null; // 心跳
     private ?int $reconnectTimer = null; // 重连
     private ?int $sendMessageTimer = null; // 消息
+    // 重连配置
+    private int $initialReconnectDelay = 1; // 初始延迟（秒）
+    private int $maxReconnectDelay = 60;    // 最大延迟（秒）
+    private float $backoffMultiplier = 2.0; // 退避乘数
+    private int $maxReconnectAttempts = 10;  // 最大重连次数
+    private int $reconnectAttempts = 0;     // 当前重连次数
 
     public function onWorkerStart()
     {
@@ -84,9 +87,8 @@ class Bilibili
                 $this->setupConnection($con, $realRoomId, $token);
                 $con->connect();
             } catch (\Exception $e) {
-                // 断开房间链接
-                Utils\FileUtils::fileDelete(runtime_path() . '/tmp/connect.cfg');
-                restartBilibili();
+                // 重试
+                $this->scheduleReconnect();
             }
         }
     }
@@ -125,9 +127,7 @@ class Bilibili
             echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "连接已关闭，正在尝试重新连接...\n";
             $this->clearTimers();
             // 设置重连定时器
-            $this->reconnectTimer = Timer::add($this->reconnectInterval, function () {
-                $this->scheduleReconnect();
-            }, [], false);
+            $this->scheduleReconnect();
         };
 
         // 设置连接错误回调
@@ -135,9 +135,7 @@ class Bilibili
             echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "Error: $msg (code: $code), 尝试重新连接\n";
             $this->clearTimers();
             // 设置重连定时器
-            $this->reconnectTimer = Timer::add($this->reconnectInterval, function () {
-                $this->scheduleReconnect();
-            }, [], false);
+            $this->scheduleReconnect();
         };
     }
 
@@ -196,6 +194,13 @@ class Bilibili
         }
     }
 
+    /**
+     * 记录原始日志
+     * 
+     * @param mixed $payload 记录数据
+     * 
+     * @return void 
+     */
     private function analysis($payload)
     {
         $dir = base_path() . '/runtime/logs/' . Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d') . '/直播间信息记录/';
@@ -424,20 +429,55 @@ class Bilibili
      * 
      * @return void 
      */
-    private function scheduleReconnect()
+    public function scheduleReconnect()
     {
-        $this->reconnectAttempts++; // 增加重连次数计数器
+        if ($this->reconnectTimer !== null) {
+            Timer::del($this->reconnectTimer);
+            $this->reconnectTimer = null;
+        }
+        $this->reconnectAttempts++;
         // 检查是否超过最大重连次数
         if ($this->reconnectAttempts >= $this->maxReconnectAttempts) {
             echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "已达到最大重连次数，不再尝试连接。\n";
-            Utils\FileUtils::fileDelete(runtime_path() . '/tmp/cookie.cfg');
-            Utils\FileUtils::fileDelete(runtime_path() . '/tmp/uid.cfg');
-            Utils\FileUtils::fileDelete(runtime_path() . '/tmp/connect.cfg');
-            $this->cookie = null;
-            $this->roomId = null;
+            $this->cleanupResources();
             return;
         }
-        // 重新连接
-        $this->connectToWebSocket();
+        // 计算指数退避延迟（含随机抖动）
+        $delay = $this->calculateExponentialDelay();
+        echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "第 {$this->reconnectAttempts} 次重试，将在 {$delay} 秒后尝试...\n";
+        // 设置延迟重连定时器
+        $this->reconnectTimer = Timer::add($delay, function () {
+            $this->connectToWebSocket();
+        }, [], false);
+    }
+
+    /**
+     * 计算指数退避延迟时间（含随机抖动）
+     * 
+     * @return float 
+     */
+    private function calculateExponentialDelay(): float
+    {
+        // 基础延迟 = initialDelay * (backoffMultiplier ^ retryCount)
+        $exponentialDelay = $this->initialReconnectDelay * pow($this->backoffMultiplier, $this->reconnectAttempts - 1);
+        // 限制最大延迟
+        $clampedDelay = min($exponentialDelay, $this->maxReconnectDelay);
+        // 添加随机抖动
+        $jitter = $clampedDelay * 0.1 * mt_rand(0, 10); // 10% 范围内的随机抖动
+        return $clampedDelay + $jitter;
+    }
+
+    /**
+     * 清理资源（如配置文件等）
+     * 
+     * @return void 
+     */
+    private function cleanupResources()
+    {
+        Utils\FileUtils::fileDelete(runtime_path() . '/tmp/cookie.cfg');
+        Utils\FileUtils::fileDelete(runtime_path() . '/tmp/uid.cfg');
+        Utils\FileUtils::fileDelete(runtime_path() . '/tmp/connect.cfg');
+        $this->cookie = null;
+        $this->roomId = null;
     }
 }
