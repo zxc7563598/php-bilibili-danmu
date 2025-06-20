@@ -5,6 +5,7 @@ namespace process;
 use app\core\RobotServices;
 use app\core\UserPublicMethods;
 use app\model\Lives;
+use app\model\ShopConfig;
 use app\queue\SendMessage;
 use app\server\Autoresponders;
 use app\server\CheckIn;
@@ -32,10 +33,11 @@ class Bilibili
     private ?int $sendMessageTimer = null; // 消息
     // 重连配置
     private int $initialReconnectDelay = 1; // 初始延迟（秒）
-    private int $maxReconnectDelay = 60;    // 最大延迟（秒）
+    private int $maxReconnectDelay = 100;    // 最大延迟（秒）
     private float $backoffMultiplier = 2.0; // 退避乘数
     private int $maxReconnectAttempts = 10;  // 最大重连次数
     private int $reconnectAttempts = 0;     // 当前重连次数
+    private array $reconnectAttemptsMessage = []; // 重连信息，用于邮件发送
 
     public function onWorkerStart()
     {
@@ -438,13 +440,48 @@ class Bilibili
         $this->reconnectAttempts++;
         // 检查是否超过最大重连次数
         if ($this->reconnectAttempts >= $this->maxReconnectAttempts) {
+            $room_id = $this->roomId;
             echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "已达到最大重连次数，不再尝试连接。\n";
             $this->cleanupResources();
+            // 获取配置信息
+            $config = ShopConfig::whereIn('title', [
+                'enable-disconnect-mail',
+                'email-address',
+                'address-as'
+            ])->get([
+                'title' => 'title',
+                'content' => 'content'
+            ]);
+            $shop_config = [];
+            foreach ($config as $_config) {
+                $shop_config[$_config->title] = $_config->content;
+            }
+            if (!empty($shop_config['enable-disconnect-mail']) && $shop_config['enable-disconnect-mail']) {
+                if (!empty($shop_config['email-address']) && !empty($shop_config['address-as'])) {
+                    // 发送邮件
+                    Utils\HttpClient::sendPostRequest('https://tools.api.hejunjie.life/bilibilidanmu-api/live-disconnect-email', [
+                        'Content-Type: application/json'
+                    ], json_encode([
+                        'mail' => $shop_config['email-address'],
+                        'name' => $shop_config['address-as'],
+                        'room_id' => $room_id,
+                        'error_queue' => $this->reconnectAttemptsMessage
+                    ]));
+                }
+            }
+            // 重置最大重试信息
+            $this->reconnectAttempts = 0;     // 当前重连次数
+            $this->reconnectAttemptsMessage = []; // 重连信息，用于邮件发送
             return;
         }
         // 计算指数退避延迟（含随机抖动）
         $delay = $this->calculateExponentialDelay();
         echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "第 {$this->reconnectAttempts} 次重试，将在 {$delay} 秒后尝试...\n";
+        $this->reconnectAttemptsMessage[] = [
+            'reconnect_attempts' => $this->reconnectAttempts,
+            'delay' => $delay,
+            'time' => Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
+        ];
         // 设置延迟重连定时器
         $this->reconnectTimer = Timer::add($delay, function () {
             $this->connectToWebSocket();
