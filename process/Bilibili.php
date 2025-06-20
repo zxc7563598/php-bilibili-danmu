@@ -479,7 +479,7 @@ class Bilibili
         echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "第 {$this->reconnectAttempts} 次重试，将在 {$delay} 秒后尝试...\n";
         $this->reconnectAttemptsMessage[] = [
             'reconnect_attempts' => $this->reconnectAttempts,
-            'delay' => $delay,
+            'delay' => round($delay, 2),
             'time' => Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
         ];
         // 设置延迟重连定时器
