@@ -85,6 +85,7 @@ class ShopSettingsController
             'tribute_gift_order_successful_rankingslist' => $data['tribute-gift-order-successful-rankingslist'], // 贡品下单成功排名列表
             'enable_aggregate_mail' => $data['enable-aggregate-mail'], // 是否开启下播邮件
             'enable_shop_mail' => $data['enable-shop-mail'], // 是否开启兑换邮件
+            'enable_disconnect_mail' => $data['enable-disconnect-mail'], // 是否开启断开链接邮件通知
             'email_address' => $data['email-address'], // 邮箱地址
             'address_as' => $data['address-as'], // 称呼
         ]);
@@ -124,6 +125,7 @@ class ShopSettingsController
      * @param array $tribute_gift_order_successful_rankingslist 贡品下单成功排名列表
      * @param string $enable_aggregate_mail 是否开启下播邮件
      * @param string $enable_shop_mail 是否开启兑换邮件
+     * @param string $enable_disconnect_mail 是否开启断开链接邮件通知
      * @param string $email_address 邮箱地址
      * @param string $address_as 称呼
      * 
@@ -163,6 +165,7 @@ class ShopSettingsController
         $input['tribute-gift-order-successful-rankingslist'] = $request->data['tribute_gift_order_successful_rankingslist'];
         $input['enable-aggregate-mail'] = $request->data['enable_aggregate_mail'];
         $input['enable-shop-mail'] = $request->data['enable_shop_mail'];
+        $input['enable-disconnect-mail'] = $request->data['enable_disconnect_mail'];
         $input['email-address'] = $request->data['email_address'];
         $input['address-as'] = $request->data['address_as'];
         // 获取数据
