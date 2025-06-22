@@ -3,7 +3,7 @@ description: 用于提交待开发的功能/需求/调整，进入排期与跟�
 title: "[需求] "
 labels: ["pending","feature"]
 assignees:
-  -  # 可设定默认负责人
+  -  zxc7563598
 body:
   - type: markdown
     attributes:
