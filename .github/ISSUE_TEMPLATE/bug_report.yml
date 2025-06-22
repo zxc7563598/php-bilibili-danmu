@@ -2,6 +2,8 @@ name: 🐞 Bug 反馈
 description: 报告一个 bug，帮助完善项目
 title: "[Bug]: "
 labels: ["bug","pending"]
+assignees:
+  -  zxc7563598
 body:
   - type: input
     id: title
