@@ -1,7 +1,7 @@
 name: 💡 需求排期
 description: 用于提交待开发的功能/需求/调整，进入排期与跟踪流程
 title: "[需求] "
-labels: ["pending"]
+labels: ["pending","feature"]
 assignees:
   -  # 可设定默认负责人
 body:
