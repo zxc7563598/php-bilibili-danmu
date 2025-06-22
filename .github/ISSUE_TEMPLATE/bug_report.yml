@@ -1,0 +1,47 @@
+name: 🐞 Bug 反馈
+description: 报告一个 bug，帮助完善项目
+title: "[Bug]: "
+labels: ["bug","pending"]
+body:
+  - type: input
+    id: title
+    attributes:
+      label: 问题标题
+      description: 简明扼要概括你遇到的错误
+      placeholder: 比如：登录接口 500 错误
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 问题描述
+      description: 请尽量详细描述这个问题，附上错误日志或截图。
+      placeholder: 请详细描述发生了什么、期望的行为、实际行为
+    validations:
+      required: true
+
+  - type: dropdown
+    id: server_type
+    attributes:
+      label: 服务器类型
+      description: 请选择你当前使用的服务器类型
+      options:
+        - Ubuntu
+        - CentOS
+        - Debian
+        - Windows
+        - 其他
+    validations:
+      required: true
+
+  - type: dropdown
+    id: deployment_method
+    attributes:
+      label: 部署方式
+      description: 请选择你使用的部署方式
+      options:
+        - 手动部署
+        - Docker 自动部署
+    validations:
+      required: true
