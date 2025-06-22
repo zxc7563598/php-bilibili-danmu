@@ -1,0 +1,22 @@
+name: ❓ 问题 / 疑问
+description: 用于提交使用过程中产生的疑问
+title: "[Question]: "
+labels: ["pending","question"]
+body:
+  - type: input
+    id: title
+    attributes:
+      label: 问题概述
+      description: 简单概括你的疑问或需要澄清的地方
+      placeholder: 比如：接口参数含义、配置疑问等
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: 详细描述
+      description: 请尽可能提供完整背景、参考代码或场景说明。
+      placeholder: 我在调用接口 A 时，参数 X 的意义是？预期效果是？目前表现是？等。
+    validations:
+      required: true
