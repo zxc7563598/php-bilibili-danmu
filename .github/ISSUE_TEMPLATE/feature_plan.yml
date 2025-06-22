@@ -1,0 +1,56 @@
+name: 💡 需求排期
+description: 用于提交待开发的功能/需求/调整，进入排期与跟踪流程
+title: "[需求] "
+labels: ["待排期"]
+assignees:
+  -  # 可设定默认负责人
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请按照以下模板填写你的需求信息，便于团队理解与排期。
+
+  - type: input
+    id: feature_name
+    attributes:
+      label: 功能/需求名称
+      description: 一句话总结这个需求是什么
+      placeholder: 比如：添加导出报表功能
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 优先级
+      description: 该需求的重要程度
+      options:
+        - 🟥 高（重要且紧急）
+        - 🟨 中（重要不紧急）
+        - 🟦 低（可延期处理）
+
+  - type: textarea
+    id: background
+    attributes:
+      label: 背景与目标
+      description: 为什么要做这个功能？解决了什么问题？
+      placeholder: 请写清楚使用场景、存在的问题、希望达成的目标等
+
+  - type: textarea
+    id: requirement
+    attributes:
+      label: 需求说明
+      description: 详细描述要做什么，最好列出功能点或交互逻辑
+      placeholder: 比如：1. 页面新增导出按钮；2. 可选择导出格式（CSV / Excel）；3. 支持分页导出等
+
+  - type: textarea
+    id: expected_result
+    attributes:
+      label: 预期结果
+      description: 完成后的效果是怎样的？如何判断开发完成？
+      placeholder: 比如：导出文件内容正确、格式符合要求、导出速度满足使用需求等
+
+  - type: textarea
+    id: note
+    attributes:
+      label: 备注 / 其他说明
+      description: 其他需要补充的信息，例如相关链接、原型图、参考文档等
+      placeholder: 这里可以贴图、贴链接、写说明
