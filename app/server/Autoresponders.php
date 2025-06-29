@@ -8,7 +8,12 @@ use app\queue\SendMessage;
 use app\server\core\KeywordEvaluator;
 use app\server\core\KeywordMatcher;
 use Carbon\Carbon;
+use Exception;
+use Carbon\Exceptions\InvalidTimeZoneException;
 use Hejunjie\Bililive;
+use InvalidArgumentException;
+use LogicException;
+use Illuminate\Database\Eloquent\InvalidCastException;
 use support\Redis;
 
 /**
@@ -49,7 +54,7 @@ class Autoresponders
             $autoresponders_status = intval($autoresponders['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
             $autoresponders_content = $autoresponders['content']; // 内容
             $message = '';
-            $silent = false;
+            $silent = '0';
             $silent_minute = 0;
             $ransom_amount = 0;
             // 确认链接直播间的情况
@@ -112,7 +117,7 @@ class Autoresponders
                                     }
                                 }
                                 $message = $item['text'];
-                                $silent = isset($item['silent']) ? $item['silent'] : false;
+                                $silent = isset($item['silent']) ? $item['silent'] : '0';
                                 $silent_minute = isset($item['silent_minute']) ? $item['silent_minute'] : 0;
                                 $ransom_amount = isset($item['ransom_amount']) ? $item['ransom_amount'] : 0;
                             }
@@ -142,13 +147,19 @@ class Autoresponders
      * 
      * @param string $content 文本信息
      * @param array $args 要替换的模版
+     * @param string $msg 发送消息
+     * @param bool $silent 是否禁言
+     * @param int $silent_minute 禁言时间
+     * @param int $ransom_amount 禁言解除需要的金额
+     * @param string $uid 用户uid
+     * @param string $uname 用户名称
      * 
      * @return void 
      */
     public static function sendMessage(string $content, array $args, string $msg, bool $silent, int $silent_minute, int $ransom_amount, string $uid, string $uname)
     {
         // 加入禁言
-        if ($silent) {
+        if ($silent == '1') {
             // 创建数据
             SilentUser::where('tuid', $uid)->delete();
             // 添加禁言
