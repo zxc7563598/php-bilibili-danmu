@@ -205,6 +205,7 @@ class ProductManagementController extends GeneralMethod
      * @param integer $sale_num 销售数量
      * @param integer $sale_increase 每次销售递增
      * @param array $subs 商品规格
+     * @param integer $sub_num 可购买规格数量
      * 
      * @return Response 
      */
@@ -216,7 +217,7 @@ class ProductManagementController extends GeneralMethod
         $amount_type = $request->data['amount_type'];
         $amount = $request->data['amount'];
         $subs = $request->data['subs'];
-        $sub_num = count($request->data['subs']);
+        $sub_num = $request->data['sub_num'] ?? count($request->data['subs']);
         $tips = $request->data['tips'];
         $cover_image = $request->data['cover_image'];
         $carousel_images = $request->data['carousel_images'];
