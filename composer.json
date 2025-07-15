@@ -60,7 +60,9 @@
       "": "./",
       "app\\": "./app",
       "App\\": "./app",
-      "app\\View\\Components\\": "./app/view/components"
+      "app\\View\\Components\\": "./app/view/components",
+      "app\\Protobuf\\InteractWordV2\\": "./app/protobuf/InteractWordV2",
+      "GPBMetadata\\": "app/protobuf/GPBMetadata"
     },
     "files": [
       "./support/helpers.php"
