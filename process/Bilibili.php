@@ -23,6 +23,7 @@ use Workerman\Protocols\Ws;
 use Hejunjie\Utils;
 use support\Redis;
 use Webman\RedisQueue\Client;
+use app\Protobuf\InteractWordV2;
 
 class Bilibili
 {
@@ -343,30 +344,33 @@ class Bilibili
                             writeLinesToFile($filePath, $line);
                         }
                         break;
-                    case 'INTERACT_WORD': // 直播间互动
-                        switch (intval($payload['payload']['data']['msg_type'])) {
+                    case 'INTERACT_WORD_V2': // 直播间互动
+                        $pbBinary = base64_decode($payload['payload']['data']['pb']);
+                        $interact = new InteractWordV2\InteractWordV2();
+                        $interact->mergeFromString($pbBinary);
+                        switch (intval($interact['msg_type'])) {
                             case 1: // 进入直播间
                                 Enter::processing(
-                                    $payload['payload']['data']['uid'],
-                                    $payload['payload']['data']['uname'],
-                                    isset($payload['payload']['data']['uinfo']['medal']['ruid']) ? $payload['payload']['data']['uinfo']['medal']['ruid'] : null,
-                                    isset($payload['payload']['data']['uinfo']['medal']['guard_level']) ? $payload['payload']['data']['uinfo']['medal']['guard_level'] : null
+                                    $interact['uid'],
+                                    $interact['uname'],
+                                    isset($interact['uinfo']['medal']['ruid']) ? $interact['uinfo']['medal']['ruid'] : null,
+                                    isset($interact['uinfo']['medal']['guard_level']) ? $interact['uinfo']['medal']['guard_level'] : null
                                 );
                                 break;
                             case 2: // 关注
                                 Follow::processing(
-                                    $payload['payload']['data']['uid'],
-                                    $payload['payload']['data']['uname'],
-                                    isset($payload['payload']['data']['uinfo']['medal']['ruid']) ? $payload['payload']['data']['uinfo']['medal']['ruid'] : null,
-                                    isset($payload['payload']['data']['uinfo']['medal']['guard_level']) ? $payload['payload']['data']['uinfo']['medal']['guard_level'] : null
+                                    $interact['uid'],
+                                    $interact['uname'],
+                                    isset($interact['uinfo']['medal']['ruid']) ? $interact['uinfo']['medal']['ruid'] : null,
+                                    isset($interact['uinfo']['medal']['guard_level']) ? $interact['uinfo']['medal']['guard_level'] : null
                                 );
                                 break;
                             case 3: // 分享直播间
                                 Share::processing(
-                                    $payload['payload']['data']['uid'],
-                                    $payload['payload']['data']['uname'],
-                                    isset($payload['payload']['data']['uinfo']['medal']['ruid']) ? $payload['payload']['data']['uinfo']['medal']['ruid'] : null,
-                                    isset($payload['payload']['data']['uinfo']['medal']['guard_level']) ? $payload['payload']['data']['uinfo']['medal']['guard_level'] : null
+                                    $interact['uid'],
+                                    $interact['uname'],
+                                    isset($interact['uinfo']['medal']['ruid']) ? $interact['uinfo']['medal']['ruid'] : null,
+                                    isset($interact['uinfo']['medal']['guard_level']) ? $interact['uinfo']['medal']['guard_level'] : null
                                 );
                                 break;
                         }
