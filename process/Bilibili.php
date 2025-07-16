@@ -351,26 +351,26 @@ class Bilibili
                         switch (intval($interact['msg_type'])) {
                             case 1: // 进入直播间
                                 Enter::processing(
-                                    $interact['uid'],
-                                    $interact['uname'],
-                                    isset($interact['uinfo']['medal']['ruid']) ? $interact['uinfo']['medal']['ruid'] : null,
-                                    isset($interact['uinfo']['medal']['guard_level']) ? $interact['uinfo']['medal']['guard_level'] : null
+                                    $interact->getUid(),
+                                    $interact->getUname(),
+                                    ($interact->getUinfo()?->getMedal()?->getRuid()) ? $interact->getUinfo()?->getMedal()?->getRuid() : null,
+                                    ($interact->getUinfo()?->getMedal()?->getGuardLevel()) ? $interact->getUinfo()?->getMedal()?->getGuardLevel() : null
                                 );
                                 break;
                             case 2: // 关注
                                 Follow::processing(
-                                    $interact['uid'],
-                                    $interact['uname'],
-                                    isset($interact['uinfo']['medal']['ruid']) ? $interact['uinfo']['medal']['ruid'] : null,
-                                    isset($interact['uinfo']['medal']['guard_level']) ? $interact['uinfo']['medal']['guard_level'] : null
+                                    $interact->getUid(),
+                                    $interact->getUname(),
+                                    ($interact->getUinfo()?->getMedal()?->getRuid()) ? $interact->getUinfo()?->getMedal()?->getRuid() : null,
+                                    ($interact->getUinfo()?->getMedal()?->getGuardLevel()) ? $interact->getUinfo()?->getMedal()?->getGuardLevel() : null
                                 );
                                 break;
                             case 3: // 分享直播间
                                 Share::processing(
-                                    $interact['uid'],
-                                    $interact['uname'],
-                                    isset($interact['uinfo']['medal']['ruid']) ? $interact['uinfo']['medal']['ruid'] : null,
-                                    isset($interact['uinfo']['medal']['guard_level']) ? $interact['uinfo']['medal']['guard_level'] : null
+                                    $interact->getUid(),
+                                    $interact->getUname(),
+                                    ($interact->getUinfo()?->getMedal()?->getRuid()) ? $interact->getUinfo()?->getMedal()?->getRuid() : null,
+                                    ($interact->getUinfo()?->getMedal()?->getGuardLevel()) ? $interact->getUinfo()?->getMedal()?->getGuardLevel() : null
                                 );
                                 break;
                         }
