@@ -348,7 +348,7 @@ class Bilibili
                         $pbBinary = base64_decode($payload['payload']['data']['pb']);
                         $interact = new InteractWordV2\InteractWordV2();
                         $interact->mergeFromString($pbBinary);
-                        switch (intval($interact['msg_type'])) {
+                        switch (intval($interact->getMsgType())) {
                             case 1: // 进入直播间
                                 Enter::processing(
                                     $interact->getUid(),
