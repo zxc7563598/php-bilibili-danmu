@@ -928,16 +928,16 @@
         },
         {
             "name": "hejunjie/bililive",
-            "version": "v1.0.7",
+            "version": "v1.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zxc7563598/php-bilibili-danmu-core.git",
-                "reference": "1ce9d58d43d3c316905c5bb4b45dd3d3870f38f8"
+                "reference": "cb0aa027139ae4de8a6f41abbec3ce4c12428f55"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zxc7563598/php-bilibili-danmu-core/zipball/1ce9d58d43d3c316905c5bb4b45dd3d3870f38f8",
-                "reference": "1ce9d58d43d3c316905c5bb4b45dd3d3870f38f8",
+                "url": "https://api.github.com/repos/zxc7563598/php-bilibili-danmu-core/zipball/cb0aa027139ae4de8a6f41abbec3ce4c12428f55",
+                "reference": "cb0aa027139ae4de8a6f41abbec3ce4c12428f55",
                 "shasum": ""
             },
             "require": {
@@ -969,9 +969,9 @@
             ],
             "support": {
                 "issues": "https://github.com/zxc7563598/php-bilibili-danmu-core/issues",
-                "source": "https://github.com/zxc7563598/php-bilibili-danmu-core/tree/v1.0.7"
+                "source": "https://github.com/zxc7563598/php-bilibili-danmu-core/tree/v1.0.8"
             },
-            "time": "2025-06-05T12:29:54+00:00"
+            "time": "2025-06-05T14:02:38+00:00"
         },
         {
             "name": "hejunjie/cache",
@@ -1055,16 +1055,16 @@
         },
         {
             "name": "hejunjie/error-log",
-            "version": "v1.0.2",
+            "version": "v1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zxc7563598/php-error-log.git",
-                "reference": "5fe91311079e46a53364e0da8289f51e35f306e7"
+                "reference": "b1ccac06fa0412c3fb37ed5db14aa14421335c90"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zxc7563598/php-error-log/zipball/5fe91311079e46a53364e0da8289f51e35f306e7",
-                "reference": "5fe91311079e46a53364e0da8289f51e35f306e7",
+                "url": "https://api.github.com/repos/zxc7563598/php-error-log/zipball/b1ccac06fa0412c3fb37ed5db14aa14421335c90",
+                "reference": "b1ccac06fa0412c3fb37ed5db14aa14421335c90",
                 "shasum": ""
             },
             "require": {
@@ -1089,9 +1089,9 @@
             "description": "基于责任链模式的错误日志处理组件，支持多通道日志处理（如本地文件、远程 API、控制台输出），适用于复杂日志策略场景 | An error logging component using the Chain of Responsibility pattern. Supports multiple output channels like local files, remote APIs, and console logs—ideal for flexible and scalable logging strategies.",
             "support": {
                 "issues": "https://github.com/zxc7563598/php-error-log/issues",
-                "source": "https://github.com/zxc7563598/php-error-log/tree/v1.0.2"
+                "source": "https://github.com/zxc7563598/php-error-log/tree/v1.0.3"
             },
-            "time": "2025-05-27T02:51:12+00:00"
+            "time": "2025-07-28T05:56:32+00:00"
         },
         {
             "name": "hejunjie/google-authenticator",
@@ -5004,12 +5004,12 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.2"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }

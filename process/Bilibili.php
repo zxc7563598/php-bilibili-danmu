@@ -281,6 +281,15 @@ class Bilibili
                         Redis::del('bilibili_send_sequence');
                         break;
                     case 'SEND_GIFT': // 赠送礼物
+                        sublog('直播间礼物', '收到礼物', $payload['payload']['data']['uname'], [
+                            'uid' => $payload['payload']['data']['uid'],
+                            'giftId' => $payload['payload']['data']['giftId'],
+                            'giftName' => $payload['payload']['data']['giftName'],
+                            'price' => intval($payload['payload']['data']['price'] / 100),
+                            'num' => $payload['payload']['data']['num'],
+                            'box' => !is_null($payload['payload']['data']['blind_gift']) ? true : false,
+                            'blind_gift' => $payload['payload']['data']['blind_gift'] ?? null
+                        ]);
                         Present::processing(
                             $payload['payload']['data']['uid'],
                             $payload['payload']['data']['uname'],
