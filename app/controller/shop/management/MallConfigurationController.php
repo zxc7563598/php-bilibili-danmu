@@ -159,7 +159,7 @@ class MallConfigurationController extends GeneralMethod
         $input['tribute-gift-order-successful-rankings'] = $param['tribute_gift_order_successful_rankings'];
         $input['tribute-gift-order-successful-rankingslist'] = $param['tribute_gift_order_successful_rankingslist'];
         $input['enable-aggregate-mail'] = $param['enable_aggregate_mail'];
-        $input['enable-disconnect-mail'] = $request->data['enable_disconnect_mail'];
+        $input['enable-disconnect-mail'] = $param['enable_disconnect_mail'];
         $input['enable-shop-mail'] = $param['enable_shop_mail'];
         $input['email-address'] = $param['email_address'];
         $input['address-as'] = $param['address_as'];
