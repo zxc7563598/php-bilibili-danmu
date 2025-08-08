@@ -300,7 +300,8 @@ class Bilibili
                             $payload['payload']['data']['receiver_uinfo']['uid'],
                             isset($payload['payload']['data']['sender_uinfo']['medal']['ruid']) ? $payload['payload']['data']['sender_uinfo']['medal']['ruid'] : null,
                             isset($payload['payload']['data']['sender_uinfo']['medal']['guard_level']) ? $payload['payload']['data']['sender_uinfo']['medal']['guard_level'] : null,
-                            isset($payload['payload']['data']['sender_uinfo']['medal']['level']) ? $payload['payload']['data']['sender_uinfo']['medal']['level'] : null
+                            isset($payload['payload']['data']['sender_uinfo']['medal']['level']) ? $payload['payload']['data']['sender_uinfo']['medal']['level'] : null,
+                            $payload['payload']['data']['blind_gift'] ?? null
                         );
                         // 记录信息
                         if (Redis::get('bilibili_live_key')) {
@@ -328,7 +329,8 @@ class Bilibili
                             0,
                             0,
                             $payload['payload']['data']['guard_level'],
-                            0
+                            0,
+                            null
                         );
                         // 上舰
                         $uid = $payload['payload']['data']['uid'];
