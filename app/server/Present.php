@@ -153,7 +153,7 @@ class Present
             $gift_records->total_price = round(($gift_records->price * $gift_records->num), 2);
             $gift_records->original = GiftRecordsEnums\Original::Yes->value;
             if (!empty($blind_gift)) {
-                $gift_records->original_price = round(($blind_gift['gift_tip_price'] / 1000), 2);
+                $gift_records->original_price = round(($blind_gift['original_gift_price'] / 1000), 2);
                 $gift_records->original_gift_name = $blind_gift['original_gift_name'];
                 $gift_records->original = GiftRecordsEnums\Original::No->value;
             }
