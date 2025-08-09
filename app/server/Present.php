@@ -9,6 +9,7 @@ use app\model\SilentUser;
 use app\queue\SendMessage;
 use Hejunjie\Bililive;
 use support\Redis;
+use resource\enums\GiftRecordsEnums;
 
 /**
  * 礼物答谢，优先级20
@@ -28,9 +29,10 @@ class Present
      * @param mixed $ruid 用户携带的牌子归属主播的uid
      * @param mixed $guard_level 大航海类型，0=普通用户，1=总督，2=提督，3=舰长
      * @param mixed $level 牌子等级
+     * @param mixed $blind_gift 绑定礼物(盲盒信息)
      * @return void 
      */
-    public static function processing($uid, $uname, $gift_id, $gift_name, $price, $num, $anchor_id, $ruid, $guard_level, $level)
+    public static function processing($uid, $uname, $gift_id, $gift_name, $price, $num, $anchor_id, $ruid, $guard_level, $level, $blind_gift)
     {
         $is_message = false;
         $cookie = RobotServices::getCookie();
@@ -149,6 +151,12 @@ class Present
             $gift_records->price = round(($price / 10), 2);
             $gift_records->num = $num;
             $gift_records->total_price = round(($gift_records->price * $gift_records->num), 2);
+            $gift_records->original = GiftRecordsEnums\Original::Yes->value;
+            if (!empty($blind_gift)) {
+                $gift_records->original_price = round(($blind_gift['original_gift_price'] / 1000), 2);
+                $gift_records->original_gift_name = $blind_gift['original_gift_name'];
+                $gift_records->original = GiftRecordsEnums\Original::No->value;
+            }
             $gift_records->save();
         }
         sublog('核心业务', '礼物答谢', '----------', []);
