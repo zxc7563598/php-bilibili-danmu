@@ -142,8 +142,10 @@
                                         <tr v-for="(item,index) in list.data">
                                             <td class="is-vcentered">{{item.uid}}</td>
                                             <td class="is-vcentered">{{item.user_name}}</td>
-                                            <td class="is-vcentered">{{item.goods_name}}<p class="help">
-                                                    {{item.goods_sub}}</p>
+                                            <td class="is-vcentered">{{item.goods_name}}
+                                                <p class="help">
+                                                    <div style="max-width: 300px;overflow: hidden;">{{item.goods_sub}}</div>
+                                                </p>
                                             </td>
                                             <td class="is-vcentered">{{item.point}}{{item.amount_type}}</td>
                                             <td class="is-vcentered">{{item.status}}</td>

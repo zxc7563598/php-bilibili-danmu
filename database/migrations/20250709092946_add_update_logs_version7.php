@@ -34,6 +34,6 @@ final class AddUpdateLogsVersion7 extends AbstractMigration
      */
     public function down()
     {
-        $this->execute("DELETE FROM `bl_admin_update_logs` WHERE `id` in (6)");
+        $this->execute("DELETE FROM `bl_admin_update_logs` WHERE `id` in (7)");
     }
 }
