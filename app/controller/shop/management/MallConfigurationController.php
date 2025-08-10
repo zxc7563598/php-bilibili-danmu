@@ -161,8 +161,8 @@ class MallConfigurationController extends GeneralMethod
         $input['enable-aggregate-mail'] = $param['enable_aggregate_mail'];
         $input['enable-disconnect-mail'] = $param['enable_disconnect_mail'];
         $input['enable-shop-mail'] = $param['enable_shop_mail'];
-        $input['email-address'] = $param['email_address'];
-        $input['address-as'] = $param['address_as'];
+        $input['email-address'] = $param['email_address'] ?? null;
+        $input['address-as'] = $param['address_as'] ?? null;
         // 获取数据
         $shop_config = ShopConfig::get([
             'config_id' => 'config_id',
