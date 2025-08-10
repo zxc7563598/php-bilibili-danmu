@@ -104,7 +104,7 @@ class GiftInfoController extends GeneralMethod
         return success($request, [
             'num' => number_format($records->num, 0, '.', ','),
             'price' => number_format($records->total_price, 2, '.', ','),
-            'unit' => number_format(round($records->total_price / $records->num, 2), 2, '.', ',')
+            'unit' => $records->num > 0 ? number_format(round($records->total_price / $records->num, 2), 2, '.', ',') : '0.00'
         ]);
     }
 }
