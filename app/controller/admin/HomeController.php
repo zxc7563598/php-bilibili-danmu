@@ -21,7 +21,7 @@ class HomeController
         // 获取管理员id
         $admin_id = $request->admins['id'];
         // 获取日志
-        $update_logs = AdminUpdateLogs::orderBy('created_at', 'desc')->get([
+        $update_logs = AdminUpdateLogs::orderBy('id', 'desc')->get([
             'id' => 'id',
             'version' => 'version',
             'title' => 'title',
