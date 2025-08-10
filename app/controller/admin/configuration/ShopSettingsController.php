@@ -166,8 +166,8 @@ class ShopSettingsController
         $input['enable-aggregate-mail'] = $request->data['enable_aggregate_mail'];
         $input['enable-shop-mail'] = $request->data['enable_shop_mail'];
         $input['enable-disconnect-mail'] = $request->data['enable_disconnect_mail'];
-        $input['email-address'] = $request->data['email_address'];
-        $input['address-as'] = $request->data['address_as'];
+        $input['email-address'] = $request->data['email_address'] ?? null;
+        $input['address-as'] = $request->data['address_as'] ?? null;
         // 获取数据
         $shop_config = ShopConfig::get([
             'config_id' => 'config_id',
