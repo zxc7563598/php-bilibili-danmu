@@ -29,6 +29,8 @@
 
 可能不是最完美的方案，但它一定是对新手最友好的选择：一键配置，命令执行后静待完成，项目会自动拉取、配置并保持更新，全程无需额外操作。
 
+视频教学：[点击查看](https://www.bilibili.com/video/BV1xhKczkEg9)
+
 在你的服务器上执行：
 
 ```bash
@@ -44,6 +46,8 @@ curl -fsSL https://bilibili-danmu-scripts.oss-cn-hongkong.aliyuncs.com/install-d
 ### 手动部署方案
 
 > 以下是手动部署项目的推荐流程，适合具备基本 PHP 环境搭建经验的用户。
+
+视频教学：[点击查看](https://www.bilibili.com/video/BV1jkYazSEFk)
 
 * **环境要求**：LNMP 环境，PHP 8.1+，需安装 Redis、Brotli、GD 扩展
 * **项目结构**：标准 PHP 项目，依赖管理采用 Composer，符合现代开发规范。首次运行前请执行 `composer install`​ 安装依赖。
