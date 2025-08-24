@@ -300,7 +300,7 @@ class UserPublicMethods extends GeneralMethod
                 $getTopSpenders = GiftRecords::whereBetween('created_at', [
                     $lives->created_at->timezone(config('app')['default_timezone'])->timestamp,
                     Carbon::parse($lives->end_time)->timezone(config('app')['default_timezone'])->timestamp
-                ])->groupBy('uid')->orderByRaw('count(*) desc')->get([
+                ])->groupBy('uid')->orderByRaw('sum(total_price) desc')->get([
                     'uid' => 'uid',
                     'uname' => 'uname',
                     'count' => Db::raw('sum(total_price) as count')
