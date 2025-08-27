@@ -9,13 +9,15 @@ enum Source: int
 {
     case AnchorChange = 0;
     case SignIn = 1;
+    case AutomaticallyClear = 2;
 
     //定义一个转换函数，用来显示
     public function label(): string
     {
         return match ($this) {
             static::AnchorChange => '主播变更',
-            static::SignIn => '签到'
+            static::SignIn => '签到',
+            static::AutomaticallyClear => '系统自动清理',
         };
     }
 

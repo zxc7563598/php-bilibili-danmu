@@ -59,6 +59,7 @@ class ShopSettingsController
             'theme_color' => $data['theme-color'], // 主题色
             'live_streaming_link' => $data['live-streaming-link'], // 直播间链接
             'user_login_password' => $data['user-login-password'], // 用户是否需要密码登录
+            'protocols_enable' => $data['protocols-enable'], // 是否开启协议
             'protocols_surname' => $data['protocols-surname'], // 协议人姓名
             'protocols_uid' => $data['protocols-uid'], // 协议人UID
             'protocols_name' => $data['protocols-name'], // 协议名称
@@ -69,6 +70,8 @@ class ShopSettingsController
             'vip_lv1_bonus_points' => $data['vip-lv1-bonus-points'], // 开通舰长奖励积分
             'vip_lv2_bonus_points' => $data['vip-lv2-bonus-points'], // 开通提督奖励积分
             'vip_lv3_bonus_points' => $data['vip-lv3-bonus-points'], // 开通总督奖励积分
+            'points_expire_mode' => $data['points-expire-mode'], // 积分过期模式
+            'points_expire_days' => $data['points-expire-days'], // 积分过期天数
             'virtual_gift_order_successful_icon' => $data['virtual-gift-order-successful-icon'], // 虚拟礼物下单成功图标
             'virtual_gift_order_successful_title' => $data['virtual-gift-order-successful-title'], // 虚拟礼物下单成功标题
             'virtual_gift_order_successful_content' => $data['virtual-gift-order-successful-content'], // 虚拟礼物下单成功内容
@@ -99,6 +102,7 @@ class ShopSettingsController
      * @param array $theme_color 主题色
      * @param string $live_streaming_link 直播间链接
      * @param string $user_login_password 用户是否需要密码登录
+     * @param string $protocols_enable 是否开启协议
      * @param string $protocols_surname 协议人姓名
      * @param string $protocols_uid 协议人UID
      * @param string $protocols_name 协议名称
@@ -109,6 +113,8 @@ class ShopSettingsController
      * @param string $vip_lv1_bonus_points 开通舰长奖励积分
      * @param string $vip_lv2_bonus_points 开通提督奖励积分
      * @param string $vip_lv3_bonus_points 开通总督奖励积分
+     * @param string $points_expire_mode 积分过期模式
+     * @param string $points_expire_days 积分过期天数
      * @param string $virtual_gift_order_successful_icon 虚拟礼物下单成功图标
      * @param string $virtual_gift_order_successful_title 虚拟礼物下单成功标题
      * @param string $virtual_gift_order_successful_content 虚拟礼物下单成功内容
@@ -139,6 +145,7 @@ class ShopSettingsController
         $input['theme-color'] = $request->data['theme_color'];
         $input['live-streaming-link'] = $request->data['live_streaming_link'];
         $input['user-login-password'] = $request->data['user_login_password'];
+        $input['protocols-enable'] = $request->data['protocols_enable'] ?? 1;
         $input['protocols-surname'] = $request->data['protocols_surname'];
         $input['protocols-uid'] = $request->data['protocols_uid'];
         $input['protocols-name'] = $request->data['protocols_name'];
@@ -149,6 +156,8 @@ class ShopSettingsController
         $input['vip-lv1-bonus-points'] = $request->data['vip_lv1_bonus_points'];
         $input['vip-lv2-bonus-points'] = $request->data['vip_lv2_bonus_points'];
         $input['vip-lv3-bonus-points'] = $request->data['vip_lv3_bonus_points'];
+        $input['points-expire-mode'] = $request->data['points_expire_mode'] ?? 0;
+        $input['points-expire-days'] = $request->data['points_expire_days'] ?? 0;
         $input['virtual-gift-order-successful-icon'] = $request->data['virtual_gift_order_successful_icon'];
         $input['virtual-gift-order-successful-title'] = $request->data['virtual_gift_order_successful_title'];
         $input['virtual-gift-order-successful-content'] = $request->data['virtual_gift_order_successful_content'];

@@ -15,7 +15,7 @@ enum PointType: int
     {
         return match ($this) {
             static::Point => '积分',
-            static::Coin => '积分'
+            static::Coin => '硬币'
         };
     }
 

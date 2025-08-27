@@ -3,12 +3,17 @@
 namespace process;
 
 use app\core\RobotServices;
+use app\model\RedemptionRecords;
+use app\model\ShopConfig;
 use app\model\SilentUser;
+use app\model\SystemChangePointRecords;
+use app\model\UserVips;
 use Carbon\Carbon;
 use Workerman\Crontab\Crontab;
 use Hejunjie\Utils;
 use Hejunjie\Bililive;
 use support\Redis;
+use resource\enums\SystemChangePointRecordsEnums;
 
 class Task
 {
@@ -18,6 +23,7 @@ class Task
         new Crontab('0 0 * * *', function () {
             self::logDeletion();
             self::logTransfer();
+            self::clearPoints();
             Redis::del(config('app')['app_name'] . ':config');
             // 获取配置信息
             $cookie = RobotServices::getCookie();
@@ -114,6 +120,58 @@ class Task
             $item->delete();
             sublog('每日任务', '解除禁言', "解除成功", []);
             sublog('每日任务', '解除禁言', "----------", []);
+        }
+    }
+
+    /**
+     * 清理过期积分
+     * 
+     * @return void
+     */
+    private static function clearPoints(): void
+    {
+        // 获取配置
+        $config = ShopConfig::whereIn('title', [
+            'points-expire-mode',
+            'points-expire-days'
+        ])->get([
+            'title' => 'title',
+            'content' => 'content'
+        ]);
+        $shop_config = [];
+        foreach ($config as $_config) {
+            $shop_config[$_config->title] = $_config->content;
+        }
+        switch ($shop_config['points-expire-mode']) {
+            case '1':
+                // 定期清理
+                if ($shop_config['points-expire-days'] > 0) {
+                    $users = UserVips::where('point', '>', 0)->get([
+                        'user_id' => 'user_id',
+                        'point' => 'point'
+                    ]);
+                    foreach ($users as $user) {
+                        $records = RedemptionRecords::where('user_id', $user->user_id)->orderBy('created_at', 'desc')->first([
+                            'created_at' => 'created_at'
+                        ]);
+                        if ($records) {
+                            $expire_time = $records->created_at->copy()->addDays($shop_config['points-expire-days'])->timezone(config('app')['default_timezone'])->startOfDay();
+                            if ($expire_time->lte(Carbon::today()->timezone(config('app')['default_timezone']))) {
+                                // 清空积分
+                                $system_change_point_records = new SystemChangePointRecords();
+                                $system_change_point_records->user_id = $user->user_id;
+                                $system_change_point_records->type = SystemChangePointRecordsEnums\Type::Down->value;
+                                $system_change_point_records->point_type = SystemChangePointRecordsEnums\PointType::Point->value;
+                                $system_change_point_records->point = $user->point;
+                                $system_change_point_records->source = SystemChangePointRecordsEnums\Source::AutomaticallyClear->value;
+                                $system_change_point_records->pre_point = $user->point;
+                                $system_change_point_records->after_point = 0;
+                                $system_change_point_records->save();
+                            }
+                        }
+                    }
+                }
+                break;
         }
     }
 }
