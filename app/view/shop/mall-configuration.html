@@ -228,7 +228,7 @@
                                     <label class="label">开通舰长奖励积分</label>
                                     <div class="control">
                                         <input class="input" type="text" v-model="form.vip_lv1_bonus_points"
-                                            placeholder="协议人名称">
+                                            placeholder="开通舰长奖励积分">
                                     </div>
                                     <p class="help">指与用户开通舰长后获得的积分，仅在开启大航海监听后有效</p>
                                 </div>
@@ -236,7 +236,7 @@
                                     <label class="label">开通提督奖励积分</label>
                                     <div class="control">
                                         <input class="input" type="text" v-model="form.vip_lv2_bonus_points"
-                                            placeholder="协议人名称">
+                                            placeholder="开通提督奖励积分">
                                     </div>
                                     <p class="help">指与用户开通提督后获得的积分，仅在开启大航海监听后有效</p>
                                 </div>
@@ -244,9 +244,31 @@
                                     <label class="label">开通总督奖励积分</label>
                                     <div class="control">
                                         <input class="input" type="text" v-model="form.vip_lv3_bonus_points"
-                                            placeholder="协议人名称">
+                                            placeholder="开通总督奖励积分">
                                     </div>
                                     <p class="help">指与用户开通总督后获得的积分，仅在开启大航海监听后有效</p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">积分过期模式</label>
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            <select v-model="form.points_expire_mode">
+                                                <option :value="null" disabled>请选择</option>
+                                                <option value="0">永久有效</option>
+                                                <option value="1">根据不活跃天数清零</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <p class="help"><b>永久有效</b>：积分不会被自动清空，仅会随着用户的使用消耗</p>
+                                    <p class="help"><b>根据不活跃天数清零</b>：用户在获得积分后，如果在设置的天数内未进行积分消费，则清空积分</p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">积分过期天数</label>
+                                    <div class="control">
+                                        <input class="input" type="text" v-model="form.points_expire_days" placeholder="积分过期天数">
+                                    </div>
+                                    <p class="help">天数，多少天过期</p>
+                                    <p class="help"><b>注意</b>：永久有效的模式下，此配置不会生效，无论设置任何内容都不会有任何影响</p>
                                 </div>
                             </div>
                         </div>
@@ -587,6 +609,8 @@
                     vip_lv1_bonus_points: null, // 开通舰长奖励积分
                     vip_lv2_bonus_points: null, // 开通提督奖励积分
                     vip_lv3_bonus_points: null, // 开通总督奖励积分
+                    points_expire_mode:0, // 积分过期模式
+                    points_expire_days:0, // 积分过期天数
                     virtual_gift_order_successful_icon: [], // 虚拟礼物下单成功图标
                     virtual_gift_order_successful_title: null, // 虚拟礼物下单成功标题
                     virtual_gift_order_successful_content: null, // 虚拟礼物下单成功内容
