@@ -53,6 +53,7 @@ class MallConfigurationController extends GeneralMethod
             'theme_color' => $data['theme-color'], // 主题色
             'live_streaming_link' => $data['live-streaming-link'], // 直播间链接
             'user_login_password' => $data['user-login-password'], // 用户是否需要密码登录
+            'protocols_enable' => $data['protocols-enable'], // 是否开启协议
             'protocols_surname' => $data['protocols-surname'], // 协议人姓名
             'protocols_uid' => $data['protocols-uid'], // 协议人UID
             'protocols_name' => $data['protocols-name'], // 协议名称
@@ -95,6 +96,7 @@ class MallConfigurationController extends GeneralMethod
      * @param string $theme_color 主题色
      * @param string $live_streaming_link 直播间链接
      * @param string $user_login_password 用户是否需要密码登录
+     * @param string $protocols_enable 是否开启协议
      * @param string $protocols_surname 协议人姓名
      * @param string $protocols_uid 协议人UID
      * @param string $protocols_name 协议名称
@@ -138,6 +140,7 @@ class MallConfigurationController extends GeneralMethod
         $input['theme-color'] = $param['theme_color'];
         $input['live-streaming-link'] = $param['live_streaming_link'];
         $input['user-login-password'] = $param['user_login_password'];
+        $input['protocols-enable'] = $param['protocols_enable'] ?? 1;
         $input['protocols-surname'] = $param['protocols_surname'];
         $input['protocols-uid'] = $param['protocols_uid'];
         $input['protocols-name'] = $param['protocols_name'];

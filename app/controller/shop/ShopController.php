@@ -203,7 +203,8 @@ class ShopController extends GeneralMethod
                     ['key' => '发货时间', 'value' => '取决于主包心情']
                 ]
             ],
-            'protocols_title' => !empty($config['protocols-name']) ? $config['protocols-name'] : '协议'
+            'protocols_title' => !empty($config['protocols-name']) ? $config['protocols-name'] : '协议',
+            'protocols_enable' => isset($config['protocols-enable']) ? (int)$config['protocols-enable'] === 1 : true
         ]);
     }
 
