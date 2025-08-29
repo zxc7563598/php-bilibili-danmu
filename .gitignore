@@ -24,3 +24,4 @@
 /public/attachment/detailsImages/
 /node_modules
 /.github/ISSUE_TEMPLATE/
+*.pem
