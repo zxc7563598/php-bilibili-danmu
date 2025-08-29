@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "66d0a32080e1cf66d40e9afb644e226b",
+    "content-hash": "9d97e75c6b0b799e3cf3e67c1017becb",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1052,6 +1052,46 @@
                 "source": "https://github.com/zxc7563598/php-china-division/tree/v1.0.4"
             },
             "time": "2025-05-27T02:51:11+00:00"
+        },
+        {
+            "name": "hejunjie/encrypted-request",
+            "version": "v2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zxc7563598/php-encrypted-request.git",
+                "reference": "2cfd377e1446fd5192a26e5d7c14bb9cb7f64766"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zxc7563598/php-encrypted-request/zipball/2cfd377e1446fd5192a26e5d7c14bb9cb7f64766",
+                "reference": "2cfd377e1446fd5192a26e5d7c14bb9cb7f64766",
+                "shasum": ""
+            },
+            "require": {
+                "vlucas/phpdotenv": "^5.6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Hejunjie\\EncryptedRequest\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "何俊杰",
+                    "email": "junjie.he.925@gmail.com"
+                }
+            ],
+            "description": "PHP 请求加密工具包，支持 AES 解密、签名与时间戳验证，快速实现前后端安全通信 | PHP encryption toolkit for AES decryption, signature, and timestamp verification, enabling fast and secure front-to-backend communication. Front-end npm package generates encrypted request parameters without changing existing APIs",
+            "support": {
+                "issues": "https://github.com/zxc7563598/php-encrypted-request/issues",
+                "source": "https://github.com/zxc7563598/php-encrypted-request/tree/v2.0.0"
+            },
+            "time": "2025-08-28T07:45:20+00:00"
         },
         {
             "name": "hejunjie/error-log",
@@ -5004,12 +5044,12 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.2"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "plugin-api-version": "2.6.0"
 }

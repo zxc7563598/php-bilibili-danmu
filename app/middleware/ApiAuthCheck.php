@@ -15,9 +15,8 @@
 
 namespace app\middleware;
 
-use app\model\Users;
 use app\model\UserVips;
-use Carbon\Carbon;
+use Hejunjie\EncryptedRequest\EncryptedRequestHandler;
 use Webman\MiddlewareInterface;
 use Webman\Http\Response;
 use Webman\Http\Request;
@@ -35,26 +34,21 @@ class ApiAuthCheck implements MiddlewareInterface
         $route = $request->route;
         $path = $route->getPath();
         $param = $request->all();
-        // 验证签名
-        if (!isset($param['timestamp']) || !isset($param['sign'])) {
-            return fail($request, 900001);
-        }
-        // 验证签名
-        if (md5(config('app')['key'] . $param['timestamp']) != $param['sign']) {
+        $handler = new EncryptedRequestHandler(['RSA_PRIVATE_KEY' => file_get_contents(base_path('private_key.pem'))]);
+        try {
+            $request->data = $handler->handle(
+                $param['en_data'] ?? '',
+                $param['enc_payload'] ?? '',
+                $param['timestamp'] ?? '',
+                $param['sign'] ?? ''
+            );
+        } catch (\Hejunjie\EncryptedRequest\Exceptions\SignatureException $e) {
             return fail($request, 900002);
-        }
-        // 验证时间是否正确
-        $difference = Carbon::now()->timezone(config('app')['default_timezone'])->diffInSeconds(Carbon::parse((int)$param['timestamp'])->timezone(config('app')['default_timezone']));
-        if ($difference > 60) {
+        } catch (\Hejunjie\EncryptedRequest\Exceptions\TimestampException $e) {
             return fail($request, 900003);
-        }
-        // 解密数据
-        $data = openssl_decrypt($param['en_data'], 'aes-128-cbc', config('app')['aes_key'], 0, config('app')['aes_iv']);
-        if (!$data) {
+        } catch (\Hejunjie\EncryptedRequest\Exceptions\DecryptionException $e) {
             return fail($request, 900004);
         }
-        // 完成签名验证，没问题，透传account_id与appid
-        $request->data = json_decode($data, true);
         // 验证用户登录
         $request->user_vips = null;
         $token = isset($param['token']) ? $param['token'] : null;
