@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of webman.
  *
@@ -15,4 +16,5 @@
 return [
     support\bootstrap\Session::class,
     support\bootstrap\LaravelDb::class,
+    app\bootstrap\RsaKeyGenerator::class,
 ];
