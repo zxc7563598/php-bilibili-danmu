@@ -52,13 +52,11 @@ SHOP_DIR="$ROOT_DIR/public/shop"
 run_command "删除旧商城目录" rm -rf "$SHOP_DIR"
 run_command "克隆商城项目" git clone https://github.com/zxc7563598/vue-bilibili-danmu-shop.git "$SHOP_DIR"
 cp "$SHOP_DIR/.env.example" "$SHOP_DIR/.env"
+cp "$ROOT_DIR/public/public_key.pem" "$SHOP_DIR/public/public_key.pem"
 
 # 替换商城 .env 配置
 replace_in_env "$SHOP_DIR/.env" "^VITE_APP_NAME=.*" "VITE_APP_NAME=$SHOP_NAME"
 replace_in_env "$SHOP_DIR/.env" "^VITE_API_URL=.*" "VITE_API_URL=$SYSTEM_API_URL"
-replace_in_env "$SHOP_DIR/.env" "^VITE_API_AES_KEY=.*" "VITE_API_AES_KEY=$SYSTEM_AES_KEY"
-replace_in_env "$SHOP_DIR/.env" "^VITE_API_AES_IV=.*" "VITE_API_AES_IV=$SYSTEM_AES_IV"
-replace_in_env "$SHOP_DIR/.env" "^VITE_API_KEY=.*" "VITE_API_KEY=$SYSTEM_KEY"
 
 cd "$SHOP_DIR" || { echo "❌ 无法进入目录 $SHOP_DIR" >> "$LOG_FILE"; exit 1; }
 run_command "安装商城依赖" npm install
