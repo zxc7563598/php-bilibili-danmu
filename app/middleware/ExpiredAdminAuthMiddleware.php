@@ -17,8 +17,8 @@ class ExpiredAdminAuthMiddleware implements MiddlewareInterface
         $path = $route->getPath();
         // 如果路由是 /upload，直接跳过认证
         if (in_array($path, [
-            '/admin-api-v2/mall-configuration/upload-images',
-            '/admin-api-v2/shop-management/product-management/upload-images',
+            '/admin-api/mall-configuration/upload-images',
+            '/admin-api/shop-management/product-management/upload-images',
         ])) {
             return $handler($request);
         }
