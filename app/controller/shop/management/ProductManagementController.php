@@ -194,7 +194,7 @@ class ProductManagementController extends GeneralMethod
         $name = $param['name'];
         $amount = $param['amount'];
         $sub_num = $param['sub_num'];
-        $tips = $param['tips'];
+        $tips = $param['tips'] ?? null;
         $cover_image = $param['cover_image'];
         $carousel_images = $param['carousel_images'];
         $details_images = $param['details_images'];
