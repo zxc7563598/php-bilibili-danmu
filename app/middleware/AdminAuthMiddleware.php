@@ -16,6 +16,13 @@ class AdminAuthMiddleware implements MiddlewareInterface
         // 获取路由数据
         $route = $request->route;
         $path = $route->getPath();
+        // 如果路由是 /upload，直接跳过认证
+        if (in_array($path, [
+            '/admin-api/mall-configuration/upload-images',
+            '/admin-api/shop-management/product-management/upload-images',
+        ])) {
+            return $next($request);
+        }
         $param = $request->all();
         $handler = new EncryptedRequestHandler(['RSA_PRIVATE_KEY' => file_get_contents(base_path('private_key.pem'))]);
         try {
