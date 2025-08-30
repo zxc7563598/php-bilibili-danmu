@@ -42,9 +42,6 @@ replace_in_env() {
 ENV_PATH="$ROOT_DIR/.env"
 SHOP_NAME=$(awk -F'=' '/^SHOP_NAME/ {print $2}' "$ENV_PATH")
 SYSTEM_API_URL=$(awk -F'=' '/^SYSTEM_API_URL/ {print $2}' "$ENV_PATH")
-SYSTEM_AES_KEY=$(awk -F'=' '/^SYSTEM_AES_KEY/ {print $2}' "$ENV_PATH")
-SYSTEM_AES_IV=$(awk -F'=' '/^SYSTEM_AES_IV/ {print $2}' "$ENV_PATH")
-SYSTEM_KEY=$(awk -F'=' '/^SYSTEM_KEY/ {print $2}' "$ENV_PATH")
 
 # ---------- 商城项目 ----------
 

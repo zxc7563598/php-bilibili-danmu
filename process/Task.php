@@ -172,6 +172,27 @@ class Task
                     }
                 }
                 break;
+            case '2':
+                // 每月1日清理
+                $today = Carbon::today();
+                if ($today->day === 1) {
+                    $users = UserVips::where('point', '>', 0)->get([
+                        'user_id' => 'user_id',
+                        'point' => 'point'
+                    ]);
+                    foreach ($users as $user) {
+                        $system_change_point_records = new SystemChangePointRecords();
+                        $system_change_point_records->user_id = $user->user_id;
+                        $system_change_point_records->type = SystemChangePointRecordsEnums\Type::Down->value;
+                        $system_change_point_records->point_type = SystemChangePointRecordsEnums\PointType::Point->value;
+                        $system_change_point_records->point = $user->point;
+                        $system_change_point_records->source = SystemChangePointRecordsEnums\Source::AutomaticallyClear->value;
+                        $system_change_point_records->pre_point = $user->point;
+                        $system_change_point_records->after_point = 0;
+                        $system_change_point_records->save();
+                    }
+                }
+                break;
         }
     }
 }
