@@ -20,10 +20,10 @@ class AdminAuthMiddleware implements MiddlewareInterface
         $handler = new EncryptedRequestHandler(['RSA_PRIVATE_KEY' => file_get_contents(base_path('private_key.pem'))]);
         try {
             $request->data = $handler->handle(
-                $param['en_data'] ?? '',
-                $param['enc_payload'] ?? '',
-                $param['timestamp'] ?? '',
-                $param['sign'] ?? ''
+                (string)$param['en_data'] ?? '',
+                (string)$param['enc_payload'] ?? '',
+                (int)$param['timestamp'] ?? 0,
+                (string)$param['sign'] ?? ''
             );
         } catch (\Hejunjie\EncryptedRequest\Exceptions\SignatureException $e) {
             return fail($request, 900002);
