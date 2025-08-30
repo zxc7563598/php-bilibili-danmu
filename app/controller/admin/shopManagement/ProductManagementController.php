@@ -218,7 +218,7 @@ class ProductManagementController extends GeneralMethod
         $amount = $request->data['amount'];
         $subs = $request->data['subs'];
         $sub_num = $request->data['sub_num'] ?? count($request->data['subs']);
-        $tips = $request->data['tips'];
+        $tips = $request->data['tips'] ?? null;
         $cover_image = $request->data['cover_image'];
         $carousel_images = $request->data['carousel_images'];
         $details_images = $request->data['details_images'];
