@@ -15,7 +15,6 @@ use app\model\UserAddress;
 use app\model\UserVips;
 use Carbon\Carbon;
 use resource\enums\GoodsEnums;
-use resource\enums\UserVipsEnums;
 use resource\enums\UserAddressEnums;
 use resource\enums\PaymentRecordsEnums;
 use resource\enums\RedemptionRecordsEnums;
@@ -308,11 +307,13 @@ class UserPublicMethods extends GeneralMethod
                 $gift_total_price = 0;
                 foreach ($getTopSpenders as $_getTopSpenders) {
                     $gift_total_price += $_getTopSpenders['count'];
-                    $gift_list[] = [
-                        'uid' => $_getTopSpenders['uid'],
-                        'name' => $_getTopSpenders['uname'],
-                        'count' => $_getTopSpenders['count'],
-                    ];
+                    if (count($gift_list) < 10) {
+                        $gift_list[] = [
+                            'uid' => $_getTopSpenders['uid'],
+                            'name' => $_getTopSpenders['uname'],
+                            'count' => $_getTopSpenders['count'],
+                        ];
+                    }
                 }
                 // 发送邮件
                 Utils\HttpClient::sendPostRequest('https://tools.api.hejunjie.life/bilibilidanmu-api/live-end-email', [
