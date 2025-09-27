@@ -14,6 +14,9 @@ use support\Redis;
  */
 class Timing
 {
+
+    private ?int $timerId = null;
+
     public function onWorkerStart()
     {
         $this->startUnixWorker();
@@ -39,6 +42,7 @@ class Timing
                 echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "已重启定时广告进程" . "\n";
             }
             $connection->send("已重启定时广告进程: $data");
+            $connection->close();
         };
         $unixWorker->listen();
     }
@@ -50,6 +54,11 @@ class Timing
      */
     private function startUp()
     {
+        // 如果之前有 Timer，先删除
+        if ($this->timerId) {
+            Timer::del($this->timerId);
+            $this->timerId = null;
+        }
         // 获取定时广告配置
         $timing = readFileContent(runtime_path() . '/tmp/timing.cfg');
         if ($timing) {
@@ -60,7 +69,8 @@ class Timing
             $intervals = $timing['intervals']; // 间隔时间
             $status = intval($timing['status']); // 状态
             $content = $timing['content']; // 内容
-            Timer::add($intervals, function () use ($status, $content) {
+            // 注册 Timer，并保存 ID
+            $this->timerId = Timer::add($intervals, function () use ($status, $content) {
                 // 确认链接直播间的情况
                 $cookie = RobotServices::getCookie();
                 $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
@@ -70,14 +80,10 @@ class Timing
                             $this->sendMessage($content);
                             break;
                         case 1: // 仅在直播中
-                            if (Redis::get('bilibili_live_key')) {
-                                $this->sendMessage($content);
-                            }
+                            if (Redis::get('bilibili_live_key')) $this->sendMessage($content);
                             break;
                         case 2: // 仅在非直播中
-                            if (!Redis::get('bilibili_live_key')) {
-                                $this->sendMessage($content);
-                            }
+                            if (!Redis::get('bilibili_live_key')) $this->sendMessage($content);
                             break;
                     }
                 }
