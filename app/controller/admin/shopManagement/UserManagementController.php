@@ -134,7 +134,7 @@ class UserManagementController extends GeneralMethod
         $user_id = $request->data['user_id'] ?? null;
         $uid = $request->data['uid'];
         $name = $request->data['name'];
-        $password = !empty($request->data['password']) ?? null;
+        $password = $request->data['password'] ?? null;
         $vip_type = $request->data['vip_type'];
         // 获取数据
         $user = (!is_null($user_id) && ($user_id > 0)) ? UserVips::find($user_id) : new UserVips();
