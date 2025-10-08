@@ -28,17 +28,23 @@ class Handler extends ExceptionHandler
             return;
         }
         $request = request();
-        $date = Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d');
-        (new Logger([
-            new Handlers\FileHandler(runtime_path("logs/{$date}/重点关注")),
-            new Handlers\RemoteApiHandler('http://8.210.141.97:9999/write')
-        ]))->error('未定义异常', $exception->getMessage(), [
-            'project' => config('app')['app_name'],
-            'ip' => $request->getRealIp(),
-            'method' => $request->method(),
-            'full_url' => $request->fullUrl(),
-            'trace' => $this->getDebugData($exception)
-        ]);
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'https://error.hejunjie.life/write');
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        // 设置请求头
+        if (!empty($headers)) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        }
+        // 设置请求数据
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $this->formatThrowable($exception, [
+            'request_url' => $request->fullUrl() ?? '',
+            'method'      => $request->method() ?? '',
+            'data' => json_encode($request->all(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?? ''
+        ]));
+        curl_exec($ch);
+        curl_close($ch);
     }
 
     public function render(Request $request, Throwable $exception): Response
@@ -48,7 +54,11 @@ class Handler extends ExceptionHandler
         $response = [
             'code' => $this->getErrorCode($exception),
             'message' => $isDebug ? $exception->getMessage() : 'Server Error',
-            'data' => $isDebug ? $this->getDebugData($exception) : new \stdClass()
+            'data' => $isDebug ? $this->formatThrowable($exception, [
+                'request_url' => $request->fullUrl() ?? '',
+                'method'      => $request->method() ?? '',
+                'data' => json_encode($request->data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?? ''
+            ]) : new \stdClass()
         ];
         if ($requestId = $request->header('X-Request-ID')) {
             $response['request_id'] = $requestId;
@@ -71,29 +81,35 @@ class Handler extends ExceptionHandler
         return (string)$exception->getCode() ?: '500';
     }
 
-    protected function getDebugData(Throwable $exception): array
+    function formatThrowable(Throwable $e, array $context = []): string
     {
-        $trace = $exception->getTrace();
-        $simplifiedTrace = array_map(function ($frame) {
+        // 清理并标准化 trace 结构
+        $trace = array_map(static function ($t) {
             return [
-                'file' => $frame['file'] ?? '[internal function]',
-                'line' => $frame['line'] ?? 0,
-                'function' => $frame['function'] ?? null,
-                'class' => $frame['class'] ?? null,
-                'type' => $frame['type'] ?? null
+                'file'     => isset($t['file']) ? (string)$t['file'] : null,
+                'line'     => isset($t['line']) ? (int)$t['line'] : null,
+                'function' => isset($t['function']) ? (string)$t['function'] : null,
+                'class'    => isset($t['class']) ? (string)$t['class'] : null,
             ];
-        }, $trace);
-        return [
-            'class' => get_class($exception),
-            'message' => $exception->getMessage(),
-            'code' => (string)$exception->getCode(),
-            'file' => $exception->getFile(),
-            'line' => $exception->getLine(),
-            'trace' => $simplifiedTrace,
-            'previous' => $exception->getPrevious() ? [
-                'class' => get_class($exception->getPrevious()),
-                'message' => $exception->getPrevious()->getMessage()
-            ] : null
+        }, $e->getTrace() ?? []);
+        // 构造完整结构
+        $data = [
+            'uuid'        => bin2hex(random_bytes(8)),
+            'project'     => 'bilibili-danmu',
+            'level'       => 'error',
+            'timestamp'   => date('c'),
+            'message'     => (string)$e->getMessage(),
+            'code'        => (int)$e->getCode(),
+            'file'        => (string)$e->getFile(),
+            'line'        => (int)$e->getLine(),
+            'trace'       => $trace,
+            'context'     => (object)$context,
+            'server'      => [
+                'hostname'    => gethostname() ?: 'unknown',
+                'ip'          => $_SERVER['SERVER_ADDR'] ?? '127.0.0.1',
+                'php_version' => PHP_VERSION,
+            ],
         ];
+        return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 }
