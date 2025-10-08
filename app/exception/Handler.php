@@ -39,9 +39,9 @@ class Handler extends ExceptionHandler
         }
         // 设置请求数据
         curl_setopt($ch, CURLOPT_POSTFIELDS, $this->formatThrowable($exception, [
-            'request_url' => $_SERVER['REQUEST_URI'] ?? '',
-            'method'      => $_SERVER['REQUEST_METHOD'] ?? '',
-            'data' => json_encode($request->data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?? ''
+            'request_url' => $request->fullUrl() ?? '',
+            'method'      => $request->method() ?? '',
+            'data' => json_encode($request->all(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?? ''
         ]));
         curl_exec($ch);
         curl_close($ch);
@@ -55,8 +55,8 @@ class Handler extends ExceptionHandler
             'code' => $this->getErrorCode($exception),
             'message' => $isDebug ? $exception->getMessage() : 'Server Error',
             'data' => $isDebug ? $this->formatThrowable($exception, [
-                'request_url' => $_SERVER['REQUEST_URI'] ?? '',
-                'method'      => $_SERVER['REQUEST_METHOD'] ?? '',
+                'request_url' => $request->fullUrl() ?? '',
+                'method'      => $request->method() ?? '',
                 'data' => json_encode($request->data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?? ''
             ]) : new \stdClass()
         ];
