@@ -208,7 +208,11 @@ class UserController extends GeneralMethod
         $base64 = $param['base64'];
         // base64存储图片 
         $path = public_path('attachment/user-info/' . implode('/', str_split(Utils\Str::padString(0, $user_vips->user_id), 2)) . '/signing/');
-        $base64ToImage = Utils\Img::base64ToImage($base64, $path);
+        try {
+            $base64ToImage = Utils\Img::base64ToImage($base64, $path);
+        } catch (\Exception $e) {
+            return fail($request, 800017);
+        }
         $image_path = Utils\Str::replaceFirst(public_path() . '/attachment/', '', $base64ToImage);
         $user_vips->sign_image = $image_path;
         $user_vips->save();

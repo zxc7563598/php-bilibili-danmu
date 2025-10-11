@@ -248,7 +248,11 @@ class MallConfigurationController extends GeneralMethod
                 $path = public_path('attachment/shop-config/tribute-gift-order-successful-icon/');
                 break;
         }
-        $base64ToImage = Utils\Img::base64ToImage($base64, $path);
+        try {
+            $base64ToImage = Utils\Img::base64ToImage($base64, $path);
+        } catch (\Exception $e) {
+            return fail($request, 800017);
+        }
         $image_path = Utils\Str::replaceFirst(public_path() . '/attachment/', '', $base64ToImage);
         // 返回数据
         return success($request, [
