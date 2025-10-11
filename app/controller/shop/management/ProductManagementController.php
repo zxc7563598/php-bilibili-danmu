@@ -156,7 +156,11 @@ class ProductManagementController extends GeneralMethod
         ];
         $path = $pathMap[$type] ?? 'attachment/shop-config/';
         // 转换base64为图片
-        $base64ToImage = Utils\Img::base64ToImage($base64, public_path($path));
+        try {
+            $base64ToImage = Utils\Img::base64ToImage($base64, public_path($path));
+        } catch (\Exception $e) {
+            return fail($request, 800017);
+        }
         $image_path = Utils\Str::replaceFirst(public_path() . '/attachment/', '', $base64ToImage);
         return success($request, [
             'path' => $image_path,
