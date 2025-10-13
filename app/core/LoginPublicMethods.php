@@ -84,7 +84,7 @@ class LoginPublicMethods extends GeneralMethod
             if ($getMasterInfo['httpStatus'] == 200) {
                 $getMasterInfoData = json_decode($getMasterInfo['data'], true);
             }
-            if (isset($getMasterInfoData['data']['info']['uname']) && isset($getMasterInfoData['data']['info']['face'])) {
+            if (!empty($getMasterInfoData['data']['info']['uname']) && !emprt($getMasterInfoData['data']['info']['face'])) {
                 if ($user_vips->name != $getMasterInfoData['data']['info']['uname']) {
                     $user_vips->name = $getMasterInfoData['data']['info']['uname'];
                 }
