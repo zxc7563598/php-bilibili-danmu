@@ -27,9 +27,6 @@ class SystemSettingsController
             'shop_name' => getenv('SHOP_NAME'),
             'shop_url' => getenv('SHOP_URL'),
             'system_api_url' => getenv('SYSTEM_API_URL'),
-            'system_aes_key' => getenv('SYSTEM_AES_KEY'),
-            'system_aes_iv' => getenv('SYSTEM_AES_IV'),
-            'system_key' => getenv('SYSTEM_KEY'),
             'host' => getenv('HOST'),
             'listen' => getenv('LISTEN'),
             're_open_host' => getenv('RE_OPEN_HOST'),
@@ -78,9 +75,6 @@ class SystemSettingsController
      * @param string $shop_name 商城名称 
      * @param string $shop_url 商城链接 
      * @param string $system_api_url 项目地址 
-     * @param string $system_aes_key AES加密KEY 
-     * @param string $system_aes_iv AES加密IV 
-     * @param string $system_key 签名KEY 
      * @param string $host 项目启动地址 
      * @param string $listen 项目启动端口 
      * @param string $re_open_host 重启项目地址 
@@ -109,9 +103,6 @@ class SystemSettingsController
             'shop_name',
             'shop_url',
             'system_api_url',
-            'system_aes_key',
-            'system_aes_iv',
-            'system_key',
             'host',
             'listen',
             're_open_host',
@@ -131,7 +122,7 @@ class SystemSettingsController
         $env = Utils\FileUtils::readFile(base_path() . '/.env');
         // 需要重新构建VUE的关键配置项
         $shouldExecuteCode = false;
-        $keysToCheck = ['SYSTEM_API_URL', 'SYSTEM_AES_KEY', 'SYSTEM_AES_IV', 'SYSTEM_KEY', 'SHOP_NAME', 'SHOP_URL'];
+        $keysToCheck = ['SYSTEM_API_URL', 'SHOP_NAME', 'SHOP_URL'];
         foreach ($keysToCheck as $key) {
             preg_match("/^$key=(.*)$/m", $env, $matches);
             $currentValue = $matches[1] ?? null;

@@ -58,14 +58,8 @@ if [ ! -f "$ENV_FILE" ]; then
     run_command "复制 .env.example 为 .env" cp "$ENV_EXAMPLE_FILE" "$ENV_FILE"
 
     # 配置信息
-    SYSTEM_AES_KEY=$(generate_random_string 16)
-    SYSTEM_AES_IV=$(generate_random_string 16)
-    SYSTEM_KEY=$(generate_random_string 32)
     SECURE_API_KEY=$(generate_random_string 32)
     replace_in_env "$ENV_FILE" "^SYSTEM_API_URL=.*" "SYSTEM_API_URL="
-    replace_in_env "$ENV_FILE" "^SYSTEM_AES_KEY=.*" "SYSTEM_AES_KEY=$SYSTEM_AES_KEY"
-    replace_in_env "$ENV_FILE" "^SYSTEM_AES_IV=.*" "SYSTEM_AES_IV=$SYSTEM_AES_IV"
-    replace_in_env "$ENV_FILE" "^SYSTEM_KEY=.*" "SYSTEM_KEY=$SYSTEM_KEY"
     replace_in_env "$ENV_FILE" "^SECURE_API_KEY=.*" "SECURE_API_KEY=$SECURE_API_KEY"
     replace_in_env "$ENV_FILE" "^SHOP_URL=.*" "SHOP_URL="
     replace_in_env "$ENV_FILE" "^HOST=.*" "HOST=http://php"

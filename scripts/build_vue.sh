@@ -74,9 +74,6 @@ run_command "构建商城项目" npm run build
 # replace_in_env "$ADMIN_BUILD_DIR/.env" "^VITE_PUBLIC_PATH=.*" "VITE_PUBLIC_PATH=/dist"
 # replace_in_env "$ADMIN_BUILD_DIR/.env" "^VITE_AXIOS_BASE_URL=.*" "VITE_AXIOS_BASE_URL=$SYSTEM_API_URL/admin-api"
 # replace_in_env "$ADMIN_BUILD_DIR/.env" "^VITE_PROXY_TARGET=.*" "VITE_PROXY_TARGET=$SYSTEM_API_URL"
-# replace_in_env "$ADMIN_BUILD_DIR/.env" "^VITE_AES_KEY=.*" "VITE_AES_KEY=$SYSTEM_AES_KEY"
-# replace_in_env "$ADMIN_BUILD_DIR/.env" "^VITE_AES_IV=.*" "VITE_AES_IV=$SYSTEM_AES_IV"
-# replace_in_env "$ADMIN_BUILD_DIR/.env" "^VITE_SIGN_KEY=.*" "VITE_SIGN_KEY=$SYSTEM_KEY"
 
 # cd "$ADMIN_BUILD_DIR" || { echo "❌ 无法进入目录 $ADMIN_BUILD_DIR" >> "$LOG_FILE"; exit 1; }
 # run_command "安装后台依赖" npm install
