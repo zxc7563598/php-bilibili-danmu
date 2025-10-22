@@ -116,7 +116,7 @@ class SystemConfigurationController extends GeneralMethod
             'db_password'
         ];
         // 组装需要修改的环境变量数据
-        $data = array_map(fn($key) => ['key' => strtoupper($key), 'value' => $param[$key]], $configKeys);
+        $data = array_map(fn($key) => ['key' => strtoupper($key), 'value' => isset($param[$key]) ? $param[$key] : ''], $configKeys);
         // 读取 .env 文件内容
         $env = Utils\FileUtils::readFile(base_path() . '/.env');
         // 需要重新构建VUE的关键配置项
