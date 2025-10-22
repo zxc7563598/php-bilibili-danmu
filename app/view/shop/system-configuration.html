@@ -72,36 +72,6 @@
                                             <p class="help">此配置项决定了项目请求的根路径，影响整体项目中所有资源（如图片、CSS、JavaScript
                                                 等）的链接地址。调整此配置会改变项目中所有相关资源的访问路径。</p>
                                         </div>
-                                        <div class="field">
-                                            <label class="label">AES加密KEY</label>
-                                            <div class="control">
-                                                <input class="input" type="text" placeholder=""
-                                                    v-model="form.system_aes_key">
-                                            </div>
-                                            <p class="help">此配置项决定项目接口与前端页面之间数据的加密和解密过程。AES加密KEY
-                                                用于对前端发送到后端的数据进行加密，同时也用于后端返回给前端的数据的解密。调整此密钥会影响整个项目中的数据安全性，特别是在积分商城等涉及用户敏感数据传输的功能模块中
-                                            </p>
-                                        </div>
-                                        <div class="field">
-                                            <label class="label">AES加密IV</label>
-                                            <div class="control">
-                                                <input class="input" type="text" placeholder=""
-                                                    v-model="form.system_aes_iv">
-                                            </div>
-                                            <p class="help">此配置项决定项目接口与前端页面之间数据的加密和解密过程。AES加密KEY
-                                                用于对前端发送到后端的数据进行加密，同时也用于后端返回给前端的数据的解密。调整此密钥会影响整个项目中的数据安全性，特别是在积分商城等涉及用户敏感数据传输的功能模块中
-                                            </p>
-                                        </div>
-                                        <div class="field">
-                                            <label class="label">签名KEY</label>
-                                            <div class="control">
-                                                <input class="input" type="text" placeholder=""
-                                                    v-model="form.system_key">
-                                            </div>
-                                            <p class="help">此配置项决定项目接口与前端页面之间的数据签名机制，用于确保数据在传输过程中未被篡改。签名KEY
-                                                用于生成请求数据的签名，并通过接口校验签名的正确性。调整此密钥会影响整个项目中接口的请求验证过程，特别是在积分商城等涉及敏感操作的功能模块中。
-                                            </p>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -321,10 +291,7 @@
                     redis_password: "",
                     re_open_host: "",
                     secure_api_key: "",
-                    system_aes_iv: "",
-                    system_aes_key: "",
-                    system_api_url: "",
-                    system_key: ""
+                    system_api_url: ""
                 }
             };
         },
@@ -441,9 +408,6 @@
                     this.form.shop_name = '积分商城';
                     this.form.shop_url = window.location.protocol + "//" + window.location.hostname + ":5177";
                     this.form.system_api_url = window.location.protocol + "//" + window.location.host;
-                    this.form.system_aes_key = this.getRandomString(16)
-                    this.form.system_aes_iv = this.getRandomString(16)
-                    this.form.system_key = this.getRandomString(32)
                     this.saveData();
                 }
                 this.buildLoading = true;
