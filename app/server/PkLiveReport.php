@@ -38,9 +38,11 @@ class PkLiveReport
             // 获取PK信息
             $cookie = RobotServices::getCookie();
             $getOnlineGoldRank = Bililive\Live::getOnlineGoldRank($uid, $room_id, $cookie);
+            $getVipNumbers = Bililive\Live::getVipNumbers($uid, $room_id, $cookie);
             $online_num = $getOnlineGoldRank['online_num'] ?? 0;
             $online_score = 0;
             $top_three_score = 0;
+            $vip_num = $getVipNumbers >= 0 ? $getVipNumbers : 'NaN';
             $i = 0;
             foreach ($getOnlineGoldRank['online_item'] as $online_item) {
                 if ($i < 3) {
@@ -54,14 +56,16 @@ class PkLiveReport
                     'uname' => $uname,
                     'online_num' => $online_num,
                     'online_score' => $online_score,
-                    'top_three_score' => $top_three_score
+                    'top_three_score' => $top_three_score,
+                    'vip_num' => $vip_num
                 ]
             ]);
             self::sendMessage($enter_content, [
                 'uname' => $uname,
                 'online_num' => $online_num,
                 'online_score' => $online_score,
-                'top_three_score' => $top_three_score
+                'top_three_score' => $top_three_score,
+                'vip_num' => $vip_num
             ]);
             sublog('核心业务', 'PK播报', '----------', []);
         }
