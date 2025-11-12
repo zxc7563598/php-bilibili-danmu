@@ -180,7 +180,7 @@ class Present
                 if (isset($extra['merge']) && $extra['merge'] == 1) {
                     SendMessage::mergePush($text, $extra['uid'], $extra['uname'], $extra['number'], $args);
                 } else {
-                    $text = self::template($content[mt_rand(0, (count($content) - 1))], $extra['number'], $args);
+                    $text = self::template($text, $extra['number'], $args);
                     SendMessage::push($text, 'Present');
                 }
             }
@@ -188,7 +188,7 @@ class Present
     }
 
     /**
-     * 短信模板转换
+     * 消息模板转换
      *
      * @param string $text 文本信息
      * @param integer $number 是否展示数量
