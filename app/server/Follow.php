@@ -128,14 +128,14 @@ class Follow
             $text = $content[mt_rand(0, (count($content) - 1))];
             if (!empty($text)) {
                 // 加入消息发送队列
-                $text = self::template($content[mt_rand(0, (count($content) - 1))], $args);
+                $text = self::template($text, $args);
                 SendMessage::push($text, 'Follow');
             }
         }
     }
 
     /**
-     * 短信模板转换
+     * 消息模板转换
      *
      * @param string $text 文本信息
      * @param array $args 要替换的模版
