@@ -29,7 +29,7 @@ class PkLiveReport
         }
         // 开启PK播报
         if (isset($pk['opens']) && $pk['opens']) {
-            sublog('核心业务', 'PK播报', "入参检测", [
+            sublog('核心业务/PK播报', '入参', [
                 'uid' => $uid,
                 'uname' => $uname,
                 'room_id' => $room_id
@@ -50,7 +50,7 @@ class PkLiveReport
                 }
                 $online_score += $online_item['score'];
             }
-            sublog('核心业务', 'PK播报', "数据匹配成功", [
+            sublog('核心业务/PK播报', '数据投递', [
                 'message' => $enter_content,
                 'args' => [
                     'uname' => $uname,
@@ -67,7 +67,6 @@ class PkLiveReport
                 'top_three_score' => $top_three_score,
                 'vip_num' => $vip_num
             ]);
-            sublog('核心业务', 'PK播报', '----------', []);
         }
     }
 

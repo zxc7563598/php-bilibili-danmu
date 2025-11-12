@@ -38,7 +38,7 @@ class Autoresponders
         }
         // 开启自动回复
         if (isset($autoresponders['opens']) && $autoresponders['opens'] && $uid != $robot_uid) {
-            sublog('核心业务', '自动回复', "入参检测", [
+            sublog('核心业务/自动回复', '入参', [
                 'msg' => $msg,
                 'uid' => $uid,
                 'uname' => $uname,
@@ -130,18 +130,14 @@ class Autoresponders
             };
             $up_name = isset($room_uinfo['uname']) ? $room_uinfo['uname'] : '';
             if ($is_message) {
-                sublog('核心业务', '自动回复', "数据匹配成功", [
-                    'message' => $message
-                ]);
+                sublog('核心业务/自动回复', '数据匹配', $message);
                 self::sendMessage($message, [
                     'name' => $uname,
                     'guard' => $guard,
                     'up_name' => $up_name
                 ], $msg, $silent, $silent_minute, $ransom_amount, (string)$uid, $uname);
-                sublog('核心业务', '自动回复', "----------", []);
             } else {
-                sublog('核心业务', '自动回复', "数据匹配失败", []);
-                sublog('核心业务', '自动回复', "----------", []);
+                sublog('核心业务/自动回复', '数据不匹配', "N/A");
             }
         }
     }

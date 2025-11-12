@@ -154,7 +154,7 @@ class UserPublicMethods extends GeneralMethod
      */
     public static function userOpensVip($uid, $name, $guard_level, $amount, $payment_at, $live_key)
     {
-        sublog('核心逻辑', '记录舰长付费', "入参", [
+        sublog('核心业务/记录舰长付费', '舰长付费', [
             'uid' => $uid,
             'name' => $name,
             'guard_level' => $guard_level,

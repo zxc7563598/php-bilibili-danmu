@@ -83,22 +83,22 @@ class Task
      */
     private static function logDeletion(): void
     {
-        sublog('每日任务', '初始化', "日志删除", []);
+        sublog('每日任务/初始化', "日志删除", 'N/A');
         $dir = base_path() . '/runtime/logs/' . Carbon::now()->subDays(8)->timezone(config('app')['default_timezone'])->format('Y-m-d');
-        sublog('每日任务', '初始化', "删除路径", [
+        sublog('每日任务/初始化', "删除路径", [
             'dir' => $dir
         ]);
         if (is_dir($dir)) {
             $fileDelete = Utils\FileUtils::fileDelete($dir);
             if ($fileDelete) {
-                sublog('每日任务', '初始化', "日志删除成功", []);
+                sublog('每日任务/初始化', "日志删除成功", 'N/A');
             } else {
-                sublog('每日任务', '初始化', "日志删除失败", []);
+                sublog('每日任务/初始化', "日志删除失败", 'N/A');
             }
         } else {
-            sublog('每日任务', '初始化', "日志路径不存在", []);
+            sublog('每日任务/初始化', "日志路径不存在", 'N/A');
         }
-        sublog('每日任务', '初始化', "----------", []);
+        sublog('每日任务/初始化', "----------", 'N/A');
     }
 
     /**
@@ -115,11 +115,12 @@ class Task
         $silent_minute = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
         $silent_user = SilentUser::where('silent_minute', '<', $silent_minute)->get();
         foreach ($silent_user as $item) {
-            sublog('每日任务', '解除禁言', "解除用户:{$item->tuid}", []);
+            sublog('每日任务/解除禁言', "解除用户", [
+                'uid' => $item->tuid
+            ]);
             Bililive\Live::delSilentUser($room_id, $cookie, $item->black_id);
             $item->delete();
-            sublog('每日任务', '解除禁言', "解除成功", []);
-            sublog('每日任务', '解除禁言', "----------", []);
+            sublog('每日任务/解除禁言', "解除成功", 'N/A');
         }
     }
 

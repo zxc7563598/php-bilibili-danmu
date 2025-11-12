@@ -45,7 +45,7 @@ class Present
             }
             // 开启礼物答谢
             if (isset($present['opens']) && $present['opens']) {
-                sublog('核心业务', '礼物答谢', "入参检测", [
+                sublog('核心业务/礼物答谢', "入参", [
                     'uid' => $uid,
                     'uname' => $uname,
                     'gift_id' => $gift_id,
@@ -103,7 +103,7 @@ class Present
                 }
                 // 如果发送的话
                 if ($is_message) {
-                    sublog('核心业务', '礼物答谢', "数据匹配成功", [
+                    sublog('核心业务/礼物答谢', '数据匹配', [
                         'message' => $present_content,
                         'args' => [
                             'giftName' => $gift_name,
@@ -124,7 +124,7 @@ class Present
                         'number' => $present_number
                     ]);
                 } else {
-                    sublog('核心业务', '礼物答谢', '数据未匹配', []);
+                    sublog('核心业务/礼物答谢', '数据不匹配', 'N/A');
                 }
             }
             // 检测禁言是否需要解除
@@ -132,10 +132,12 @@ class Present
             if (!empty($silent_user)) {
                 if ($silent_user->ransom_amount > 0) {
                     if ($price >= $silent_user->ransom_amount) {
-                        sublog('核心业务', '礼物答谢', "用户:{$silent_user->tuid}解除黑名单", []);
+                        sublog('核心业务/礼物答谢', "用户解除黑名单", [
+                            'uid' => $silent_user->tuid
+                        ]);
                         Bililive\Live::delSilentUser($room_id, $cookie, $silent_user->black_id);
                         $silent_user->delete();
-                        sublog('核心业务', '礼物答谢', "解除成功", []);
+                        sublog('核心业务/礼物答谢', "解除成功", 'N/A');
                     }
                 }
             }
@@ -159,7 +161,7 @@ class Present
             }
             $gift_records->save();
         }
-        sublog('核心业务', '礼物答谢', '----------', []);
+        sublog('核心业务/礼物答谢', '完成答谢', 'N/A');
     }
 
     /**

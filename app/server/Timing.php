@@ -125,11 +125,11 @@ class Timing
                     SendMessage::push($text, 'Timing');
                     // 设置锁，过期时间为 $lockExpiration - 1 秒
                     Redis::setEx($lockKey, $lockExpiration - 1, 'locked');
-                    sublog('核心业务', '定时广告', "发送数据", [
+                    sublog('核心业务/定时广告', "发送数据", [
                         'text' => $text
                     ]);
                 } else {
-                    sublog('核心业务', '定时广告', "死锁", [
+                    sublog('核心业务/定时广告', "死锁", [
                         'text' => $text
                     ]);
                 }

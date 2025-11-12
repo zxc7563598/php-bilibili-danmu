@@ -57,7 +57,6 @@ class LoginController extends GeneralMethod
     public function getUserVip(Request $request): Response
     {
         $param = $request->data;
-        sublog('积分商城用户端', '获取用户是否存在', '入参', $param);
         // 声明参数
         $uid = $param['uid'];
         // 防止连续提提交
@@ -88,7 +87,6 @@ class LoginController extends GeneralMethod
     public function performLogin(Request $request): Response
     {
         $param = $request->data;
-        sublog('积分商城用户端', '执行登录', '入参', $param);
         // 声明参数
         $uid = $param['uid'];
         $password = $param['password'];

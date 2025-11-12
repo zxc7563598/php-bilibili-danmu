@@ -156,7 +156,6 @@ class ShopController extends GeneralMethod
     {
         $param = $request->data;
         $user_vips = $request->user_vips;
-        sublog('积分商城用户端', '获取确认订单信息', "用户:{$user_vips->uid}", $param);
         // 获取参数
         $goods_id = $param['goods_id'];
         $sub_id = explode(',', $param['sub_id']);
@@ -221,7 +220,6 @@ class ShopController extends GeneralMethod
     {
         $param = $request->data;
         $user_vips = $request->user_vips;
-        sublog('积分商城用户端', '确认下单', "用户:{$user_vips->uid}", $param);
         // 获取参数
         $goods_id = $param['goods_id'];
         $sub_id = explode(',', $param['sub_id']);

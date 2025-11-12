@@ -63,12 +63,6 @@ class AdminAuthMiddleware implements MiddlewareInterface
                 $request->admins = $loginCheck;
             }
         }
-        if (config('app')['debug'] == 1) {
-            sublog('接口调用', $route->getName(), $request->method(), [
-                'data' => $request->data,
-                'admins' => $request->admins
-            ]);
-        }
         return $next($request);
     }
 

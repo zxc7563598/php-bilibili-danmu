@@ -115,7 +115,7 @@ class Bilibili
             $this->connection->connect();
             $this->startHealthCheck();
         } catch (\Exception $e) {
-            sublog('Websocket异常', '连接失败', $e->getMessage(), [
+            sublog('Websocket异常/连接失败', $e->getMessage(), [
                 'exception' => $e->getTrace(),
                 'room_id' => $this->roomId ?? 'unknown'
             ]);
@@ -175,7 +175,7 @@ class Bilibili
         $con->onError = function ($connection, $code, $msg) {
             $this->isConnected = false;
             $errorMsg = sprintf("WebSocket连接错误: %s (code: %d), 尝试重新连接", $msg, $code);
-            sublog('Websocket异常', '连接错误', $errorMsg, [
+            sublog('Websocket异常/连接错误', $errorMsg, [
                 'code' => $code,
                 'msg' => $msg,
                 'room_id' => $this->roomId ?? 'unknown'
@@ -196,7 +196,7 @@ class Bilibili
     private function validateMessage($data): bool
     {
         if (empty($data) || !is_string($data)) {
-            sublog('Websocket异常', '无效消息格式', "收到无效消息格式: " . gettype($data), [
+            sublog('Websocket异常/无效消息格式', "收到无效消息格式: " . gettype($data), [
                 'data' => $data,
                 'room_id' => $this->roomId ?? 'unknown'
             ]);
@@ -310,7 +310,7 @@ class Bilibili
             $content = json_encode($payload['payload'], JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION) . "\n";
             file_put_contents($currentFile, $content, FILE_APPEND);
         } catch (\Exception $e) {
-            sublog('Websocket异常', '记录日志失败', $e->getMessage(), [
+            sublog('Websocket异常/记录日志失败', $e->getMessage(), [
                 'payload' => $payload,
                 'room_id' => $this->roomId ?? 'unknown'
             ]);
@@ -337,7 +337,7 @@ class Bilibili
                 }
             }
         } catch (\Exception $e) {
-            sublog('Websocket异常', '处理消息失败', $e->getMessage(), [
+            sublog('Websocket异常/处理消息失败', $e->getMessage(), [
                 'room_id' => $this->roomId ?? 'unknown'
             ]);
         }
@@ -379,7 +379,7 @@ class Bilibili
                     break;
             }
         } catch (\Exception $e) {
-            sublog('Websocket异常', '处理消息类型失败', $e->getMessage(), [
+            sublog('Websocket异常/处理消息类型失败', $e->getMessage(), [
                 'cmd' => $cmd,
                 'room_id' => $this->roomId ?? 'unknown'
             ]);
@@ -534,7 +534,7 @@ class Bilibili
                     break;
             }
         } catch (\Exception $e) {
-            sublog('Websocket异常', '处理互动消息失败', $e->getMessage(), [
+            sublog('Websocket异常/处理互动消息失败', $e->getMessage(), [
                 'room_id' => $this->roomId ?? 'unknown'
             ]);
         }
@@ -613,7 +613,7 @@ class Bilibili
                 ], JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION);
                 writeLinesToFile($filePath, $line);
             } catch (\Exception $e) {
-                sublog('Websocket异常', '记录礼物信息失败', $e->getMessage(), [
+                sublog('Websocket异常/记录礼物信息失败', $e->getMessage(), [
                     'room_id' => $this->roomId ?? 'unknown'
                 ]);
             }
@@ -726,7 +726,7 @@ class Bilibili
                 }
             }
         } catch (\Exception $e) {
-            sublog('Websocket异常', '发送断开连接通知失败', $e->getMessage(), [
+            sublog('Websocket异常/发送断开连接通知失败', $e->getMessage(), [
                 'room_id' => $room_id,
                 'error_queue' => $this->reconnectAttemptsMessage
             ]);

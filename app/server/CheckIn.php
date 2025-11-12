@@ -40,7 +40,7 @@ class CheckIn
         }
         // 开启感谢关注
         if (isset($check_in['opens']) && $check_in['opens'] && $uid != $robot_uid) {
-            sublog('核心业务', '用户签到', "入参检测", [
+            sublog('核心业务/用户签到', '入参', [
                 'uid' => $uid,
                 'uname' => $uname,
                 'ruid' => $ruid,
@@ -178,7 +178,7 @@ class CheckIn
                 };
                 $up_name = isset($room_uinfo['uname']) ? $room_uinfo['uname'] : '';
                 if ($is_message) {
-                    sublog('核心业务', '用户签到', "数据匹配成功", [
+                    sublog('核心业务/用户签到', '数据匹配', [
                         'message' => $check_in_content,
                         'args' => [
                             'total_coin' => $coin,
@@ -199,10 +199,8 @@ class CheckIn
                         'guard' => $guard,
                         'up_name' => $up_name
                     ]);
-                    sublog('核心业务', '用户签到', "----------", []);
                 } else {
-                    sublog('核心业务', '用户签到', "数据未匹配", []);
-                    sublog('核心业务', '用户签到', "----------", []);
+                    sublog('核心业务/用户签到', '数据不匹配', "N/A");
                 }
             }
         }
