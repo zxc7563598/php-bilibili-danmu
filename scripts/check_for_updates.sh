@@ -169,7 +169,7 @@ if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
     log_stage "安装 Composer 依赖"
     composer clear-cache >> $LOG_FILE 2>&1
     composer install >> $LOG_FILE 2>&1
-    composer update hejunjie/bililive hejunjie/cache hejunjie/china-division hejunjie/error-log hejunjie/mobile-locator hejunjie/utils hejunjie/address-parser hejunjie/url-signer hejunjie/google-authenticator hejunjie/simple-rule-engine >> $LOG_FILE 2>&1
+    composer update hejunjie/bililive hejunjie/cache hejunjie/china-division hejunjie/lazylog hejunjie/mobile-locator hejunjie/utils hejunjie/address-parser hejunjie/url-signer hejunjie/google-authenticator hejunjie/simple-rule-engine >> $LOG_FILE 2>&1
 
     log_stage "启动 Webman 服务"
     nohup php start.php start -d >> $LOG_FILE 2>&1 &
