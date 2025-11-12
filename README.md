@@ -2,10 +2,6 @@
 
 ⚠️ 本项目仅供学习交流使用，禁止用于商业或非法用途。
 
-<img src="https://img.shields.io/badge/Docker-Support-blue">
-<img src="https://img.shields.io/badge/PHP-8.1%2B-purple">
-<img src="https://img.shields.io/badge/WebSocket-Realtime-orange">
-
 **本项目已经经由 Zread 解析完成，如果需要快速了解项目，可以点击此处进行查看：[了解本项目](https://zread.ai/zxc7563598/php-bilibili-danmu)**
 
 ---
