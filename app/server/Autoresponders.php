@@ -122,12 +122,21 @@ class Autoresponders
                 }
             }
             // 如果发送的话
+            $guard = match ($guard_level) {
+                1 => '总督',
+                2 => '提督',
+                3 => '舰长',
+                default => '',
+            };
+            $up_name = isset($room_uinfo['uname']) ? $room_uinfo['uname'] : '';
             if ($is_message) {
                 sublog('核心业务', '自动回复', "数据匹配成功", [
                     'message' => $message
                 ]);
                 self::sendMessage($message, [
-                    'name' => $uname
+                    'name' => $uname,
+                    'guard' => $guard,
+                    'up_name' => $up_name
                 ], $msg, $silent, $silent_minute, $ransom_amount, (string)$uid, $uname);
                 sublog('核心业务', '自动回复', "----------", []);
             } else {
