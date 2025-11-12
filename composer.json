@@ -51,7 +51,8 @@
     "hejunjie/google-authenticator": "^1.0",
     "fukuball/jieba-php": "^0.34.0",
     "google/protobuf": "^4.31",
-    "hejunjie/encrypted-request": "^2.0"
+    "hejunjie/encrypted-request": "^2.0",
+    "hejunjie/lazylog": "^1.0"
   },
   "suggest": {
     "ext-event": "For better performance. "

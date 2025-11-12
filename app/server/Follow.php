@@ -32,7 +32,7 @@ class Follow
         }
         // 开启感谢关注
         if (isset($follow['opens']) && $follow['opens'] && $uid != $robot_uid) {
-            sublog('核心业务', '感谢关注', "入参检测", [
+            sublog('核心业务/感谢关注', '入参', [
                 'uid' => $uid,
                 'uname' => $uname,
                 'ruid' => $ruid,
@@ -83,20 +83,29 @@ class Follow
                 }
             }
             // 如果发送的话
+            $guard = match ($guard_level) {
+                1 => '总督',
+                2 => '提督',
+                3 => '舰长',
+                default => '',
+            };
+            $up_name = isset($room_uinfo['uname']) ? $room_uinfo['uname'] : '';
             if ($is_message) {
-                sublog('核心业务', '感谢关注', "数据匹配成功", [
+                sublog('核心业务/感谢关注', '数据匹配', [
                     'message' => $follow_content,
                     'args' => [
-                        'name' => $uname
+                        'name' => $uname,
+                        'guard' => $guard,
+                        'up_name' => $up_name
                     ]
                 ]);
                 self::sendMessage($follow_content, [
-                    'name' => $uname
+                    'name' => $uname,
+                    'guard' => $guard,
+                    'up_name' => $up_name
                 ]);
-                sublog('核心业务', '感谢关注', '----------', []);
             } else {
-                sublog('核心业务', '感谢关注', '数据未匹配', []);
-                sublog('核心业务', '感谢关注', '----------', []);
+                sublog('核心业务/感谢关注', '数据不匹配', "N/A");
             }
         }
     }
@@ -117,14 +126,14 @@ class Follow
             $text = $content[mt_rand(0, (count($content) - 1))];
             if (!empty($text)) {
                 // 加入消息发送队列
-                $text = self::template($content[mt_rand(0, (count($content) - 1))], $args);
+                $text = self::template($text, $args);
                 SendMessage::push($text, 'Follow');
             }
         }
     }
 
     /**
-     * 短信模板转换
+     * 消息模板转换
      *
      * @param string $text 文本信息
      * @param array $args 要替换的模版

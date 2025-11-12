@@ -4,8 +4,7 @@ use Carbon\Carbon;
 use Carbon\Exceptions\InvalidTimeZoneException;
 use support\Response;
 use Hejunjie\Utils;
-use Hejunjie\ErrorLog\Logger;
-use Hejunjie\ErrorLog\Handlers;
+use Hejunjie\Lazylog\Logger;
 
 /**
  * Api响应成功
@@ -112,17 +111,13 @@ function splitAndFilterLines($text)
  *
  * @param string $paths 存储路径
  * @param string $title 存储名称
- * @param string $contents 存储内容
+ * @param string|array|object $content 存储内容
  * 
  * @return void
  */
-function sublog($paths, $title, $message, $context): void
+function sublog(string $paths, string $title, mixed $content): void
 {
-    $date = Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d');
-    $log = new Logger([
-        new Handlers\FileHandler(runtime_path("logs/{$date}/{$paths}"))
-    ]);
-    $log->info($title, $message, $context);
+    Logger::write(runtime_path("logs"), $paths, $title, $content);
 }
 
 /**

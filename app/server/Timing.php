@@ -102,6 +102,7 @@ class Timing
     {
         // 拆分要发送的内容
         $content = splitAndFilterLines($content);
+        $room_uinfo = !empty(strval(readFileContent(runtime_path() . '/tmp/room_uinfo.cfg'))) ? json_decode(strval(readFileContent(runtime_path() . '/tmp/room_uinfo.cfg')), true) : [];
         if (count($content)) {
             $text = $content[mt_rand(0, (count($content) - 1))];
             if (!empty($text)) {
@@ -117,18 +118,38 @@ class Timing
                     $lockExpiration = 60;
                 }
                 if (!Redis::get($lockKey)) {
+                    $up_name = isset($room_uinfo['uname']) ? $room_uinfo['uname'] : '';
+                    $text = $this->template($text, [
+                        'up_name' => $up_name
+                    ]);
                     SendMessage::push($text, 'Timing');
                     // 设置锁，过期时间为 $lockExpiration - 1 秒
                     Redis::setEx($lockKey, $lockExpiration - 1, 'locked');
-                    sublog('核心业务', '定时广告', "发送数据", [
+                    sublog('核心业务/定时广告', "发送数据", [
                         'text' => $text
                     ]);
                 } else {
-                    sublog('核心业务', '定时广告', "死锁", [
+                    sublog('核心业务/定时广告', "死锁", [
                         'text' => $text
                     ]);
                 }
             }
         }
+    }
+
+    /**
+     * 消息模板转换
+     *
+     * @param string $text 文本信息
+     * @param array $args 要替换的模版
+     * 
+     * @return string
+     */
+    private function template(string $text = '', array $args = []): string
+    {
+        foreach ($args as $key => $replace) {
+            $text = preg_replace('/(@' . $key . '@)/i', $replace, $text);
+        }
+        return $text;
     }
 }

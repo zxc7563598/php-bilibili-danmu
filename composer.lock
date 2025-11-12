@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9d97e75c6b0b799e3cf3e67c1017becb",
+    "content-hash": "a00048224e84ad14c0da40e06dad181f",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -928,16 +928,16 @@
         },
         {
             "name": "hejunjie/bililive",
-            "version": "v1.0.9",
+            "version": "v1.0.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zxc7563598/php-bilibili-danmu-core.git",
-                "reference": "b63fc1d14e0243950514a9e648bbc2ae2a1a7169"
+                "reference": "74c1135f1f22a4dcef3b85f806c5458a0ed19b84"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zxc7563598/php-bilibili-danmu-core/zipball/b63fc1d14e0243950514a9e648bbc2ae2a1a7169",
-                "reference": "b63fc1d14e0243950514a9e648bbc2ae2a1a7169",
+                "url": "https://api.github.com/repos/zxc7563598/php-bilibili-danmu-core/zipball/74c1135f1f22a4dcef3b85f806c5458a0ed19b84",
+                "reference": "74c1135f1f22a4dcef3b85f806c5458a0ed19b84",
                 "shasum": ""
             },
             "require": {
@@ -969,9 +969,9 @@
             ],
             "support": {
                 "issues": "https://github.com/zxc7563598/php-bilibili-danmu-core/issues",
-                "source": "https://github.com/zxc7563598/php-bilibili-danmu-core/tree/v1.0.9"
+                "source": "https://github.com/zxc7563598/php-bilibili-danmu-core/tree/v1.0.10"
             },
-            "time": "2025-11-07T01:00:36+00:00"
+            "time": "2025-11-11T09:40:48+00:00"
         },
         {
             "name": "hejunjie/cache",
@@ -1213,6 +1213,46 @@
                 "source": "https://github.com/zxc7563598/php-hardware-monitor/tree/v1.0.1"
             },
             "time": "2024-12-21T07:02:47+00:00"
+        },
+        {
+            "name": "hejunjie/lazylog",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zxc7563598/php-lazylog.git",
+                "reference": "39dfcd1af379e7d49228e98281d896a3624e4966"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zxc7563598/php-lazylog/zipball/39dfcd1af379e7d49228e98281d896a3624e4966",
+                "reference": "39dfcd1af379e7d49228e98281d896a3624e4966",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Hejunjie\\Lazylog\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "何俊杰",
+                    "email": "junjie.he.925@gmail.com"
+                }
+            ],
+            "description": "轻量级 PHP 日志库，提供本地日志安全写入以及异常信息远程上报（同步/异步） | A lightweight PHP logging library providing safe local log writing and remote exception reporting (both synchronous and asynchronous)",
+            "support": {
+                "issues": "https://github.com/zxc7563598/php-lazylog/issues",
+                "source": "https://github.com/zxc7563598/php-lazylog/tree/v1.0.0"
+            },
+            "time": "2025-11-11T02:33:52+00:00"
         },
         {
             "name": "hejunjie/mobile-locator",
@@ -5044,12 +5084,12 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.2"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "plugin-api-version": "2.6.0"
 }

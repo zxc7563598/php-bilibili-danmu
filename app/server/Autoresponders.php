@@ -38,7 +38,7 @@ class Autoresponders
         }
         // 开启自动回复
         if (isset($autoresponders['opens']) && $autoresponders['opens'] && $uid != $robot_uid) {
-            sublog('核心业务', '自动回复', "入参检测", [
+            sublog('核心业务/自动回复', '入参', [
                 'msg' => $msg,
                 'uid' => $uid,
                 'uname' => $uname,
@@ -122,17 +122,22 @@ class Autoresponders
                 }
             }
             // 如果发送的话
+            $guard = match ($guard_level) {
+                1 => '总督',
+                2 => '提督',
+                3 => '舰长',
+                default => '',
+            };
+            $up_name = isset($room_uinfo['uname']) ? $room_uinfo['uname'] : '';
             if ($is_message) {
-                sublog('核心业务', '自动回复', "数据匹配成功", [
-                    'message' => $message
-                ]);
+                sublog('核心业务/自动回复', '数据匹配', $message);
                 self::sendMessage($message, [
-                    'name' => $uname
+                    'name' => $uname,
+                    'guard' => $guard,
+                    'up_name' => $up_name
                 ], $msg, $silent, $silent_minute, $ransom_amount, (string)$uid, $uname);
-                sublog('核心业务', '自动回复', "----------", []);
             } else {
-                sublog('核心业务', '自动回复', "数据匹配失败", []);
-                sublog('核心业务', '自动回复', "----------", []);
+                sublog('核心业务/自动回复', '数据不匹配', "N/A");
             }
         }
     }
@@ -207,14 +212,14 @@ class Autoresponders
             $text = $content[mt_rand(0, (count($content) - 1))];
             if (!empty($text)) {
                 // 加入消息发送队列
-                $text = self::template($content[mt_rand(0, (count($content) - 1))], $args);
+                $text = self::template($text, $args);
                 SendMessage::push($text, 'Autoresponders');
             }
         }
     }
 
     /**
-     * 短信模板转换
+     * 消息模板转换
      *
      * @param string $text 文本信息
      * @param array $args 要替换的模版

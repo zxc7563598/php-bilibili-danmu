@@ -40,7 +40,7 @@ class CheckIn
         }
         // 开启感谢关注
         if (isset($check_in['opens']) && $check_in['opens'] && $uid != $robot_uid) {
-            sublog('核心业务', '用户签到', "入参检测", [
+            sublog('核心业务/用户签到', '入参', [
                 'uid' => $uid,
                 'uname' => $uname,
                 'ruid' => $ruid,
@@ -170,15 +170,24 @@ class CheckIn
                     }
                 }
                 // 如果发送的话
+                $guard = match ($guard_level) {
+                    1 => '总督',
+                    2 => '提督',
+                    3 => '舰长',
+                    default => '',
+                };
+                $up_name = isset($room_uinfo['uname']) ? $room_uinfo['uname'] : '';
                 if ($is_message) {
-                    sublog('核心业务', '用户签到', "数据匹配成功", [
+                    sublog('核心业务/用户签到', '数据匹配', [
                         'message' => $check_in_content,
                         'args' => [
                             'total_coin' => $coin,
                             'total_point' => $total_point,
                             'name' => $uname,
                             'total' => $total,
-                            'serial' => $serial
+                            'serial' => $serial,
+                            'guard' => $guard,
+                            'up_name' => $up_name
                         ]
                     ]);
                     self::sendMessage($check_in_content, [
@@ -186,12 +195,12 @@ class CheckIn
                         'total_point' => $total_point,
                         'name' => $uname,
                         'total' => $total,
-                        'serial' => $serial
+                        'serial' => $serial,
+                        'guard' => $guard,
+                        'up_name' => $up_name
                     ]);
-                    sublog('核心业务', '用户签到', "----------", []);
                 } else {
-                    sublog('核心业务', '用户签到', "数据未匹配", []);
-                    sublog('核心业务', '用户签到', "----------", []);
+                    sublog('核心业务/用户签到', '数据不匹配', "N/A");
                 }
             }
         }
@@ -213,14 +222,14 @@ class CheckIn
             $text = $content[mt_rand(0, (count($content) - 1))];
             if (!empty($text)) {
                 // 加入消息发送队列
-                $text = self::template($content[mt_rand(0, (count($content) - 1))], $args);
+                $text = self::template($text, $args);
                 SendMessage::push($text, 'CheckIn');
             }
         }
     }
 
     /**
-     * 短信模板转换
+     * 消息模板转换
      *
      * @param string $text 文本信息
      * @param array $args 要替换的模版
