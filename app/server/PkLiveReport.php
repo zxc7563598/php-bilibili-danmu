@@ -93,7 +93,7 @@ class PkLiveReport
     }
 
     /**
-     * 短信模板转换
+     * 消息模板转换
      *
      * @param string $text 文本信息
      * @param array $args 要替换的模版
