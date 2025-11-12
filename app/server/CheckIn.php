@@ -170,6 +170,13 @@ class CheckIn
                     }
                 }
                 // 如果发送的话
+                $guard = match ($guard_level) {
+                    1 => '总督',
+                    2 => '提督',
+                    3 => '舰长',
+                    default => '',
+                };
+                $up_name = isset($room_uinfo['uname']) ? $room_uinfo['uname'] : '';
                 if ($is_message) {
                     sublog('核心业务', '用户签到', "数据匹配成功", [
                         'message' => $check_in_content,
@@ -178,7 +185,9 @@ class CheckIn
                             'total_point' => $total_point,
                             'name' => $uname,
                             'total' => $total,
-                            'serial' => $serial
+                            'serial' => $serial,
+                            'guard' => $guard,
+                            'up_name' => $up_name
                         ]
                     ]);
                     self::sendMessage($check_in_content, [
@@ -186,7 +195,9 @@ class CheckIn
                         'total_point' => $total_point,
                         'name' => $uname,
                         'total' => $total,
-                        'serial' => $serial
+                        'serial' => $serial,
+                        'guard' => $guard,
+                        'up_name' => $up_name
                     ]);
                     sublog('核心业务', '用户签到', "----------", []);
                 } else {
