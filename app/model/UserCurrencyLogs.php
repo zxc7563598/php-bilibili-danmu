@@ -2,7 +2,6 @@
 
 namespace app\model;
 
-use Carbon\Carbon;
 use support\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -51,10 +50,10 @@ class UserCurrencyLogs extends Model
             $user_vips = UserVips::where('user_id', $model->user_id)->first();
             switch ($model->point_type) {
                 case UserCurrencyLogsEnums\CurrencyType::Coin->value:
-                    $user_vips->coin = $model->after_point;
+                    $user_vips->coin = $model->after_currency;
                     break;
                 case UserCurrencyLogsEnums\CurrencyType::Point->value:
-                    $user_vips->point = $model->after_point;
+                    $user_vips->point = $model->after_currency;
                     break;
             }
             $user_vips->save();
