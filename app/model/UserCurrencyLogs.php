@@ -48,7 +48,7 @@ class UserCurrencyLogs extends Model
         static::creating(function ($model) {
             // 用户信息变更
             $user_vips = UserVips::where('user_id', $model->user_id)->first();
-            switch ($model->point_type) {
+            switch ($model->currency_type) {
                 case UserCurrencyLogsEnums\CurrencyType::Coin->value:
                     $user_vips->coin = $model->after_currency;
                     break;
