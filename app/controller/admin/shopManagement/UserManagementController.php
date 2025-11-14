@@ -13,8 +13,8 @@ use app\controller\GeneralMethod;
 use resource\enums\UserVipsEnums;
 use resource\enums\PaymentRecordsEnums;
 use resource\enums\RedemptionRecordsEnums;
-use app\model\SystemChangePointRecords;
-use resource\enums\SystemChangePointRecordsEnums;
+use app\model\UserCurrencyLogs;
+use resource\enums\UserCurrencyLogsEnums;
 
 class UserManagementController extends GeneralMethod
 {
@@ -182,79 +182,34 @@ class UserManagementController extends GeneralMethod
         // 获取参数
         $user_id = $request->data['user_id'];
         // 获取记录
-        $payment_records = PaymentRecords::where('user_id', $user_id)->get([
-            'vip_type' => 'vip_type',
-            'point' => 'point',
-            'after_point' => 'after_point',
-            'payment_at' => 'payment_at'
-        ]);
-        $redemption_records = RedemptionRecords::join('bl_goods', 'bl_redemption_records.goods_id', '=', 'bl_goods.goods_id')
-            ->where('bl_redemption_records.amount_type', RedemptionRecordsEnums\AmountType::Point->value)
-            ->where('bl_redemption_records.user_id', $user_id)
+        $user_currency_logs = UserCurrencyLogs::where('user_id', $user_id)
+            ->where('currency_type', UserCurrencyLogsEnums\CurrencyType::Point->value)
+            ->orderBy('created_at', 'desc')
             ->get([
-                'name' => 'bl_goods.name',
-                'cover_image' => 'bl_goods.cover_image',
-                'point' => 'bl_redemption_records.point',
-                'after_point' => 'bl_redemption_records.after_point',
-                'created_at' => 'bl_redemption_records.created_at'
+                'type' => 'type',
+                'currency' => 'currency',
+                'source' => 'source',
+                'after_currency' => 'after_currency',
+                'created_at' => 'created_at'
             ]);
-        $system_change_point_records = SystemChangePointRecords::where('user_id', $user_id)->where('point_type', SystemChangePointRecordsEnums\PointType::Point->value)->get([
-            'type' => 'type',
-            'point' => 'point',
-            'source' => 'source',
-            'after_point' => 'after_point',
-            'created_at' => 'created_at'
-        ]);
         // 处理数据
         $data = [];
-        // 整合上舰数据
-        foreach ($payment_records as $_payment_records) {
-            $icon = getImageUrl('shop-config/jian.png');
-            switch ($_payment_records->vip_type) {
-                case PaymentRecordsEnums\VipType::Lv2->value:
-                    $icon = getImageUrl('shop-config/ti.png');
-                    break;
-                case PaymentRecordsEnums\VipType::Lv3->value:
-                    $icon = getImageUrl('shop-config/zong.png');
-                    break;
-            }
-            $data[] = [
-                'icon' => $icon,
-                'name' => '成为' . PaymentRecordsEnums\VipType::from($_payment_records->vip_type)->label(),
-                'point' => '+ ' . $_payment_records->point,
-                'after_point' => $_payment_records->after_point,
-                'date' => Carbon::parse($_payment_records->payment_at)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
-            ];
-        }
-        // 整合系统变更数据
-        foreach ($system_change_point_records as $_system_change_point_records) {
-            $type = $_system_change_point_records->type == SystemChangePointRecordsEnums\Type::Up->value ? '+' : '-';
+        foreach ($user_currency_logs as $_user_currency_logs) {
+            $type = $_user_currency_logs->type == UserCurrencyLogsEnums\Type::Up->value ? '+' : '-';
             $data[] = [
                 'icon' => getImageUrl('shop-config/supreme.png'),
-                'name' => SystemChangePointRecordsEnums\Source::from($_system_change_point_records->source)->label(),
-                'point' => $type . ' ' . $_system_change_point_records->point,
-                'after_point' => $_system_change_point_records->after_point,
-                'date' => $_system_change_point_records->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
+                'name' => UserCurrencyLogsEnums\Source::from($_user_currency_logs->source)->label(),
+                'point' => $type . ' ' . $_user_currency_logs->currency,
+                'after_point' => $_user_currency_logs->after_currency,
+                'date' => $_user_currency_logs->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
             ];
         }
-        // 整合消费数据
-        foreach ($redemption_records as $_redemption_records) {
-            $data[] = [
-                'icon' => getImageUrl($_redemption_records->cover_image),
-                'name' => $_redemption_records->name,
-                'point' => '- ' . $_redemption_records->point,
-                'after_point' => $_redemption_records->after_point,
-                'date' => $_redemption_records->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
-            ];
-        }
-        // 排序
-        $data = Utils\Arr::sortByField($data, 'date', false);
         // 返回数据
         return success($request, ['records' => $data]);
     }
 
     /**
-     * 获取用户积分变更记录
+     * 获取用户硬币变更记录
      * 
      * @param integer $user_id 用户ID
      * 
@@ -265,48 +220,28 @@ class UserManagementController extends GeneralMethod
         // 获取参数
         $user_id = $request->data['user_id'];
         // 获取记录
-        $redemption_records = RedemptionRecords::join('bl_goods', 'bl_redemption_records.goods_id', '=', 'bl_goods.goods_id')
-            ->where('bl_redemption_records.amount_type', RedemptionRecordsEnums\AmountType::Coin->value)
-            ->where('bl_redemption_records.user_id', $user_id)
+        $user_currency_logs = UserCurrencyLogs::where('user_id', $user_id)
+            ->where('currency_type', UserCurrencyLogsEnums\CurrencyType::Coin->value)
+            ->orderBy('created_at', 'desc')
             ->get([
-                'name' => 'bl_goods.name',
-                'cover_image' => 'bl_goods.cover_image',
-                'point' => 'bl_redemption_records.point',
-                'after_point' => 'bl_redemption_records.after_point',
-                'created_at' => 'bl_redemption_records.created_at'
+                'type' => 'type',
+                'currency' => 'currency',
+                'source' => 'source',
+                'after_currency' => 'after_currency',
+                'created_at' => 'created_at'
             ]);
-        $system_change_point_records = SystemChangePointRecords::where('user_id', $user_id)->where('point_type', SystemChangePointRecordsEnums\PointType::Coin->value)->get([
-            'type' => 'type',
-            'point' => 'point',
-            'source' => 'source',
-            'after_point' => 'after_point',
-            'created_at' => 'created_at'
-        ]);
         // 处理数据
         $data = [];
-        // 整合系统变更数据
-        foreach ($system_change_point_records as $_system_change_point_records) {
-            $type = $_system_change_point_records->type == SystemChangePointRecordsEnums\Type::Up->value ? '+' : '-';
+        foreach ($user_currency_logs as $_user_currency_logs) {
+            $type = $_user_currency_logs->type == UserCurrencyLogsEnums\Type::Up->value ? '+' : '-';
             $data[] = [
                 'icon' => getImageUrl('shop-config/supreme.png'),
-                'name' => SystemChangePointRecordsEnums\Source::from($_system_change_point_records->source)->label(),
-                'point' => $type . ' ' . $_system_change_point_records->point,
-                'after_point' => $_system_change_point_records->after_point,
-                'date' => $_system_change_point_records->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
+                'name' => UserCurrencyLogsEnums\Source::from($_user_currency_logs->source)->label(),
+                'point' => $type . ' ' . $_user_currency_logs->currency,
+                'after_point' => $_user_currency_logs->after_currency,
+                'date' => $_user_currency_logs->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
             ];
         }
-        // 整合消费数据
-        foreach ($redemption_records as $_redemption_records) {
-            $data[] = [
-                'icon' => getImageUrl($_redemption_records->cover_image),
-                'name' => $_redemption_records->name,
-                'point' => '- ' . $_redemption_records->point,
-                'after_point' => $_redemption_records->after_point,
-                'date' => $_redemption_records->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
-            ];
-        }
-        // 排序
-        $data = Utils\Arr::sortByField($data, 'date', false);
         // 返回数据
         return success($request, ['records' => $data]);
     }
@@ -332,15 +267,15 @@ class UserManagementController extends GeneralMethod
             return fail($request, 800013);
         }
         // 添加数据
-        $system_change_point_records = new SystemChangePointRecords();
-        $system_change_point_records->user_id = $user_id;
-        $system_change_point_records->type = $type;
-        $system_change_point_records->point_type = SystemChangePointRecordsEnums\PointType::Point->value;
-        $system_change_point_records->point = $point;
-        $system_change_point_records->source = SystemChangePointRecordsEnums\Source::AnchorChange->value;
-        $system_change_point_records->pre_point = $user_vips->point;
-        $system_change_point_records->after_point = $type === SystemChangePointRecordsEnums\Type::Up->value ? $user_vips->point + $point : $user_vips->point - $point;
-        $system_change_point_records->save();
+        $user_currency_logs = new UserCurrencyLogs();
+        $user_currency_logs->user_id = $user_id;
+        $user_currency_logs->type = $type;
+        $user_currency_logs->source = UserCurrencyLogsEnums\Source::AnchorChange->value;
+        $user_currency_logs->currency_type = UserCurrencyLogsEnums\CurrencyType::Point->value;
+        $user_currency_logs->currency = $point;
+        $user_currency_logs->pre_currency = $user_vips->point;
+        $user_currency_logs->after_currency = $type === UserCurrencyLogsEnums\Type::Up->value ? $user_vips->point + $point : $user_vips->point - $point;
+        $user_currency_logs->save();
         // 返回数据
         return success($request, []);
     }
@@ -366,15 +301,15 @@ class UserManagementController extends GeneralMethod
             return fail($request, 800013);
         }
         // 添加数据
-        $system_change_point_records = new SystemChangePointRecords();
-        $system_change_point_records->user_id = $user_id;
-        $system_change_point_records->type = $type;
-        $system_change_point_records->point_type = SystemChangePointRecordsEnums\PointType::Coin->value;
-        $system_change_point_records->point = $coin;
-        $system_change_point_records->source = SystemChangePointRecordsEnums\Source::AnchorChange->value;
-        $system_change_point_records->pre_point = $user_vips->coin;
-        $system_change_point_records->after_point = $type === SystemChangePointRecordsEnums\Type::Up->value ? $user_vips->coin + $coin : $user_vips->coin - $coin;
-        $system_change_point_records->save();
+        $user_currency_logs = new UserCurrencyLogs();
+        $user_currency_logs->user_id = $user_id;
+        $user_currency_logs->type = $type;
+        $user_currency_logs->source = UserCurrencyLogsEnums\Source::AnchorChange->value;
+        $user_currency_logs->currency_type = UserCurrencyLogsEnums\CurrencyType::Coin->value;
+        $user_currency_logs->currency = $coin;
+        $user_currency_logs->pre_currency = $user_vips->coin;
+        $user_currency_logs->after_currency = $type === UserCurrencyLogsEnums\Type::Up->value ? $user_vips->coin + $coin : $user_vips->coin - $coin;
+        $user_currency_logs->save();
         // 返回数据
         return success($request, []);
     }

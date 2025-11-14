@@ -1,11 +1,11 @@
 <?php
 
-namespace resource\enums\SystemChangePointRecordsEnums;
+namespace resource\enums\UserCurrencyLogsEnums;
 
 /**
- * 变更积分类型
+ * 变更货币类型（积分或硬币）
  */
-enum PointType: int
+enum CurrencyType: int
 {
     case Point = 0;
     case Coin = 1;

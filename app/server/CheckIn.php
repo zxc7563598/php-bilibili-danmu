@@ -4,13 +4,13 @@ namespace app\server;
 
 use app\core\LoginPublicMethods;
 use app\core\RobotServices;
-use app\model\SystemChangePointRecords;
+use app\model\UserCurrencyLogs;
 use app\model\UserCheckIn;
 use app\model\UserVips;
 use app\queue\SendMessage;
 use Carbon\Carbon;
 use support\Redis;
-use resource\enums\SystemChangePointRecordsEnums;
+use resource\enums\UserCurrencyLogsEnums;
 
 /**
  * 签到，优先级15
@@ -92,15 +92,15 @@ class CheckIn
                     $user_vips->save();
                     // 增加积分
                     if ($user_check_in->points > 0) {
-                        $system_change_point_records = new SystemChangePointRecords();
-                        $system_change_point_records->user_id = $user_vips->user_id;
-                        $system_change_point_records->type = SystemChangePointRecordsEnums\Type::Up->value;
-                        $system_change_point_records->source = SystemChangePointRecordsEnums\Source::SignIn->value;
-                        $system_change_point_records->point_type = SystemChangePointRecordsEnums\PointType::Coin->value;
-                        $system_change_point_records->point = $user_check_in->points;
-                        $system_change_point_records->pre_point = $user_vips->coin;
-                        $system_change_point_records->after_point = $user_vips->coin + $user_check_in->points;
-                        $system_change_point_records->save();
+                        $user_currency_logs = new UserCurrencyLogs();
+                        $user_currency_logs->user_id = $user_vips->user_id;
+                        $user_currency_logs->type = UserCurrencyLogsEnums\Type::Up->value;
+                        $user_currency_logs->source = UserCurrencyLogsEnums\Source::SignIn->value;
+                        $user_currency_logs->currency_type = UserCurrencyLogsEnums\CurrencyType::Coin->value;
+                        $user_currency_logs->currency = $user_check_in->points;
+                        $user_currency_logs->pre_currency = $user_vips->coin;
+                        $user_currency_logs->after_currency = $user_vips->coin + $user_check_in->points;
+                        $user_currency_logs->save();
                     }
                     $total = $user_vips->total_check_in;
                     $serial = $user_vips->serial_check_in;

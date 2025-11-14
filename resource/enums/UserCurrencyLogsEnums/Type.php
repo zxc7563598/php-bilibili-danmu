@@ -1,6 +1,6 @@
 <?php
 
-namespace resource\enums\SystemChangePointRecordsEnums;
+namespace resource\enums\UserCurrencyLogsEnums;
 
 /**
  * 类型

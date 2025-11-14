@@ -1,6 +1,6 @@
 <?php
 
-namespace resource\enums\SystemChangePointRecordsEnums;
+namespace resource\enums\UserCurrencyLogsEnums;
 
 /**
  * 来源类型
@@ -10,6 +10,9 @@ enum Source: int
     case AnchorChange = 0;
     case SignIn = 1;
     case AutomaticallyClear = 2;
+    case PurchaseVip = 3;
+    case GiftRebate = 4;
+    case Exchange = 5;
 
     //定义一个转换函数，用来显示
     public function label(): string
@@ -18,6 +21,9 @@ enum Source: int
             static::AnchorChange => '主播变更',
             static::SignIn => '签到',
             static::AutomaticallyClear => '系统自动清理',
+            static::PurchaseVip => '开通航海',
+            static::GiftRebate => '礼物返利',
+            static::Exchange => '兑换商品',
         };
     }
 

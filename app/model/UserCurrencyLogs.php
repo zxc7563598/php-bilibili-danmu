@@ -6,9 +6,9 @@ use Carbon\Carbon;
 use support\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use resource\enums\SystemChangePointRecordsEnums;
+use resource\enums\UserCurrencyLogsEnums;
 
-class SystemChangePointRecords extends Model
+class UserCurrencyLogs extends Model
 {
     use HasFactory;
     use SoftDeletes;
@@ -18,7 +18,7 @@ class SystemChangePointRecords extends Model
      *
      * @var string
      */
-    protected $table = 'bl_system_change_point_records';
+    protected $table = 'bl_user_currency_logs';
 
     /**
      * 重定义主键，默认是id
@@ -50,10 +50,10 @@ class SystemChangePointRecords extends Model
             // 用户信息变更
             $user_vips = UserVips::where('user_id', $model->user_id)->first();
             switch ($model->point_type) {
-                case SystemChangePointRecordsEnums\PointType::Coin->value:
+                case UserCurrencyLogsEnums\CurrencyType::Coin->value:
                     $user_vips->coin = $model->after_point;
                     break;
-                case SystemChangePointRecordsEnums\PointType::Point->value:
+                case UserCurrencyLogsEnums\CurrencyType::Point->value:
                     $user_vips->point = $model->after_point;
                     break;
             }
