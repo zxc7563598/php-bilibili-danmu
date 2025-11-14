@@ -270,6 +270,37 @@
                                     <p class="help">天数，多少天过期</p>
                                     <p class="help"><b>注意</b>：永久有效的模式下，此配置不会生效，无论设置任何内容都不会有任何影响</p>
                                 </div>
+                                <div class="field">
+                                    <label class="label">是否开启礼物返利</label>
+                                    <div class="control">
+                                        <div class="select is-fullwidth">
+                                            <select v-model="form.rebate_enable">
+                                                <option :value="null" disabled>请选择</option>
+                                                <option value="0">否</option>
+                                                <option value="1">是</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <p class="help">开启后，用户在直播间赠送礼物时，将会按照 <b>礼物电池数 * 返利比例</b> 的数额为用户增加积分</p>
+                                    <p class="help"><b>注意：当 礼物电池数 * 返利比例 的数额为小数时，将向下取整，即：1.5=1，0.8=0</b></p>
+                                    <p class="help"><b>注意：当 礼物电池数 * 返利比例 的数额小于 最低返利积分 时，不会为用户增加积分</b></p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">返利比例</label>
+                                    <div class="control">
+                                        <input class="input" type="text" v-model="form.rebate_proportion"
+                                            placeholder="返利比例">
+                                    </div>
+                                    <p class="help">数字，可以为小数，例如：设置为0.1时，用户赠送价值10电池的礼物，为用户增加1积分</p>
+                                </div>
+                                <div class="field">
+                                    <label class="label">开通舰长奖励积分</label>
+                                    <div class="control">
+                                        <input class="input" type="text" v-model="form.min_rebate_point"
+                                            placeholder="开通舰长奖励积分">
+                                    </div>
+                                    <p class="help">数字，最低返利的积分，例如设置为2时，返利比例设置为0.1，用户赠送20及以上电池的礼物才会增加积分</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -626,6 +657,9 @@
                     vip_lv3_bonus_points: null, // 开通总督奖励积分
                     points_expire_mode:0, // 积分过期模式
                     points_expire_days:0, // 积分过期天数
+                    rebate_enable:0, // 是否开启礼物返利
+                    rebate_proportion:0, // 返利比例
+                    min_rebate_point:0, // 最低返利积分
                     virtual_gift_order_successful_icon: [], // 虚拟礼物下单成功图标
                     virtual_gift_order_successful_title: null, // 虚拟礼物下单成功标题
                     virtual_gift_order_successful_content: null, // 虚拟礼物下单成功内容
