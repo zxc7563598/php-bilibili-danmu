@@ -928,16 +928,16 @@
         },
         {
             "name": "hejunjie/bililive",
-            "version": "v1.0.10",
+            "version": "v1.0.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zxc7563598/php-bilibili-danmu-core.git",
-                "reference": "74c1135f1f22a4dcef3b85f806c5458a0ed19b84"
+                "reference": "f8a8e1fcd1ec63e8a69c184081804cc505179c9e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zxc7563598/php-bilibili-danmu-core/zipball/74c1135f1f22a4dcef3b85f806c5458a0ed19b84",
-                "reference": "74c1135f1f22a4dcef3b85f806c5458a0ed19b84",
+                "url": "https://api.github.com/repos/zxc7563598/php-bilibili-danmu-core/zipball/f8a8e1fcd1ec63e8a69c184081804cc505179c9e",
+                "reference": "f8a8e1fcd1ec63e8a69c184081804cc505179c9e",
                 "shasum": ""
             },
             "require": {
@@ -969,9 +969,9 @@
             ],
             "support": {
                 "issues": "https://github.com/zxc7563598/php-bilibili-danmu-core/issues",
-                "source": "https://github.com/zxc7563598/php-bilibili-danmu-core/tree/v1.0.10"
+                "source": "https://github.com/zxc7563598/php-bilibili-danmu-core/tree/v1.0.11"
             },
-            "time": "2025-11-11T09:40:48+00:00"
+            "time": "2025-11-12T10:50:02+00:00"
         },
         {
             "name": "hejunjie/cache",
@@ -5084,12 +5084,12 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.2"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }
