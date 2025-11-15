@@ -313,4 +313,84 @@ class UserManagementController extends GeneralMethod
         // 返回数据
         return success($request, []);
     }
+
+    /**
+     * 获取用户积分变更记录
+     * 
+     * @param integer $user_id 用户ID
+     * 
+     * @return Response 
+     */
+    public function getUserPointRecordsV2(Request $request)
+    {
+        // 获取参数
+        $pageNo = $request->data['pageNo'] ?? 1;
+        $pageSize = $request->data['pageSize'] ?? 6;
+        $user_id = $request->data['user_id'];
+        // 获取记录
+        $user_currency_logs = UserCurrencyLogs::where('user_id', $user_id)
+            ->where('currency_type', UserCurrencyLogsEnums\CurrencyType::Point->value)
+            ->orderBy('created_at', 'desc')
+            ->paginate($pageSize, [
+                'type' => 'type',
+                'currency' => 'currency',
+                'source' => 'source',
+                'after_currency' => 'after_currency',
+                'created_at' => 'created_at'
+            ], 'page', $pageNo);
+        // 处理数据
+        foreach ($user_currency_logs as &$_user_currency_logs) {
+            $type = $_user_currency_logs->type == UserCurrencyLogsEnums\Type::Up->value ? '+' : '-';
+            $_user_currency_logs->icon = getImageUrl('shop-config/supreme.png');
+            $_user_currency_logs->name = UserCurrencyLogsEnums\Source::from($_user_currency_logs->source)->label();
+            $_user_currency_logs->currency = $type . ' ' . $_user_currency_logs->currency;
+            $_user_currency_logs->date = $_user_currency_logs->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
+        }
+        $data = is_array($user_currency_logs) ? $user_currency_logs : $user_currency_logs->toArray();
+        // 返回数据
+        return success($request, [
+            "total" => $data['total'],
+            "pageData" => $data['data']
+        ]);
+    }
+
+    /**
+     * 获取用户硬币变更记录
+     * 
+     * @param integer $user_id 用户ID
+     * 
+     * @return Response 
+     */
+    public function getUserCoinRecordsV2(Request $request)
+    {
+        // 获取参数
+        $pageNo = $request->data['pageNo'] ?? 1;
+        $pageSize = $request->data['pageSize'] ?? 6;
+        $user_id = $request->data['user_id'];
+        // 获取记录
+        $user_currency_logs = UserCurrencyLogs::where('user_id', $user_id)
+            ->where('currency_type', UserCurrencyLogsEnums\CurrencyType::Coin->value)
+            ->orderBy('created_at', 'desc')
+            ->paginate($pageSize, [
+                'type' => 'type',
+                'currency' => 'currency',
+                'source' => 'source',
+                'after_currency' => 'after_currency',
+                'created_at' => 'created_at'
+            ], 'page', $pageNo);
+        // 处理数据
+        foreach ($user_currency_logs as &$_user_currency_logs) {
+            $type = $_user_currency_logs->type == UserCurrencyLogsEnums\Type::Up->value ? '+' : '-';
+            $_user_currency_logs->icon = getImageUrl('shop-config/supreme.png');
+            $_user_currency_logs->name = UserCurrencyLogsEnums\Source::from($_user_currency_logs->source)->label();
+            $_user_currency_logs->currency = $type . ' ' . $_user_currency_logs->currency;
+            $_user_currency_logs->date = $_user_currency_logs->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
+        }
+        $data = is_array($user_currency_logs) ? $user_currency_logs : $user_currency_logs->toArray();
+        // 返回数据
+        return success($request, [
+            "total" => $data['total'],
+            "pageData" => $data['data']
+        ]);
+    }
 }
