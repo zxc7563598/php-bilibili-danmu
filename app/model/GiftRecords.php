@@ -5,6 +5,7 @@ namespace app\model;
 use support\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use resource\enums\UserCurrencyLogsEnums;
 
 class GiftRecords extends Model
 {
@@ -50,6 +51,18 @@ class GiftRecords extends Model
             if ($user_vips) {
                 $user_vips->total_gift_amount += $model->total_price;
                 $user_vips->save();
+                // 礼物返利
+                if ($model->rebate_point > 0) {
+                    $user_currency_logs = new UserCurrencyLogs();
+                    $user_currency_logs->user_id = $model->user_id;
+                    $user_currency_logs->type = UserCurrencyLogsEnums\Type::Up->value;
+                    $user_currency_logs->source = UserCurrencyLogsEnums\Source::GiftRebate->value;
+                    $user_currency_logs->currency_type = UserCurrencyLogsEnums\CurrencyType::Point->value;
+                    $user_currency_logs->currency = $model->rebate_point;
+                    $user_currency_logs->pre_currency = $user_vips->point;
+                    $user_currency_logs->after_currency = $model->rebate_point + $user_vips->point;
+                    $user_currency_logs->save();
+                }
             }
         });
     }

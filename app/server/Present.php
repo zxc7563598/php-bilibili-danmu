@@ -30,9 +30,11 @@ class Present
      * @param mixed $guard_level 大航海类型，0=普通用户，1=总督，2=提督，3=舰长
      * @param mixed $level 牌子等级
      * @param mixed $blind_gift 绑定礼物(盲盒信息)
+     * @param mixed $gift_type 礼物类型，vip=航海，gift=礼物
+     * 
      * @return void 
      */
-    public static function processing($uid, $uname, $gift_id, $gift_name, $price, $num, $anchor_id, $ruid, $guard_level, $level, $blind_gift)
+    public static function processing($uid, $uname, $gift_id, $gift_name, $price, $num, $anchor_id, $ruid, $guard_level, $level, $blind_gift, $gift_type)
     {
         $is_message = false;
         $cookie = RobotServices::getCookie();
@@ -159,6 +161,16 @@ class Present
                 $gift_records->original_price = round(($blind_gift['original_gift_price'] / 1000), 2);
                 $gift_records->original_gift_name = $blind_gift['original_gift_name'];
                 $gift_records->original = GiftRecordsEnums\Original::No->value;
+            }
+            $gift_records->rebate_enable = isset($shop_config['rebate-enable']) ? $shop_config['rebate-enable'] : 0;
+            $gift_records->rebate_proportion = isset($shop_config['rebate-proportion']) ? $shop_config['rebate-proportion'] : 0;
+            $gift_records->min_rebate_point = isset($shop_config['min-rebate-point']) ? $shop_config['min-rebate-point'] : 0;
+            $gift_records->rebate_point = 0;
+            if ($gift_records->rebate_enable == 1 && $gift_type == 'gift') {
+                $rebate_point = floor(($price * $num) * $gift_records->rebate_proportion);
+                if ($rebate_point >= $gift_records->min_rebate_point) {
+                    $gift_records->rebate_point = $rebate_point;
+                }
             }
             $gift_records->save();
         }
