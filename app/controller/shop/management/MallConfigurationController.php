@@ -66,6 +66,9 @@ class MallConfigurationController extends GeneralMethod
             'vip_lv3_bonus_points' => $data['vip-lv3-bonus-points'], // 开通总督奖励积分
             'points_expire_mode' => $data['points-expire-mode'], // 积分过期模式
             'points_expire_days' => $data['points-expire-days'], // 积分过期天数
+            'rebate_enable' => $data['rebate-enable'], // 是否开启礼物返利
+            'rebate_proportion' => $data['rebate-proportion'], // 返利比例
+            'min_rebate_point' => $data['min-rebate-point'], // 最低返利积分
             'virtual_gift_order_successful_icon' => $data['virtual-gift-order-successful-icon'], // 虚拟礼物下单成功图标
             'virtual_gift_order_successful_title' => $data['virtual-gift-order-successful-title'], // 虚拟礼物下单成功标题
             'virtual_gift_order_successful_content' => $data['virtual-gift-order-successful-content'], // 虚拟礼物下单成功内容
@@ -109,6 +112,9 @@ class MallConfigurationController extends GeneralMethod
      * @param string $vip_lv3_bonus_points 开通总督奖励积分
      * @param string $points_expire_mode 积分过期模式
      * @param string $points_expire_days 积分过期天数
+     * @param string $rebate_enable 是否开启礼物返利
+     * @param string $rebate_proportion 返利比例
+     * @param string $min_rebate_point 最低返利积分
      * @param string $virtual_gift_order_successful_icon 虚拟礼物下单成功图标
      * @param string $virtual_gift_order_successful_title 虚拟礼物下单成功标题
      * @param string $virtual_gift_order_successful_content 虚拟礼物下单成功内容
@@ -153,6 +159,9 @@ class MallConfigurationController extends GeneralMethod
         $input['vip-lv3-bonus-points'] = $param['vip_lv3_bonus_points'];
         $input['points-expire-mode'] = $param['points_expire_mode'];
         $input['points-expire-days'] = $param['points_expire_days'];
+        $input['rebate-enable'] = $param['rebate_enable'] ?? 0;
+        $input['rebate-proportion'] = $param['rebate_proportion'] ?? 0;
+        $input['min-rebate-point'] = $param['min_rebate_point'] ?? 0;
         $input['virtual-gift-order-successful-icon'] = $param['virtual_gift_order_successful_icon'];
         $input['virtual-gift-order-successful-title'] = $param['virtual_gift_order_successful_title'];
         $input['virtual-gift-order-successful-content'] = $param['virtual_gift_order_successful_content'];

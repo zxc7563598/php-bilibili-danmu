@@ -455,7 +455,8 @@ class Bilibili
             isset($data['sender_uinfo']['medal']['ruid']) ? $data['sender_uinfo']['medal']['ruid'] : null,
             isset($data['sender_uinfo']['medal']['guard_level']) ? $data['sender_uinfo']['medal']['guard_level'] : null,
             isset($data['sender_uinfo']['medal']['level']) ? $data['sender_uinfo']['medal']['level'] : null,
-            $data['blind_gift'] ?? null
+            $data['blind_gift'] ?? null,
+            'gift'
         );
         // 记录信息
         $this->recordGiftInfo($data);
@@ -481,7 +482,8 @@ class Bilibili
             0,
             $data['guard_level'],
             0,
-            null
+            null,
+            'vip'
         );
         // 上舰
         $uid = $data['uid'];
@@ -594,7 +596,8 @@ class Bilibili
     /**
      * 记录礼物信息
      * 
-     * @param array $data
+     * @param array $data 数据
+     * 
      * @return void
      */
     private function recordGiftInfo($data)

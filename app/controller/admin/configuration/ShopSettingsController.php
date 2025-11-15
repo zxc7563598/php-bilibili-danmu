@@ -72,6 +72,9 @@ class ShopSettingsController
             'vip_lv3_bonus_points' => $data['vip-lv3-bonus-points'], // 开通总督奖励积分
             'points_expire_mode' => $data['points-expire-mode'], // 积分过期模式
             'points_expire_days' => $data['points-expire-days'], // 积分过期天数
+            'rebate_enable' => $data['rebate-enable'], // 是否开启礼物返利
+            'rebate_proportion' => $data['rebate-proportion'], // 返利比例
+            'min_rebate_point' => $data['min-rebate-point'], // 最低返利积分
             'virtual_gift_order_successful_icon' => $data['virtual-gift-order-successful-icon'], // 虚拟礼物下单成功图标
             'virtual_gift_order_successful_title' => $data['virtual-gift-order-successful-title'], // 虚拟礼物下单成功标题
             'virtual_gift_order_successful_content' => $data['virtual-gift-order-successful-content'], // 虚拟礼物下单成功内容
@@ -115,6 +118,9 @@ class ShopSettingsController
      * @param string $vip_lv3_bonus_points 开通总督奖励积分
      * @param string $points_expire_mode 积分过期模式
      * @param string $points_expire_days 积分过期天数
+     * @param string $rebate_enable 是否开启礼物返利
+     * @param string $rebate_proportion 返利比例
+     * @param string $min_rebate_point 最低返利积分
      * @param string $virtual_gift_order_successful_icon 虚拟礼物下单成功图标
      * @param string $virtual_gift_order_successful_title 虚拟礼物下单成功标题
      * @param string $virtual_gift_order_successful_content 虚拟礼物下单成功内容
@@ -158,6 +164,9 @@ class ShopSettingsController
         $input['vip-lv3-bonus-points'] = $request->data['vip_lv3_bonus_points'];
         $input['points-expire-mode'] = $request->data['points_expire_mode'] ?? 0;
         $input['points-expire-days'] = $request->data['points_expire_days'] ?? 0;
+        $input['rebate-enable'] = $request->data['rebate_enable'] ?? 0;
+        $input['rebate-proportion'] = $request->data['rebate_proportion'] ?? 0;
+        $input['min-rebate-point'] = $request->data['min_rebate_point'] ?? 0;
         $input['virtual-gift-order-successful-icon'] = $request->data['virtual_gift_order_successful_icon'];
         $input['virtual-gift-order-successful-title'] = $request->data['virtual_gift_order_successful_title'];
         $input['virtual-gift-order-successful-content'] = $request->data['virtual_gift_order_successful_content'];
