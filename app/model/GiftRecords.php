@@ -54,7 +54,7 @@ class GiftRecords extends Model
                 // 礼物返利
                 if ($model->rebate_point > 0) {
                     $user_currency_logs = new UserCurrencyLogs();
-                    $user_currency_logs->user_id = $model->user_id;
+                    $user_currency_logs->user_id = $user_vips->user_id;
                     $user_currency_logs->type = UserCurrencyLogsEnums\Type::Up->value;
                     $user_currency_logs->source = UserCurrencyLogsEnums\Source::GiftRebate->value;
                     $user_currency_logs->currency_type = UserCurrencyLogsEnums\CurrencyType::Point->value;
