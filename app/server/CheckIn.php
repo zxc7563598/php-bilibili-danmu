@@ -68,7 +68,7 @@ class CheckIn
                     $user_check_in->name = $uname;
                     $user_check_in->ruid = $ruid;
                     $user_check_in->guard_level = $guard_level;
-                    $user_check_in->points = $check_in_points;
+                    $user_check_in->currency = $check_in_points;
                     $user_check_in->currency_type = $check_in_currency_type;
                     $user_check_in->save();
                     // 获取用户信息
@@ -93,15 +93,15 @@ class CheckIn
                     }
                     $user_vips->save();
                     // 增加积分
-                    if ($user_check_in->points > 0) {
+                    if ($user_check_in->currency > 0) {
                         $user_currency_logs = new UserCurrencyLogs();
                         $user_currency_logs->user_id = $user_vips->user_id;
                         $user_currency_logs->type = UserCurrencyLogsEnums\Type::Up->value;
                         $user_currency_logs->source = UserCurrencyLogsEnums\Source::SignIn->value;
                         $user_currency_logs->currency_type = $check_in_currency_type;
-                        $user_currency_logs->currency = $user_check_in->points;
+                        $user_currency_logs->currency = $user_check_in->currency;
                         $user_currency_logs->pre_currency = $user_vips->coin;
-                        $user_currency_logs->after_currency = $user_vips->coin + $user_check_in->points;
+                        $user_currency_logs->after_currency = $user_vips->coin + $user_check_in->currency;
                         $user_currency_logs->save();
                     }
                     $total = $user_vips->total_check_in;
