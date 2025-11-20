@@ -236,9 +236,6 @@ class RobotControlController
             Utils\FileUtils::writeToFile(runtime_path() . '/tmp/autoresponders.cfg', json_encode($autoresponders));
         }
         // 返回数据
-        if (empty($checkIn['currency_type'])) {
-            $checkIn['currency_type'] = 0;
-        }
         return success($request, [
             'timing' => $timing,
             'present' => $present,
