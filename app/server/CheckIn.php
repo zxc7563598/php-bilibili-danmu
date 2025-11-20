@@ -50,7 +50,7 @@ class CheckIn
             $check_in_type = intval($check_in['type']); // 类型
             $check_in_status = intval($check_in['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
             $check_in_currency_type = intval($check_in['currency_type'] ?? 1); // 奖励类型：1=硬币，0=积分
-            $check_in_points = intval($check_in['points'] ?? 0); // 赠送积分
+            $check_in_currency = intval($check_in['points'] ?? 0); // 赠送积分
             $check_in_content = '';
             $total_point = 0;
             $coin = 0;
@@ -68,7 +68,7 @@ class CheckIn
                     $user_check_in->name = $uname;
                     $user_check_in->ruid = $ruid;
                     $user_check_in->guard_level = $guard_level;
-                    $user_check_in->currency = $check_in_points;
+                    $user_check_in->currency = $check_in_currency;
                     $user_check_in->currency_type = $check_in_currency_type;
                     $user_check_in->save();
                     // 获取用户信息
