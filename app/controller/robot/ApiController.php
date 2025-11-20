@@ -235,9 +235,6 @@ class ApiController
             <p>当然啦，如果你觉得现在这样也挺好，也可以忽略这条消息，不影响正常使用～</p><br>
             <p>👉 教学地址：<a href="https://hejunjie.life/posts/b4f053ee.html#%E5%85%B3%E4%BA%8E%E7%8B%AC%E7%AB%8B%E5%90%8E%E5%8F%B0" target="_blank">点击前往</a></p>';
         // 返回数据
-        if (empty($checkIn['currency_type'])) {
-            $checkIn['currency_type'] = 0;
-        }
         return success($request, [
             'timing' => $timing,
             'present' => $present,
