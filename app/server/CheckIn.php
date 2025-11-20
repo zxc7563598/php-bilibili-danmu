@@ -49,6 +49,7 @@ class CheckIn
             ]);
             $check_in_type = intval($check_in['type']); // 类型
             $check_in_status = intval($check_in['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
+            $check_in_currency_type = intval($check_in['currency_type'] ?? 1); // 奖励类型：1=硬币，0=积分
             $check_in_points = intval($check_in['points'] ?? 0); // 赠送积分
             $check_in_content = '';
             $total_point = 0;
@@ -68,6 +69,7 @@ class CheckIn
                     $user_check_in->ruid = $ruid;
                     $user_check_in->guard_level = $guard_level;
                     $user_check_in->points = $check_in_points;
+                    $user_check_in->currency_type = $check_in_currency_type;
                     $user_check_in->save();
                     // 获取用户信息
                     $user_vips = UserVips::where('uid', $uid)->first();
@@ -96,7 +98,7 @@ class CheckIn
                         $user_currency_logs->user_id = $user_vips->user_id;
                         $user_currency_logs->type = UserCurrencyLogsEnums\Type::Up->value;
                         $user_currency_logs->source = UserCurrencyLogsEnums\Source::SignIn->value;
-                        $user_currency_logs->currency_type = UserCurrencyLogsEnums\CurrencyType::Coin->value;
+                        $user_currency_logs->currency_type = $check_in_currency_type;
                         $user_currency_logs->currency = $user_check_in->points;
                         $user_currency_logs->pre_currency = $user_vips->coin;
                         $user_currency_logs->after_currency = $user_vips->coin + $user_check_in->points;
