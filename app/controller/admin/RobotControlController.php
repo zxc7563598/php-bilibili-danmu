@@ -201,7 +201,7 @@ class RobotControlController
             Utils\FileUtils::fileDelete(runtime_path() . '/tmp/share.cfg');
             Utils\FileUtils::writeToFile(runtime_path() . '/tmp/share.cfg', json_encode($share));
         }
-        // 获取自动回复配置
+        // 获取签到配置
         $checkIn = readFileContent(runtime_path() . '/tmp/check-in.cfg');
         if ($checkIn) {
             $checkIn = json_decode($checkIn, true);
@@ -211,6 +211,7 @@ class RobotControlController
                 'opens' => false, // 是否开启
                 'status' => "0", // 状态
                 'type' => "0", // 类型：0=全部感谢，1=仅感谢牌子，2=仅感谢航海
+                'currency_type' => "1", // 奖励类型：1=硬币，0=积分
                 'keywords' => "", // 签到词
                 'select' => "", // 查询词
                 'success' => "", // 成功回复

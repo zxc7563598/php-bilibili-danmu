@@ -293,7 +293,24 @@
                                 </div>
                                 <div class="field is-horizontal">
                                     <div class="field-label is-normal">
-                                        <label class="label">赠送硬币</label>
+                                        <label class="label">奖励类型</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <div class="button-group">
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.check_in.currency_type == 0 ? 'is-active' : ''"
+                                                    @click="configSwitch('check_in-currency_type',0)">积分</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.check_in.currency_type == 1 ? 'is-active' : ''"
+                                                    @click="configSwitch('check_in-currency_type',1)">硬币</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">赠送数量</label>
                                     </div>
                                     <div class="field-body">
                                         <div class="field">
@@ -1465,6 +1482,7 @@
                             opens: false, // 是否开启
                             status: 0, // 状态
                             type: 0, // 类型：0=全部感谢，1=仅感谢牌子，2=仅感谢航海
+                            currency_type: 1, // 奖励类型：1=硬币，0=积分
                             keywords: null, // 签到词
                             points:0, // 签到赠送积分
                             select: null, // 查询词
@@ -1550,6 +1568,9 @@
                             break;
                         case 'check_in-type':
                             this.config.check_in.type = opens
+                            break;
+                        case 'check_in-currency_type':
+                            this.config.check_in.currency_type = opens
                             break;
                         case 'present':
                             this.config.present.opens = opens

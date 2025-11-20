@@ -340,8 +340,29 @@ class UserManagementController extends GeneralMethod
             ], 'page', $pageNo);
         // 处理数据
         foreach ($user_currency_logs as &$_user_currency_logs) {
+            $icon = getImageUrl('icon/supreme.png');
+            switch ($_user_currency_logs->source) {
+                case UserCurrencyLogsEnums\Source::AnchorChange->value: // 主播变更
+                    $icon = getImageUrl('icon/AnchorChange.png');
+                    break;
+                case UserCurrencyLogsEnums\Source::SignIn->value: // 签到
+                    $icon = getImageUrl('icon/SignIn.png');
+                    break;
+                case UserCurrencyLogsEnums\Source::AutomaticallyClear->value: // 系统清理
+                    $icon = getImageUrl('icon/AutomaticallyClear.png');
+                    break;
+                case UserCurrencyLogsEnums\Source::PurchaseVip->value: // 开通航海
+                    $icon = getImageUrl('icon/PurchaseVip.png');
+                    break;
+                case UserCurrencyLogsEnums\Source::GiftRebate->value: // 礼物返利
+                    $icon = getImageUrl('icon/GiftRebate.png');
+                    break;
+                case UserCurrencyLogsEnums\Source::Exchange->value: // 兑换商品
+                    $icon = getImageUrl('icon/Exchange.png');
+                    break;
+            }
             $type = $_user_currency_logs->type == UserCurrencyLogsEnums\Type::Up->value ? '+' : '-';
-            $_user_currency_logs->icon = getImageUrl('shop-config/supreme.png');
+            $_user_currency_logs->icon = $icon;
             $_user_currency_logs->name = UserCurrencyLogsEnums\Source::from($_user_currency_logs->source)->label();
             $_user_currency_logs->currency = $type . ' ' . $_user_currency_logs->currency;
             $_user_currency_logs->date = $_user_currency_logs->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
@@ -380,8 +401,29 @@ class UserManagementController extends GeneralMethod
             ], 'page', $pageNo);
         // 处理数据
         foreach ($user_currency_logs as &$_user_currency_logs) {
+            $icon = getImageUrl('icon/supreme.png');
+            switch ($_user_currency_logs->source) {
+                case UserCurrencyLogsEnums\Source::AnchorChange->value: // 主播变更
+                    $icon = getImageUrl('icon/AnchorChange.png');
+                    break;
+                case UserCurrencyLogsEnums\Source::SignIn->value: // 签到
+                    $icon = getImageUrl('icon/SignIn.png');
+                    break;
+                case UserCurrencyLogsEnums\Source::AutomaticallyClear->value: // 系统清理
+                    $icon = getImageUrl('icon/AutomaticallyClear.png');
+                    break;
+                case UserCurrencyLogsEnums\Source::PurchaseVip->value: // 开通航海
+                    $icon = getImageUrl('icon/PurchaseVip.png');
+                    break;
+                case UserCurrencyLogsEnums\Source::GiftRebate->value: // 礼物返利
+                    $icon = getImageUrl('icon/GiftRebate.png');
+                    break;
+                case UserCurrencyLogsEnums\Source::Exchange->value: // 兑换商品
+                    $icon = getImageUrl('icon/Exchange.png');
+                    break;
+            }
             $type = $_user_currency_logs->type == UserCurrencyLogsEnums\Type::Up->value ? '+' : '-';
-            $_user_currency_logs->icon = getImageUrl('shop-config/supreme.png');
+            $_user_currency_logs->icon = $icon;
             $_user_currency_logs->name = UserCurrencyLogsEnums\Source::from($_user_currency_logs->source)->label();
             $_user_currency_logs->currency = $type . ' ' . $_user_currency_logs->currency;
             $_user_currency_logs->date = $_user_currency_logs->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
