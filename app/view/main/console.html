@@ -293,7 +293,24 @@
                                 </div>
                                 <div class="field is-horizontal">
                                     <div class="field-label is-normal">
-                                        <label class="label">赠送硬币</label>
+                                        <label class="label">奖励类型</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <div class="button-group">
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.check_in.currency_type == 0 ? 'is-active' : ''"
+                                                    @click="configSwitch('check_in-currency_type',0)">硬币</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.check_in.currency_type == 1 ? 'is-active' : ''"
+                                                    @click="configSwitch('check_in-currency_type',1)">积分</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">赠送数量</label>
                                     </div>
                                     <div class="field-body">
                                         <div class="field">
@@ -1550,6 +1567,9 @@
                             break;
                         case 'check_in-type':
                             this.config.check_in.type = opens
+                            break;
+                        case 'check_in-currency_type':
+                            this.config.check_in.currency_type = opens
                             break;
                         case 'present':
                             this.config.present.opens = opens
