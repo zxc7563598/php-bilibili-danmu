@@ -14,15 +14,6 @@
  */
 
 return [
-    'listen' => getenv('HOST') . ':' . getenv('LISTEN'),
-    'listen_port' => getenv('LISTEN'),
-    'transport' => 'tcp',
-    'context' => [],
-    'name' => 'Danmuji',
-    'count' => cpu_count() * 1,
-    'user' => '',
-    'group' => '',
-    'reusePort' => false,
     'event_loop' => '',
     'stop_timeout' => 2,
     'pid_file' => runtime_path() . '/webman.pid',
