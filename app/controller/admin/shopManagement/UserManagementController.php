@@ -21,19 +21,19 @@ class UserManagementController extends GeneralMethod
     /**
      * 获取用户列表
      * 
-     * @param integer $page 页码
-     * @param string $uid 用户UID
-     * @param string $uname 用户名称
+     * @param integer $pageNo 页码
+     * @param integer $pageSize 每页展示数量
+     * @param string $uid 用户uid
+     * @param string $uname 用户名
      * 
      * @return Response 
      */
-    public function getData(Request $request)
+    public function getData(Request $request): Response
     {
-        // 获取参数
-        $pageNo = $request->data['pageNo'] ?? 1;
-        $pageSize = $request->data['pageSize'] ?? 10;
-        $uid = $request->data['uid'] ?? null;
-        $uname = $request->data['uname'] ?? null;
+        $pageNo = $request->post('pageNo', 1);
+        $pageSize = $request->post('pageSize', 10);
+        $uid = $request->post('uid', null);
+        $uname = $request->post('uname', null);
         // 获取数据
         $users = UserVips::query();
         if (!is_null($uid)) {
@@ -54,12 +54,12 @@ class UserManagementController extends GeneralMethod
                 'coin' => 'coin'
             ], 'page', $pageNo);
         // 处理数据
-        foreach ($users as &$_user) {
-            $_user->vip_type = UserVipsEnums\VipType::from($_user->vip_type)->label();
-            $_user->last_vip_at = Carbon::parse($_user->last_vip_at)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
-            $_user->end_vip_at = Carbon::parse($_user->end_vip_at)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
-        }
         $data = is_array($users) ? $users : $users->toArray();
+        foreach ($data['data'] as &$_data) {
+            $_data['vip_type'] = UserVipsEnums\VipType::from($_data['vip_type'])->label();
+            $_data['last_vip_at'] = Carbon::parse($_data['last_vip_at'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
+            $_data['end_vip_at'] = Carbon::parse($_data['end_vip_at'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
+        }
         // 返回数据
         return success($request, [
             "total" => $data['total'],
@@ -74,10 +74,10 @@ class UserManagementController extends GeneralMethod
      * 
      * @return Response 
      */
-    public function getUserData(Request $request)
+    public function getUserData(Request $request): Response
     {
         // 获取参数
-        $user_id = $request->data['user_id'];
+        $user_id = $request->post('user_id');
         // 获取用户数据
         $user = UserVips::where('user_id', $user_id)->first([
             'user_id' => 'user_id',
@@ -99,10 +99,10 @@ class UserManagementController extends GeneralMethod
      * 
      * @return Response 
      */
-    public function getUserInfo(Request $request)
+    public function getUserInfo(Request $request): Response
     {
         // 获取参数
-        $uid = $request->data['uid'];
+        $uid = $request->post('uid');
         // 获取数据
         $getMasterInfo = Utils\HttpClient::sendGetRequest('https://api.live.bilibili.com/live_user/v1/Master/info?uid=' . $uid, [
             "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
@@ -128,14 +128,14 @@ class UserManagementController extends GeneralMethod
      * 
      * @return Response 
      */
-    public function setData(Request $request)
+    public function setData(Request $request): Response
     {
         // 获取参数
-        $user_id = $request->data['user_id'] ?? null;
-        $uid = $request->data['uid'];
-        $name = $request->data['name'];
-        $password = $request->data['password'] ?? null;
-        $vip_type = $request->data['vip_type'];
+        $user_id = $request->post('user_id', null);
+        $uid = $request->post('uid');
+        $name = $request->post('name');
+        $password = $request->post('password', null);
+        $vip_type = $request->post('vip_type');
         // 获取数据
         $user = (!is_null($user_id) && ($user_id > 0)) ? UserVips::find($user_id) : new UserVips();
         if (!$user && !is_null($user_id)) {
@@ -159,7 +159,7 @@ class UserManagementController extends GeneralMethod
      * 
      * @return Response 
      */
-    public function resetPassword(Request $request)
+    public function resetPassword(Request $request): Response
     {
         // 处理数据
         UserVips::where('created_at', '>', 0)->update([
@@ -177,10 +177,9 @@ class UserManagementController extends GeneralMethod
      * 
      * @return Response 
      */
-    public function getUserPointRecords(Request $request)
+    public function getUserPointRecords(Request $request): Response
     {
-        // 获取参数
-        $user_id = $request->data['user_id'];
+        $user_id = $request->post('user_id');
         // 获取记录
         $user_currency_logs = UserCurrencyLogs::where('user_id', $user_id)
             ->where('currency_type', UserCurrencyLogsEnums\CurrencyType::Point->value)
@@ -217,8 +216,7 @@ class UserManagementController extends GeneralMethod
      */
     public function getUserCoinRecords(Request $request)
     {
-        // 获取参数
-        $user_id = $request->data['user_id'];
+        $user_id = $request->post('user_id');
         // 获取记录
         $user_currency_logs = UserCurrencyLogs::where('user_id', $user_id)
             ->where('currency_type', UserCurrencyLogsEnums\CurrencyType::Coin->value)
@@ -257,10 +255,9 @@ class UserManagementController extends GeneralMethod
      */
     public function setUserPoint(Request $request)
     {
-        // 获取参数
-        $type = $request->data['type'];
-        $point = $request->data['point'];
-        $user_id = $request->data['user_id'];
+        $type = $request->post('type');
+        $point = $request->post('point');
+        $user_id = $request->post('user_id');
         // 获取用户数据
         $user_vips = UserVips::where('user_id', $user_id)->first();
         if (empty($user_vips)) {
@@ -289,12 +286,11 @@ class UserManagementController extends GeneralMethod
      * 
      * @return Response 
      */
-    public function setUserCoin(Request $request)
+    public function setUserCoin(Request $request): Response
     {
-        // 获取参数
-        $type = $request->data['type'];
-        $coin = $request->data['coin'];
-        $user_id = $request->data['user_id'];
+        $type = $request->post('type');
+        $coin = $request->post('coin');
+        $user_id = $request->post('user_id');
         // 获取用户数据
         $user_vips = UserVips::where('user_id', $user_id)->first();
         if (empty($user_vips)) {
@@ -321,12 +317,11 @@ class UserManagementController extends GeneralMethod
      * 
      * @return Response 
      */
-    public function getUserPointRecordsV2(Request $request)
+    public function getUserPointRecordsV2(Request $request): Response
     {
-        // 获取参数
-        $pageNo = $request->data['pageNo'] ?? 1;
-        $pageSize = $request->data['pageSize'] ?? 6;
-        $user_id = $request->data['user_id'];
+        $pageNo = $request->post('pageNo', 1);
+        $pageSize = $request->post('pageSize', 6);
+        $user_id = $request->post('user_id');
         // 获取记录
         $user_currency_logs = UserCurrencyLogs::where('user_id', $user_id)
             ->where('currency_type', UserCurrencyLogsEnums\CurrencyType::Point->value)
@@ -339,9 +334,10 @@ class UserManagementController extends GeneralMethod
                 'created_at' => 'created_at'
             ], 'page', $pageNo);
         // 处理数据
-        foreach ($user_currency_logs as &$_user_currency_logs) {
+        $data = is_array($user_currency_logs) ? $user_currency_logs : $user_currency_logs->toArray();
+        foreach ($data['data'] as &$_data) {
             $icon = getImageUrl('icon/supreme.png');
-            switch ($_user_currency_logs->source) {
+            switch ($_data['source']) {
                 case UserCurrencyLogsEnums\Source::AnchorChange->value: // 主播变更
                     $icon = getImageUrl('icon/AnchorChange.png');
                     break;
@@ -361,13 +357,12 @@ class UserManagementController extends GeneralMethod
                     $icon = getImageUrl('icon/Exchange.png');
                     break;
             }
-            $type = $_user_currency_logs->type == UserCurrencyLogsEnums\Type::Up->value ? '+' : '-';
-            $_user_currency_logs->icon = $icon;
-            $_user_currency_logs->name = UserCurrencyLogsEnums\Source::from($_user_currency_logs->source)->label();
-            $_user_currency_logs->currency = $type . ' ' . $_user_currency_logs->currency;
-            $_user_currency_logs->date = $_user_currency_logs->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
+            $type = $_data['type'] == UserCurrencyLogsEnums\Type::Up->value ? '+' : '-';
+            $_data['icon'] = $icon;
+            $_data['name'] = UserCurrencyLogsEnums\Source::from($_data['source'])->label();
+            $_data['currency'] = $type . ' ' . $_data['currency'];
+            $_data['date'] = Carbon::parse($_data['created_at'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
         }
-        $data = is_array($user_currency_logs) ? $user_currency_logs : $user_currency_logs->toArray();
         // 返回数据
         return success($request, [
             "total" => $data['total'],
@@ -382,12 +377,11 @@ class UserManagementController extends GeneralMethod
      * 
      * @return Response 
      */
-    public function getUserCoinRecordsV2(Request $request)
+    public function getUserCoinRecordsV2(Request $request): Response
     {
-        // 获取参数
-        $pageNo = $request->data['pageNo'] ?? 1;
-        $pageSize = $request->data['pageSize'] ?? 6;
-        $user_id = $request->data['user_id'];
+        $pageNo = $request->post('pageNo', 1);
+        $pageSize = $request->post('pageSize', 6);
+        $user_id = $request->post('user_id');
         // 获取记录
         $user_currency_logs = UserCurrencyLogs::where('user_id', $user_id)
             ->where('currency_type', UserCurrencyLogsEnums\CurrencyType::Coin->value)
@@ -400,9 +394,10 @@ class UserManagementController extends GeneralMethod
                 'created_at' => 'created_at'
             ], 'page', $pageNo);
         // 处理数据
-        foreach ($user_currency_logs as &$_user_currency_logs) {
+        $data = is_array($user_currency_logs) ? $user_currency_logs : $user_currency_logs->toArray();
+        foreach ($data['data'] as &$_data) {
             $icon = getImageUrl('icon/supreme.png');
-            switch ($_user_currency_logs->source) {
+            switch ($_data['source']) {
                 case UserCurrencyLogsEnums\Source::AnchorChange->value: // 主播变更
                     $icon = getImageUrl('icon/AnchorChange.png');
                     break;
@@ -422,13 +417,12 @@ class UserManagementController extends GeneralMethod
                     $icon = getImageUrl('icon/Exchange.png');
                     break;
             }
-            $type = $_user_currency_logs->type == UserCurrencyLogsEnums\Type::Up->value ? '+' : '-';
-            $_user_currency_logs->icon = $icon;
-            $_user_currency_logs->name = UserCurrencyLogsEnums\Source::from($_user_currency_logs->source)->label();
-            $_user_currency_logs->currency = $type . ' ' . $_user_currency_logs->currency;
-            $_user_currency_logs->date = $_user_currency_logs->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
+            $type = $_data['type'] == UserCurrencyLogsEnums\Type::Up->value ? '+' : '-';
+            $_data['icon'] = $icon;
+            $_data['name'] = UserCurrencyLogsEnums\Source::from($_data['source'])->label();
+            $_data['currency'] = $type . ' ' . $_data['currency'];
+            $_data['date'] = Carbon::parse($_data['created_at'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
         }
-        $data = is_array($user_currency_logs) ? $user_currency_logs : $user_currency_logs->toArray();
         // 返回数据
         return success($request, [
             "total" => $data['total'],

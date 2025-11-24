@@ -50,6 +50,74 @@ Route::group('/api/shop', function () {
     app\middleware\ApiAuthCheck::class
 ]);
 
+// 不分离后台页面
+Route::get('/', [app\controller\robot\PageController::class, 'main'])->middleware([app\middleware\BasicAuthMiddleware::class]);
+Route::get('/login', [app\controller\robot\PageController::class, 'login'])->middleware([app\middleware\BasicAuthMiddleware::class]);
+Route::group('/points-mall', function () {
+    Route::get('/system-configuration', [app\controller\robot\ManagementController::class, 'pageSystemConfiguration']); // 系统配置
+    Route::get('/mall-configuration', [app\controller\robot\ManagementController::class, 'pageMallConfiguration']); // 商城配置
+    Route::get('/user-management', [app\controller\robot\ManagementController::class, 'pageUserManagement']); // 用户管理
+    Route::get('/product-management', [app\controller\robot\ManagementController::class, 'pageProductManagement']); // 商品管理
+    Route::get('/shipping-management', [app\controller\robot\ManagementController::class, 'pageShippingManagement']); // 发货管理
+    Route::get('/complaint-management', [app\controller\robot\ManagementController::class, 'pageComplaintManagement']); // 投诉管理
+    Route::get('/feedback', [app\controller\robot\ManagementController::class, 'pageFeedback']); // 问题反馈
+    Route::get('/gift-records', [app\controller\robot\ManagementController::class, 'pageGiftRecords']); // 礼物记录
+    Route::get('/danmu-records', [app\controller\robot\ManagementController::class, 'pageDanmuRecords']); // 弹幕记录
+    Route::get('/user-analysis', [app\controller\robot\ManagementController::class, 'pageUserAnalysis']); // 用户分析
+    Route::get('/gift-blind-box', [app\controller\robot\ManagementController::class, 'pageGiftBlindBox']); // 礼物盲盒
+})->middleware([
+    app\middleware\BasicAuthMiddleware::class
+]);
+
+// 不分离后台积分商城设置
+Route::group('/api/points-mall', function () {
+    Route::any('/system-configuration/get-data', [app\controller\robot\management\SystemConfigurationController::class, 'getData']);
+    Route::any('/system-configuration/get-data-qrcode', [app\controller\robot\management\SystemConfigurationController::class, 'getDataQrCode']);
+    Route::any('/system-configuration/set-data', [app\controller\robot\management\SystemConfigurationController::class, 'setData']);
+    Route::any('/mall-configuration/get-data', [app\controller\robot\management\MallConfigurationController::class, 'getData']);
+    Route::any('/mall-configuration/set-data', [app\controller\robot\management\MallConfigurationController::class, 'setData']);
+    Route::any('/mall-configuration/upload-images', [app\controller\robot\management\MallConfigurationController::class, 'uploadImages']);
+    Route::any('/user-management/get-data', [app\controller\robot\management\UserManagementController::class, 'getData']);
+    Route::any('/user-management/get-user-data', [app\controller\robot\management\UserManagementController::class, 'getUserData']);
+    Route::any('/user-management/get-user-info', [app\controller\robot\management\UserManagementController::class, 'getUserInfo']);
+    Route::any('/user-management/set-data', [app\controller\robot\management\UserManagementController::class, 'setData']);
+    Route::any('/user-management/reset-password', [app\controller\robot\management\UserManagementController::class, 'resetPassword']);
+    Route::any('/user-management/get-user-point-records', [app\controller\robot\management\UserManagementController::class, 'getUserPointRecords']);
+    Route::any('/user-management/get-user-coin-records', [app\controller\robot\management\UserManagementController::class, 'getUserCoinRecords']);
+    Route::any('/user-management/set-user-point', [app\controller\robot\management\UserManagementController::class, 'setUserPoint']);
+    Route::any('/user-management/set-user-coin', [app\controller\robot\management\UserManagementController::class, 'setUserCoin']);
+    Route::any('/product-management/get-data', [app\controller\robot\management\ProductManagementController::class, 'getData']);
+    Route::any('/product-management/get-data-details', [app\controller\robot\management\ProductManagementController::class, 'getDataDetails']);
+    Route::any('/product-management/set-data-details', [app\controller\robot\management\ProductManagementController::class, 'setDataDetails']);
+    Route::any('/product-management/upload-images', [app\controller\robot\management\ProductManagementController::class, 'uploadImages']);
+    Route::any('/shipping-management/get-data', [app\controller\robot\management\ShippingManagementController::class, 'getData']);
+    Route::any('/shipping-management/get-data-details', [app\controller\robot\management\ShippingManagementController::class, 'getDataDetails']);
+    Route::any('/shipping-management/set-data-details', [app\controller\robot\management\ShippingManagementController::class, 'setDataDetails']);
+    Route::any('/complaint-management/get-data', [app\controller\robot\management\ComplaintManagementController::class, 'getData']);
+    Route::any('/complaint-management/get-data-details', [app\controller\robot\management\ComplaintManagementController::class, 'getDataDetails']);
+    Route::any('/gift-records-management/get-data', [app\controller\robot\management\GiftRecordsManagementController::class, 'getData']);
+})->middleware([
+    app\middleware\AccessControl::class,
+    app\middleware\SignatureMiddleware::class
+]);
+
+// 不分离后台机器人设置
+Route::group('/api/robot', function () {
+    Route::any('/login-check', [app\controller\robot\ApiController::class, 'loginCheck']);
+    Route::any('/login-out', [app\controller\robot\ApiController::class, 'loginOut']);
+    Route::any('/get-user-info', [app\controller\robot\ApiController::class, 'getUserInfo']);
+    Route::any('/get-real-room-info', [app\controller\robot\ApiController::class, 'getRealRoomInfo']);
+    Route::any('/get-config', [app\controller\robot\ApiController::class, 'getConfig']);
+    Route::any('/set-config', [app\controller\robot\ApiController::class, 'setConfig']);
+    Route::any('/connect-out', [app\controller\robot\ApiController::class, 'connectOut']);
+    Route::any('/export-config', [app\controller\robot\ApiController::class, 'exportConfig']);
+    Route::any('/update-read', [app\controller\robot\ApiController::class, 'updateRead']);
+})->middleware([
+    app\middleware\SignatureMiddleware::class
+]);
+
+Route::any('/file/import-config', [app\controller\robot\ApiController::class, 'importConfig']);
+
 // 新版后台API接口
 Route::group('/admin-api-v2', function () {
     // 欢迎页
@@ -142,74 +210,6 @@ Route::group('/admin-api-v2', function () {
     app\middleware\LangMiddleware::class,
     app\middleware\AdminAuthMiddleware::class
 ]);
-
-// 不分离后台页面
-Route::get('/', [app\controller\robot\PageController::class, 'main'])->middleware([app\middleware\BasicAuthMiddleware::class]);
-Route::get('/login', [app\controller\robot\PageController::class, 'login'])->middleware([app\middleware\BasicAuthMiddleware::class]);
-Route::group('/points-mall', function () {
-    Route::get('/system-configuration', [app\controller\robot\ManagementController::class, 'pageSystemConfiguration']); // 系统配置
-    Route::get('/mall-configuration', [app\controller\robot\ManagementController::class, 'pageMallConfiguration']); // 商城配置
-    Route::get('/user-management', [app\controller\robot\ManagementController::class, 'pageUserManagement']); // 用户管理
-    Route::get('/product-management', [app\controller\robot\ManagementController::class, 'pageProductManagement']); // 商品管理
-    Route::get('/shipping-management', [app\controller\robot\ManagementController::class, 'pageShippingManagement']); // 发货管理
-    Route::get('/complaint-management', [app\controller\robot\ManagementController::class, 'pageComplaintManagement']); // 投诉管理
-    Route::get('/feedback', [app\controller\robot\ManagementController::class, 'pageFeedback']); // 问题反馈
-    Route::get('/gift-records', [app\controller\robot\ManagementController::class, 'pageGiftRecords']); // 礼物记录
-    Route::get('/danmu-records', [app\controller\robot\ManagementController::class, 'pageDanmuRecords']); // 弹幕记录
-    Route::get('/user-analysis', [app\controller\robot\ManagementController::class, 'pageUserAnalysis']); // 用户分析
-    Route::get('/gift-blind-box', [app\controller\robot\ManagementController::class, 'pageGiftBlindBox']); // 礼物盲盒
-})->middleware([
-    app\middleware\BasicAuthMiddleware::class
-]);
-
-// 不分离后台积分商城设置
-Route::group('/api/points-mall', function () {
-    Route::any('/system-configuration/get-data', [app\controller\robot\management\SystemConfigurationController::class, 'getData']);
-    Route::any('/system-configuration/get-data-qrcode', [app\controller\robot\management\SystemConfigurationController::class, 'getDataQrCode']);
-    Route::any('/system-configuration/set-data', [app\controller\robot\management\SystemConfigurationController::class, 'setData']);
-    Route::any('/mall-configuration/get-data', [app\controller\robot\management\MallConfigurationController::class, 'getData']);
-    Route::any('/mall-configuration/set-data', [app\controller\robot\management\MallConfigurationController::class, 'setData']);
-    Route::any('/mall-configuration/upload-images', [app\controller\robot\management\MallConfigurationController::class, 'uploadImages']);
-    Route::any('/user-management/get-data', [app\controller\robot\management\UserManagementController::class, 'getData']);
-    Route::any('/user-management/get-user-data', [app\controller\robot\management\UserManagementController::class, 'getUserData']);
-    Route::any('/user-management/get-user-info', [app\controller\robot\management\UserManagementController::class, 'getUserInfo']);
-    Route::any('/user-management/set-data', [app\controller\robot\management\UserManagementController::class, 'setData']);
-    Route::any('/user-management/reset-password', [app\controller\robot\management\UserManagementController::class, 'resetPassword']);
-    Route::any('/user-management/get-user-point-records', [app\controller\robot\management\UserManagementController::class, 'getUserPointRecords']);
-    Route::any('/user-management/get-user-coin-records', [app\controller\robot\management\UserManagementController::class, 'getUserCoinRecords']);
-    Route::any('/user-management/set-user-point', [app\controller\robot\management\UserManagementController::class, 'setUserPoint']);
-    Route::any('/user-management/set-user-coin', [app\controller\robot\management\UserManagementController::class, 'setUserCoin']);
-    Route::any('/product-management/get-data', [app\controller\robot\management\ProductManagementController::class, 'getData']);
-    Route::any('/product-management/get-data-details', [app\controller\robot\management\ProductManagementController::class, 'getDataDetails']);
-    Route::any('/product-management/set-data-details', [app\controller\robot\management\ProductManagementController::class, 'setDataDetails']);
-    Route::any('/product-management/upload-images', [app\controller\robot\management\ProductManagementController::class, 'uploadImages']);
-    Route::any('/shipping-management/get-data', [app\controller\robot\management\ShippingManagementController::class, 'getData']);
-    Route::any('/shipping-management/get-data-details', [app\controller\robot\management\ShippingManagementController::class, 'getDataDetails']);
-    Route::any('/shipping-management/set-data-details', [app\controller\robot\management\ShippingManagementController::class, 'setDataDetails']);
-    Route::any('/complaint-management/get-data', [app\controller\robot\management\ComplaintManagementController::class, 'getData']);
-    Route::any('/complaint-management/get-data-details', [app\controller\robot\management\ComplaintManagementController::class, 'getDataDetails']);
-    Route::any('/gift-records-management/get-data', [app\controller\robot\management\GiftRecordsManagementController::class, 'getData']);
-})->middleware([
-    app\middleware\AccessControl::class,
-    app\middleware\SignatureMiddleware::class
-]);
-
-// 不分离后台机器人设置
-Route::group('/api/robot', function () {
-    Route::any('/login-check', [app\controller\robot\ApiController::class, 'loginCheck']);
-    Route::any('/login-out', [app\controller\robot\ApiController::class, 'loginOut']);
-    Route::any('/get-user-info', [app\controller\robot\ApiController::class, 'getUserInfo']);
-    Route::any('/get-real-room-info', [app\controller\robot\ApiController::class, 'getRealRoomInfo']);
-    Route::any('/get-config', [app\controller\robot\ApiController::class, 'getConfig']);
-    Route::any('/set-config', [app\controller\robot\ApiController::class, 'setConfig']);
-    Route::any('/connect-out', [app\controller\robot\ApiController::class, 'connectOut']);
-    Route::any('/export-config', [app\controller\robot\ApiController::class, 'exportConfig']);
-    Route::any('/update-read', [app\controller\robot\ApiController::class, 'updateRead']);
-})->middleware([
-    app\middleware\SignatureMiddleware::class
-]);
-
-Route::any('/file/import-config', [app\controller\robot\ApiController::class, 'importConfig']);
 
 Route::post('/reload-bilibili', function (Request $request) {
     // 预定义的 API 密钥（可以从配置文件或环境变量中读取）

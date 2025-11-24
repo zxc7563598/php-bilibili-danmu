@@ -14,7 +14,7 @@ class ShopSettingsController
      * 
      * @return Response 
      */
-    public function getData(Request $request)
+    public function getData(Request $request): Response
     {
         // 获取数据
         $shop_config = ShopConfig::get();
@@ -143,49 +143,49 @@ class ShopSettingsController
      * 
      * @return Response 
      */
-    public function setData(Request $request)
+    public function setData(Request $request): Response
     {
         $input = [];
-        $input['login-background-image'] = $request->data['login_background_image'];
-        $input['personal-background-image'] = $request->data['personal_background_image'];
-        $input['theme-color'] = $request->data['theme_color'];
-        $input['live-streaming-link'] = $request->data['live_streaming_link'];
-        $input['user-login-password'] = $request->data['user_login_password'];
-        $input['protocols-enable'] = $request->data['protocols_enable'] ?? 1;
-        $input['protocols-surname'] = $request->data['protocols_surname'];
-        $input['protocols-uid'] = $request->data['protocols_uid'];
-        $input['protocols-name'] = $request->data['protocols_name'];
-        $input['protocols-signature'] = $request->data['protocols_signature'];
-        $input['protocols-content'] = $request->data['protocols_content'];
-        $input['gift-records'] = $request->data['gift_records'];
-        $input['listening-open-vip'] = $request->data['listening_open_vip'];
-        $input['vip-lv1-bonus-points'] = $request->data['vip_lv1_bonus_points'];
-        $input['vip-lv2-bonus-points'] = $request->data['vip_lv2_bonus_points'];
-        $input['vip-lv3-bonus-points'] = $request->data['vip_lv3_bonus_points'];
-        $input['points-expire-mode'] = $request->data['points_expire_mode'] ?? 0;
-        $input['points-expire-days'] = $request->data['points_expire_days'] ?? 0;
-        $input['rebate-enable'] = $request->data['rebate_enable'] ?? 0;
-        $input['rebate-proportion'] = $request->data['rebate_proportion'] ?? 0;
-        $input['min-rebate-point'] = $request->data['min_rebate_point'] ?? 0;
-        $input['virtual-gift-order-successful-icon'] = $request->data['virtual_gift_order_successful_icon'];
-        $input['virtual-gift-order-successful-title'] = $request->data['virtual_gift_order_successful_title'];
-        $input['virtual-gift-order-successful-content'] = $request->data['virtual_gift_order_successful_content'];
-        $input['virtual-gift-order-successful-button'] = $request->data['virtual_gift_order_successful_button'];
-        $input['realism-gift-order-successful-icon'] = $request->data['realism_gift_order_successful_icon'];
-        $input['realism-gift-order-successful-title'] = $request->data['realism_gift_order_successful_title'];
-        $input['realism-gift-order-successful-content'] = $request->data['realism_gift_order_successful_content'];
-        $input['realism-gift-order-successful-button'] = $request->data['realism_gift_order_successful_button'];
-        $input['tribute-gift-order-successful-icon'] = $request->data['tribute_gift_order_successful_icon'];
-        $input['tribute-gift-order-successful-title'] = $request->data['tribute_gift_order_successful_title'];
-        $input['tribute-gift-order-successful-content'] = $request->data['tribute_gift_order_successful_content'];
-        $input['tribute-gift-order-successful-button'] = $request->data['tribute_gift_order_successful_button'];
-        $input['tribute-gift-order-successful-rankings'] = $request->data['tribute_gift_order_successful_rankings'];
-        $input['tribute-gift-order-successful-rankingslist'] = $request->data['tribute_gift_order_successful_rankingslist'];
-        $input['enable-aggregate-mail'] = $request->data['enable_aggregate_mail'];
-        $input['enable-shop-mail'] = $request->data['enable_shop_mail'];
-        $input['enable-disconnect-mail'] = $request->data['enable_disconnect_mail'];
-        $input['email-address'] = $request->data['email_address'] ?? null;
-        $input['address-as'] = $request->data['address_as'] ?? null;
+        $input['login-background-image'] = $request->post('login_background_image');
+        $input['personal-background-image'] = $request->post('personal_background_image');
+        $input['theme-color'] = $request->post('theme_color');
+        $input['live-streaming-link'] = $request->post('live_streaming_link');
+        $input['user-login-password'] = $request->post('user_login_password');
+        $input['protocols-enable'] = $request->post('protocols_enable', 1);
+        $input['protocols-surname'] = $request->post('protocols_surname');
+        $input['protocols-uid'] = $request->post('protocols_uid');
+        $input['protocols-name'] = $request->post('protocols_name');
+        $input['protocols-signature'] = $request->post('protocols_signature');
+        $input['protocols-content'] = $request->post('protocols_content');
+        $input['gift-records'] = $request->post('gift_records');
+        $input['listening-open-vip'] = $request->post('listening_open_vip');
+        $input['vip-lv1-bonus-points'] = $request->post('vip_lv1_bonus_points');
+        $input['vip-lv2-bonus-points'] = $request->post('vip_lv2_bonus_points');
+        $input['vip-lv3-bonus-points'] = $request->post('vip_lv3_bonus_points');
+        $input['points-expire-mode'] = $request->post('points_expire_mode', 0);
+        $input['points-expire-days'] = $request->post('points_expire_days', 0);
+        $input['rebate-enable'] = $request->post('rebate_enable', 0);
+        $input['rebate-proportion'] = $request->post('rebate_proportion', 0);
+        $input['min-rebate-point'] = $request->post('min_rebate_point', 0);
+        $input['virtual-gift-order-successful-icon'] = $request->post('virtual_gift_order_successful_icon');
+        $input['virtual-gift-order-successful-title'] = $request->post('virtual_gift_order_successful_title');
+        $input['virtual-gift-order-successful-content'] = $request->post('virtual_gift_order_successful_content');
+        $input['virtual-gift-order-successful-button'] = $request->post('virtual_gift_order_successful_button');
+        $input['realism-gift-order-successful-icon'] = $request->post('realism_gift_order_successful_icon');
+        $input['realism-gift-order-successful-title'] = $request->post('realism_gift_order_successful_title');
+        $input['realism-gift-order-successful-content'] = $request->post('realism_gift_order_successful_content');
+        $input['realism-gift-order-successful-button'] = $request->post('realism_gift_order_successful_button');
+        $input['tribute-gift-order-successful-icon'] = $request->post('tribute_gift_order_successful_icon');
+        $input['tribute-gift-order-successful-title'] = $request->post('tribute_gift_order_successful_title');
+        $input['tribute-gift-order-successful-content'] = $request->post('tribute_gift_order_successful_content');
+        $input['tribute-gift-order-successful-button'] = $request->post('tribute_gift_order_successful_button');
+        $input['tribute-gift-order-successful-rankings'] = $request->post('tribute_gift_order_successful_rankings');
+        $input['tribute-gift-order-successful-rankingslist'] = $request->post('tribute_gift_order_successful_rankingslist');
+        $input['enable-aggregate-mail'] = $request->post('enable_aggregate_mail');
+        $input['enable-shop-mail'] = $request->post('enable_shop_mail');
+        $input['enable-disconnect-mail'] = $request->post('enable_disconnect_mail');
+        $input['email-address'] = $request->post('email_address', null);
+        $input['address-as'] = $request->post('address_as', null);
         // 获取数据
         $shop_config = ShopConfig::get([
             'config_id' => 'config_id',
@@ -226,7 +226,7 @@ class ShopSettingsController
      * 
      * @return Response 
      */
-    public function uploadImages(Request $request)
+    public function uploadImages(Request $request): Response
     {
         $file = $request->file('image');
         $type = $request->input('type', '');

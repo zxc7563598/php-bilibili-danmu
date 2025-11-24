@@ -28,11 +28,10 @@ class AdminRoleController
      */
     public function list(Request $request): Response
     {
-        $param = $request->data;
-        $pageNo = $param['pageNo'] ?? 1;
-        $pageSize = $param['pageSize'] ?? 10;
-        $name = $param['name'] ?? null;
-        $enable = $param['enable'] ?? null;
+        $pageNo = $request->post('pageNo', 1);
+        $pageSize = $request->post('pageSize', 10);
+        $name = $request->post('name', null);
+        $enable = $request->post('enable', null);
         // 获取数据
         $list = Roles::with('permissions');
         if (!is_null($name)) {
@@ -48,16 +47,16 @@ class AdminRoleController
             'enable' => 'enable'
         ], 'page', $pageNo);
         // 处理数据
-        foreach ($list as &$_list) {
-            $permissionIds = [];
-            foreach ($_list->permissions as $permissions) {
-                $permissionIds[] = $permissions->menu_id;
-            }
-            $_list['permissionIds'] = $permissionIds;
-            $_list['enable'] = $_list['enable'] != RolesEnums\Enable::Disable->value;
-            unset($_list->permissions);
-        }
         $data = is_array($list) ? $list : $list->toArray();
+        foreach ($data['data'] as &$_data) {
+            $permissionIds = [];
+            foreach ($_data['permissions'] as $permissions) {
+                $permissionIds[] = $permissions['menu_id'];
+            }
+            $_data['permissionIds'] = $permissionIds;
+            $_data['enable'] = $_data['enable'] != RolesEnums\Enable::Disable->value;
+            unset($_data->permissions);
+        }
         // 返回数据
         return success($request, [
             "total" => $data['total'],
@@ -100,11 +99,11 @@ class AdminRoleController
      */
     public function createOrUpdate(Request $request): Response
     {
-        $id = $request->data['id'] ?? null;
-        $code = $request->data['code'] ?? null;
-        $name = $request->data['name'] ?? null;
-        $enable = $request->data['enable'] ?? null;
-        $permissionIds = $request->data['permissionIds'] ?? null;
+        $id = $request->post('id', null);
+        $code = $request->post('code', null);
+        $name = $request->post('name', null);
+        $enable = $request->post('enable', null);
+        $permissionIds = $request->post('permissionIds', null);
         // 获取数据
         $roles = new Roles();
         if (!empty($id)) {
@@ -147,7 +146,7 @@ class AdminRoleController
      */
     public function delete(Request $request): Response
     {
-        $id = $request->data['id'];
+        $id = $request->post('id');
         // 删除角色
         Roles::destroy($id);
         // 删除相关菜单

@@ -17,7 +17,7 @@ class SystemSettingsController
      * 
      * @return Response 
      */
-    public function getData(Request $request)
+    public function getData(Request $request): Response
     {
         // 获取 shop 文件夹是否存在
         $shop = is_dir(public_path('shop'));
@@ -49,10 +49,10 @@ class SystemSettingsController
      *  
      * @return Response 
      */
-    public function getDataQrCode(Request $request)
+    public function getDataQrCode(Request $request): Response
     {
         // 获取请求参数
-        $url = $request->data['url'];
+        $url = $request->post('url');
         // 生成二维码
         $qrcode = md5($url) . '.png';
         // 确认目录信息，不存在则创建
@@ -90,7 +90,7 @@ class SystemSettingsController
      * 
      * @return Response 
      */
-    public function setData(Request $request)
+    public function setData(Request $request): Response
     {
         // 限制请求频率
         $redis = Redis::get(config('app')['app_name'] . ':system_set_config');
@@ -117,7 +117,7 @@ class SystemSettingsController
             'db_password'
         ];
         // 组装需要修改的环境变量数据
-        $data = array_map(fn($key) => ['key' => strtoupper($key), 'value' => isset($request->data[$key]) ? $request->data[$key] : ''], $configKeys);
+        $data = array_map(fn($key) => ['key' => strtoupper($key), 'value' => $request->post($key, '')], $configKeys);
         // 读取 .env 文件内容
         $env = Utils\FileUtils::readFile(base_path() . '/.env');
         // 需要重新构建VUE的关键配置项
@@ -126,7 +126,7 @@ class SystemSettingsController
         foreach ($keysToCheck as $key) {
             preg_match("/^$key=(.*)$/m", $env, $matches);
             $currentValue = $matches[1] ?? null;
-            $newValue = $request->data[strtolower($key)];
+            $newValue = $request->post(strtolower($key));
             if ($currentValue !== $newValue) {
                 $shouldExecuteCode = true;
                 break;

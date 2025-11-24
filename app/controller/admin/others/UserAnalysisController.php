@@ -10,12 +10,6 @@ use app\model\GiftRecords;
 use app\model\Lives;
 use app\model\UserVips;
 use Carbon\Carbon;
-use Carbon\Exceptions\InvalidTimeZoneException;
-use Carbon\Exceptions\InvalidFormatException;
-use Fukuball\Jieba\Finalseg;
-use Fukuball\Jieba\Jieba;
-use InvalidArgumentException;
-use RuntimeException;
 use support\Db;
 
 class UserAnalysisController extends GeneralMethod
@@ -23,19 +17,19 @@ class UserAnalysisController extends GeneralMethod
     /**
      * 获取用户分析列表
      * 
-     * @param integer $page 页码
-     * @param string $uid 用户UID
-     * @param string $uname 用户名称
+     * @param integer $pageNo 页码
+     * @param integer $pageSize 每页展示数量
+     * @param string $uid 用户uid
+     * @param string $uname 用户名
      * 
      * @return Response 
      */
     public function getData(Request $request)
     {
-        // 获取参数
-        $pageNo = $request->data['pageNo'];
-        $pageSize = $request->data['pageSize'];
-        $uid = $request->data['uid'] ?? null;
-        $uname = $request->data['uname'] ?? null;
+        $pageNo = $request->post('pageNo', 1);
+        $pageSize = $request->post('pageSize', 30);
+        $uid = $request->post('uid', null);
+        $uname = $request->post('uname', null);
         // 获取数据
         $user_vips = new UserVips();
         if (!is_null($uid)) {
@@ -71,13 +65,14 @@ class UserAnalysisController extends GeneralMethod
      */
     public function getDailyActive(Request $request)
     {
-        // 获取数据
-        $uid = $request->data['uid'];
+        $uid = $request->post('uid');
+        $year = $request->post('year', 0);
+        $month = $request->post('month', 0);
         // 获取目标年月，默认当前
         $timezone = config('app.default_timezone');
         $now = Carbon::now()->timezone($timezone);
-        $year = ($request->data['year'] ?? 0) > 0 ? (int)$request->data['year'] : (int)$now->year;
-        $month = ($request->data['month'] ?? 0) > 0 ? (int)$request->data['month'] : (int)$now->month;
+        $year = ($year) > 0 ? (int)$year : (int)$now->year;
+        $month = ($month) > 0 ? (int)$month : (int)$now->month;
         // 构造月份字符串并获取起止时间戳
         $targetDate = Carbon::createFromDate($year, $month, 1, $timezone);
         $start = $targetDate->copy()->startOfMonth()->startOfDay()->timestamp;
@@ -136,7 +131,7 @@ class UserAnalysisController extends GeneralMethod
      */
     public function getWordCloudFromText(Request $request)
     {
-        $uid = $request->data['uid'];
+        $uid = $request->post('uid');
         // 从数据库获取弹幕内容
         $danmu_logs = DanmuLogs::where('uid', $uid)->pluck('msg')->toArray();
         // 准备 JSON 输入

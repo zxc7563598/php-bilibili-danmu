@@ -22,10 +22,9 @@ class AuthenticationController
      */
     public function login(Request $request): Response
     {
-        // 获取请求参数
-        $username = $request->data['username'];
-        $password = $request->data['password'];
-        $captcha = $request->data['captcha'] ?? '';
+        $username = $request->post('username');
+        $password = $request->post('password');
+        $captcha = $request->post('captcha', '');
         // 执行登录
         $token = AdminAuthService::login($username, $password, $captcha);
         if (is_int($token)) {
@@ -60,7 +59,7 @@ class AuthenticationController
      */
     public function switchRole(Request $request): Response
     {
-        $code = $request->data['code'];
+        $code = $request->post('code');
         // 获取角色信息
         $roles = Roles::where('code', $code)->first();
         if (empty($roles)) {
@@ -88,9 +87,8 @@ class AuthenticationController
      */
     public function updatePassword(Request $request): Response
     {
-        $param = $request->data;
-        $newPassword = $param['newPassword'];
-        $oldPassword = $param['oldPassword'];
+        $newPassword = $request->post('newPassword');
+        $oldPassword = $request->post('oldPassword');
         // 验证密码
         $admins = Admins::where('id', $request->admins['id'])->first();
         if ($admins->password == sha1(sha1($oldPassword) . $admins->salt)) {
