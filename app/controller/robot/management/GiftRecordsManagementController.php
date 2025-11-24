@@ -1,6 +1,6 @@
 <?php
 
-namespace app\controller\shop\management;
+namespace app\controller\robot\management;
 
 use support\Request;
 use support\Response;
@@ -20,15 +20,13 @@ class GiftRecordsManagementController extends GeneralMethod
      * 
      * @return Response 
      */
-    public function getData(Request $request)
+    public function getData(Request $request): Response
     {
-        $param = $request->all();
-        // 获取参数
-        $page = $param['page'];
-        $uid = $param['uid'] ?? null;
-        $uname = $param['uname'] ?? null;
-        $start_time = $param['start_time'] ?? null;
-        $end_time = $param['end_time'] ?? null;
+        $page = $request->post('page', 1);
+        $uid = $request->post('uid', null);
+        $uname = $request->post('uname', null);
+        $start_time = $request->post('start_time', null);
+        $end_time = $request->post('end_time', null);
         // 获取数据
         $records = GiftRecords::query();
         $records_total = GiftRecords::query();
@@ -66,13 +64,14 @@ class GiftRecordsManagementController extends GeneralMethod
             Db::raw("ifNull(sum(total_price),0) as total_price"),
         ]);
         // 处理数据
-        foreach ($records as &$_records) {
-            $_records->create_time = $_records->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
-            unset($_records->created_at);
+        $list = pageToArray($records);
+        foreach ($list['data'] as &$_list) {
+            $_list['create_time'] = Carbon::parse($_list['created_at'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
+            unset($_list['created_at']);
         }
         // 返回数据
         return success($request, [
-            'list' => pageToArray($records),
+            'list' => $list,
             'num' => number_format($records_total->num, 0, '.', ','),
             'total_price' => number_format($records_total->total_price, 2, '.', ',')
         ]);

@@ -1,11 +1,12 @@
 <?php
 
-namespace app\controller\shop\management;
+namespace app\controller\robot\management;
 
 use support\Request;
 use support\Response;
 use app\model\Complaint;
 use app\controller\GeneralMethod;
+use Illuminate\Support\Carbon;
 use resource\enums\ComplaintEnums;
 
 class ComplaintManagementController extends GeneralMethod
@@ -19,14 +20,11 @@ class ComplaintManagementController extends GeneralMethod
      * 
      * @return Response
      */
-    public function getData(Request $request)
+    public function getData(Request $request): Response
     {
-        $param = $request->all();
-        // 分页参数
-        $page = $param['page'] ?? 1;
-        // 查询参数
-        $uid = $param['uid'] ?? null;
-        $uname = $param['uname'] ?? null;
+        $page = $request->post('page', 1);
+        $uid = $request->post('uid', null);
+        $uname = $request->post('uname', null);
         // 构建查询
         $complaintQuery = Complaint::join('bl_user_vips', 'bl_user_vips.user_id', '=', 'bl_complaint.user_id');
         if (!is_null($uname)) {
@@ -45,13 +43,14 @@ class ComplaintManagementController extends GeneralMethod
                 'created_at' => 'bl_complaint.created_at as created_at',
             ], 'page', $page);
         // 格式化数据
-        foreach ($complaints as $complaint) {
-            $complaint->create_time = $complaint->created_at->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s');
-            unset($complaint->created_at);
+        $list = pageToArray($complaints);
+        foreach ($list['data'] as $_list) {
+            $_list['create_time'] = Carbon::parse($_list['created_at'])->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s');
+            unset($_list['created_at']);
         }
         // 返回结果
         return success($request, [
-            'list' => pageToArray($complaints),
+            'list' => $list
         ]);
     }
 
@@ -62,14 +61,9 @@ class ComplaintManagementController extends GeneralMethod
      * 
      * @return Response
      */
-    public function getDataDetails(Request $request)
+    public function getDataDetails(Request $request): Response
     {
-        $param = $request->all();
-        // 获取投诉 ID
-        $complaintId = $param['complaint_id'] ?? null;
-        if (!$complaintId) {
-            return fail($request, 800015);
-        }
+        $complaintId = $request->post('complaint_id', null);
         // 查询投诉详情
         $complaint = Complaint::where('complaint_id', $complaintId)->first([
             'complaint_id' => 'complaint_id',

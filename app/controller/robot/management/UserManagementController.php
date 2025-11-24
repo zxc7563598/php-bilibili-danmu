@@ -1,6 +1,6 @@
 <?php
 
-namespace app\controller\shop\management;
+namespace app\controller\robot\management;
 
 use Carbon\Carbon;
 use Hejunjie\Utils;
@@ -10,6 +10,7 @@ use app\model\UserVips;
 use app\controller\GeneralMethod;
 use resource\enums\UserVipsEnums;
 use app\model\UserCurrencyLogs;
+use Hejunjie\Bililive;
 use resource\enums\UserCurrencyLogsEnums;
 
 class UserManagementController extends GeneralMethod
@@ -23,13 +24,13 @@ class UserManagementController extends GeneralMethod
      * 
      * @return Response 
      */
-    public function getData(Request $request)
+    public function getData(Request $request): Response
     {
         $param = $request->all();
         // 获取参数
-        $page = $param['page'];
-        $uid = $param['uid'] ?? null;
-        $uname = $param['uname'] ?? null;
+        $page = $request->post('page', 1);
+        $uid = $request->post('uid', null);
+        $uname = $request->post('uname', null);
         // 获取数据
         $users = UserVips::query();
         if (!is_null($uid)) {
@@ -50,13 +51,14 @@ class UserManagementController extends GeneralMethod
                 'coin' => 'coin',
             ], 'page', $page);
         // 处理数据
-        foreach ($users as &$_user) {
-            $_user->vip_type = UserVipsEnums\VipType::from($_user->vip_type)->label();
-            $_user->last_vip_at = Carbon::parse($_user->last_vip_at)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
-            $_user->end_vip_at = Carbon::parse($_user->end_vip_at)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
+        $list = pageToArray($users);
+        foreach ($list['data'] as &$_list) {
+            $_list['vip_type'] = UserVipsEnums\VipType::from($_list['vip_type'])->label();
+            $_list['last_vip_at'] = Carbon::parse($_list['last_vip_at'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
+            $_list['end_vip_at'] = Carbon::parse($_list['end_vip_at'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
         }
         // 返回数据
-        return success($request, ['list' => pageToArray($users)]);
+        return success($request, ['list' => $list]);
     }
 
     /**
@@ -66,11 +68,9 @@ class UserManagementController extends GeneralMethod
      * 
      * @return Response 
      */
-    public function getUserData(Request $request)
+    public function getUserData(Request $request): Response
     {
-        $param = $request->all();
-        // 获取参数
-        $user_id = $param['user_id'];
+        $user_id = $request->post('user_id');
         // 获取用户数据
         $user = UserVips::where('user_id', $user_id)->first([
             'user_id' => 'user_id',
@@ -93,22 +93,15 @@ class UserManagementController extends GeneralMethod
      * 
      * @return Response 
      */
-    public function getUserInfo(Request $request)
+    public function getUserInfo(Request $request): Response
     {
-        $param = $request->all();
-        // 获取参数
-        $uid = $param['uid'];
+        $uid = $request->post('uid');
         // 获取数据
-        $getMasterInfo = Utils\HttpClient::sendGetRequest('https://api.live.bilibili.com/live_user/v1/Master/info?uid=' . $uid, [
-            "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
-            "Origin: https://live.bilibili.com",
-        ], 10);
-        // 处理数据
-        $getMasterInfoData = $getMasterInfo['httpStatus'] == 200 ? json_decode($getMasterInfo['data'], true) : [];
+        $getMasterInfo = Bililive\Live::getMasterInfo($uid);
         // 返回数据
         return success($request, [
-            'uname' => $getMasterInfoData['data']['info']['uname'] ?? null,
-            'face' => $getMasterInfoData['data']['info']['face'] ?? null,
+            'uname' => $getMasterInfo['name'] ?? null,
+            'face' => $getMasterInfo['face'] ?? null,
         ]);
     }
 
@@ -123,15 +116,13 @@ class UserManagementController extends GeneralMethod
      * 
      * @return Response 
      */
-    public function setData(Request $request)
+    public function setData(Request $request): Response
     {
-        $param = $request->all();
-        // 获取参数
-        $user_id = $param['user_id'] ?? null;
-        $uid = $param['uid'];
-        $name = $param['name'];
-        $password = $param['password'] ?? null;
-        $vip_type = $param['vip_type'];
+        $user_id = $request->post('user_id', null);
+        $uid = $request->post('uid');
+        $name = $request->post('name');
+        $password = $request->post('password', null);
+        $vip_type = $request->post('vip_type');
         // 获取数据
         $user = !is_null($user_id) ? UserVips::find($user_id) : new UserVips();
         if (!$user && !is_null($user_id)) {
@@ -155,7 +146,7 @@ class UserManagementController extends GeneralMethod
      * 
      * @return Response 
      */
-    public function resetPassword(Request $request)
+    public function resetPassword(Request $request): Response
     {
         // 处理数据
         UserVips::where('created_at', '>', 0)->update([
@@ -173,11 +164,9 @@ class UserManagementController extends GeneralMethod
      * 
      * @return Response 
      */
-    public function getUserPointRecords(Request $request)
+    public function getUserPointRecords(Request $request): Response
     {
-        $param = $request->all();
-        // 获取参数
-        $user_id = $param['user_id'];
+        $user_id = $request->post('user_id');
         // 获取记录
         $user_currency_logs = UserCurrencyLogs::where('user_id', $user_id)
             ->where('currency_type', UserCurrencyLogsEnums\CurrencyType::Point->value)
@@ -212,11 +201,9 @@ class UserManagementController extends GeneralMethod
      * 
      * @return Response 
      */
-    public function getUserCoinRecords(Request $request)
+    public function getUserCoinRecords(Request $request): Response
     {
-        $param = $request->all();
-        // 获取参数
-        $user_id = $param['user_id'];
+        $user_id = $request->post('user_id');
         // 获取记录
         $user_currency_logs = UserCurrencyLogs::where('user_id', $user_id)
             ->where('currency_type', UserCurrencyLogsEnums\CurrencyType::Coin->value)
@@ -255,11 +242,9 @@ class UserManagementController extends GeneralMethod
      */
     public function setUserPoint(Request $request)
     {
-        $param = $request->all();
-        // 获取参数
-        $type = $param['type'];
-        $point = $param['point'];
-        $user_id = $param['user_id'];
+        $type = $request->post('type');
+        $point = $request->post('point');
+        $user_id = $request->post('user_id');
         // 获取用户数据
         $user_vips = UserVips::where('user_id', $user_id)->first();
         if (empty($user_vips)) {
@@ -290,11 +275,9 @@ class UserManagementController extends GeneralMethod
      */
     public function setUserCoin(Request $request)
     {
-        $param = $request->all();
-        // 获取参数
-        $type = $param['type'];
-        $point = $param['point'];
-        $user_id = $param['user_id'];
+        $type = $request->post('type');
+        $point = $request->post('point');
+        $user_id = $request->post('user_id');
         // 获取用户数据
         $user_vips = UserVips::where('user_id', $user_id)->first();
         if (empty($user_vips)) {
