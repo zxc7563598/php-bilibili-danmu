@@ -4,6 +4,7 @@ namespace app\bootstrap;
 
 use Webman\Bootstrap;
 
+// RSA密钥对生成
 class RsaKeyGenerator implements Bootstrap
 {
     protected static string $privateKeyPath = __DIR__ . '/../../private_key.pem';
