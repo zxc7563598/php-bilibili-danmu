@@ -3,11 +3,7 @@
 namespace app\core;
 
 use app\model\Admins;
-use app\cache\AdminLoginCache;
-use app\model\AdminRoles;
-use app\model\Roles;
-use Carbon\Carbon;
-use Hejunjie\Cache;
+use support\Cache;
 use resource\enums\AdminsEnums;
 
 /**
@@ -42,13 +38,13 @@ class AdminAuthService
         }
         // 生成token
         $token = md5(mt_rand(1000, 9999) . uniqid(md5(microtime(true)), true));
-        // 存储登录信息
+        // 删除先前的token信息
         if ($admins->token) {
-            $cache = self::getCache();
-            $cache->del($admins->token);
+            Cache::delete($admins->token);
         }
         $admins->token = $token;
         $admins->save();
+        Cache::set($token, json_encode($admins), 86400 * 7);
         // 返回数据
         return $token;
     }
@@ -65,32 +61,6 @@ class AdminAuthService
         $token = $admins->token;
         $admins->token = null;
         $admins->save();
-        $cache = self::getCache();
-        $cache->del($token);
-    }
-
-    /**
-     * 获取缓存实例
-     * 
-     * @return object 
-     */
-    public static function getCache(): object
-    {
-        return new Cache\RedisCache(
-            new Cache\FileCache(
-                new AdminLoginCache(),
-                runtime_path('admin/login'),
-                (3600 * 24 * 7)
-            ),
-            [
-                'host' => config('redis')['default']['host'],
-                'port' => config('redis')['default']['port'],
-                'password' => !empty(config('redis')['default']['password']) ? config('redis')['default']['password'] : null,
-                'db' => config('redis')['default']['database'],
-                'ttl' => (3600 * 24),
-            ],
-            'admin:token:',
-            true
-        );
+        Cache::delete($token);
     }
 }

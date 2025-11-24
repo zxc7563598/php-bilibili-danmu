@@ -2,9 +2,8 @@
 
 namespace app\middleware;
 
-use app\core\AdminAuthService;
-use Carbon\Carbon;
 use Hejunjie\EncryptedRequest\EncryptedRequestHandler;
+use support\Cache;
 use Webman\MiddlewareInterface;
 use Webman\Http\Response;
 use Webman\Http\Request;
@@ -68,8 +67,7 @@ class AdminAuthMiddleware implements MiddlewareInterface
 
     public static function loginCheck($token): int|array
     {
-        $cache = AdminAuthService::getCache();
-        $admins = $cache->get($token);
+        $admins = Cache::get($token);
         return !empty($admins) ? json_decode($admins, true) : 900005;
     }
 }
