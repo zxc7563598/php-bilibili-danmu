@@ -52,7 +52,7 @@ class Bilibili
      * 
      * @return void 
      */
-    public function onWorkerStart()
+    public function onWorkerStart(): void
     {
         $this->startUnixWorker();
         $this->connectToWebSocket();
@@ -63,7 +63,7 @@ class Bilibili
      * 
      * @return void 
      */
-    private function startUnixWorker()
+    private function startUnixWorker(): void
     {
         $socketFile = runtime_path() . '/bilibili.sock';
         if (file_exists($socketFile)) {
@@ -86,7 +86,7 @@ class Bilibili
      * 
      * @return void 
      */
-    private function connectToWebSocket()
+    private function connectToWebSocket(): void
     {
         $this->clearTimers();
         $this->cookie = RobotServices::getCookie();
@@ -143,7 +143,7 @@ class Bilibili
      * 
      * @return void 
      */
-    private function setupConnection(AsyncTcpConnection $con, int $roomId, string $token)
+    private function setupConnection(AsyncTcpConnection $con, int $roomId, string $token): void
     {
         // 设置 SSL 和自定义 HTTP 头
         $con->transport = 'ssl';
@@ -237,7 +237,7 @@ class Bilibili
      * 
      * @return void 
      */
-    private function onConnected(AsyncTcpConnection $con, int $roomId, string $token)
+    private function onConnected(AsyncTcpConnection $con, int $roomId, string $token): void
     {
         echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "已连接到WebSocket,房间号:" . $roomId . "\n";
         // 发送认证包
@@ -268,7 +268,7 @@ class Bilibili
      * 
      * @return void
      */
-    private function startHealthCheck()
+    private function startHealthCheck(): void
     {
         $this->healthCheckTimer = Timer::add(60, function () {
             if (!$this->isConnectionHealthy() && !$this->isConnecting) {
@@ -285,7 +285,7 @@ class Bilibili
      * 
      * @return void 
      */
-    private function analysis($payload)
+    private function analysis($payload): void
     {
         try {
             $dir = base_path() . '/runtime/logs/' . Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d') . '/直播间信息记录/';
@@ -323,7 +323,7 @@ class Bilibili
      * 
      * @return void 
      */
-    private function onMessageReceived($data)
+    private function onMessageReceived($data): void
     {
         try {
             // 解析消息内容
@@ -349,7 +349,7 @@ class Bilibili
      * @param array $payload
      * @return void
      */
-    private function processMessage($payload)
+    private function processMessage($payload): void
     {
         $cmd = $payload['payload']['cmd'];
         try {
@@ -392,7 +392,7 @@ class Bilibili
      * @param array $payload
      * @return void
      */
-    private function handleLiveStart($payload)
+    private function handleLiveStart($payload): void
     {
         Redis::set('bilibili_live_key', $payload['payload']['live_key']);
         Redis::set('bilibili_live_create', Carbon::now()->timezone(config('app')['default_timezone'])->timestamp);
@@ -412,7 +412,7 @@ class Bilibili
      * @param array $payload
      * @return void
      */
-    private function handleLiveEnd($payload)
+    private function handleLiveEnd($payload): void
     {
         // 记录下播
         if (Redis::get('bilibili_live_key')) {
@@ -441,7 +441,7 @@ class Bilibili
      * @param array $payload
      * @return void
      */
-    private function handleGift($payload)
+    private function handleGift($payload): void
     {
         $data = $payload['payload']['data'];
         Present::processing(
@@ -468,7 +468,7 @@ class Bilibili
      * @param array $payload
      * @return void
      */
-    private function handleGuardBuy($payload)
+    private function handleGuardBuy($payload): void
     {
         $data = $payload['payload']['data'];
         Present::processing(
@@ -503,7 +503,7 @@ class Bilibili
      * @param array $payload
      * @return void
      */
-    private function handleInteractWord($payload)
+    private function handleInteractWord($payload): void
     {
         try {
             $pbBinary = base64_decode($payload['payload']['data']['pb']);
@@ -548,7 +548,7 @@ class Bilibili
      * @param array $payload
      * @return void
      */
-    private function handleDanmu($payload)
+    private function handleDanmu($payload): void
     {
         $info = $payload['payload']['info'];
         CheckIn::processing(
@@ -587,7 +587,7 @@ class Bilibili
      * @param array $payload
      * @return void
      */
-    private function handlePkBattle($payload)
+    private function handlePkBattle($payload): void
     {
         $data = $payload['payload']['data'];
         PkLiveReport::processing($data['uid'], $data['uname'], $data['room_id']);
@@ -600,7 +600,7 @@ class Bilibili
      * 
      * @return void
      */
-    private function recordGiftInfo($data)
+    private function recordGiftInfo($data): void
     {
         if (Redis::get('bilibili_live_key')) {
             try {
@@ -628,7 +628,7 @@ class Bilibili
      * 
      * @return void 
      */
-    public function clearTimers()
+    public function clearTimers(): void
     {
         $timers = [
             $this->heartbeatTimer,
@@ -652,7 +652,7 @@ class Bilibili
      * 
      * @return void 
      */
-    public function scheduleReconnect()
+    public function scheduleReconnect(): void
     {
         $this->clearTimers();
         $this->cookie = RobotServices::getCookie();
@@ -699,7 +699,7 @@ class Bilibili
      * @param int $room_id
      * @return void
      */
-    private function sendDisconnectNotification($room_id)
+    private function sendDisconnectNotification($room_id): void
     {
         try {
             // 获取配置信息
@@ -760,7 +760,7 @@ class Bilibili
      * 
      * @return void 
      */
-    private function cleanupResources()
+    private function cleanupResources(): void
     {
         $this->clearTimers();
         if ($this->connection) {

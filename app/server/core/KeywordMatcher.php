@@ -15,7 +15,7 @@ class KeywordMatcher
         $this->position = 0;
     }
 
-    // 1. 将表达式拆分成 token
+    // 将表达式拆分成 token
     private function tokenize(string $expression): array
     {
         $pattern = '/(\|\||&&|\(|\)|\w+)/u';
@@ -23,7 +23,7 @@ class KeywordMatcher
         return $matches[0];
     }
 
-    // 2. 解析表达式
+    // 解析表达式
     public function parse(): array
     {
         return $this->parseOr();

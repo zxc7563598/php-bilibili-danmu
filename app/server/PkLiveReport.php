@@ -4,7 +4,6 @@ namespace app\server;
 
 use app\core\RobotServices;
 use app\queue\SendMessage;
-use support\Redis;
 use Hejunjie\Bililive;
 
 /**
@@ -20,7 +19,7 @@ class PkLiveReport
      * @param mixed $room_id 主播房间号
      * @return void 
      */
-    public static function processing($uid, $uname, $room_id)
+    public static function processing($uid, $uname, $room_id): void
     {
         // 获取PK播报配置
         $pk = readFileContent(runtime_path() . '/tmp/pk.cfg');
@@ -78,7 +77,7 @@ class PkLiveReport
      * 
      * @return void 
      */
-    public static function sendMessage(string $content, array $args)
+    public static function sendMessage(string $content, array $args): void
     {
         // 拆分要发送的内容
         $content = splitAndFilterLines($content);

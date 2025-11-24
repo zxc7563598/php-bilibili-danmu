@@ -34,7 +34,7 @@ class Present
      * 
      * @return void 
      */
-    public static function processing($uid, $uname, $gift_id, $gift_name, $price, $num, $anchor_id, $ruid, $guard_level, $level, $blind_gift, $gift_type)
+    public static function processing($uid, $uname, $gift_id, $gift_name, $price, $num, $anchor_id, $ruid, $guard_level, $level, $blind_gift, $gift_type): void
     {
         $is_message = false;
         $cookie = RobotServices::getCookie();
@@ -185,7 +185,7 @@ class Present
      * 
      * @return void 
      */
-    public static function sendMessage(string $content, array $args, array $extra = [])
+    public static function sendMessage(string $content, array $args, array $extra = []): void
     {
         // 拆分要发送的内容
         $content = splitAndFilterLines($content);

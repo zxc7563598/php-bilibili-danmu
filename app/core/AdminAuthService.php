@@ -53,9 +53,10 @@ class AdminAuthService
      * 退出登录
      * 
      * @param integer $id 退出用户id
+     * 
      * @return void 
      */
-    public static function logout(int $id)
+    public static function logout(int $id): void
     {
         $admins = Admins::where('id', $id)->first();
         $token = $admins->token;

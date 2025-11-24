@@ -11,7 +11,6 @@ class AccessControl implements MiddlewareInterface
     public function process(Request $request, callable $handler): Response
     {
         $response = $handler($request);
-        // 给响应添加跨域相关的http头
         $response->withHeaders([
             'Access-Control-Allow-Credentials' => 'true',
             'Access-Control-Allow-Origin' => '*',

@@ -25,16 +25,13 @@ class KeywordEvaluator
             // 关键词匹配
             return mb_strpos($this->message, $node['keyword']) !== false;
         }
-
         $left = $this->evaluateNode($node['left']);
         $right = $this->evaluateNode($node['right']);
-
         if ($node['operator'] === '||') {
             return $left || $right;
         } elseif ($node['operator'] === '&&') {
             return $left && $right;
         }
-
         return false;
     }
 }

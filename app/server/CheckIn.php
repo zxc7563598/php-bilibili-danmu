@@ -28,7 +28,7 @@ class CheckIn
      * 
      * @return void 
      */
-    public static function processing($uid, $uname, $ruid, $guard_level, $msg)
+    public static function processing($uid, $uname, $ruid, $guard_level, $msg): void
     {
         $is_message = false;
         // 不处理自己发送的消息
@@ -216,7 +216,7 @@ class CheckIn
      * 
      * @return void 
      */
-    public static function sendMessage(string $content, array $args)
+    public static function sendMessage(string $content, array $args): void
     {
         // 拆分要发送的内容
         $content = splitAndFilterLines($content);

@@ -152,7 +152,7 @@ class UserPublicMethods extends GeneralMethod
      * 
      * @return void
      */
-    public static function userOpensVip($uid, $name, $guard_level, $amount, $payment_at, $live_key)
+    public static function userOpensVip($uid, $name, $guard_level, $amount, $payment_at, $live_key): void
     {
         sublog('核心业务/记录舰长付费', '舰长付费', [
             'uid' => $uid,
@@ -211,8 +211,6 @@ class UserPublicMethods extends GeneralMethod
             $payment_records->payment_at = $payment_at;
             $payment_records->save();
         }
-        // 返回成功
-        return true;
     }
 
     /**
@@ -222,7 +220,7 @@ class UserPublicMethods extends GeneralMethod
      * 
      * @return void 
      */
-    public static function aggregateMail($live_id)
+    public static function aggregateMail($live_id): void
     {
         // 获取配置信息
         $config = ShopConfig::whereIn('title', [

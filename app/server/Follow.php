@@ -20,7 +20,7 @@ class Follow
      * @param mixed $guard_level 大航海类型，0=普通用户，1=总督，2=提督，3=舰长
      * @return void 
      */
-    public static function processing($uid, $uname, $ruid, $guard_level)
+    public static function processing($uid, $uname, $ruid, $guard_level): void
     {
         $is_message = false;
         // 不处理自己发送的消息
@@ -118,7 +118,7 @@ class Follow
      * 
      * @return void 
      */
-    public static function sendMessage(string $content, array $args)
+    public static function sendMessage(string $content, array $args): void
     {
         // 拆分要发送的内容
         $content = splitAndFilterLines($content);
