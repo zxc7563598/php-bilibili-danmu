@@ -18,6 +18,38 @@ use support\Request;
 use support\Response;
 use app\controller\admin;
 
+// 积分商城接口
+Route::group('/api/shop', function () {
+    Route::post('/login/get-theme-color', [app\controller\shop\LoginController::class, 'getThemeColor']); // 获取主题色
+    Route::post('/login/get-config', [app\controller\shop\LoginController::class, 'getConfig']); // 获取登录配置
+    Route::post('/login/get-user-vip', [app\controller\shop\LoginController::class, 'getUserVip']); // 获取用户是否存在
+    Route::post('/login/perform-login', [app\controller\shop\LoginController::class, 'performLogin']); // 执行登陆
+    Route::post('/login/logout', [app\controller\shop\LoginController::class, 'logout']); // 退出登录
+    Route::post('/login/get-my', [app\controller\shop\LoginController::class, 'getMy']); // 获取我的
+
+    Route::post('/shop/get-goods', [app\controller\shop\ShopController::class, 'getGoods']); // 获取商品列表
+    Route::post('/shop/get-goods-v2', [app\controller\shop\ShopController::class, 'getGoodsV2']); // 获取商品列表
+    Route::post('/shop/get-goods-details', [app\controller\shop\ShopController::class, 'getGoodsDetails']); // 获取商品详情
+    Route::post('/shop/get-confirm', [app\controller\shop\ShopController::class, 'getConfirm']); // 获取确认订单信息
+
+    Route::post('/user/get-background', [app\controller\shop\UserController::class, 'getBackground']); // 获取背景图片
+    Route::post('/user/get-address-list', [app\controller\shop\UserController::class, 'getAddressList']); // 获取用户地址列表
+    Route::post('/user/get-address-details', [app\controller\shop\UserController::class, 'getAddressDetails']); // 获取用户地址详情
+    Route::post('/user/set-address-list', [app\controller\shop\UserController::class, 'setAddressList']); // 存储地址信息
+    Route::post('/user/set-address-selected', [app\controller\shop\UserController::class, 'setAddressSelected']); // 选择地址信息
+    Route::post('/user/get-consumers', [app\controller\shop\UserController::class, 'getConsumers']); // 开通记录
+    Route::post('/user/get-redeeming', [app\controller\shop\UserController::class, 'getRedeeming']); // 兑换记录
+    Route::post('/user/set-complaint', [app\controller\shop\UserController::class, 'setComplaint']); // 投诉上传
+
+    Route::post('/user/get-protocol-credit', [app\controller\shop\UserController::class, 'getProtocolCredit']); // 获取赊销协议
+    Route::post('/user/upload-signing', [app\controller\shop\UserController::class, 'uploadSigning']); // 签名上传
+    Route::post('/shop/confirm-product', [app\controller\shop\ShopController::class, 'confirmProduct']); // 确认下单
+    Route::post('/shop/get-transactions-success', [app\controller\shop\ShopController::class, 'getTransactionsSuccess']); // 获取交易成功页面信息
+})->middleware([
+    app\middleware\AccessControl::class,
+    app\middleware\ApiAuthCheck::class
+]);
+
 // 新版后台API接口
 Route::group('/admin-api-v2', function () {
     // 欢迎页
@@ -175,39 +207,6 @@ Route::group('/api/robot', function () {
     Route::any('/update-read', [app\controller\robot\ApiController::class, 'updateRead']);
 })->middleware([
     app\middleware\SignatureMiddleware::class
-]);
-
-// 积分商城接口
-Route::group('/api/shop', function () {
-    Route::post('/login/get-theme-color', [app\controller\shop\LoginController::class, 'getThemeColor']); // 获取主题色
-    Route::post('/login/get-config', [app\controller\shop\LoginController::class, 'getConfig']); // 获取登录配置
-    Route::post('/login/get-user-vip', [app\controller\shop\LoginController::class, 'getUserVip']); // 获取用户是否存在
-    Route::post('/login/perform-login', [app\controller\shop\LoginController::class, 'performLogin']); // 执行登陆
-    Route::post('/login/logout', [app\controller\shop\LoginController::class, 'logout']); // 退出登录
-    Route::post('/login/get-my', [app\controller\shop\LoginController::class, 'getMy']); // 获取我的
-
-    Route::post('/shop/get-goods', [app\controller\shop\ShopController::class, 'getGoods']); // 获取商品列表
-    Route::post('/shop/get-goods-v2', [app\controller\shop\ShopController::class, 'getGoodsV2']); // 获取商品列表
-    Route::post('/shop/get-goods-details', [app\controller\shop\ShopController::class, 'getGoodsDetails']); // 获取商品详情
-    Route::post('/shop/get-confirm', [app\controller\shop\ShopController::class, 'getConfirm']); // 获取确认订单信息
-
-
-    Route::post('/user/get-background', [app\controller\shop\UserController::class, 'getBackground']); // 获取背景图片
-    Route::post('/user/get-address-list', [app\controller\shop\UserController::class, 'getAddressList']); // 获取用户地址列表
-    Route::post('/user/get-address-details', [app\controller\shop\UserController::class, 'getAddressDetails']); // 获取用户地址详情
-    Route::post('/user/set-address-list', [app\controller\shop\UserController::class, 'setAddressList']); // 存储地址信息
-    Route::post('/user/set-address-selected', [app\controller\shop\UserController::class, 'setAddressSelected']); // 选择地址信息
-    Route::post('/user/get-consumers', [app\controller\shop\UserController::class, 'getConsumers']); // 开通记录
-    Route::post('/user/get-redeeming', [app\controller\shop\UserController::class, 'getRedeeming']); // 兑换记录
-    Route::post('/user/set-complaint', [app\controller\shop\UserController::class, 'setComplaint']); // 投诉上传
-
-    Route::post('/user/get-protocol-credit', [app\controller\shop\UserController::class, 'getProtocolCredit']); // 获取赊销协议
-    Route::post('/user/upload-signing', [app\controller\shop\UserController::class, 'uploadSigning']); // 签名上传
-    Route::post('/shop/confirm-product', [app\controller\shop\ShopController::class, 'confirmProduct']); // 确认下单
-    Route::post('/shop/get-transactions-success', [app\controller\shop\ShopController::class, 'getTransactionsSuccess']); // 获取交易成功页面信息
-})->middleware([
-    app\middleware\AccessControl::class,
-    app\middleware\ApiAuthCheck::class
 ]);
 
 Route::any('/file/import-config', [app\controller\robot\ApiController::class, 'importConfig']);

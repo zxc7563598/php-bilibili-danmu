@@ -17,6 +17,7 @@ namespace app\middleware;
 
 use app\model\UserVips;
 use Hejunjie\EncryptedRequest\EncryptedRequestHandler;
+use support\Cache;
 use Webman\MiddlewareInterface;
 use Webman\Http\Response;
 use Webman\Http\Request;
@@ -37,11 +38,12 @@ class ApiAuthCheck implements MiddlewareInterface
         $handler = new EncryptedRequestHandler(['RSA_PRIVATE_KEY' => file_get_contents(base_path('private_key.pem'))]);
         try {
             $decoded = $handler->handle(
-                $param['en_data'] ?? '',
-                $param['enc_payload'] ?? '',
-                $param['timestamp'] ?? '',
-                $param['sign'] ?? ''
+                (string)$param['en_data'] ?? '',
+                (string)$param['enc_payload'] ?? '',
+                (string)$param['timestamp'] ?? '',
+                (string)$param['sign'] ?? ''
             );
+            $post = [];
             foreach ($decoded as $key => $value) {
                 $post[$key] = $value;
             }
@@ -54,7 +56,7 @@ class ApiAuthCheck implements MiddlewareInterface
             return fail($request, 900004);
         }
         // 验证用户登录
-        $request->user_vips = null;
+        $request->user_vips = [];
         $token = isset($param['token']) ? $param['token'] : null;
         $whitelisting = [
             '/api/shop/login/get-user-vip',
@@ -62,11 +64,13 @@ class ApiAuthCheck implements MiddlewareInterface
             '/api/shop/login/get-config',
             '/api/shop/login/get-theme-color'
         ];
+        // 不在白名单的接口需要token才能访问
         if (!in_array($path, $whitelisting)) {
             if (empty($token)) {
                 return fail($request, 900005);
             }
         }
+        // 验证token有效性
         if (!empty($token)) {
             $loginCheck = self::loginCheck($token);
             if (is_int($loginCheck)) {
@@ -82,25 +86,9 @@ class ApiAuthCheck implements MiddlewareInterface
         return $response;
     }
 
-    /**
-     * 检查用户登陆信息
-     *
-     * @param string $token 管理员登陆凭证
-     * 
-     * @return object|int
-     */
-    public static function loginCheck($token)
+    public static function loginCheck($token): int|array
     {
-        $uinfo = Redis::get(config('app')['app_name'] . ':token_to_info:vip:' . $token);
-        if (empty($uinfo)) {
-            return 800004;
-        }
-        $uinfo = unserialize($uinfo);
-        $uid = !empty($uinfo['uid']) ? (string)$uinfo['uid'] : null;
-        $users = UserVips::where('uid', $uid)->first();
-        if (empty($users)) {
-            return 800004;
-        }
-        return $users;
+        $user_vips = Cache::get($token);
+        return !empty($user_vips) ? json_decode($user_vips, true) : 900005;
     }
 }

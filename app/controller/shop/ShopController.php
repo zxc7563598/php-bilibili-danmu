@@ -19,7 +19,7 @@ use resource\enums\UserAddressEnums;
 class ShopController extends GeneralMethod
 {
     /**
-     * 获取商品列表
+     * 获取商品列表(无分页，已废弃，后续不再提供支持)
      * 
      * @return Response
      */
@@ -44,7 +44,7 @@ class ShopController extends GeneralMethod
     }
 
     /**
-     * 获取商品列表 v2
+     * 获取商品列表
      * 
      * @param integer $pageNo 页码
      * @param integer $pageSize 每页展示数量
@@ -53,8 +53,8 @@ class ShopController extends GeneralMethod
      */
     public function getGoodsV2(Request $request): Response
     {
-        $pageNo = $request->data['pageNo'];
-        $pageSize = $request->data['pageSize'];
+        $pageNo = $request->post('pageNo', 1);
+        $pageSize = $request->post('pageSize', 10);
         // 获取商品
         $goods = Goods::where('status', GoodsEnums\Status::Normal->value)->orderBy('sort', 'asc')->paginate($pageSize, [
             'goods_id' => 'goods_id',
@@ -63,11 +63,12 @@ class ShopController extends GeneralMethod
             'amount_type' => 'amount_type',
             'cover_image' => 'cover_image'
         ], 'page', $pageNo);
-        foreach ($goods as &$_goods) {
-            $_goods->amount_type = GoodsEnums\AmountType::from($_goods->amount_type)->label();
-            $_goods->cover_image = getImageUrl($_goods->cover_image);
-        }
+        // 处理数据
         $data = is_array($goods) ? $goods : $goods->toArray();
+        foreach ($data['data'] as &$_data) {
+            $_data['amount_type'] = GoodsEnums\AmountType::from($_data['amount_type'])->label();
+            $_data['cover_image'] = getImageUrl($_data['cover_image']);
+        }
         // 返回数据
         return success($request, [
             "total" => $data['total'],
@@ -84,9 +85,7 @@ class ShopController extends GeneralMethod
      */
     public function getGoodsDetails(Request $request): Response
     {
-        $param = $request->data;
-        // 获取参数
-        $goods_id = $param['goods_id'];
+        $goods_id = $request->post('goods_id');
         // 获取商品
         $goods = Goods::where('goods_id', $goods_id)->where('status', GoodsEnums\Status::Normal->value)->first([
             'goods_id' => 'goods_id',
@@ -154,13 +153,11 @@ class ShopController extends GeneralMethod
      */
     public function getConfirm(Request $request): Response
     {
-        $param = $request->data;
         $user_vips = $request->user_vips;
-        // 获取参数
-        $goods_id = $param['goods_id'];
-        $sub_id = explode(',', $param['sub_id']);
+        $goods_id = $request->post('goods_id');
+        $sub_id = explode(',', $request->post('sub_id'));
         // 获取用户选择的地址
-        $user_address = UserAddress::where('user_id', $user_vips->user_id)->where('selected', UserAddressEnums\Selected::Yes->value)->first([
+        $user_address = UserAddress::where('user_id', $user_vips['user_id'])->where('selected', UserAddressEnums\Selected::Yes->value)->first([
             'id' => 'id',
             'name' => 'name',
             'phone' => 'phone',
@@ -218,18 +215,16 @@ class ShopController extends GeneralMethod
      */
     public function confirmProduct(Request $request): Response
     {
-        $param = $request->data;
         $user_vips = $request->user_vips;
-        // 获取参数
-        $goods_id = $param['goods_id'];
-        $sub_id = explode(',', $param['sub_id']);
-        $email = !empty($param['email']) ? $param['email'] : null;
+        $goods_id = $request->post('goods_id');
+        $sub_id = explode(',', $request->post('sub_id'));
+        $email = $request->post('email', null);
         // 获取商品
         $goods = Goods::where('goods_id', $goods_id)->first([
             'type' => 'type'
         ]);
         // 兑换商品
-        $redeemingGoods = UserPublicMethods::redeemingGoods($user_vips->user_id, $goods_id, $sub_id, $email);
+        $redeemingGoods = UserPublicMethods::redeemingGoods($user_vips['user_id'], $goods_id, $sub_id, $email);
         if (is_int($redeemingGoods)) {
             return fail($request, $redeemingGoods);
         }
@@ -249,9 +244,7 @@ class ShopController extends GeneralMethod
     public function getTransactionsSuccess(Request $request): Response
     {
         $user_vips = $request->user_vips;
-        $param = $request->data;
-        // 获取参数
-        $type = $param['type'];
+        $type = $request->post('type');
         // 声明数据
         $title = '下单成功！';
         $content = '已经在安排啦';
@@ -303,7 +296,7 @@ class ShopController extends GeneralMethod
                     $i = 1;
                     foreach ($redemption as &$_redemption) {
                         if ($ranking == 0) {
-                            if ($user_vips->user_id == $_redemption->user_id) {
+                            if ($user_vips['user_id'] == $_redemption->user_id) {
                                 $ranking = $i;
                             }
                         }
@@ -341,7 +334,6 @@ class ShopController extends GeneralMethod
                             break;
                     }
                 }
-
                 break;
         }
         // 返回数据
