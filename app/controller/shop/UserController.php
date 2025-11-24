@@ -166,12 +166,7 @@ class UserController extends GeneralMethod
         $user_vips = $request->user_vips;
         $goods_id = $request->post('goods_id');
         // 获取数据
-        $user_vips = UserVips::where('user_id', $user_vips['user_id'])->first([
-            'user_id' => 'user_id',
-            'uid' => 'uid',
-            'name' => 'name',
-            'sign_image' => 'sign_image',
-        ]);
+        $user_vips = UserVips::where('user_id', $user_vips['user_id'])->first();
         // 获取配置信息
         $config = self::getShopConfig();
         // 返回信息
@@ -204,7 +199,7 @@ class UserController extends GeneralMethod
         $user_vips = $request->user_vips;
         $base64 = $request->post('base64');
         // base64存储图片 
-        $path = public_path('attachment/user-info/' . implode('/', str_split(Utils\Str::padString(0, $user_vips->user_id), 2)) . '/signing/');
+        $path = public_path('attachment/user-info/' . implode('/', str_split(Utils\Str::padString(0, $user_vips['user_id']), 2)) . '/signing/');
         try {
             $base64ToImage = Utils\Img::base64ToImage($base64, $path);
         } catch (\Exception $e) {

@@ -12,6 +12,7 @@ use resource\enums\GoodsEnums;
 use app\core\UserPublicMethods;
 use app\model\RedemptionRecords;
 use app\controller\GeneralMethod;
+use app\model\UserVips;
 use resource\enums\GoodSubsEnums;
 use resource\enums\ShopConfigEnums;
 use resource\enums\UserAddressEnums;
@@ -156,6 +157,7 @@ class ShopController extends GeneralMethod
         $user_vips = $request->user_vips;
         $goods_id = $request->post('goods_id');
         $sub_id = explode(',', $request->post('sub_id'));
+        $user_vips = UserVips::where('user_id', $user_vips['user_id'])->first();
         // 获取用户选择的地址
         $user_address = UserAddress::where('user_id', $user_vips['user_id'])->where('selected', UserAddressEnums\Selected::Yes->value)->first([
             'id' => 'id',
