@@ -6,6 +6,7 @@ use support\Request;
 use support\Response;
 use app\controller\GeneralMethod;
 use app\model\GiftRecords;
+use Illuminate\Support\Carbon;
 use support\Db;
 use resource\enums\GiftRecordsEnums;
 
@@ -14,21 +15,21 @@ class GiftBlindBoxcontroller extends GeneralMethod
     /**
      * 获取盲盒信息数据
      * 
-     * @param integer $page 页码
-     * @param string $uid 用户UID
-     * @param string $uname 用户名称
+     * @param integer $pageNo 页码
+     * @param integer $pageSize 每页展示数量
+     * @param string $uid 用户uid
+     * @param string $uname 用户名
      * @param array $create_date 赠送时间
      * 
      * @return Response 
      */
-    public function getData(Request $request)
+    public function getData(Request $request): Response
     {
-        // 获取参数
-        $pageNo = $request->data['pageNo'];
-        $pageSize = $request->data['pageSize'];
-        $uid = $request->data['uid'] ?? null;
-        $uname = $request->data['uname'] ?? null;
-        $create_date = $request->data['create_date'] ?? null;
+        $pageNo = $request->post('pageNo', 1);
+        $pageSize = $request->post('pageSize', 30);
+        $uid = $request->post('uid', null);
+        $uname = $request->post('uname', null);
+        $create_date = $request->post('create_date', null);
         // 获取数据
         $records = GiftRecords::where('original', GiftRecordsEnums\Original::No->value);
         if (!is_null($uid)) {
@@ -56,13 +57,13 @@ class GiftBlindBoxcontroller extends GeneralMethod
                 'created_at' => 'created_at'
             ], 'page', $pageNo);
         // 处理数据
-        foreach ($records as &$_records) {
-            $_records->create_time = $_records->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
-            $_records->original_price = round(($_records->original_price * $_records->num), 2);
-            $_records->profit_price = round(($_records->total_price - $_records->original_price), 2);
-            unset($_records->created_at);
-        }
         $data = is_array($records) ? $records : $records->toArray();
+        foreach ($data['data'] as &$_data) {
+            $_data['create_time'] = Carbon::parse($_data['created_at'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
+            $_data['original_price'] = round(($_data['original_price'] * $_data['num']), 2);
+            $_data['profit_price'] = round(($_data['total_price'] - $_data['original_price']), 2);
+            unset($_data['created_at']);
+        }
         // 返回数据
         return success($request, [
             "total" => $data['total'],
@@ -81,10 +82,9 @@ class GiftBlindBoxcontroller extends GeneralMethod
      */
     public function getStatisticData(Request $request)
     {
-        // 获取参数
-        $uid = $request->data['uid'] ?? null;
-        $uname = $request->data['uname'] ?? null;
-        $create_date = $request->data['create_date'] ?? null;
+        $uid = $request->post('uid', null);
+        $uname = $request->post('uname', null);
+        $create_date = $request->post('create_date', null);
         // 获取数据
         $records = GiftRecords::where('original', GiftRecordsEnums\Original::No->value);
         if (!is_null($uid)) {

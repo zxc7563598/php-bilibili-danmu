@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of webman.
  *
@@ -13,7 +14,7 @@
  */
 
 return [
-    'default' => 'file',
+    'default' => 'redis',
     'stores' => [
         'file' => [
             'driver' => 'file',
@@ -21,7 +22,7 @@ return [
         ],
         'redis' => [
             'driver' => 'redis',
-            'connection' => 'default'
+            'connection' => 'cache'
         ],
         'array' => [
             'driver' => 'array'

@@ -56,9 +56,7 @@ class LoginController extends GeneralMethod
      */
     public function getUserVip(Request $request): Response
     {
-        $param = $request->data;
-        // 声明参数
-        $uid = $param['uid'];
+        $uid = $request->post('uid');
         // 防止连续提提交
         $redis = Redis::get(config('app')['app_name'] . ':uid-check:' . $uid);
         if (!empty($redis)) {
@@ -86,10 +84,9 @@ class LoginController extends GeneralMethod
      */
     public function performLogin(Request $request): Response
     {
-        $param = $request->data;
         // 声明参数
-        $uid = $param['uid'];
-        $password = $param['password'];
+        $uid = $request->post('uid');
+        $password = $request->post('password');
         // 查询用户信息
         $user_vip = UserVips::where('uid', $uid)->first();
         if (empty($user_vip)) {
@@ -116,6 +113,7 @@ class LoginController extends GeneralMethod
                 }
             }
         }
+        // 执行登陆
         $userLogin = LoginPublicMethods::userLogin($user_vip->uid);
         if (is_int($userLogin)) {
             return fail($request, $userLogin);
@@ -133,7 +131,7 @@ class LoginController extends GeneralMethod
     {
         $user_vips = $request->user_vips;
         // 退出登录
-        LoginPublicMethods::userLogoutLogin($user_vips->token);
+        LoginPublicMethods::userLogoutLogin($user_vips['uid']);
         // 返回处理
         return success($request);
     }
@@ -148,6 +146,7 @@ class LoginController extends GeneralMethod
         $user_vips = $request->user_vips;
         // 获取链接
         $config = self::getShopConfig();
+        $user_vips = UserVips::where('user_id', $user_vips['user_id'])->first();
         // 返回处理
         return success($request, [
             'uid' => $user_vips->uid,

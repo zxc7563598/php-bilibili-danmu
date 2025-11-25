@@ -23,13 +23,13 @@ class ProductManagementController extends GeneralMethod
      * 
      * @return Response 
      */
-    public function getData(Request $request)
+    public function getData(Request $request): Response
     {
         // 获取参数
-        $pageNo = $request->data['pageNo'] ?? 1;
-        $pageSize = $request->data['pageSize'] ?? 10;
-        $name = $request->data['name'] ?? null;
-        $type = $request->data['type'] ?? null;
+        $pageNo = $request->post('pageNo', 1);
+        $pageSize = $request->post('pageSize', 10);
+        $name = $request->post('name', null);
+        $type = $request->post('type', null);
         // 获取数据
         $goods = Goods::query();
         if (!is_null($name)) {
@@ -50,13 +50,13 @@ class ProductManagementController extends GeneralMethod
                 'sort' => 'sort'
             ], 'page', $pageNo);
         // 处理数据
-        foreach ($goods as &$_goods) {
-            $_goods->amount_type = GoodsEnums\AmountType::from($_goods->amount_type)->label();
-            $_goods->cover_image = getImageUrl($_goods->cover_image);
-            $_goods->status = GoodsEnums\Status::from($_goods->status)->label();
-            $_goods->type = GoodsEnums\Type::from($_goods->type)->label();
-        }
         $data = is_array($goods) ? $goods : $goods->toArray();
+        foreach ($data['data'] as &$_data) {
+            $_data['amount_type'] = GoodsEnums\AmountType::from($_data['amount_type'])->label();
+            $_data['cover_image'] = getImageUrl($_data['cover_image']);
+            $_data['status'] = GoodsEnums\Status::from($_data['status'])->label();
+            $_data['type'] = GoodsEnums\Type::from($_data['type'])->label();
+        }
         // 返回数据
         return success($request, [
             "total" => $data['total'],
@@ -71,10 +71,10 @@ class ProductManagementController extends GeneralMethod
      * 
      * @return Response 
      */
-    public function getDataDetails(Request $request)
+    public function getDataDetails(Request $request): Response
     {
         // 获取参数
-        $goods_id = $request->data['goods_id'];
+        $goods_id = $request->post('goods_id');
         // 获取商品数据
         $goods = Goods::where('goods_id', $goods_id)->first([
             'goods_id' => 'goods_id',
@@ -144,7 +144,7 @@ class ProductManagementController extends GeneralMethod
      * 
      * @return Response 
      */
-    public function uploadImages(Request $request)
+    public function uploadImages(Request $request): Response
     {
         $file = $request->file('image');
         $type = $request->input('type', '');
@@ -209,25 +209,25 @@ class ProductManagementController extends GeneralMethod
      * 
      * @return Response 
      */
-    public function setDataDetails(Request $request)
+    public function setDataDetails(Request $request): Response
     {
         // 获取参数
-        $goods_id = $request->data['goods_id'] ?? null;
-        $name = $request->data['name'];
-        $amount_type = $request->data['amount_type'];
-        $amount = $request->data['amount'];
-        $subs = $request->data['subs'];
-        $sub_num = $request->data['sub_num'] ?? count($request->data['subs']);
-        $tips = $request->data['tips'] ?? null;
-        $cover_image = $request->data['cover_image'];
-        $carousel_images = $request->data['carousel_images'];
-        $details_images = $request->data['details_images'];
-        $service_description_images = $request->data['service_description_images'];
-        $status = $request->data['status'];
-        $type = $request->data['type'];
-        $sort = $request->data['sort'];
-        $sale_num = $request->data['sale_num'] ?? 0;
-        $sale_increase = $request->data['sale_increase'] ?? 1;
+        $goods_id = $request->post('goods_id', null);
+        $name = $request->post('name');
+        $amount_type = $request->post('amount_type');
+        $amount = $request->post('amount');
+        $subs = $request->post('subs', []);
+        $sub_num = $request->post('sub_num', count($subs));
+        $tips = $request->post('tips', null);
+        $cover_image = $request->post('cover_image');
+        $carousel_images = $request->post('carousel_images');
+        $details_images = $request->post('details_images');
+        $service_description_images = $request->post('service_description_images');
+        $status = $request->post('status');
+        $type = $request->post('type');
+        $sort = $request->post('sort');
+        $sale_num = $request->post('sale_num', 0);
+        $sale_increase = $request->post('sale_increase', 1);
         // 查找现有商品
         $goods = (!is_null($goods_id) && ($goods_id > 0)) ? Goods::find($goods_id) : new Goods();
         if (!$goods && !is_null($goods_id)) {

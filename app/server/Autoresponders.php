@@ -26,7 +26,7 @@ class Autoresponders
      * @param mixed $guard_level 大航海类型，0=普通用户，1=总督，2=提督，3=舰长
      * @return void 
      */
-    public static function processing($msg, $uid, $uname, $ruid, $guard_level)
+    public static function processing($msg, $uid, $uname, $ruid, $guard_level): void
     {
         $is_message = false;
         // 不处理自己发送的消息
@@ -156,7 +156,7 @@ class Autoresponders
      * 
      * @return void 
      */
-    public static function sendMessage(string $content, array $args, string $msg, bool $silent, int $silent_minute, int $ransom_amount, string $uid, string $uname)
+    public static function sendMessage(string $content, array $args, string $msg, bool $silent, int $silent_minute, int $ransom_amount, string $uid, string $uname): void
     {
         // 加入禁言
         if ($silent == '1') {

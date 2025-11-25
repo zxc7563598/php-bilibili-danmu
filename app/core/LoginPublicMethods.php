@@ -7,16 +7,17 @@ use app\model\UserVips;
 use Carbon\Carbon;
 use resource\enums\UserVipsEnums;
 use Hejunjie\Utils;
+use Hejunjie\Bililive;
+use support\Cache;
 
-class LoginPublicMethods extends GeneralMethod
+class LoginPublicMethods
 {
 
     /**
      * 商城用户注册
      *
-     * @param string $uid 手机号
-     * @param integer $channel_id 渠道
-     * @param string $referrer 来源链接
+     * @param string $uid 用户uid
+     * @param string $name 用户名称
      * 
      * @return int|bool
      */
@@ -36,7 +37,7 @@ class LoginPublicMethods extends GeneralMethod
     /**
      * APP登录
      *
-     * @param string $uid 手机号
+     * @param string $uid 用户uid
      * 
      * @return integer|array
      */
@@ -47,15 +48,21 @@ class LoginPublicMethods extends GeneralMethod
             return 800005;
         }
         // 创建token执行登录
-        $token = self::createToken();
-        $setToken = self::setToken($token, [
+        $token = md5(mt_rand(1000, 9999) . uniqid(md5(microtime(true)), true));
+        // 删除先前的token信息
+        if ($user_vip->token) {
+            Cache::delete($user_vip->token);
+        }
+        // 存储token
+        Cache::set($token, json_encode([
+            'user_id' => $user_vip->user_id,
             'uid' => $user_vip->uid,
             'name' => $user_vip->name,
             'timestamp' => Carbon::now()->timezone(config('app')['default_timezone'])->timestamp
-        ], 'vip');
-        if (!$setToken) {
-            return 900005;
-        }
+        ]), 86400 * 7);
+        $user_vip->token = $token;
+        $user_vip->save();
+        // 更新用户信息
         self::updatingUserProfiles($uid);
         // 返回数据 
         return [
@@ -76,36 +83,35 @@ class LoginPublicMethods extends GeneralMethod
         // 获取用户信息
         $user_vips = UserVips::where('uid', $uid)->first();
         if (!empty($user_vips)) {
-            // 获取用户名称与头像
-            $getMasterInfo = Utils\HttpClient::sendGetRequest('https://api.live.bilibili.com/live_user/v1/Master/info?uid=' . $user_vips->uid, [
-                "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
-                "Origin: https://live.bilibili.com",
-            ], 10);
-            if ($getMasterInfo['httpStatus'] == 200) {
-                $getMasterInfoData = json_decode($getMasterInfo['data'], true);
+            $getMasterInfo = Bililive\Live::getMasterInfo($user_vips->uid);
+            // 名称更新
+            if (!empty($getMasterInfo['name']) && $user_vips->name != $getMasterInfo['name']) {
+                $user_vips->name = $getMasterInfo['name'];
             }
-            if (!empty($getMasterInfoData['data']['info']['uname']) && !empty($getMasterInfoData['data']['info']['face'])) {
-                if ($user_vips->name != $getMasterInfoData['data']['info']['uname']) {
-                    $user_vips->name = $getMasterInfoData['data']['info']['uname'];
-                }
-                $file_name = pathinfo($getMasterInfoData['data']['info']['face'], PATHINFO_FILENAME);
+            // 头像更新
+            if (!empty($getMasterInfo['face'])) {
+                $file_name = pathinfo($getMasterInfo['face'], PATHINFO_FILENAME);
                 $path = public_path('attachment/user-info/' . implode('/', str_split(Utils\Str::padString(0, $user_vips->user_id), 2)) . '/avatar/');
-                $image_path = Utils\Img::downloadImageFromUrl($getMasterInfoData['data']['info']['face'], $path, $file_name);
+                $image_path = Utils\Img::downloadImageFromUrl($getMasterInfo['face'], $path, $file_name);
                 $user_vips->avatar = Utils\Str::replaceFirst(public_path() . '/attachment/', '', $image_path);
-                $user_vips->save();
             }
+            $user_vips->save();
         }
     }
 
     /**
      * APP退出登录
      *
-     * @param string $token 用户登录凭证
+     * @param string $uid 用户uid
      * 
      * @return void
      */
-    public static function userLogoutLogin($token)
+    public static function userLogoutLogin($uid)
     {
-        self::delToken($token, 'vip');
+        $user_vips = UserVips::where('uid', $uid)->first();
+        $token = $user_vips->token;
+        $user_vips->token = null;
+        $user_vips->save();
+        Cache::delete($token);
     }
 }

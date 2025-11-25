@@ -63,7 +63,7 @@ class AdminPermissionController
      */
     public function validateMenu(Request $request): Response
     {
-        $path = $request->data['path'];
+        $path = $request->post('path');
         // 获取菜单信息
         $menus = Menus::where('path', $path)->count();
         // 返回数据
@@ -81,7 +81,7 @@ class AdminPermissionController
      */
     public function buttons(Request $request): Response
     {
-        $parent_id = $request->data['parent_id'];
+        $parent_id = $request->post('parent_id');
         // 获取数据
         $menus = Menus::where('parent_id', $parent_id)->where('type', MenusEnums\Type::Button->value)->select([
             'id' => 'id',
@@ -120,7 +120,7 @@ class AdminPermissionController
      * @param bool $show 显示状态 
      * @param bool $keep_alive KeepAlive 
      * @param string $layout 样式 
-     * @param string $type 类型 
+     * @param string $type 类型：MENU 或者 BUTTON
      * @param integer $parent_id 所属菜单 
      * @param string $name 菜单名称 
      * @param string $icon 菜单图标 
@@ -132,19 +132,19 @@ class AdminPermissionController
      */
     public function createOrUpdateMenu(Request $request): Response
     {
-        $id = $request->data['id'] ?? 0; // id
-        $code = $request->data['code']; // 编码
-        $enable = $request->data['enable']; // 启用
-        $show = $request->data['show']; // 显示状态
-        $keep_alive = $request->data['keepAlive'] ?? false; // KeepAlive(缓存组件)
-        $layout = $request->data['layout'] ?? ''; // layout
-        $type = $request->data['type']; // 类型：MENU 或者 BUTTON
-        $parent_id = $request->data['parentId'] ?? 0; // 所属菜单
-        $name = $request->data['name']; // 名称
-        $icon = $request->data['icon'] ?? ""; // 菜单图标
-        $path = $request->data['path'] ?? ""; // 路由地址
-        $component = $request->data['component'] ?? ""; // 组件路径
-        $order = $request->data['order'] ?? 0; // 排序
+        $id = $request->post('id', 0);
+        $code = $request->post('code');
+        $enable = $request->post('enable');
+        $show = $request->post('show');
+        $keep_alive = $request->post('keepAlive', false);
+        $layout = $request->post('layout', '');
+        $type = $request->post('type');
+        $parent_id = $request->post('parentId', 0);
+        $name = $request->post('name');
+        $icon = $request->post('icon', '');
+        $path = $request->post('path', '');
+        $component = $request->post('component', '');
+        $order = $request->post('order', 0);
         // 处理数据
         $menus = new Menus();
         if (!empty($id)) {
@@ -177,8 +177,8 @@ class AdminPermissionController
      */
     public function toggleMenu(Request $request): Response
     {
-        $id = $request->data['id'];
-        $enable = $request->data['enable'];
+        $id = $request->post('id');
+        $enable = $request->post('enable');
         // 变更数据
         Menus::where('id', $id)->update([
             'enable' => $enable ? MenusEnums\Enable::Enable->value : MenusEnums\Enable::Disable->value
@@ -196,7 +196,7 @@ class AdminPermissionController
      */
     public function deleteMenu(Request $request): Response
     {
-        $id = $request->data['id'];
+        $id = $request->post('id');
         // 删除
         Menus::where('id', $id)->delete();
         // 返回数据
@@ -214,9 +214,9 @@ class AdminPermissionController
      */
     public function assignUsersToRole(Request $request): Response
     {
-        $give = $request->data['give'];
-        $role_id = $request->data['role_id'];
-        $userIds = $request->data['userIds'];
+        $give = $request->post('give');
+        $role_id = $request->post('role_id');
+        $userIds = $request->post('userIds');
         // 处理数据
         if ($give) {
             foreach ($userIds as $userId) {

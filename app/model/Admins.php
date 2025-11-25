@@ -7,6 +7,7 @@ use support\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use support\Cache;
 
 class Admins extends Model
 {
@@ -56,8 +57,7 @@ class Admins extends Model
             }
             // 如果用户登录，清除缓存信息
             if (!empty($model->token)) {
-                $cache = AdminAuthService::getCache();
-                $cache->del($model->token);
+                Cache::delete($model->token);
             }
         });
     }

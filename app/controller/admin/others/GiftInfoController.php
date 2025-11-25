@@ -15,21 +15,21 @@ class GiftInfoController extends GeneralMethod
     /**
      * 获取礼物记录数据
      * 
-     * @param integer $page 页码
-     * @param string $uid 用户UID
-     * @param string $uname 用户名称
+     * @param integer $pageNo 页码
+     * @param integer $pageSize 每页展示数量
+     * @param string $uid 用户uid
+     * @param string $uname 用户名
      * @param array $create_date 赠送时间
      * 
      * @return Response 
      */
     public function getData(Request $request)
     {
-        // 获取参数
-        $pageNo = $request->data['pageNo'];
-        $pageSize = $request->data['pageSize'];
-        $uid = $request->data['uid'] ?? null;
-        $uname = $request->data['uname'] ?? null;
-        $create_date = $request->data['create_date'] ?? null;
+        $pageNo = $request->post('pageNo', 1);
+        $pageSize = $request->post('pageSize', 30);
+        $uid = $request->post('uid', null);
+        $uname = $request->post('uname', null);
+        $create_date = $request->post('create_date', null);
         // 获取数据
         $records = new GiftRecords();
         if (!is_null($uid)) {
@@ -55,11 +55,11 @@ class GiftInfoController extends GeneralMethod
                 'created_at' => 'created_at'
             ], 'page', $pageNo);
         // 处理数据
-        foreach ($records as &$_records) {
-            $_records->create_time = $_records->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
-            unset($_records->created_at);
-        }
         $data = is_array($records) ? $records : $records->toArray();
+        foreach ($data['data'] as &$_data) {
+            $_data['create_time'] = Carbon::parse($_data['created_at'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
+            unset($_data['created_at']);
+        }
         // 返回数据
         return success($request, [
             "total" => $data['total'],
@@ -79,9 +79,9 @@ class GiftInfoController extends GeneralMethod
     public function getStatisticData(Request $request)
     {
         // 获取参数
-        $uid = $request->data['uid'] ?? null;
-        $uname = $request->data['uname'] ?? null;
-        $create_date = $request->data['create_date'] ?? null;
+        $uid = $request->post('uid', null);
+        $uname = $request->post('uname', null);
+        $create_date = $request->post('create_date', null);
         // 获取数据
         $records = new GiftRecords();
         if (!is_null($uid)) {

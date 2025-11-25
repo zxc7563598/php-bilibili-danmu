@@ -16,7 +16,7 @@ class HomeController
      * 
      * @return Response 
      */
-    public function getUpdateLogs(Request $request)
+    public function getUpdateLogs(Request $request): Response
     {
         // 获取管理员id
         $admin_id = $request->admins['id'];
@@ -56,10 +56,10 @@ class HomeController
      * 
      * @return Response 
      */
-    public function readUpdateLogs(Request $request)
+    public function readUpdateLogs(Request $request): Response
     {
+        $id = $request->post('id');
         // 获取管理员id
-        $id = $request->data['id'];
         $admin_id = $request->admins['id'];
         // 获取是否已读
         $is_exist = AdminUpdateReads::where('log_id', $id)->where('admin_id', $admin_id)->count();
@@ -81,10 +81,10 @@ class HomeController
      * 
      * @return Response 
      */
-    public function downloadSourceCode(Request $request)
+    public function downloadSourceCode(Request $request): Response
     {
         // 获取参数
-        $version = $request->data['version'];
+        $version = $request->post('version');
         // 下载源代码
         $url = 'https://github.com/zxc7563598/vue-bilibili-danmu-admin/archive/refs/tags/' . $version . '.zip';
         $path = public_path('distSourceCode');

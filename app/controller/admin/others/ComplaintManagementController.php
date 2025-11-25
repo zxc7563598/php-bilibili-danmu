@@ -6,6 +6,7 @@ use support\Request;
 use support\Response;
 use app\model\Complaint;
 use app\controller\GeneralMethod;
+use Illuminate\Support\Carbon;
 use resource\enums\ComplaintEnums;
 
 class ComplaintManagementController extends GeneralMethod
@@ -13,18 +14,19 @@ class ComplaintManagementController extends GeneralMethod
     /**
      * 获取投诉数据列表
      *
-     * @param integer $page 页码
-     * @param integer $uid 用户uid
+     * @param integer $pageNo 页码
+     * @param integer $pageSize 每页展示数量
+     * @param string $uid 用户uid
      * @param string $uname 用户名
      * 
      * @return Response
      */
-    public function getData(Request $request)
+    public function getData(Request $request): Response
     {
-        $pageNo = $request->data['pageNo'];
-        $pageSize = $request->data['pageSize'];
-        $uid = $request->data['uid'] ?? null;
-        $uname = $request->data['uname'] ?? null;
+        $pageNo = $request->post('pageNo', 1);
+        $pageSize = $request->post('pageSize', 30);
+        $uid = $request->post('uid', null);
+        $uname = $request->post('uname', null);
         // 构建查询
         $complaintQuery = Complaint::join('bl_user_vips', 'bl_user_vips.user_id', '=', 'bl_complaint.user_id');
         if (!is_null($uname)) {
@@ -44,12 +46,12 @@ class ComplaintManagementController extends GeneralMethod
                 'created_at' => 'bl_complaint.created_at as created_at',
             ], 'page', $pageNo);
         // 格式化数据
-        foreach ($complaints as $complaint) {
-            $complaint->read = ComplaintEnums\Read::from($complaint->read)->label();
-            $complaint->create_time = $complaint->created_at->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s');
-            unset($complaint->created_at);
-        }
         $data = is_array($complaints) ? $complaints : $complaints->toArray();
+        foreach ($data['data'] as &$_data) {
+            $_data['read'] = ComplaintEnums\Read::from($_data['read'])->label();
+            $_data['create_time'] = Carbon::parse($_data['created_at'])->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s');
+            unset($_data['created_at']);
+        }
         // 返回数据
         return success($request, [
             "total" => $data['total'],
@@ -64,10 +66,10 @@ class ComplaintManagementController extends GeneralMethod
      * 
      * @return Response
      */
-    public function getDataDetails(Request $request)
+    public function getDataDetails(Request $request): Response
     {
         // 获取投诉 ID
-        $complaintId = $request->data['complaint_id'] ?? null;
+        $complaintId = $request->post('complaint_id', null);
         if (!$complaintId) {
             return fail($request, 800015);
         }

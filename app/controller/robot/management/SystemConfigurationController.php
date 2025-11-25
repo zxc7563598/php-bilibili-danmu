@@ -1,6 +1,6 @@
 <?php
 
-namespace app\controller\shop\management;
+namespace app\controller\robot\management;
 
 use app\controller\GeneralMethod;
 use Exception;
@@ -54,9 +54,7 @@ class SystemConfigurationController extends GeneralMethod
      */
     public function getDataQrCode(Request $request)
     {
-        // 获取请求参数
-        $param = $request->all();
-        $url = $param['url'];
+        $url = $request->post('url');
         // 生成二维码
         $qrcode = md5($url) . '.png';
         // 确认目录信息，不存在则创建
@@ -130,6 +128,9 @@ class SystemConfigurationController extends GeneralMethod
                 $shouldExecuteCode = true;
                 break;
             }
+        }
+        if (!is_dir(public_path('shop'))) {
+            $shouldExecuteCode = true;
         }
         // 更新环境变量
         foreach ($data as $_data) {

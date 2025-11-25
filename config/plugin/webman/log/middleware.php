@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This file is part of webman.
  *
@@ -13,4 +12,10 @@
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
-return new Webman\Container;
+use Webman\Log\Middleware;
+
+return [
+    '@' => [
+        Middleware::class
+    ]
+];

@@ -7,9 +7,15 @@ use Hejunjie\Bililive;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\Encoding\Encoding;
+use support\Response;
 
 class PageController
 {
+    /**
+     * 不分离后台 - 控制台页面
+     * 
+     * @return Response 
+     */
     public function main(Request $request)
     {
         // 获取 shop 文件夹是否存在
@@ -25,6 +31,11 @@ class PageController
         ]);
     }
 
+    /**
+     * 不分离后台 - 登录页面
+     * 
+     * @return Response 
+     */
     public function login(Request $request)
     {
         // 获取登录信息

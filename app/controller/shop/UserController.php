@@ -13,6 +13,7 @@ use app\model\UserAddress;
 use app\model\PaymentRecords;
 use app\model\RedemptionRecords;
 use app\controller\GeneralMethod;
+use app\model\UserVips;
 use resource\enums\UserAddressEnums;
 use resource\enums\RedemptionRecordsEnums;
 
@@ -41,10 +42,9 @@ class UserController extends GeneralMethod
      */
     public function getAddressList(Request $request): Response
     {
-        $param = $request->data;
         $user_vips = $request->user_vips;
-        // 获取参数
-        $user_address = UserAddress::where('user_id', $user_vips->user_id)->get([
+        // 获取数据
+        $user_address = UserAddress::where('user_id', $user_vips['user_id'])->get([
             'id' => 'id',
             'name' => 'name',
             'phone' => 'phone',
@@ -69,14 +69,12 @@ class UserController extends GeneralMethod
      */
     public function getAddressDetails(Request $request): Response
     {
-        $param = $request->data;
         $user_vips = $request->user_vips;
-        // 获取参数
-        $id = !empty($param['id']) ? $param['id'] : null;
+        $id = $request->post('id', null);
         // 获取数据
         $user_address = false;
         if (!is_null($id)) {
-            $user_address = UserAddress::where('user_id', $user_vips->user_id)->where('id', $id)->first([
+            $user_address = UserAddress::where('user_id', $user_vips['user_id'])->where('id', $id)->first([
                 'id' => 'id',
                 'name' => 'name',
                 'phone' => 'phone',
@@ -108,22 +106,21 @@ class UserController extends GeneralMethod
      */
     public function setAddressList(Request $request): Response
     {
-        $param = $request->data;
         $user_vips = $request->user_vips;
         // 获取参数
-        $id = !empty($param['id']) ? $param['id'] : null;
-        $name = $param['name'];
-        $phone = $param['phone'];
-        $province = $param['province'];
-        $city = $param['city'];
-        $county = $param['county'];
-        $detail = $param['detail'];
+        $id = $request->post('id', null);
+        $name = $request->post('name');
+        $phone = $request->post('phone');
+        $province = $request->post('province');
+        $city = $request->post('city');
+        $county = $request->post('county');
+        $detail = $request->post('detail');
         // 获取数据
         $user_address = new UserAddress();
         if (!is_null($id)) {
             $user_address = UserAddress::where('id', $id)->first();
         }
-        $user_address->user_id = $user_vips->user_id;
+        $user_address->user_id = $user_vips['user_id'];
         $user_address->name = $name;
         $user_address->phone = $phone;
         $user_address->province = $province;
@@ -145,12 +142,10 @@ class UserController extends GeneralMethod
      */
     public function setAddressSelected(Request $request): Response
     {
-        $param = $request->data;
         $user_vips = $request->user_vips;
-        // 获取参数
-        $id = $param['id'];
+        $id = $request->post('id');
         // 把所有地址的选择去掉
-        UserAddress::where('user_id', $user_vips->user_id)->update(['selected' => UserAddressEnums\Selected::No->value]);
+        UserAddress::where('user_id', $user_vips['user_id'])->update(['selected' => UserAddressEnums\Selected::No->value]);
         // 选择当前id的地址
         $user_address = UserAddress::where('id', $id)->first();
         $user_address->selected = UserAddressEnums\Selected::Yes->value;
@@ -168,15 +163,14 @@ class UserController extends GeneralMethod
      */
     public function getProtocolCredit(Request $request): Response
     {
-        $param = $request->data;
         $user_vips = $request->user_vips;
-        // 获取参数
-        $goods_id = $param['goods_id'];
+        $goods_id = $request->post('goods_id');
         // 获取数据
-        $sn = $user_vips->created_at->timezone(config('app')['default_timezone'])->format('Ymd') . Utils\Str::padString(0, $user_vips->user_id);
+        $user_vips = UserVips::where('user_id', $user_vips['user_id'])->first();
         // 获取配置信息
         $config = self::getShopConfig();
         // 返回信息
+        $sn = $user_vips->created_at->timezone(config('app')['default_timezone'])->format('Ymd') . Utils\Str::padString(0, $user_vips->user_id);
         return success($request, [
             'sn' => $sn,
             'title' => isset($config['protocols-name']) ? $config['protocols-name'] : '',
@@ -202,18 +196,18 @@ class UserController extends GeneralMethod
      */
     public function uploadSigning(Request $request): Response
     {
-        $param = $request->data;
         $user_vips = $request->user_vips;
-        // 获取参数
-        $base64 = $param['base64'];
+        $base64 = $request->post('base64');
         // base64存储图片 
-        $path = public_path('attachment/user-info/' . implode('/', str_split(Utils\Str::padString(0, $user_vips->user_id), 2)) . '/signing/');
+        $path = public_path('attachment/user-info/' . implode('/', str_split(Utils\Str::padString(0, $user_vips['user_id']), 2)) . '/signing/');
         try {
             $base64ToImage = Utils\Img::base64ToImage($base64, $path);
         } catch (\Exception $e) {
             return fail($request, 800017);
         }
         $image_path = Utils\Str::replaceFirst(public_path() . '/attachment/', '', $base64ToImage);
+        // 存储数据
+        $user_vips = UserVips::where('user_id', $user_vips['user_id'])->first();
         $user_vips->sign_image = $image_path;
         $user_vips->save();
         // 返回数据
@@ -233,7 +227,7 @@ class UserController extends GeneralMethod
         $user_vips = $request->user_vips;
         // 获取数据
         $payment_records = PaymentRecords::join('bl_user_vips', 'bl_user_vips.user_id', '=', 'bl_payment_records.user_id')
-            ->where('bl_payment_records.user_id', $user_vips->user_id)
+            ->where('bl_payment_records.user_id', $user_vips['user_id'])
             ->orderBy('bl_payment_records.payment_at', 'desc')->get([
                 'uid' => 'bl_user_vips.uid',
                 'name' => 'bl_user_vips.name',
@@ -262,7 +256,7 @@ class UserController extends GeneralMethod
         $user_vips = $request->user_vips;
         // 获取数据
         $redemption_records = RedemptionRecords::join('bl_user_vips', 'bl_user_vips.user_id', '=', 'bl_redemption_records.user_id')
-            ->where('bl_redemption_records.user_id', $user_vips->user_id)
+            ->where('bl_redemption_records.user_id', $user_vips['user_id'])
             ->orderBy('bl_redemption_records.created_at', 'desc')->get([
                 'records_id' => 'bl_redemption_records.records_id',
                 'goods_id' => 'bl_redemption_records.goods_id',
@@ -330,14 +324,12 @@ class UserController extends GeneralMethod
      */
     public function setComplaint(Request $request): Response
     {
-        $param = $request->data;
         $user_vips = $request->user_vips;
-        // 获取参数
-        $title = $param['title'];
-        $content = $param['complaint'];
+        $title = $request->post('title');
+        $content = $request->post('complaint');
         // 获取数据
         $complaint = new Complaint();
-        $complaint->user_id = $user_vips->user_id;
+        $complaint->user_id = $user_vips['user_id'];
         $complaint->title = $title;
         $complaint->content = $content;
         $complaint->save();

@@ -1,6 +1,6 @@
 <?php
 
-namespace app\controller\shop\management;
+namespace app\controller\robot\management;
 
 use app\model\Goods;
 use support\Request;
@@ -9,6 +9,7 @@ use app\model\GoodSubs;
 use app\model\UserVips;
 use app\model\RedemptionRecords;
 use app\controller\GeneralMethod;
+use Illuminate\Support\Carbon;
 use resource\enums\RedemptionRecordsEnums;
 
 class ShippingManagementController extends GeneralMethod
@@ -25,16 +26,14 @@ class ShippingManagementController extends GeneralMethod
      * 
      * @return Response 
      */
-    public function getData(Request $request)
+    public function getData(Request $request): Response
     {
-        $param = $request->all();
-        // 获取参数
-        $page = $param['page'];
-        $user_name = $param['user_name'] ?? null;
-        $user_uid = $param['user_uid'] ?? null;
-        $goods_name = $param['goods_name'] ?? null;
-        $goods_type = $param['goods_type'] ?? null;
-        $status = $param['status'] ?? null;
+        $page = $request->post('page', 1);
+        $user_name = $request->post('user_name', null);
+        $user_uid = $request->post('user_uid', null);
+        $goods_name = $request->post('goods_name', null);
+        $goods_type = $request->post('goods_type', null);
+        $status = $request->post('status', null);
         // 获取数据并构建查询
         $redemption_records = RedemptionRecords::join('bl_user_vips', 'bl_user_vips.user_id', '=', 'bl_redemption_records.user_id')
             ->join('bl_goods', 'bl_goods.goods_id', '=', 'bl_redemption_records.goods_id');
@@ -67,9 +66,10 @@ class ShippingManagementController extends GeneralMethod
             ], 'page', $page);
 
         // 处理子集数据
+        $list = pageToArray($redemption_records);
         $sub_ids = [];
-        foreach ($redemption_records as &$_redemption_records) {
-            $sub_ids = array_merge($sub_ids, explode(',', $_redemption_records->sub_id));
+        foreach ($list['data'] as &$_list) {
+            $sub_ids = array_merge($sub_ids, explode(',', $_list['sub_id']));
         }
         $goods_subs_database = GoodSubs::whereIn('sub_id', array_unique($sub_ids))->get([
             'sub_id' => 'sub_id',
@@ -81,17 +81,17 @@ class ShippingManagementController extends GeneralMethod
             $goods_subs[$_goods_subs_database->sub_id] = $_goods_subs_database->name;
         }
         // 添加子集和状态等字段
-        foreach ($redemption_records as &$_redemption_records) {
-            $subs = explode(',', $_redemption_records->sub_id);
-            $_redemption_records->amount_type = RedemptionRecordsEnums\AmountType::from($_redemption_records->amount_type)->label();
-            $_redemption_records->goods_sub = implode("\r\n", array_map(fn($sub) => $goods_subs[$sub], $subs));
-            $_redemption_records->status = RedemptionRecordsEnums\Status::from($_redemption_records->status)->label();
-            $_redemption_records->create_time = $_redemption_records->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
-            unset($_redemption_records->sub_id, $_redemption_records->created_at);
+        foreach ($list['data'] as &$_list) {
+            $subs = explode(',', $_list['sub_id']);
+            $_list['amount_type'] = RedemptionRecordsEnums\AmountType::from($_list['amount_type'])->label();
+            $_list['goods_sub'] = implode("\r\n", array_map(fn($sub) => $goods_subs[$sub], $subs));
+            $_list['status'] = RedemptionRecordsEnums\Status::from($_list['status'])->label();
+            $_list['create_time'] = Carbon::parse($_list['created_at'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
+            unset($_list['sub_id'], $_list['created_at']);
         }
         // 返回数据
         return success($request, [
-            'list' => pageToArray($redemption_records)
+            'list' => $list
         ]);
     }
 
@@ -102,11 +102,9 @@ class ShippingManagementController extends GeneralMethod
      * 
      * @return Response 
      */
-    public function getDataDetails(Request $request)
+    public function getDataDetails(Request $request): Response
     {
-        $param = $request->all();
-        // 获取参数
-        $records_id = $param['records_id'];
+        $records_id = $request->post('records_id');
         // 获取数据
         $redemption_records = RedemptionRecords::where('records_id', $records_id)->first([
             'records_id' => 'records_id',
@@ -176,13 +174,11 @@ class ShippingManagementController extends GeneralMethod
      * 
      * @return Response 
      */
-    public function setDataDetails(Request $request)
+    public function setDataDetails(Request $request): Response
     {
-        $param = $request->all();
-        // 获取参数
-        $records_id = $param['records_id'];
-        $tracking_number = $param['tracking_number'];
-        $status = $param['status'];
+        $records_id = $request->post('records_id');
+        $tracking_number = $request->post('tracking_number');
+        $status = $request->post('status');
         // 获取数据
         $records = RedemptionRecords::where('records_id', $records_id)->first();
         if (!$records) {

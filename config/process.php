@@ -13,9 +13,30 @@
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
+
+use support\Log;
+use app\process\Http;
+use support\Request;
+
 global $argv;
 
 return [
+    'core' => [
+        'handler' => Http::class,
+        'listen' => getenv('HOST') . ':' . getenv('LISTEN'),
+        'count' => cpu_count() * 1,
+        'user' => '',
+        'group' => '',
+        'reusePort' => false,
+        'eventLoop' => Workerman\Events\Fiber::class,
+        'context' => [],
+        'constructor' => [
+            'requestClass' => Request::class,
+            'logger' => Log::channel('default'),
+            'appPath' => app_path(),
+            'publicPath' => public_path()
+        ]
+    ],
     'bilibili' => [
         'handler'  => process\Bilibili::class
     ],

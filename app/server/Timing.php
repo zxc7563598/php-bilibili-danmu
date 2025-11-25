@@ -17,7 +17,7 @@ class Timing
 
     private ?int $timerId = null;
 
-    public function onWorkerStart()
+    public function onWorkerStart(): void
     {
         $this->startUnixWorker();
         $this->startUp();
@@ -29,7 +29,7 @@ class Timing
      * @return void 
      * @throws Exception 
      */
-    private function startUnixWorker()
+    private function startUnixWorker(): void
     {
         $socketFile = runtime_path() . '/timing.sock';
         if (file_exists($socketFile)) {
@@ -52,7 +52,7 @@ class Timing
      * 
      * @return void 
      */
-    private function startUp()
+    private function startUp(): void
     {
         // 如果之前有 Timer，先删除
         if ($this->timerId) {
@@ -98,7 +98,7 @@ class Timing
      * 
      * @return void 
      */
-    private function sendMessage(string $content)
+    private function sendMessage(string $content): void
     {
         // 拆分要发送的内容
         $content = splitAndFilterLines($content);

@@ -12,7 +12,7 @@ use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\Encoding\Encoding;
 use Exception;
-use support\Redis;
+use support\Cache;
 
 class RobotControlController
 {
@@ -22,7 +22,7 @@ class RobotControlController
      * 
      * @return Response 
      */
-    public function getUserInfo(Request $request)
+    public function getUserInfo(Request $request): Response
     {
         // 获取登录信息配置
         $cookie = RobotServices::getCookie();
@@ -54,9 +54,9 @@ class RobotControlController
      * 
      * @return Response 
      */
-    public function getRealRoomInfo(Request $request)
+    public function getRealRoomInfo(Request $request): Response
     {
-        $room_id = isset($request->data['room_id']) ? $request->data['room_id'] : 0;
+        $room_id = $request->post('room_id', 0);
         // 如果存在房间号则变更配置房间号
         $reconnect = false;
         if ($room_id > 0) {
@@ -108,7 +108,7 @@ class RobotControlController
      * 
      * @return Response 
      */
-    public function getConfig(Request $request)
+    public function getConfig(Request $request): Response
     {
         // 获取定时广告配置
         $timing = readFileContent(runtime_path() . '/tmp/timing.cfg');
@@ -262,23 +262,23 @@ class RobotControlController
      * 
      * @return Response 
      */
-    public function setConfig(Request $request)
+    public function setConfig(Request $request): Response
     {
         // 限制请求频率
-        $redis = Redis::get(config('app')['app_name'] . ':robot_set_config');
-        if (!empty($redis)) {
+        $cache = Cache::get('robot_set_config');
+        if (!empty($cache)) {
             return fail($request, 800016);
         }
-        Redis::setEx(config('app')['app_name'] . ':robot_set_config', 30, 1);
+        Cache::set('robot_set_config', 1, 30);
         // 获取参数
-        $timing = $request->data['timing'] ?: false;
-        $present = $request->data['present'] ?: false;
-        $enter = $request->data['enter'] ?: false;
-        $pk = $request->data['pk'] ?: false;
-        $follow = $request->data['follow'] ?: false;
-        $share = $request->data['share'] ?: false;
-        $autoresponders = $request->data['autoresponders'] ?: false;
-        $check_in = $request->data['check_in'] ?: false;
+        $timing = $request->post('timing', false);
+        $present = $request->post('present', false);
+        $enter = $request->post('enter', false);
+        $pk = $request->post('pk', false);
+        $follow = $request->post('follow', false);
+        $share = $request->post('share', false);
+        $autoresponders = $request->post('autoresponders', false);
+        $check_in = $request->post('check_in', false);
         // 存储数据
         if ($timing) {
             Utils\FileUtils::fileDelete(runtime_path() . '/tmp/timing.cfg');
@@ -323,7 +323,7 @@ class RobotControlController
      * 
      * @return Response 
      */
-    public function getLoginQr(Request $request)
+    public function getLoginQr(Request $request): Response
     {
         // 获取登录信息
         $getQrcode = Bililive\Login::getQrcode();
@@ -350,9 +350,9 @@ class RobotControlController
      *  
      * @return Response 
      */
-    public function loginCheck(Request $request)
+    public function loginCheck(Request $request): Response
     {
-        $qrcode_key = $request->data['qrcode_key'] ?: '';
+        $qrcode_key = $request->post('qrcode_key', '');
         // 获取登录信息
         $checkQrcode = Bililive\Login::checkQrcode($qrcode_key);
         // 如果登录成功，存储cookie
@@ -375,7 +375,7 @@ class RobotControlController
      * 
      * @return Response 
      */
-    public function loginOut(Request $request)
+    public function loginOut(Request $request): Response
     {
         // 删除配置信息
         Utils\FileUtils::fileDelete(runtime_path() . '/tmp/cookie.cfg');
@@ -392,7 +392,7 @@ class RobotControlController
      * 
      * @return Response 
      */
-    public function connectOut(Request $request)
+    public function connectOut(Request $request): Response
     {
         // 删除配置信息
         Utils\FileUtils::fileDelete(runtime_path() . '/tmp/connect.cfg');
@@ -407,7 +407,7 @@ class RobotControlController
      * 
      * @return Response 
      */
-    public function exportConfig(Request $request)
+    public function exportConfig(Request $request): Response
     {
         $path_name = Carbon::now()->timezone(config('app')['default_timezone'])->format('YmdHis') . '.cfg';
         // 获取定时广告配置
@@ -541,7 +541,7 @@ class RobotControlController
      * 
      * @return Response 
      */
-    public function importConfig(Request $request)
+    public function importConfig(Request $request): Response
     {
         // 获取上传的文件
         $file = $request->file('file');

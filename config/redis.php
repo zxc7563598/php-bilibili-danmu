@@ -20,4 +20,11 @@ return [
         'port' => getenv('REDIS_PORT'),
         'database' => 0,
     ],
+    'cache' => [
+        'host' => getenv('REDIS_HOST'),
+        'password' => getenv('REDIS_PASSWORD') ? getenv('REDIS_PASSWORD') : null,
+        'port' => getenv('REDIS_PORT'),
+        'database' => 1,
+        'prefix' => 'bilibili_danmu_cache-',
+    ]
 ];

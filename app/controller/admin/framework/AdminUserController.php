@@ -27,11 +27,11 @@ class AdminUserController
      */
     public function list(Request $request): Response
     {
-        $pageNo = $request->data['pageNo'] ?? 1;
-        $pageSize = $request->data['pageSize'] ?? 10;
-        $gender = $request->data['gender'] ?? null;
-        $enable = $request->data['enable'] ?? null;
-        $username = $request->data['username'] ?? null;
+        $pageNo = $request->post('pageNo', 1);
+        $pageSize = $request->post('pageSize', 10);
+        $gender = $request->post('gender');
+        $enable = $request->post('enable');
+        $username = $request->post('username');
         // 获取数据
         $list = Admins::with('roles');
         if (!is_null($gender)) {
@@ -71,18 +71,15 @@ class AdminUserController
                 'enable' => $_roles['enable'] == AdminsEnums\Enable::Enable->value
             ];
         }
-        foreach ($list as &$_list) {
-            $_list->avatar = getImageUrl($_list->avatar);
-            $_list->roles = $_list->roles->toArray();
-            $_list->enable = $_list->enable == AdminsEnums\Enable::Enable->value;
-            $_list->createTime = $_list->created_at->timezone('Asia/Shanghai')->format('Y-m-d H:i:s');
-            $_list->updateTime = Carbon::parse($_list->updated_at)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
-            unset($_list->created_at);
-            unset($_list->updated_at);
-        }
         $data = is_array($list) ? $list : $list->toArray();
-        // 追加角色权限信息
         foreach ($data['data'] as &$_data) {
+            $_data['avatar'] = getImageUrl($_data['avatar']);
+            $_data['enable'] = $_data['enable'] == AdminsEnums\Enable::Enable->value;
+            $_data['createTime'] = Carbon::parse($_data['created_at'])->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s');
+            $_data['updateTime'] = Carbon::parse($_data['updated_at'])->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s');
+            unset($_data['created_at']);
+            unset($_data['updated_at']);
+            // 追加角色权限信息
             $user_roles = $_data['roles'];
             $_data['roles'] = [];
             foreach ($user_roles as $_user_roles) {
@@ -150,11 +147,11 @@ class AdminUserController
      */
     public function createOrUpdate(Request $request): Response
     {
-        $id = $request->data['id'] ?? null;
-        $enable = $request->data['enable'] ?? true;
-        $username = $request->data['username'] ?? null;
-        $password = $request->data['password'] ?? null;
-        $roleIds = $request->data['roleIds'] ?? null;
+        $id = $request->post('id', null);
+        $enable = $request->post('enable', true);
+        $username = $request->post('username', null);
+        $password = $request->post('password', null);
+        $roleIds = $request->post('roleIds', null);
         // 处理数据
         $admins = new Admins();
         if (!is_null($id)) {
@@ -207,7 +204,7 @@ class AdminUserController
      */
     public function delete(Request $request): Response
     {
-        $id = $request->data['id'];
+        $id = $request->post('id');
         // 删除管理员与角色关联
         Admins::where('id', $id)->delete();
         AdminRoles::where('admin_id', $id)->delete();
@@ -225,8 +222,8 @@ class AdminUserController
      */
     public function updatePassword(Request $request): Response
     {
-        $id = $request->data['id'];
-        $password = $request->data['password'];
+        $id = $request->post('id');
+        $password = $request->post('password');
         // 获取数据
         $admins = Admins::where('id', $id)->first();
         $admins->password = $password;
@@ -248,11 +245,11 @@ class AdminUserController
      */
     public function updateProfile(Request $request): Response
     {
-        $id = $request->data['id'];
-        $address = $request->data['address'] ?? null;
-        $email = $request->data['email'] ?? null;
-        $gender = $request->data['gender'] ?? null;
-        $nickName = $request->data['nickName'] ?? null;
+        $id = $request->post('id');
+        $address = $request->post('address', null);
+        $email = $request->post('email', null);
+        $gender = $request->post('gender', null);
+        $nickName = $request->post('nickName', null);
         // 获取数据
         $admins = Admins::where('id', $id)->first();
         $admins->address = $address;

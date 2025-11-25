@@ -2,9 +2,8 @@
 
 namespace app\middleware;
 
-use app\core\AdminAuthService;
-use Carbon\Carbon;
 use Hejunjie\EncryptedRequest\EncryptedRequestHandler;
+use support\Cache;
 use Webman\MiddlewareInterface;
 use Webman\Http\Response;
 use Webman\Http\Request;
@@ -26,12 +25,17 @@ class AdminAuthMiddleware implements MiddlewareInterface
         $param = $request->all();
         $handler = new EncryptedRequestHandler(['RSA_PRIVATE_KEY' => file_get_contents(base_path('private_key.pem'))]);
         try {
-            $request->data = $handler->handle(
+            $decoded = $handler->handle(
                 (string)$param['en_data'] ?? '',
                 (string)$param['enc_payload'] ?? '',
                 (int)$param['timestamp'] ?? 0,
                 (string)$param['sign'] ?? ''
             );
+            $post = [];
+            foreach ($decoded as $key => $value) {
+                $post[$key] = $value;
+            }
+            $request->setPost($post);
         } catch (\Hejunjie\EncryptedRequest\Exceptions\SignatureException $e) {
             return fail($request, 900002);
         } catch (\Hejunjie\EncryptedRequest\Exceptions\TimestampException $e) {
@@ -68,8 +72,7 @@ class AdminAuthMiddleware implements MiddlewareInterface
 
     public static function loginCheck($token): int|array
     {
-        $cache = AdminAuthService::getCache();
-        $admins = $cache->get($token);
+        $admins = Cache::get($token);
         return !empty($admins) ? json_decode($admins, true) : 900005;
     }
 }

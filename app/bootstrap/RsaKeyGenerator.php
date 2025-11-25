@@ -4,6 +4,7 @@ namespace app\bootstrap;
 
 use Webman\Bootstrap;
 
+// RSA密钥对生成
 class RsaKeyGenerator implements Bootstrap
 {
     protected static string $privateKeyPath = __DIR__ . '/../../private_key.pem';
@@ -37,6 +38,8 @@ class RsaKeyGenerator implements Bootstrap
             $config = [
                 "private_key_bits" => 2048,
                 "private_key_type" => OPENSSL_KEYTYPE_RSA,
+                'encrypt_key' => false,
+                'rsa_padding_mode'  => OPENSSL_PKCS1_PADDING,
             ];
             $res = openssl_pkey_new($config);
             if ($res) {
