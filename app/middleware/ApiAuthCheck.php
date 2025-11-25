@@ -67,7 +67,7 @@ class ApiAuthCheck implements MiddlewareInterface
         // 不在白名单的接口需要token才能访问
         if (!in_array($path, $whitelisting)) {
             if (empty($token)) {
-                return fail($request, 900005);
+                return fail($request, 800004);
             }
         }
         // 验证token有效性
@@ -89,6 +89,6 @@ class ApiAuthCheck implements MiddlewareInterface
     public static function loginCheck($token): int|array
     {
         $user_vips = Cache::get($token);
-        return !empty($user_vips) ? json_decode($user_vips, true) : 900005;
+        return !empty($user_vips) ? json_decode($user_vips, true) : 800004;
     }
 }
