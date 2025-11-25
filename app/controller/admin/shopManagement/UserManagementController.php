@@ -57,8 +57,8 @@ class UserManagementController extends GeneralMethod
         $data = is_array($users) ? $users : $users->toArray();
         foreach ($data['data'] as &$_data) {
             $_data['vip_type'] = UserVipsEnums\VipType::from($_data['vip_type'])->label();
-            $_data['last_vip_at'] = Carbon::parse($_data['last_vip_at'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
-            $_data['end_vip_at'] = Carbon::parse($_data['end_vip_at'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
+            $_data['last_vip_at'] = $_data['last_vip_at'] ? Carbon::parse($_data['last_vip_at'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') : ' - ';
+            $_data['end_vip_at'] = $_data['end_vip_at'] ? Carbon::parse($_data['end_vip_at'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') : ' - ';
         }
         // 返回数据
         return success($request, [

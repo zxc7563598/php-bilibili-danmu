@@ -3,7 +3,6 @@
 namespace app\controller\robot\management;
 
 use Carbon\Carbon;
-use Hejunjie\Utils;
 use support\Request;
 use support\Response;
 use app\model\UserVips;
@@ -54,8 +53,8 @@ class UserManagementController extends GeneralMethod
         $list = pageToArray($users);
         foreach ($list['data'] as &$_list) {
             $_list['vip_type'] = UserVipsEnums\VipType::from($_list['vip_type'])->label();
-            $_list['last_vip_at'] = Carbon::parse($_list['last_vip_at'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
-            $_list['end_vip_at'] = Carbon::parse($_list['end_vip_at'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
+            $_list['last_vip_at'] = $_list['last_vip_at'] ? Carbon::parse($_list['last_vip_at'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') : ' - ';
+            $_list['end_vip_at'] = $_list['end_vip_at'] ? Carbon::parse($_list['end_vip_at'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') : ' - ';
         }
         // 返回数据
         return success($request, ['list' => $list]);
