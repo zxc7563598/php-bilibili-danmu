@@ -129,6 +129,9 @@ class SystemConfigurationController extends GeneralMethod
                 break;
             }
         }
+        if (!is_dir(public_path('shop'))) {
+            $shouldExecuteCode = true;
+        }
         // 更新环境变量
         foreach ($data as $_data) {
             // 检查环境变量是否存在并更新
