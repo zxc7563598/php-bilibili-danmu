@@ -233,7 +233,7 @@ class ApiController
             <p>📦 新版后台支持更多自定义功能，不过需要你自己部署。我们提供了详细的教学地址，也欢迎联系作者协助，作者并不介意在闲暇时间帮大家搭一搭～</p><br>
             <p>如果你对这些部署流程比较熟悉，强烈建议试试，体验会更好；</p>
             <p>当然啦，如果你觉得现在这样也挺好，也可以忽略这条消息，不影响正常使用～</p><br>
-            <p>👉 教学地址：<a href="https://hejunjie.life/posts/b4f053ee.html#%E5%85%B3%E4%BA%8E%E7%8B%AC%E7%AB%8B%E5%90%8E%E5%8F%B0" target="_blank">点击前往</a></p>';
+            <p>👉 教学地址：<a href="https://hejunjie.life/danmusuite/start/admin-panel" target="_blank">点击前往</a></p>';
         // 返回数据
         return success($request, [
             'timing' => $timing,
