@@ -15,13 +15,12 @@
 
 namespace app\middleware;
 
-use app\model\UserVips;
 use Hejunjie\EncryptedRequest\EncryptedRequestHandler;
+use Carbon\Carbon;
 use support\Cache;
 use Webman\MiddlewareInterface;
 use Webman\Http\Response;
 use Webman\Http\Request;
-use support\Redis;
 
 /**
  * Api鉴权
@@ -88,7 +87,19 @@ class ApiAuthCheck implements MiddlewareInterface
 
     public static function loginCheck($token): int|array
     {
-        $user_vips = Cache::get($token);
-        return !empty($user_vips) ? json_decode($user_vips, true) : 800004;
+        // 从缓存获取用户信息
+        $userDataJson = Cache::get($token);
+        if (empty($userDataJson)) {
+            return 800004;
+        }
+        $data = json_decode($userDataJson, true);
+        // 确保 timestamp 存在且为整数
+        $currentTimestamp = Carbon::now()->timezone(config('app.default_timezone'))->timestamp;
+        if (!empty($data['timestamp']) && ($currentTimestamp - (int)$data['timestamp']) > 86400 * 3) {
+            // 超过 3 天，更新缓存 timestamp 并延长缓存有效期
+            $data['timestamp'] = $currentTimestamp;
+            Cache::set($token, json_encode($data), 86400 * 7);
+        }
+        return $data;
     }
 }
