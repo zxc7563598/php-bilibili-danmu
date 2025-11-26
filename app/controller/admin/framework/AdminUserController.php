@@ -100,6 +100,19 @@ class AdminUserController
      */
     public function detail(Request $request): Response
     {
+        $admins = Admins::where('id', $request->admins['id'])->first([
+            'id' => 'id',
+            'username' => 'username',
+            'nickname' => 'nickname',
+            'enable' => 'enable',
+            'gender' => 'gender',
+            'avatar' => 'avatar',
+            'address' => 'address',
+            'email' => 'email',
+            'role_id' => 'role_id',
+            'created_at' => 'created_at',
+            'updated_at' => 'updated_at',
+        ]);
         // 获取角色信息
         $roles = Roles::where('enable', RolesEnums\Enable::Enable->value)->get([
             'id' => 'id',
@@ -115,22 +128,22 @@ class AdminUserController
         }
         // 返回数据
         return success($request, [
-            'id' => $request->admins['id'],
-            'username' => $request->admins['username'],
-            'enable' => $request->admins['enable'] == AdminsEnums\Enable::Enable->value,
-            'createTime' => Carbon::parse($request->admins['created_at'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
-            'updateTime' => Carbon::parse($request->admins['updated_at'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
+            'id' => $admins->id,
+            'username' => $admins->username,
+            'enable' => $admins->enable == AdminsEnums\Enable::Enable->value,
+            'createTime' => $admins->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
+            'updateTime' => Carbon::parse($admins->updated_at)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
             'profile' => [
-                'id' => $request->admins['id'],
-                'nickName' => $request->admins['nickname'],
-                "gender" =>  $request->admins['gender'],
-                "avatar" =>  $request->admins['avatar'],
-                "address" =>  $request->admins['address'],
-                "email" =>  $request->admins['email'],
-                "userId" =>  $request->admins['id'],
+                'id' => $admins->id,
+                'nickName' => $admins->nickname,
+                "gender" =>  $admins->gender,
+                "avatar" =>  $admins->avatar,
+                "address" =>  $admins->address,
+                "email" =>  $admins->email,
+                "userId" =>  $admins->id,
             ],
             'roles' => $roles,
-            'currentRole' => $roles_data[$request->admins['role_id']]
+            'currentRole' => $roles_data[$admins->role_id]
         ]);
     }
 

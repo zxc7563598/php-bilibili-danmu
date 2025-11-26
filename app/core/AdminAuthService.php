@@ -3,6 +3,7 @@
 namespace app\core;
 
 use app\model\Admins;
+use Carbon\Carbon;
 use support\Cache;
 use resource\enums\AdminsEnums;
 
@@ -44,7 +45,11 @@ class AdminAuthService
         }
         $admins->token = $token;
         $admins->save();
-        Cache::set($token, json_encode($admins), 86400 * 7);
+        Cache::set($token, json_encode([
+            'id' => $admins->id,
+            'role_id' => $admins->role_id,
+            'timestamp' => Carbon::now()->timezone(config('app.default_timezone'))->timestamp
+        ]), 86400 * 7);
         // 返回数据
         return $token;
     }
