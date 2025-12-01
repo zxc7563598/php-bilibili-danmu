@@ -278,7 +278,7 @@ class UserPublicMethods extends GeneralMethod
                     Carbon::parse($lives->end_time)->timezone(config('app')['default_timezone'])->timestamp
                 ])->groupBy('uid')->orderByRaw('count(*) desc')->get([
                     'uid' => 'uid',
-                    'uname' => 'uname',
+                    'uname' => Db::raw('ANY_VALUE(uname) as uname'),
                     'count' => Db::raw('count(*) as count')
                 ]);
                 $danmu_count = 0;
@@ -299,7 +299,7 @@ class UserPublicMethods extends GeneralMethod
                     Carbon::parse($lives->end_time)->timezone(config('app')['default_timezone'])->timestamp
                 ])->groupBy('uid')->orderByRaw('sum(total_price) desc')->get([
                     'uid' => 'uid',
-                    'uname' => 'uname',
+                    'uname' => Db::raw('ANY_VALUE(uname) as uname'),
                     'count' => Db::raw('sum(total_price) as count')
                 ]);
                 $gift_total_price = 0;
