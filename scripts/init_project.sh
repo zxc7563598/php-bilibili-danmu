@@ -62,10 +62,10 @@ if [ ! -f "$ENV_FILE" ]; then
     replace_in_env "$ENV_FILE" "^SYSTEM_API_URL=.*" "SYSTEM_API_URL="
     replace_in_env "$ENV_FILE" "^SECURE_API_KEY=.*" "SECURE_API_KEY=$SECURE_API_KEY"
     replace_in_env "$ENV_FILE" "^SHOP_URL=.*" "SHOP_URL="
-    replace_in_env "$ENV_FILE" "^HOST=.*" "HOST=http://php"
+    replace_in_env "$ENV_FILE" "^HOST=.*" "HOST=http://danmu-php"
     replace_in_env "$ENV_FILE" "^LISTEN=.*" "LISTEN=7776"
-    replace_in_env "$ENV_FILE" "^RE_OPEN_HOST=.*" "RE_OPEN_HOST=http://php"
-    replace_in_env "$ENV_FILE" "^REDIS_HOST=.*" "REDIS_HOST=redis"
+    replace_in_env "$ENV_FILE" "^RE_OPEN_HOST=.*" "RE_OPEN_HOST=http://danmu-php"
+    replace_in_env "$ENV_FILE" "^REDIS_HOST=.*" "REDIS_HOST=danmu-redis"
     replace_in_env "$ENV_FILE" "^REDIS_PORT=.*" "REDIS_PORT=6379"
 
     # MySQL 相关配置
@@ -74,13 +74,13 @@ if [ ! -f "$ENV_FILE" ]; then
     DB_NAME="bilibili_danmu"
 
     echo "⏳ 正在等待 MySQL 启动..." >> "$LOG_FILE"
-    until mariadb-admin ping -h "mysql" --skip-ssl --silent; do
+    until mariadb-admin ping -h "danmu-mysql" --skip-ssl --silent; do
         echo "⏳ Waiting for MySQL to be ready..." >> "$LOG_FILE"
         sleep 5
     done
 
     echo "✅ MySQL 已就绪，开始创建数据库及用户..." >> "$LOG_FILE"
-    mariadb -h mysql -u root -pinit0925 --skip-ssl <<EOF >> "$LOG_FILE" 2>&1
+    mariadb -h danmu-mysql -u root -pinit0925 --skip-ssl <<EOF >> "$LOG_FILE" 2>&1
 CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER IF NOT EXISTS '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASSWORD}';
 ALTER USER '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASSWORD}';
@@ -90,7 +90,7 @@ FLUSH PRIVILEGES;
 EOF
 
     # 替换 .env 中的数据库配置
-    replace_in_env "$ENV_FILE" "^DB_HOST=.*" "DB_HOST=mysql"
+    replace_in_env "$ENV_FILE" "^DB_HOST=.*" "DB_HOST=danmu-mysql"
     replace_in_env "$ENV_FILE" "^DB_PORT=.*" "DB_PORT=3306"
     replace_in_env "$ENV_FILE" "^DB_USER=.*" "DB_USER=$DB_USER"
     replace_in_env "$ENV_FILE" "^DB_NAME=.*" "DB_NAME=$DB_NAME"
