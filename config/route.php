@@ -171,6 +171,7 @@ Route::group('/admin-api-v2', function () {
     // 其他 - 盲盒信息
     Route::post('/others/gift-blind-box/get-data', [admin\others\GiftBlindBoxcontroller::class, 'getData'])->name('[其他-盲盒信息-获取盲盒信息数据]');
     Route::post('/others/gift-blind-box/get-statistic-data', [admin\others\GiftBlindBoxcontroller::class, 'getStatisticData'])->name('[其他-盲盒信息-获取统计数据]');
+    Route::post('/others/gift-blind-box/export-data', [admin\others\GiftBlindBoxcontroller::class, 'exportData'])->name('[其他-盲盒信息-导出列表数据]');
     // 其他 - 弹幕信息
     Route::post('/others/danmaku-info/get-data', [admin\others\DanmakuInfoController::class, 'getData'])->name('[其他-弹幕信息-获取列表数据]');
     Route::post('/others/danmaku-info/export-data', [admin\others\DanmakuInfoController::class, 'exportData'])->name('[其他-弹幕信息-导出列表数据]');

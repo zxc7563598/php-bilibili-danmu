@@ -110,4 +110,80 @@ class GiftBlindBoxcontroller extends GeneralMethod
             'profit_price' => number_format(round($records->total_price - $records->original_price, 2), 2, '.', ',')
         ]);
     }
+
+    /**
+     * 导出盲盒信息数据
+     * 
+     * @param string $uid 用户uid
+     * @param string $uname 用户名
+     * @param array $create_date 赠送时间
+     * 
+     * @return Response 
+     */
+    public function exportData(Request $request): Response
+    {
+        ini_set('memory_limit', '-1');
+        $uid = $request->post('uid', null);
+        $uname = $request->post('uname', null);
+        $create_date = $request->post('create_date', null);
+        // 获取数据
+        $records = GiftRecords::where('original', GiftRecordsEnums\Original::No->value);
+        if (!is_null($uid)) {
+            $records = $records->where('uid', $uid);
+        }
+        if (!is_null($uname)) {
+            $records = $records->where('uname', 'like', '%' . $uname . '%');
+        }
+        if (!is_null($create_date)) {
+            list($start_time, $end_time) = $create_date;
+            $start_time = intval($start_time / 1000);
+            $end_time = intval($end_time / 1000);
+            $records = $records->whereBetween('created_at', [$start_time, $end_time]);
+        }
+        $records = $records->orderBy('created_at', 'desc')
+            ->get([
+                'uid' => 'uid',
+                'uname' => 'uname',
+                'gift_name' => 'gift_name',
+                'price' => 'price',
+                'num' => 'num',
+                'total_price' => 'total_price',
+                'original_gift_name' => 'original_gift_name',
+                'original_price' => 'original_price',
+                'created_at' => 'created_at'
+            ]);
+        // 处理数据
+        $csv_data = [];
+        $csv_data[] = ["UID", "名称", "礼物名称", "赠送数量", "礼物单价", "礼物总价", "对应盲盒", "盲盒价格", "盈利金额", "赠送时间"];
+        foreach ($records as $_data) {
+            $original_price = round(($_data->original_price * $_data->num), 2);
+            $profit_price = round(($_data->total_price - $original_price), 2);
+            $csv_data[] = [
+                $_data->uid,
+                $_data->uname,
+                $_data->gift_name,
+                $_data->num,
+                $_data->price,
+                $_data->total_price,
+                $_data->original_gift_name,
+                $original_price,
+                $profit_price,
+                $_data->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s')
+            ];
+        }
+        // 拼接 CSV 字符串
+        $csvContent = "\xEF\xBB\xBF";
+        foreach ($csv_data as $row) {
+            $fh = fopen('php://temp', 'r+'); // 内存临时文件
+            fputcsv($fh, $row);
+            rewind($fh);
+            $csvContent .= stream_get_contents($fh);
+            fclose($fh);
+        }
+        // 构造 Response 返回
+        return response($csvContent, 200, [
+            'Content-Type' => 'text/csv; charset=utf-8',
+            'Content-Disposition' => "attachment; filename=\"export.csv\"; filename*=UTF-8''" . rawurlencode('盲盒信息.csv'),
+        ]);
+    }
 }
