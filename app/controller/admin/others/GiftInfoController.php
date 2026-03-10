@@ -7,7 +7,6 @@ use support\Response;
 use app\controller\GeneralMethod;
 use app\model\GiftRecords;
 use Carbon\Carbon;
-use InvalidArgumentException;
 use support\Db;
 
 class GiftInfoController extends GeneralMethod
@@ -19,6 +18,7 @@ class GiftInfoController extends GeneralMethod
      * @param integer $pageSize 每页展示数量
      * @param string $uid 用户uid
      * @param string $uname 用户名
+     * @param string $gift_name 礼物名称
      * @param array $create_date 赠送时间
      * 
      * @return Response 
@@ -29,6 +29,7 @@ class GiftInfoController extends GeneralMethod
         $pageSize = $request->post('pageSize', 30);
         $uid = $request->post('uid', null);
         $uname = $request->post('uname', null);
+        $gift_name = $request->post('gift_name', null);
         $create_date = $request->post('create_date', null);
         // 获取数据
         $records = new GiftRecords();
@@ -37,6 +38,9 @@ class GiftInfoController extends GeneralMethod
         }
         if (!is_null($uname)) {
             $records = $records->where('uname', 'like', '%' . $uname . '%');
+        }
+        if (!is_null($gift_name)) {
+            $records = $records->where('gift_name', 'like', '%' . $gift_name . '%');
         }
         if (!is_null($create_date)) {
             list($start_time, $end_time) = $create_date;
@@ -81,6 +85,7 @@ class GiftInfoController extends GeneralMethod
         // 获取参数
         $uid = $request->post('uid', null);
         $uname = $request->post('uname', null);
+        $gift_name = $request->post('gift_name', null);
         $create_date = $request->post('create_date', null);
         // 获取数据
         $records = new GiftRecords();
@@ -89,6 +94,9 @@ class GiftInfoController extends GeneralMethod
         }
         if (!is_null($uname)) {
             $records = $records->where('uname', 'like', '%' . $uname . '%');
+        }
+        if (!is_null($gift_name)) {
+            $records = $records->where('gift_name', 'like', '%' . $gift_name . '%');
         }
         if (!is_null($create_date)) {
             list($start_time, $end_time) = $create_date;
