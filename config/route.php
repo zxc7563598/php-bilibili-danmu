@@ -167,6 +167,7 @@ Route::group('/admin-api-v2', function () {
     // 其他 - 礼物信息
     Route::post('/others/gift-info/get-data', [admin\others\GiftInfoController::class, 'getData'])->name('[其他-礼物信息-获取列表数据]');
     Route::post('/others/gift-info/get-statistic-data', [admin\others\GiftInfoController::class, 'getStatisticData'])->name('[其他-礼物信息-获取统计数据]');
+    Route::post('/others/gift-info/export-data', [admin\others\GiftInfoController::class, 'exportData'])->name('[其他-礼物信息-导出列表数据]');
     // 其他 - 盲盒信息
     Route::post('/others/gift-blind-box/get-data', [admin\others\GiftBlindBoxcontroller::class, 'getData'])->name('[其他-盲盒信息-获取盲盒信息数据]');
     Route::post('/others/gift-blind-box/get-statistic-data', [admin\others\GiftBlindBoxcontroller::class, 'getStatisticData'])->name('[其他-盲盒信息-获取统计数据]');
