@@ -72,4 +72,79 @@ class DanmakuInfoController extends GeneralMethod
             "pageData" => $data['data']
         ]);
     }
+
+    /**
+     * 导出列表数据
+     *
+     * @param string $uid 用户uid
+     * @param string $uname 用户名
+     * @param string $send_date 发送时间
+     * 
+     * @return Response
+     */
+    public function exportData(Request $request): Response
+    {
+        ini_set('memory_limit', '-1');
+        $uid = $request->post('uid', null);
+        $uname = $request->post('uname', null);
+        $send_date = $request->post('send_date', null);
+        // 构建查询
+        $danmu_logs = new DanmuLogs();
+        if (!is_null($uname)) {
+            $danmu_logs = $danmu_logs->where('uname', 'like', '%' . $uname . '%');
+        }
+        if (!is_null($uid)) {
+            $danmu_logs = $danmu_logs->where('uid', $uid);
+        }
+        if (!is_null($send_date)) {
+            list($start_time, $end_time) = $send_date;
+            $start_time = intval($start_time / 1000);
+            $end_time = intval($end_time / 1000);
+            $danmu_logs = $danmu_logs->whereBetween('send_at', [$start_time, $end_time]);
+        }
+        // 查询并分页
+        $danmu_logs = $danmu_logs->orderBy('send_at', 'desc')
+            ->get([
+                'id' => 'id',
+                'uid' => 'uid',
+                'uname' => 'uname',
+                'msg' => 'msg',
+                'live' => 'live',
+                'badge_uid' => 'badge_uid',
+                'badge_uname' => 'badge_uname',
+                'badge_room_id' => 'badge_room_id',
+                'badge_name' => 'badge_name',
+                'badge_level' => 'badge_level',
+                'badge_type' => 'badge_type',
+                'send_at' => 'send_at'
+            ]);
+        // 处理数据
+        $csv_data = [];
+        $csv_data[] = ["UID", "名称", "牌子等级", "牌子名称", "牌子类型", "弹幕信息", "发送时间"];
+        foreach ($danmu_logs as $_data) {
+            $csv_data[] = [
+                $_data->uid,
+                $_data->uname,
+                $_data->badge_level,
+                $_data->badge_name,
+                DanmuLogsEnums\BadgeType::from($_data->badge_type)->label(),
+                $_data->msg,
+                Carbon::parse($_data->send_at)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s')
+            ];
+        }
+        // 拼接 CSV 字符串
+        $csvContent = "\xEF\xBB\xBF";
+        foreach ($csv_data as $row) {
+            $fh = fopen('php://temp', 'r+'); // 内存临时文件
+            fputcsv($fh, $row);
+            rewind($fh);
+            $csvContent .= stream_get_contents($fh);
+            fclose($fh);
+        }
+        // 构造 Response 返回
+        return response($csvContent, 200, [
+            'Content-Type' => 'text/csv; charset=utf-8',
+            'Content-Disposition' => "attachment; filename=\"export.csv\"; filename*=UTF-8''" . rawurlencode('弹幕信息.csv'),
+        ]);
+    }
 }
