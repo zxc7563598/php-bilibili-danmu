@@ -7,7 +7,6 @@ use support\Response;
 use app\controller\GeneralMethod;
 use app\model\GiftRecords;
 use Carbon\Carbon;
-use InvalidArgumentException;
 use support\Db;
 
 class GiftInfoController extends GeneralMethod
@@ -19,6 +18,7 @@ class GiftInfoController extends GeneralMethod
      * @param integer $pageSize 每页展示数量
      * @param string $uid 用户uid
      * @param string $uname 用户名
+     * @param string $gift_name 礼物名称
      * @param array $create_date 赠送时间
      * 
      * @return Response 
@@ -29,6 +29,7 @@ class GiftInfoController extends GeneralMethod
         $pageSize = $request->post('pageSize', 30);
         $uid = $request->post('uid', null);
         $uname = $request->post('uname', null);
+        $gift_name = $request->post('gift_name', null);
         $create_date = $request->post('create_date', null);
         // 获取数据
         $records = new GiftRecords();
@@ -37,6 +38,9 @@ class GiftInfoController extends GeneralMethod
         }
         if (!is_null($uname)) {
             $records = $records->where('uname', 'like', '%' . $uname . '%');
+        }
+        if (!is_null($gift_name)) {
+            $records = $records->where('gift_name', 'like', '%' . $gift_name . '%');
         }
         if (!is_null($create_date)) {
             list($start_time, $end_time) = $create_date;
@@ -81,6 +85,7 @@ class GiftInfoController extends GeneralMethod
         // 获取参数
         $uid = $request->post('uid', null);
         $uname = $request->post('uname', null);
+        $gift_name = $request->post('gift_name', null);
         $create_date = $request->post('create_date', null);
         // 获取数据
         $records = new GiftRecords();
@@ -89,6 +94,9 @@ class GiftInfoController extends GeneralMethod
         }
         if (!is_null($uname)) {
             $records = $records->where('uname', 'like', '%' . $uname . '%');
+        }
+        if (!is_null($gift_name)) {
+            $records = $records->where('gift_name', 'like', '%' . $gift_name . '%');
         }
         if (!is_null($create_date)) {
             list($start_time, $end_time) = $create_date;
@@ -105,6 +113,80 @@ class GiftInfoController extends GeneralMethod
             'num' => number_format($records->num, 0, '.', ','),
             'price' => number_format($records->total_price, 2, '.', ','),
             'unit' => $records->num > 0 ? number_format(round($records->total_price / $records->num, 2), 2, '.', ',') : '0.00'
+        ]);
+    }
+
+    /**
+     * 导出礼物记录数据
+     * 
+     * @param string $uid 用户uid
+     * @param string $uname 用户名
+     * @param string $gift_name 礼物名称
+     * @param array $create_date 赠送时间
+     * 
+     * @return Response 
+     */
+    public function exportData(Request $request)
+    {
+        ini_set('memory_limit', '-1');
+        $uid = $request->post('uid', null);
+        $uname = $request->post('uname', null);
+        $gift_name = $request->post('gift_name', null);
+        $create_date = $request->post('create_date', null);
+        // 获取数据
+        $records = new GiftRecords();
+        if (!is_null($uid)) {
+            $records = $records->where('uid', $uid);
+        }
+        if (!is_null($uname)) {
+            $records = $records->where('uname', 'like', '%' . $uname . '%');
+        }
+        if (!is_null($gift_name)) {
+            $records = $records->where('gift_name', 'like', '%' . $gift_name . '%');
+        }
+        if (!is_null($create_date)) {
+            list($start_time, $end_time) = $create_date;
+            $start_time = intval($start_time / 1000);
+            $end_time = intval($end_time / 1000);
+            $records = $records->whereBetween('created_at', [$start_time, $end_time]);
+        }
+        $records = $records->orderBy('created_at', 'desc')
+            ->get([
+                'uid' => 'uid',
+                'uname' => 'uname',
+                'gift_name' => 'gift_name',
+                'price' => 'price',
+                'num' => 'num',
+                'total_price' => 'total_price',
+                'created_at' => 'created_at'
+            ]);
+        // 处理数据
+        $csv_data = [];
+        $csv_data[] = ["UID", "名称", "礼物名称", "赠送数量", "礼物单价", "礼物总价", "赠送时间"];
+        foreach ($records as $_data) {
+            $csv_data[] = [
+                $_data->uid,
+                $_data->uname,
+                $_data->gift_name,
+                $_data->num,
+                $_data->price,
+                $_data->total_price,
+                $_data->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s')
+            ];
+        }
+        // 拼接 CSV 字符串
+        $csvContent = "\xEF\xBB\xBF";
+        foreach ($csv_data as $row) {
+            $fh = fopen('php://temp', 'r+'); // 内存临时文件
+            fputcsv($fh, $row);
+            rewind($fh);
+            $csvContent .= stream_get_contents($fh);
+            fclose($fh);
+        }
+        // 构造 Response 返回
+        return response($csvContent, 200, [
+            'Content-Type' => 'text/csv; charset=utf-8',
+            'Content-Disposition' => "attachment; filename=\"export.csv\"; filename*=UTF-8''" . rawurlencode('礼物信息.csv'),
         ]);
     }
 }
