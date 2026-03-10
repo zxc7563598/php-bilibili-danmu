@@ -128,6 +128,7 @@ class GiftInfoController extends GeneralMethod
      */
     public function exportData(Request $request)
     {
+        ini_set('memory_limit', '-1');
         $uid = $request->post('uid', null);
         $uname = $request->post('uname', null);
         $gift_name = $request->post('gift_name', null);
@@ -170,7 +171,7 @@ class GiftInfoController extends GeneralMethod
                 $_data->num,
                 $_data->price,
                 $_data->total_price,
-                Carbon::parse($_data->created_at)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s')
+                $_data->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s')
             ];
         }
         // 拼接 CSV 字符串
