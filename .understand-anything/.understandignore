@@ -1,0 +1,46 @@
+# .understandignore — patterns for files/dirs to exclude from analysis
+# Syntax: same as .gitignore (globs, # comments, ! negation, trailing / for dirs)
+# Lines below are suggestions — uncomment to activate.
+# Use ! prefix to force-include something excluded by defaults.
+#
+# Built-in defaults (always excluded unless negated):
+#   node_modules/, .git/, dist/, build/, obj/, *.lock, *.min.js, etc.
+#
+# --- From .gitignore (uncomment to exclude) ---
+
+# /runtime
+# /.idea
+# /.vscode
+# /vendor
+# .env
+# /tests/tmp
+# /tests/.phpunit.result.cache
+# /public/qrcode.png
+# /public/qrcode/
+# /public/config/
+# /public/shop/
+# /public/dist/
+# /public/distSourceCode/
+# .htaccess
+# /public/.well-known/
+# .DS_Store
+# **/.DS_Store
+# /public/attachment/goods/
+# /public/attachment/shop/
+# /public/attachment/qrcode/
+# /public/attachment/user-info/
+# /public/attachment/shop-config/
+# /public/attachment/detailsImages/
+# /node_modules
+# /.github/ISSUE_TEMPLATE/
+# *.pem
+
+# --- Detected directories (uncomment to exclude) ---
+
+# scripts/
+
+# --- Test file patterns (uncomment to exclude) ---
+
+# *.test.*
+# *.spec.*
+# *.snap
