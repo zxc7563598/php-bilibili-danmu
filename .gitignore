@@ -25,3 +25,4 @@
 /node_modules
 /.github/ISSUE_TEMPLATE/
 *.pem
+.claude/settings.json
