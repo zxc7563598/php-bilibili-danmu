@@ -65,6 +65,7 @@ class Present
                 $present_content = $present['content']; // 内容
                 $present_merge = $present['merge']; // 是否合并
                 $present_number = $present['number']; // 展示数量
+                $present_blind_box_stats = isset($present['blind_box_stats']) ? intval($present['blind_box_stats']) : 0; // 是否统计盲盒收益
                 // 验证是否达到可以感谢的电池数
                 if ($price >= $present_price) {
                     // 验证牌子
@@ -118,12 +119,15 @@ class Present
                         'giftName' => $gift_name,
                         'price' => $price,
                         'name' => $uname,
-                        'num' => $num
+                        'num' => $num,
+                        'blind_box_original_price' => (!empty($blind_gift) && $present_blind_box_stats == 1) ? round(($blind_gift['original_gift_price'] / 1000), 2) : 0,
+                        'blind_box_total_price' => (!empty($blind_gift) && $present_blind_box_stats == 1) ? round((round($price / 10, 2) * $num), 2) : 0,
                     ], [
                         'uid' => $uid,
                         'uname' => $uname,
                         'merge' => $present_merge,
-                        'number' => $present_number
+                        'number' => $present_number,
+                        'blind_box_stats' => $present_blind_box_stats,
                     ]);
                 } else {
                     sublog('核心业务/礼物答谢', '数据不匹配', 'N/A');
@@ -193,9 +197,17 @@ class Present
             $text = $content[mt_rand(0, (count($content) - 1))];
             if (!empty($text)) {
                 if (isset($extra['merge']) && $extra['merge'] == 1) {
-                    SendMessage::mergePush($text, $extra['uid'], $extra['uname'], $extra['number'], $args);
+                    SendMessage::mergePush($text, $extra['uid'], $extra['uname'], $extra['number'], $args, isset($extra['blind_box_stats']) ? $extra['blind_box_stats'] : 0);
                 } else {
                     $text = self::template($text, $extra['number'], $args);
+                    // 非合并模式：追加盲盒收益
+                    if (
+                        isset($extra['blind_box_stats']) && $extra['blind_box_stats'] == 1
+                        && !empty($args['blind_box_original_price']) && $args['blind_box_original_price'] > 0
+                    ) {
+                        $blind_net = ($args['blind_box_original_price'] * $args['num']) - $args['blind_box_total_price'];
+                        $text .= ' | 盲盒收益：' . number_format($blind_net, 2);
+                    }
                     SendMessage::push($text, 'Present');
                 }
             }
