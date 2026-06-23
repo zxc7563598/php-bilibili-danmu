@@ -111,6 +111,7 @@ class Autoresponders
                                             break;
                                     }
                                 }
+                                $keywords = $item['keywords'];
                                 $message = $item['text'];
                                 $silent = isset($item['silent']) ? $item['silent'] : '0';
                                 $silent_minute = isset($item['silent_minute']) ? $item['silent_minute'] : 0;
@@ -132,6 +133,7 @@ class Autoresponders
             if ($is_message) {
                 sublog('核心业务/自动回复', '数据匹配', $message);
                 self::sendMessage($message, [
+                    'keywords' => $keywords,
                     'name' => $uname,
                     'guard' => $guard,
                     'up_name' => $up_name
