@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Phinx\Migration\AbstractMigration;
 
-final class AddUpdateLogsVersion16 extends AbstractMigration
+final class AddUpdateLogsVersion17 extends AbstractMigration
 {
     /**
      * Change Method.
