@@ -70,10 +70,11 @@ class SendMessage
      * @param string $name 用户名称
      * @param string $message 消息
      * @param bool $number 是否展示数量
-     * 
+     * @param bool $blindBoxStats 是否统计盲盒收益
+     *
      * @return array
      */
-    private static function getGiftMessage(string $uid, string $name, string $message, bool $number): array
+    private static function getGiftMessage(string $uid, string $name, string $message, bool $number, bool $blindBoxStats = false): array
     {
         // 获取当前用户的礼物信息，使用默认值避免空结果
         $current_message = Redis::hGet(self::$mergeKey, $uid) ?: '[]';
@@ -84,6 +85,8 @@ class SendMessage
         }
         // 分类和汇总礼物信息
         $gift = [];
+        $blindBoxNet = 0;
+        $hasBlindBox = false;
         foreach ($extra as $item) {
             $giftName = $item['giftName'];
             $price = (int) $item['price'];
@@ -94,6 +97,12 @@ class SendMessage
                 'price' => ($gift[$giftName]['price'] ?? 0) + $price,
                 'num' => ($gift[$giftName]['num'] ?? 0) + $num
             ];
+
+            // 累加盲盒收益（仅统计携带盲盒数据的条目）
+            if ($blindBoxStats && !empty($item['blind_box_original_price']) && $item['blind_box_original_price'] > 0) {
+                $hasBlindBox = true;
+                $blindBoxNet += ($item['blind_box_original_price'] * $item['num']) - $item['blind_box_total_price'];
+            }
         }
         // 如果没有礼物数据，直接返回空数组
         if (empty($gift)) {
@@ -117,6 +126,10 @@ class SendMessage
         foreach ($args as $key => $replace) {
             $message = preg_replace('/(@' . $key . '@)/i', $replace, $message);
         }
+        // 追加盲盒收益
+        if ($hasBlindBox) {
+            $message .= ' | 盲盒收益：' . number_format($blindBoxNet, 2);
+        }
         // 获取直播间最大发言长度
         $length = self::getBilibiliSpeakLength();
         // 删除累计信息
@@ -133,10 +146,11 @@ class SendMessage
      * @param string $uname 用户名
      * @param int $number 是否展示数量
      * @param array $extra 额外信息
-     * 
-     * @return void 
+     * @param bool $blindBoxStats 是否统计盲盒收益
+     *
+     * @return void
      */
-    public static function mergePush(string $message, string $uid = '', string $uname = '', int $number = 0, array $extra = []): void
+    public static function mergePush(string $message, string $uid = '', string $uname = '', int $number = 0, array $extra = [], bool $blindBoxStats = false): void
     {
         $cookie = RobotServices::getCookie();
         $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
@@ -172,7 +186,8 @@ class SendMessage
                     'timestamp' => $timestamp,
                     'type' => $number == 1 ? 'PresentArrNum' : 'PresentArr',
                     'uid' => $uid,
-                    'name' => $uname
+                    'name' => $uname,
+                    'blind_box_stats' => $blindBoxStats,
                 ]);
                 // 使用 Redis 的 ZSET 存储，优先级为负数让高优先级排前
                 Redis::zAdd(self::$queueKey, -$score, $task);
@@ -273,7 +288,8 @@ class SendMessage
                     case 'PresentArrNum':
                         if ($cookie && $room_id) {
                             $number = $task['type'] == 'PresentArrNum' ? true : false;
-                            $message = self::getGiftMessage($task['uid'], $task['name'], $task['message'], $number);
+                            $blindBoxStats = isset($task['blind_box_stats']) ? $task['blind_box_stats'] : false;
+                            $message = self::getGiftMessage($task['uid'], $task['name'], $task['message'], $number, $blindBoxStats);
                             foreach ($message as $_message) {
                                 echo "发送优先级为" . $task['score'] . "的弹幕: " . $_message . PHP_EOL;
                                 BiliLive\Live::sendMsg($room_id, $cookie, $_message);

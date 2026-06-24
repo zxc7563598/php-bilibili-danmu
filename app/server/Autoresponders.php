@@ -3,13 +3,16 @@
 namespace app\server;
 
 use app\core\RobotServices;
+use app\model\GiftRecords;
 use app\model\SilentUser;
 use app\queue\SendMessage;
 use app\server\core\KeywordEvaluator;
 use app\server\core\KeywordMatcher;
 use Carbon\Carbon;
 use Hejunjie\Bililive;
+use support\Db;
 use support\Redis;
+use resource\enums\GiftRecordsEnums;
 
 /**
  * 自动回复，优先级15
@@ -49,6 +52,7 @@ class Autoresponders
             $autoresponders_status = intval($autoresponders['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
             $autoresponders_content = $autoresponders['content']; // 内容
             $message = '';
+            $keywords = '';
             $silent = '0';
             $silent_minute = 0;
             $ransom_amount = 0;
@@ -111,6 +115,7 @@ class Autoresponders
                                             break;
                                     }
                                 }
+                                $keywords = $item['keywords'];
                                 $message = $item['text'];
                                 $silent = isset($item['silent']) ? $item['silent'] : '0';
                                 $silent_minute = isset($item['silent_minute']) ? $item['silent_minute'] : 0;
@@ -131,10 +136,35 @@ class Autoresponders
             $up_name = isset($room_uinfo['uname']) ? $room_uinfo['uname'] : '';
             if ($is_message) {
                 sublog('核心业务/自动回复', '数据匹配', $message);
+                // 无需额外查询的信息，直接进行传递，随时取用，需要进行查询的信息通过闭包进行传递
                 self::sendMessage($message, [
+                    'keywords' => $keywords,
                     'name' => $uname,
                     'guard' => $guard,
-                    'up_name' => $up_name
+                    'up_name' => $up_name,
+                    'daily_blind_box_net' => function () use ($uid): string {
+                        $todayStart = Carbon::today()
+                            ->timezone(config('app')['default_timezone'])
+                            ->timestamp;
+                        return self::getUserBlindBoxNet($uid, $todayStart);
+                    },
+                    'weekly_blind_box_net' => function () use ($uid): string {
+                        $thisWeekStart = Carbon::now()
+                            ->timezone(config('app')['default_timezone'])
+                            ->startOfWeek()
+                            ->timestamp;
+                        return self::getUserBlindBoxNet($uid, $thisWeekStart);
+                    },
+                    'monthly_blind_box_net' => function () use ($uid): string {
+                        $thisMonthStart = Carbon::now()
+                            ->timezone(config('app')['default_timezone'])
+                            ->startOfMonth()
+                            ->timestamp;
+                        return self::getUserBlindBoxNet($uid, $thisMonthStart);
+                    },
+                    'total_blind_box_net' => function () use ($uid): string {
+                        return self::getUserBlindBoxNet($uid, 0);
+                    },
                 ], $msg, $silent, $silent_minute, $ransom_amount, (string)$uid, $uname);
             } else {
                 sublog('核心业务/自动回复', '数据不匹配', "N/A");
@@ -229,8 +259,35 @@ class Autoresponders
     private static function template(string $text = '', array $args = []): string
     {
         foreach ($args as $key => $replace) {
-            $text = preg_replace('/(@' . $key . '@)/i', $replace, $text);
+            // 仅在文本中真的用到了占位符时才处理
+            if (strpos($text, '@' . $key . '@') !== false) {
+                // 如果值是 callable，延迟执行（仅在需要时才查询）
+                if (is_callable($replace) && !is_string($replace)) {
+                    $replace = $replace();
+                }
+                $text = preg_replace('/(@' . $key . '@)/i', $replace, $text);
+            }
         }
         return $text;
+    }
+
+    /**
+     * 获取用户盲盒盈亏
+     *
+     * @param string $uid 用户uid
+     * @param integer $start_timestamp 起始时间戳
+     * 
+     * @return string
+     */
+    private static function getUserBlindBoxNet(string $uid, int $start_timestamp): string
+    {
+        $gift_records = GiftRecords::where('created_at', '>', $start_timestamp)->where('uid', $uid)->where('original', GiftRecordsEnums\Original::No->value)->first([
+            'total_price' => Db::raw('sum(total_price) as total_price'),
+            'original_price' => Db::raw('sum(original_price * num) as original_price'),
+        ]);
+        if (!empty($gift_records)) {
+            return number_format(($gift_records->total_price - $gift_records->original_price), 2);
+        }
+        return '0.00';
     }
 }
