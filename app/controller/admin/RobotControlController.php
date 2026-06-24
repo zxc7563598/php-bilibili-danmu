@@ -139,7 +139,7 @@ class RobotControlController
                 'status' => "0", // 状态 
                 'type' => "0", // 状态 0=全部答谢，1=仅答谢牌子，2=仅答谢航海
                 'content' => "", // 内容
-                'blind_box_stats' => 0, // 是否统计盲盒收益
+                'blind_box_stats' => "0", // 是否统计盲盒收益
             ];
             Utils\FileUtils::fileDelete(runtime_path() . '/tmp/present.cfg');
             Utils\FileUtils::writeToFile(runtime_path() . '/tmp/present.cfg', json_encode($present));
