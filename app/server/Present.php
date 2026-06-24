@@ -203,10 +203,15 @@ class Present
                     // 非合并模式：追加盲盒收益
                     if (
                         isset($extra['blind_box_stats']) && $extra['blind_box_stats'] == 1
-                        && !empty($args['blind_box_original_price']) && $args['blind_box_original_price'] > 0
+                        && !empty($args['blind_box_original_price']) && !empty($args['blind_box_original_price'])
                     ) {
-                        $blind_net = ($args['blind_box_original_price'] * $args['num']) - $args['blind_box_total_price'];
-                        $text .= ' | 盲盒收益：' . number_format($blind_net, 2);
+                        $blind_net = $args['blind_box_total_price'] - ($args['blind_box_original_price'] * $args['num']);
+                        if ($blind_net > 0) {
+                            $text .= ' | 赚了' . round($blind_net, 2) . '元';
+                        }
+                        if ($blind_net < 0) {
+                            $text .= ' | 亏了' . round(abs($blind_net), 2) . '元';
+                        }
                     }
                     SendMessage::push($text, 'Present');
                 }
