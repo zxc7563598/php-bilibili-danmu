@@ -99,9 +99,9 @@ class SendMessage
             ];
 
             // 累加盲盒收益（仅统计携带盲盒数据的条目）
-            if ($blindBoxStats && !empty($item['blind_box_original_price']) && $item['blind_box_original_price'] > 0) {
+            if ($blindBoxStats && !empty($item['blind_box_original_price']) && !empty($item['blind_box_original_price'])) {
                 $hasBlindBox = true;
-                $blindBoxNet += ($item['blind_box_original_price'] * $item['num']) - $item['blind_box_total_price'];
+                $blindBoxNet += $item['blind_box_total_price'] - ($item['blind_box_original_price'] * $item['num']);
             }
         }
         // 如果没有礼物数据，直接返回空数组
@@ -128,7 +128,12 @@ class SendMessage
         }
         // 追加盲盒收益
         if ($hasBlindBox) {
-            $message .= ' | 盲盒收益：' . number_format($blindBoxNet, 2);
+            if ($blindBoxNet > 0) {
+                $message .= ' | 赚了' . round($blindBoxNet, 2) . '元';
+            }
+            if ($blindBoxNet < 0) {
+                $message .= ' | 亏了' . round(abs($blindBoxNet), 2) . '元';
+            }
         }
         // 获取直播间最大发言长度
         $length = self::getBilibiliSpeakLength();
