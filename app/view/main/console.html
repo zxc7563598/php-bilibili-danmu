@@ -176,9 +176,12 @@
                                     <div class="column is-col-min-32">
                                         <p>
                                             <b>开播时间：</b>
-                                            <span class="tag ml-2" :class="live_info.live_status.type">{{live_info.live_status.value}}</span>
-                                            <a class="tag is-info is-light ml-2" :href="'https://live.bilibili.com/'+live_info.room_id">点击前往直播间</a>
-                                            <span class="ml-2">{{live_info.live_time ? live_info.live_time : '当前暂未开播'}}</span>
+                                            <span class="tag ml-2"
+                                                :class="live_info.live_status.type">{{live_info.live_status.value}}</span>
+                                            <a class="tag is-info is-light ml-2"
+                                                :href="'https://live.bilibili.com/'+live_info.room_id">点击前往直播间</a>
+                                            <span class="ml-2">{{live_info.live_time ? live_info.live_time :
+                                                '当前暂未开播'}}</span>
                                         </p>
                                     </div>
                                 </div>
@@ -773,8 +776,8 @@
                                     </div>
                                     <div class="field-body">
                                         <div class="field">
-                                            <textarea class="textarea has-fixed-size" placeholder="播报内容,PK前发送"
-                                                rows="10" v-model="config.pk.content"></textarea>
+                                            <textarea class="textarea has-fixed-size" placeholder="播报内容,PK前发送" rows="10"
+                                                v-model="config.pk.content"></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -934,6 +937,23 @@
                                                 <button type="button" class="button toggle-button"
                                                     :class="config.present.merge == 1 ? 'is-active' : ''"
                                                     @click="configSwitch('present-merge',1)">合并</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">盲盒统计</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <div class="button-group">
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.present.blind_box_stats == 0 ? 'is-active' : ''"
+                                                    @click="configSwitch('present-blind-box-stats',0)">不显示</button>
+                                                <button type="button" class="button toggle-button"
+                                                    :class="config.present.blind_box_stats == 1 ? 'is-active' : ''"
+                                                    @click="configSwitch('present-blind-box-stats',1)">显示</button>
                                             </div>
                                         </div>
                                     </div>
@@ -1474,7 +1494,7 @@
                         keyframe: ''
                     },
                     room_id: null,
-                    update_html:'',
+                    update_html: '',
                     config: {
                         timing: { // 定时广告
                             opens: false, // 是否开启
@@ -1488,7 +1508,7 @@
                             type: 0, // 类型：0=全部感谢，1=仅感谢牌子，2=仅感谢航海
                             currency_type: 1, // 奖励类型：1=硬币，0=积分
                             keywords: null, // 签到词
-                            points:0, // 签到赠送积分
+                            points: 0, // 签到赠送积分
                             select: null, // 查询词
                             success: null, // 成功回复
                             reply: null // 查询回复
@@ -1500,7 +1520,8 @@
                             price: null, // 起始感谢电池数
                             status: 0, // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
                             type: 0, // 类型：0=全部答谢，1=仅答谢牌子，2=仅答谢航海
-                            content: null // 内容
+                            content: null, // 内容
+                            blind_box_stats: 0 // 是否统计盲盒收益
                         },
                         enter: { // 进房欢迎
                             opens: false,
@@ -1508,7 +1529,7 @@
                             type: 0, // 类型：0=全部欢迎，1=仅欢迎牌子，2=仅欢迎航海
                             content: null // 内容
                         },
-                        pk:{ // PK播报
+                        pk: { // PK播报
                             opens: false,
                             content: null // 内容
                         },
@@ -1545,7 +1566,7 @@
             },
             created() {
                 if (this.is_path) {
-                  window.location.href = this.path;
+                    window.location.href = this.path;
                 }
                 this.getUserInfo()
                 this.getConfig()
@@ -1590,6 +1611,9 @@
                             break;
                         case 'present-merge':
                             this.config.present.merge = opens
+                            break;
+                        case 'present-blind-box-stats':
+                            this.config.present.blind_box_stats = opens
                             break;
                         case 'enter':
                             this.config.enter.opens = opens
@@ -1828,7 +1852,7 @@
                         timing: this.config.timing,
                         present: this.config.present,
                         enter: this.config.enter,
-                        pk:this.config.pk,
+                        pk: this.config.pk,
                         follow: this.config.follow,
                         share: this.config.share,
                         autoresponders: this.config.autoresponders,
