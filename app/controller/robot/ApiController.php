@@ -127,6 +127,7 @@ class ApiController
                 'merge' => 0, // 是否合并
                 'number' => 0, // 展示数量
                 'price' => null, // 起始感谢金额
+                'name_length' => 0, // 最大昵称长度
                 'status' => 0, // 状态 
                 'type' => 0, // 状态 0=全部答谢，1=仅答谢牌子，2=仅答谢航海
                 'content' => null, // 内容

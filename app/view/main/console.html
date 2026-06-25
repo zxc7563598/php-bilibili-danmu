@@ -863,6 +863,26 @@
                                 </div>
                                 <div class="field is-horizontal">
                                     <div class="field-label is-normal">
+                                        <label class="label">最大昵称长度</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <div class="field has-addons">
+                                                <p class="control" style="flex: 1;">
+                                                    <input class="input" type="number" placeholder="x"
+                                                        v-model="config.present.name_length">
+                                                </p>
+                                                <p class="control">
+                                                    <a class="button is-static">
+                                                        字符
+                                                    </a>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
                                         <label class="label"></label>
                                     </div>
                                     <div class="field-body">
@@ -1241,10 +1261,14 @@
                                     <li><b>发送人：</b>@name@</li>
                                     <li><b>用户航海类型：</b>@guard@</li>
                                     <li><b>主播名称：</b>@up_name@</li>
-                                    <li><b>本日盲盒盈利：</b>@daily_blind_box_net@</li>
-                                    <li><b>本周盲盒盈利：</b>@weekly_blind_box_net@</li>
-                                    <li><b>本月盲盒盈利：</b>@monthly_blind_box_net@</li>
-                                    <li><b>总计盲盒盈利：</b>@total_blind_box_net@</li>
+                                    <li><b>用户本日盲盒盈利：</b>@daily_blind_box_net@</li>
+                                    <li><b>用户本周盲盒盈利：</b>@weekly_blind_box_net@</li>
+                                    <li><b>用户本月盲盒盈利：</b>@monthly_blind_box_net@</li>
+                                    <li><b>用户总计盲盒盈利：</b>@total_blind_box_net@</li>
+                                    <li><b>直播间本日盲盒盈利：</b>@daily_room_blind_box_net@</li>
+                                    <li><b>直播间本周盲盒盈利：</b>@weekly_room_blind_box_net@</li>
+                                    <li><b>直播间本月盲盒盈利：</b>@monthly_room_blind_box_net@</li>
+                                    <li><b>直播间总计盲盒盈利：</b>@total_room_blind_box_net@</li>
                                 </ul>
                             </div>
                     </article>
@@ -1518,6 +1542,7 @@
                             number: null, // 数量：0-不展示，1-展示
                             merge: null, // 礼物合并：0-不合并，1-合并
                             price: null, // 起始感谢电池数
+                            name_length: null, // 最大昵称长度
                             status: 0, // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
                             type: 0, // 类型：0=全部答谢，1=仅答谢牌子，2=仅答谢航海
                             content: null, // 内容

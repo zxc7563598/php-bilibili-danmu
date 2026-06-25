@@ -165,6 +165,29 @@ class Autoresponders
                     'total_blind_box_net' => function () use ($uid): string {
                         return self::getUserBlindBoxNet($uid, 0);
                     },
+                    'daily_room_blind_box_net' => function () use ($uid): string {
+                        $todayStart = Carbon::today()
+                            ->timezone(config('app')['default_timezone'])
+                            ->timestamp;
+                        return self::getRoomBlindBoxNet($todayStart);
+                    },
+                    'weekly_room_blind_box_net' => function () use ($uid): string {
+                        $thisWeekStart = Carbon::now()
+                            ->timezone(config('app')['default_timezone'])
+                            ->startOfWeek()
+                            ->timestamp;
+                        return self::getRoomBlindBoxNet($thisWeekStart);
+                    },
+                    'monthly_room_blind_box_net' => function () use ($uid): string {
+                        $thisMonthStart = Carbon::now()
+                            ->timezone(config('app')['default_timezone'])
+                            ->startOfMonth()
+                            ->timestamp;
+                        return self::getRoomBlindBoxNet($thisMonthStart);
+                    },
+                    'total_room_blind_box_net' => function () use ($uid): string {
+                        return self::getRoomBlindBoxNet(0);
+                    },
                 ], $msg, $silent, $silent_minute, $ransom_amount, (string)$uid, $uname);
             } else {
                 sublog('核心业务/自动回复', '数据不匹配', "N/A");
@@ -282,6 +305,25 @@ class Autoresponders
     private static function getUserBlindBoxNet(string $uid, int $start_timestamp): string
     {
         $gift_records = GiftRecords::where('created_at', '>', $start_timestamp)->where('uid', $uid)->where('original', GiftRecordsEnums\Original::No->value)->first([
+            'total_price' => Db::raw('sum(total_price) as total_price'),
+            'original_price' => Db::raw('sum(original_price * num) as original_price'),
+        ]);
+        if (!empty($gift_records)) {
+            return number_format(($gift_records->total_price - $gift_records->original_price), 2);
+        }
+        return '0.00';
+    }
+
+    /**
+     * 获取直播间盲盒盈亏
+     *
+     * @param integer $start_timestamp 起始时间戳
+     * 
+     * @return string
+     */
+    private static function getRoomBlindBoxNet(int $start_timestamp): string
+    {
+        $gift_records = GiftRecords::where('created_at', '>', $start_timestamp)->where('original', GiftRecordsEnums\Original::No->value)->first([
             'total_price' => Db::raw('sum(total_price) as total_price'),
             'original_price' => Db::raw('sum(original_price * num) as original_price'),
         ]);
