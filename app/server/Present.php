@@ -65,6 +65,7 @@ class Present
                 $present_content = $present['content']; // 内容
                 $present_merge = $present['merge']; // 是否合并
                 $present_number = $present['number']; // 展示数量
+                $present_name_length = isset($present['name_length']) ? intval($present['name_length']) : 0; // 最大昵称长度
                 $present_blind_box_stats = isset($present['blind_box_stats']) ? intval($present['blind_box_stats']) : 0; // 是否统计盲盒收益
                 // 验证是否达到可以感谢的电池数
                 if ($price >= $present_price) {
@@ -115,16 +116,17 @@ class Present
                             'num' => $num
                         ]
                     ]);
+                    $display_name = $present_name_length > 0 ? mb_substr($uname, 0, $present_name_length) : $uname;
                     self::sendMessage($present_content, [
                         'giftName' => $gift_name,
                         'price' => $price,
-                        'name' => $uname,
+                        'name' => $display_name,
                         'num' => $num,
                         'blind_box_original_price' => (!empty($blind_gift) && $present_blind_box_stats == 1) ? round(($blind_gift['original_gift_price'] / 1000), 2) : 0,
                         'blind_box_total_price' => (!empty($blind_gift) && $present_blind_box_stats == 1) ? round((round($price / 10, 2) * $num), 2) : 0,
                     ], [
                         'uid' => $uid,
-                        'uname' => $uname,
+                        'uname' => $display_name,
                         'merge' => $present_merge,
                         'number' => $present_number,
                         'blind_box_stats' => $present_blind_box_stats,

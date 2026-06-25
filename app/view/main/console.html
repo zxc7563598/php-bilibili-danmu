@@ -863,6 +863,26 @@
                                 </div>
                                 <div class="field is-horizontal">
                                     <div class="field-label is-normal">
+                                        <label class="label">最大昵称长度</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <div class="field has-addons">
+                                                <p class="control" style="flex: 1;">
+                                                    <input class="input" type="number" placeholder="x"
+                                                        v-model="config.present.name_length">
+                                                </p>
+                                                <p class="control">
+                                                    <a class="button is-static">
+                                                        字符
+                                                    </a>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
                                         <label class="label"></label>
                                     </div>
                                     <div class="field-body">
@@ -1522,6 +1542,7 @@
                             number: null, // 数量：0-不展示，1-展示
                             merge: null, // 礼物合并：0-不合并，1-合并
                             price: null, // 起始感谢电池数
+                            name_length: null, // 最大昵称长度
                             status: 0, // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
                             type: 0, // 类型：0=全部答谢，1=仅答谢牌子，2=仅答谢航海
                             content: null, // 内容
