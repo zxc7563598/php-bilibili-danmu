@@ -118,9 +118,16 @@ class Task
             sublog('每日任务/解除禁言', "解除用户", [
                 'uid' => $item->tuid
             ]);
-            Bililive\Live::delSilentUser($room_id, $cookie, $item->black_id);
-            $item->delete();
-            sublog('每日任务/解除禁言', "解除成功", 'N/A');
+            try {
+                Bililive\Live::delSilentUser($room_id, $cookie, $item->black_id);
+                $item->delete();
+                sublog('每日任务/解除禁言', "解除成功", 'N/A');
+            } catch (\Exception $e) {
+                sublog('每日任务/解除禁言', "解除失败", [
+                    'uid' => $item->tuid,
+                    'error' => $e->getMessage()
+                ]);
+            }
         }
     }
 
