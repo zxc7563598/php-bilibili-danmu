@@ -2,6 +2,7 @@
 
 namespace app\server;
 
+use app\core\ConfigService;
 use app\core\LoginPublicMethods;
 use app\core\RobotServices;
 use app\model\UserCurrencyLogs;
@@ -33,13 +34,10 @@ class CheckIn
         $is_message = false;
         // 不处理自己发送的消息
         $robot_uid = strval(readFileContent(runtime_path() . '/tmp/uid.cfg'));
-        // 获取感谢关注配置
-        $check_in = readFileContent(runtime_path() . '/tmp/check-in.cfg');
-        if ($check_in) {
-            $check_in = json_decode($check_in, true);
-        }
-        // 开启感谢关注
-        if (isset($check_in['opens']) && $check_in['opens'] && $uid != $robot_uid) {
+        // 获取签到配置
+        $check_in = ConfigService::get('check_in');
+        // 开启签到
+        if ($check_in['opens'] && $uid != $robot_uid) {
             sublog('核心业务/用户签到', '入参', [
                 'uid' => $uid,
                 'uname' => $uname,
@@ -47,10 +45,10 @@ class CheckIn
                 'guard_level' => $guard_level,
                 'msg' => $msg
             ]);
-            $check_in_type = intval($check_in['type']); // 类型
-            $check_in_status = intval($check_in['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
-            $check_in_currency_type = intval($check_in['currency_type'] ?? 1); // 奖励类型：1=硬币，0=积分
-            $check_in_currency = intval($check_in['points'] ?? 0); // 赠送积分
+            $check_in_type = (int)$check_in['type']; // 类型
+            $check_in_status = (int)$check_in['status']; // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
+            $check_in_currency_type = (int)$check_in['currency_type']; // 奖励类型：1=硬币，0=积分
+            $check_in_currency = (int)$check_in['points']; // 赠送积分
             $check_in_content = '';
             $total_point = 0;
             $coin = 0;
@@ -92,16 +90,19 @@ class CheckIn
                         $user_vips->serial_check_in = 1;
                     }
                     $user_vips->save();
-                    // 增加积分
+                    // 增加积分/硬币
                     if ($user_check_in->currency > 0) {
+                        // 根据奖励类型确定 pre/after 对应的余额字段
+                        $preCurrency = $check_in_currency_type == UserCurrencyLogsEnums\CurrencyType::Point->value
+                            ? $user_vips->point : $user_vips->coin;
                         $user_currency_logs = new UserCurrencyLogs();
                         $user_currency_logs->user_id = $user_vips->user_id;
                         $user_currency_logs->type = UserCurrencyLogsEnums\Type::Up->value;
                         $user_currency_logs->source = UserCurrencyLogsEnums\Source::SignIn->value;
                         $user_currency_logs->currency_type = $check_in_currency_type;
                         $user_currency_logs->currency = $user_check_in->currency;
-                        $user_currency_logs->pre_currency = $user_vips->coin;
-                        $user_currency_logs->after_currency = $user_vips->coin + $user_check_in->currency;
+                        $user_currency_logs->pre_currency = $preCurrency;
+                        $user_currency_logs->after_currency = $preCurrency + $user_check_in->currency;
                         $user_currency_logs->save();
                     }
                     $total = $user_vips->total_check_in;

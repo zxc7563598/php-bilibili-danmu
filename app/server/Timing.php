@@ -2,6 +2,7 @@
 
 namespace app\server;
 
+use app\core\ConfigService;
 use app\core\RobotServices;
 use app\queue\SendMessage;
 use Carbon\Carbon;
@@ -60,14 +61,11 @@ class Timing
             $this->timerId = null;
         }
         // 获取定时广告配置
-        $timing = readFileContent(runtime_path() . '/tmp/timing.cfg');
-        if ($timing) {
-            $timing = json_decode($timing, true);
-        }
+        $timing = ConfigService::get('timing');
         // 开启定时广告，载入定时
-        if (isset($timing['opens']) && $timing['opens']) {
+        if ($timing['opens']) {
             $intervals = $timing['intervals']; // 间隔时间
-            $status = intval($timing['status']); // 状态
+            $status = (int)$timing['status']; // 状态
             $content = $timing['content']; // 内容
             // 注册 Timer，并保存 ID
             $this->timerId = Timer::add($intervals, function () use ($status, $content) {
@@ -108,13 +106,9 @@ class Timing
             if (!empty($text)) {
                 // 加入消息发送队列
                 $lockKey = config('app')['app_name'] . ':send_message_lock';
-                $timing = readFileContent(runtime_path() . '/tmp/timing.cfg');
-                $lockExpiration = false;
-                if ($timing) {
-                    $timing = json_decode($timing, true);
-                    $lockExpiration = $timing['intervals'];
-                }
-                if (!$lockExpiration) {
+                $timing = ConfigService::get('timing');
+                $lockExpiration = (int)($timing['intervals'] ?? 0);
+                if ($lockExpiration <= 0) {
                     $lockExpiration = 60;
                 }
                 if (!Redis::get($lockKey)) {
@@ -123,8 +117,8 @@ class Timing
                         'up_name' => $up_name
                     ]);
                     SendMessage::push($text, 'Timing');
-                    // 设置锁，过期时间为 $lockExpiration - 1 秒
-                    Redis::setEx($lockKey, $lockExpiration - 1, 'locked');
+                    // 设置锁，过期时间为 $lockExpiration - 1 秒，最小为 1 秒
+                    Redis::setEx($lockKey, max(1, $lockExpiration - 1), 'locked');
                     sublog('核心业务/定时广告', "发送数据", [
                         'text' => $text
                     ]);
