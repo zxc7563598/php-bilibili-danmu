@@ -16,12 +16,12 @@ use Hejunjie\Lazylog\Logger;
  */
 function success($request, $data = [], $message = ''): Response
 {
-    $request->res = [
+    $res = [
         'code' => 0,
         'message' => !empty($message) ? $message : (trans(config('code')[0]) ?? 'error'),
         'data' => empty($data) ? [] : $data
     ];
-    return json($request->res, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION);
+    return json($res, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION);
 }
 
 /**
@@ -35,12 +35,12 @@ function success($request, $data = [], $message = ''): Response
 function fail($request, $code = 500, $data = [], $message = ''): Response
 {
     // 记录错误信息
-    $request->res = [
+    $res = [
         'code' => $code,
         'message' => !empty($message) ? $message : (trans(config('code')[$code]) ?? 'error'),
         'data' => empty($data) ? [] : $data
     ];
-    return json($request->res, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION);
+    return json($res, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION);
 }
 
 /**
@@ -94,7 +94,7 @@ function restartTiming()
  * 
  * @return array
  */
-function splitAndFilterLines($text)
+function splitAndFilterLines(string $text): array
 {
     // 使用 preg_split 按照各种换行符切割字符串
     $lines = preg_split('/\r\n|\r|\n/', $text);
@@ -207,14 +207,14 @@ function writeLinesToFile($filePath, $line)
 function getTopSpeakers(string $filePath, int $num): array
 {
     if (!file_exists($filePath)) {
-        throw new Exception("文件不存在: $filePath");
+        throw new \Exception("文件不存在: $filePath");
     }
 
     $userStats = []; // 用户统计数据
     // 打开文件逐行读取
     $file = fopen($filePath, 'r');
     if ($file === false) {
-        throw new Exception("无法打开文件: $filePath");
+        throw new \Exception("无法打开文件: $filePath");
     }
     $count = 0;
     while (($line = fgets($file)) !== false) {
@@ -267,13 +267,13 @@ function getTopSpeakers(string $filePath, int $num): array
 function getTopSpenders(string $filePath, int $num): array
 {
     if (!file_exists($filePath)) {
-        throw new Exception("文件不存在: $filePath");
+        throw new \Exception("文件不存在: $filePath");
     }
     $userStats = []; // 用户统计数据
     // 打开文件逐行读取
     $file = fopen($filePath, 'r');
     if ($file === false) {
-        throw new Exception("无法打开文件: $filePath");
+        throw new \Exception("无法打开文件: $filePath");
     }
     $count = 0;
     while (($line = fgets($file)) !== false) {
@@ -323,24 +323,28 @@ function getTopSpenders(string $filePath, int $num): array
  * 
  * @return integer 
  */
-function countFileLines(string $filePath)
+function countFileLines(string $filePath): int
 {
     if (!file_exists($filePath)) {
-        throw new Exception("文件不存在: $filePath");
+        throw new \Exception("文件不存在: $filePath");
     }
     // 打开文件逐行读取
     $file = fopen($filePath, 'r');
     if ($file === false) {
-        throw new Exception("无法打开文件: $filePath");
+        throw new \Exception("无法打开文件: $filePath");
     }
     $count = 0;
     while (($line = fgets($file)) !== false) {
-        json_decode(trim($line), true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            continue; // 跳过解析失败的行
+        $line = trim($line);
+        if ($line === '') {
+            continue;
         }
-        $count++;
+        json_decode($line, true);
+        if (json_last_error() === JSON_ERROR_NONE) {
+            $count++;
+        }
     }
+    fclose($file);
     return $count;
 }
 

@@ -85,6 +85,10 @@ class HomeController
     {
         // 获取参数
         $version = $request->post('version');
+        // 校验版本号格式，防止路径遍历
+        if (!preg_match('/^v\d+\.\d+\.\d+$/', $version)) {
+            return fail($request, 800018);
+        }
         // 下载源代码
         $url = 'https://github.com/zxc7563598/vue-bilibili-danmu-admin/archive/refs/tags/' . $version . '.zip';
         $path = public_path('distSourceCode');
