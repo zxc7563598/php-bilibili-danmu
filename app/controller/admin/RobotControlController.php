@@ -2,6 +2,7 @@
 
 namespace app\controller\admin;
 
+use app\core\ConfigService;
 use app\core\RobotServices;
 use Carbon\Carbon;
 use support\Request;
@@ -11,7 +12,6 @@ use Hejunjie\Utils;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\Encoding\Encoding;
-use Exception;
 use support\Cache;
 
 class RobotControlController
@@ -110,144 +110,8 @@ class RobotControlController
      */
     public function getConfig(Request $request): Response
     {
-        // 获取定时广告配置
-        $timing = readFileContent(runtime_path() . '/tmp/timing.cfg');
-        if ($timing) {
-            $timing = json_decode($timing, true);
-        }
-        if (!$timing) {
-            $timing = [
-                'opens' => false, // 是否开启
-                'intervals' => "60", // 间隔时间
-                'status' => "0", // 状态
-                'content' => "" // 内容
-            ];
-            Utils\FileUtils::fileDelete(runtime_path() . '/tmp/timing.cfg');
-            Utils\FileUtils::writeToFile(runtime_path() . '/tmp/timing.cfg', json_encode($timing));
-        }
-        // 获取礼物答谢配置
-        $present = readFileContent(runtime_path() . '/tmp/present.cfg');
-        if ($present) {
-            $present = json_decode($present, true);
-        }
-        if (!$present) {
-            $present = [
-                'opens' => false, // 是否开启
-                'merge' => "0", // 是否合并
-                'number' => "0", // 展示数量
-                'price' => "0", // 起始感谢金额
-                'name_length' => "0", // 最大昵称长度
-                'status' => "0", // 状态 
-                'type' => "0", // 状态 0=全部答谢，1=仅答谢牌子，2=仅答谢航海
-                'content' => "", // 内容
-                'blind_box_stats' => "0", // 是否统计盲盒收益
-            ];
-            Utils\FileUtils::fileDelete(runtime_path() . '/tmp/present.cfg');
-            Utils\FileUtils::writeToFile(runtime_path() . '/tmp/present.cfg', json_encode($present));
-        }
-        // 获取进房欢迎配置
-        $enter = readFileContent(runtime_path() . '/tmp/enter.cfg');
-        if ($enter) {
-            $enter = json_decode($enter, true);
-        }
-        if (!$enter) {
-            $enter = [
-                'opens' => false, // 是否开启
-                'status' => "0", // 状态
-                'type' => "0", // 类型：0=全部欢迎，1=仅欢迎牌子，2=仅欢迎航海
-                'content' => "" // 内容
-            ];
-            Utils\FileUtils::fileDelete(runtime_path() . '/tmp/enter.cfg');
-            Utils\FileUtils::writeToFile(runtime_path() . '/tmp/enter.cfg', json_encode($enter));
-        }
-        // 获取PK播报配置
-        $pk = readFileContent(runtime_path() . '/tmp/pk.cfg');
-        if ($pk) {
-            $pk = json_decode($pk, true);
-        }
-        if (!$pk) {
-            $pk = [
-                'opens' => false, // 是否开启
-                'content' => "" // 内容
-            ];
-            Utils\FileUtils::fileDelete(runtime_path() . '/tmp/pk.cfg');
-            Utils\FileUtils::writeToFile(runtime_path() . '/tmp/pk.cfg', json_encode($pk));
-        }
-        // 获取感谢关注配置
-        $follow = readFileContent(runtime_path() . '/tmp/follow.cfg');
-        if ($follow) {
-            $follow = json_decode($follow, true);
-        }
-        if (!$follow) {
-            $follow = [
-                'opens' => false, // 是否开启
-                'status' => "0", // 状态
-                'type' => "0", // 类型：0=全部感谢，1=仅感谢牌子，2=仅感谢航海
-                'content' => "" // 内容
-            ];
-            Utils\FileUtils::fileDelete(runtime_path() . '/tmp/follow.cfg');
-            Utils\FileUtils::writeToFile(runtime_path() . '/tmp/follow.cfg', json_encode($follow));
-        }
-        // 获取定时广告配置
-        $share = readFileContent(runtime_path() . '/tmp/share.cfg');
-        if ($share) {
-            $share = json_decode($share, true);
-        }
-        if (!$share) {
-            $share = [
-                'opens' => false, // 是否开启
-                'status' => "0", // 状态
-                'type' => "0", // 类型：0=全部感谢，1=仅感谢牌子，2=仅感谢航海
-                'content' => "" // 内容
-            ];
-            Utils\FileUtils::fileDelete(runtime_path() . '/tmp/share.cfg');
-            Utils\FileUtils::writeToFile(runtime_path() . '/tmp/share.cfg', json_encode($share));
-        }
-        // 获取签到配置
-        $checkIn = readFileContent(runtime_path() . '/tmp/check-in.cfg');
-        if ($checkIn) {
-            $checkIn = json_decode($checkIn, true);
-        }
-        if (!$checkIn) {
-            $checkIn = [
-                'opens' => false, // 是否开启
-                'status' => "0", // 状态
-                'type' => "0", // 类型：0=全部感谢，1=仅感谢牌子，2=仅感谢航海
-                'currency_type' => "1", // 奖励类型：1=硬币，0=积分
-                'keywords' => "", // 签到词
-                'select' => "", // 查询词
-                'success' => "", // 成功回复
-                'reply' => "" // 查询回复
-            ];
-            Utils\FileUtils::fileDelete(runtime_path() . '/tmp/check-in.cfg');
-            Utils\FileUtils::writeToFile(runtime_path() . '/tmp/check-in.cfg', json_encode($checkIn));
-        }
-        // 获取自动回复配置
-        $autoresponders = readFileContent(runtime_path() . '/tmp/autoresponders.cfg');
-        if ($autoresponders) {
-            $autoresponders = json_decode($autoresponders, true);
-        }
-        if (!$autoresponders) {
-            $autoresponders = [
-                'opens' => false, // 是否开启
-                'status' => "0", // 状态
-                'type' => "0", // 类型：0=全部响应，1=仅响应牌子，2=仅响应航海
-                'content' => [] // 内容
-            ];
-            Utils\FileUtils::fileDelete(runtime_path() . '/tmp/autoresponders.cfg');
-            Utils\FileUtils::writeToFile(runtime_path() . '/tmp/autoresponders.cfg', json_encode($autoresponders));
-        }
-        // 返回数据
-        return success($request, [
-            'timing' => $timing,
-            'present' => $present,
-            'enter' => $enter,
-            'pk' => $pk,
-            'follow' => $follow,
-            'share' => $share,
-            'autoresponders' => $autoresponders,
-            'check_in' => $checkIn
-        ]);
+        $configs = ConfigService::all();
+        return success($request, $configs);
     }
 
     /**
@@ -272,48 +136,17 @@ class RobotControlController
             return fail($request, 800016);
         }
         Cache::set('robot_set_config', 1, 30);
-        // 获取参数
-        $timing = $request->post('timing', false);
-        $present = $request->post('present', false);
-        $enter = $request->post('enter', false);
-        $pk = $request->post('pk', false);
-        $follow = $request->post('follow', false);
-        $share = $request->post('share', false);
-        $autoresponders = $request->post('autoresponders', false);
-        $check_in = $request->post('check_in', false);
-        // 存储数据
-        if ($timing) {
-            Utils\FileUtils::fileDelete(runtime_path() . '/tmp/timing.cfg');
-            Utils\FileUtils::writeToFile(runtime_path() . '/tmp/timing.cfg', json_encode($timing, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
-        }
-        if ($present) {
-            Utils\FileUtils::fileDelete(runtime_path() . '/tmp/present.cfg');
-            Utils\FileUtils::writeToFile(runtime_path() . '/tmp/present.cfg', json_encode($present, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
-        }
-        if ($enter) {
-            Utils\FileUtils::fileDelete(runtime_path() . '/tmp/enter.cfg');
-            Utils\FileUtils::writeToFile(runtime_path() . '/tmp/enter.cfg', json_encode($enter, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
-        }
-        if ($pk) {
-            Utils\FileUtils::fileDelete(runtime_path() . '/tmp/pk.cfg');
-            Utils\FileUtils::writeToFile(runtime_path() . '/tmp/pk.cfg', json_encode($pk, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
-        }
-        if ($follow) {
-            Utils\FileUtils::fileDelete(runtime_path() . '/tmp/follow.cfg');
-            Utils\FileUtils::writeToFile(runtime_path() . '/tmp/follow.cfg', json_encode($follow, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
-        }
-        if ($share) {
-            Utils\FileUtils::fileDelete(runtime_path() . '/tmp/share.cfg');
-            Utils\FileUtils::writeToFile(runtime_path() . '/tmp/share.cfg', json_encode($share, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
-        }
-        if ($autoresponders) {
-            Utils\FileUtils::fileDelete(runtime_path() . '/tmp/autoresponders.cfg');
-            Utils\FileUtils::writeToFile(runtime_path() . '/tmp/autoresponders.cfg', json_encode($autoresponders, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
-        }
-        if ($check_in) {
-            Utils\FileUtils::fileDelete(runtime_path() . '/tmp/check-in.cfg');
-            Utils\FileUtils::writeToFile(runtime_path() . '/tmp/check-in.cfg', json_encode($check_in, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
-        }
+        // 批量写入配置
+        ConfigService::set([
+            'timing' => $request->post('timing', false),
+            'present' => $request->post('present', false),
+            'enter' => $request->post('enter', false),
+            'pk' => $request->post('pk', false),
+            'follow' => $request->post('follow', false),
+            'share' => $request->post('share', false),
+            'autoresponders' => $request->post('autoresponders', false),
+            'check_in' => $request->post('check_in', false),
+        ]);
         // 重启定时广告
         restartTiming();
         // 返回数据
@@ -412,126 +245,13 @@ class RobotControlController
     public function exportConfig(Request $request): Response
     {
         $path_name = Carbon::now()->timezone(config('app')['default_timezone'])->format('YmdHis') . '.cfg';
-        // 获取定时广告配置
-        $timing = readFileContent(runtime_path() . '/tmp/timing.cfg');
-        if ($timing) {
-            $timing = json_decode($timing, true);
+        $data = ConfigService::export();
+        // 写入导出文件
+        $exportDir = public_path() . '/config/';
+        if (!is_dir($exportDir)) {
+            mkdir($exportDir, 0755, true);
         }
-        if (!$timing) {
-            $timing = [
-                'opens' => false, // 是否开启
-                'intervals' => null, // 间隔时间
-                'status' => 0, // 状态
-                'content' => null // 内容
-            ];
-        }
-        // 获取礼物答谢配置
-        $present = readFileContent(runtime_path() . '/tmp/present.cfg');
-        if ($present) {
-            $present = json_decode($present, true);
-        }
-        if (!$present) {
-            $present = [
-                'opens' => false, // 是否开启
-                'price' => null, // 起始感谢金额
-                'number' => 0, // 数量
-                'merge' => 0, // 礼物合并
-                'status' => 0, // 状态 
-                'type' => 0, // 状态 0=全部答谢，1=仅答谢牌子，2=仅答谢航海
-                'content' => null // 内容
-            ];
-        }
-        // 获取进房欢迎配置
-        $enter = readFileContent(runtime_path() . '/tmp/enter.cfg');
-        if ($enter) {
-            $enter = json_decode($enter, true);
-        }
-        if (!$enter) {
-            $enter = [
-                'opens' => false, // 是否开启
-                'status' => 0, // 状态
-                'type' => 0, // 类型：0=全部欢迎，1=仅欢迎牌子，2=仅欢迎航海
-                'content' => null // 内容
-            ];
-        }
-        // 获取PK播报配置
-        $pk = readFileContent(runtime_path() . '/tmp/pk.cfg');
-        if ($pk) {
-            $pk = json_decode($pk, true);
-        }
-        if (!$pk) {
-            $pk = [
-                'opens' => false, // 是否开启
-                'content' => null // 内容
-            ];
-        }
-        // 获取感谢关注配置
-        $follow = readFileContent(runtime_path() . '/tmp/follow.cfg');
-        if ($follow) {
-            $follow = json_decode($follow, true);
-        }
-        if (!$follow) {
-            $follow = [
-                'opens' => false, // 是否开启
-                'status' => 0, // 状态
-                'type' => 0, // 类型：0=全部感谢，1=仅感谢牌子，2=仅感谢航海
-                'content' => null // 内容
-            ];
-        }
-        // 获取定时广告配置
-        $share = readFileContent(runtime_path() . '/tmp/share.cfg');
-        if ($share) {
-            $share = json_decode($share, true);
-        }
-        if (!$share) {
-            $share = [
-                'opens' => false, // 是否开启
-                'status' => 0, // 状态
-                'type' => 0, // 类型：0=全部感谢，1=仅感谢牌子，2=仅感谢航海
-                'content' => null // 内容
-            ];
-        }
-        // 获取自动回复配置
-        $check_in = readFileContent(runtime_path() . '/tmp/check-in.cfg');
-        if ($check_in) {
-            $check_in = json_decode($check_in, true);
-        }
-        if (!$check_in) {
-            $check_in = [
-                'opens' => false, // 是否开启
-                'status' => 0, // 状态
-                'type' => 0, // 类型：0=全部感谢，1=仅感谢牌子，2=仅感谢航海
-                'points' => 0, // 赠送积分
-                'keywords' => null, // 签到词
-                'select' => null, // 查询词
-                'success' => null, // 成功回复
-                'reply' => null // 查询回复
-            ];
-        }
-        // 获取自动回复配置
-        $autoresponders = readFileContent(runtime_path() . '/tmp/autoresponders.cfg');
-        if ($autoresponders) {
-            $autoresponders = json_decode($autoresponders, true);
-        }
-        if (!$autoresponders) {
-            $autoresponders = [
-                'opens' => false, // 是否开启
-                'status' => 0, // 状态
-                'type' => 0, // 类型：0=全部响应，1=仅响应牌子，2=仅响应航海
-                'content' => [] // 内容
-            ];
-        }
-        // 返回数据
-        Utils\FileUtils::writeToFile(public_path() . '/config/' . $path_name, json_encode([
-            'timing' => $timing,
-            'present' => $present,
-            'enter' => $enter,
-            'pk' => $pk,
-            'follow' => $follow,
-            'share' => $share,
-            'autoresponders' => $autoresponders,
-            'check_in' => $check_in
-        ], JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
+        Utils\FileUtils::writeToFile($exportDir . $path_name, json_encode($data, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
         // 返回数据
         return success($request, [
             'url' => $request->host() . '/config/' . $path_name
@@ -551,51 +271,23 @@ class RobotControlController
         if (!$file || !$file->isValid()) {
             throw new \Exception("文件上传失败");
         }
-        // 获取文件临时路径
-        $text = Utils\FileUtils::readFile($file->getPathname());
         // 读取文件内容
+        $text = Utils\FileUtils::readFile($file->getPathname());
         $data = json_decode($text, true);
-        $timing = isset($data['timing']) ? $data['timing'] : false;
-        $present = isset($data['present']) ? $data['present'] : false;
-        $enter = isset($data['enter']) ? $data['enter'] : false;
-        $pk = isset($data['pk']) ? $data['pk'] : false;
-        $follow = isset($data['follow']) ? $data['follow'] : false;
-        $share = isset($data['share']) ? $data['share'] : false;
-        $autoresponders = isset($data['autoresponders']) ? $data['autoresponders'] : false;
-        $check_in = isset($data['check_in']) ? $data['check_in'] : false;
-        // 存储数据
-        if ($timing) {
-            Utils\FileUtils::fileDelete(runtime_path() . '/tmp/timing.cfg');
-            Utils\FileUtils::writeToFile(runtime_path() . '/tmp/timing.cfg', json_encode($timing, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
+        if (!is_array($data)) {
+            throw new \Exception("配置文件格式无效");
         }
-        if ($present) {
-            Utils\FileUtils::fileDelete(runtime_path() . '/tmp/present.cfg');
-            Utils\FileUtils::writeToFile(runtime_path() . '/tmp/present.cfg', json_encode($present, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
-        }
-        if ($enter) {
-            Utils\FileUtils::fileDelete(runtime_path() . '/tmp/enter.cfg');
-            Utils\FileUtils::writeToFile(runtime_path() . '/tmp/enter.cfg', json_encode($enter, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
-        }
-        if ($pk) {
-            Utils\FileUtils::fileDelete(runtime_path() . '/tmp/pk.cfg');
-            Utils\FileUtils::writeToFile(runtime_path() . '/tmp/pk.cfg', json_encode($pk, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
-        }
-        if ($follow) {
-            Utils\FileUtils::fileDelete(runtime_path() . '/tmp/follow.cfg');
-            Utils\FileUtils::writeToFile(runtime_path() . '/tmp/follow.cfg', json_encode($follow, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
-        }
-        if ($share) {
-            Utils\FileUtils::fileDelete(runtime_path() . '/tmp/share.cfg');
-            Utils\FileUtils::writeToFile(runtime_path() . '/tmp/share.cfg', json_encode($share, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
-        }
-        if ($autoresponders) {
-            Utils\FileUtils::fileDelete(runtime_path() . '/tmp/autoresponders.cfg');
-            Utils\FileUtils::writeToFile(runtime_path() . '/tmp/autoresponders.cfg', json_encode($autoresponders, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
-        }
-        if ($check_in) {
-            Utils\FileUtils::fileDelete(runtime_path() . '/tmp/check-in.cfg');
-            Utils\FileUtils::writeToFile(runtime_path() . '/tmp/check-in.cfg', json_encode($check_in, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
-        }
+        // 批量写入配置
+        ConfigService::set([
+            'timing' => $data['timing'] ?? false,
+            'present' => $data['present'] ?? false,
+            'enter' => $data['enter'] ?? false,
+            'pk' => $data['pk'] ?? false,
+            'follow' => $data['follow'] ?? false,
+            'share' => $data['share'] ?? false,
+            'autoresponders' => $data['autoresponders'] ?? false,
+            'check_in' => $data['check_in'] ?? false,
+        ]);
         // 重启定时广告
         restartTiming();
         // 返回数据
