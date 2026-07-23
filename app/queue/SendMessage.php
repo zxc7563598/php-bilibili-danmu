@@ -184,7 +184,8 @@ class SendMessage
             // 加入数据
             if (!$exist) {
                 $bilibili_send_sequence = Redis::get('bilibili_send_sequence');
-                $score = $priority - $bilibili_send_sequence * 0.000001;
+                // 使用取模保证浮点精度不因序列号过大而丢失（消息 30 秒过期，100W 足够大）
+                $score = $priority - ($bilibili_send_sequence % 1000000) * 0.000001;
                 $task = json_encode([
                     'message' => $message,
                     'score' => $score,
@@ -241,7 +242,8 @@ class SendMessage
             // 处理数据
             foreach ($message_list as $item) {
                 $bilibili_send_sequence = Redis::get('bilibili_send_sequence');
-                $score = $priority - $bilibili_send_sequence * 0.000001;
+                // 使用取模保证浮点精度不因序列号过大而丢失（消息 30 秒过期，100W 足够大）
+                $score = $priority - ($bilibili_send_sequence % 1000000) * 0.000001;
                 $task = json_encode([
                     'message' => $item,
                     'score' => $score,
@@ -297,7 +299,7 @@ class SendMessage
                             $message = self::getGiftMessage($task['uid'], $task['name'], $task['message'], $number, $blindBoxStats);
                             foreach ($message as $_message) {
                                 echo "发送优先级为" . $task['score'] . "的弹幕: " . $_message . PHP_EOL;
-                                BiliLive\Live::sendMsg($room_id, $cookie, $_message);
+                                Bililive\Live::sendMsg($room_id, $cookie, $_message);
                                 Redis::setEx('bilibili_stop_message', 4, 1);
                                 sublog('核心逻辑/机器人信息发送', '连续信息发送', [
                                     'message' => $_message,
@@ -312,7 +314,7 @@ class SendMessage
                         // 直接发送
                         echo "发送优先级为" . $task['score'] . "的弹幕: " . $task['message'] . PHP_EOL;
                         if ($cookie && $room_id) {
-                            BiliLive\Live::sendMsg($room_id, $cookie, $task['message']);
+                            Bililive\Live::sendMsg($room_id, $cookie, $task['message']);
                             sublog('核心逻辑/机器人信息发送', '单条信息发送', [
                                 'message' => $task['message'],
                                 'score' => $task['score'],
