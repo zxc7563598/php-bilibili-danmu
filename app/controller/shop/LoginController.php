@@ -104,11 +104,19 @@ class LoginController extends GeneralMethod
         }
         if (!$skip) {
             if (empty($user_vip->password)) {
-                $user_vip->salt = mt_rand(1000, 9999);
-                $user_vip->password = sha1(sha1($password) . $user_vip->salt);
+                // 首次设置密码，使用 bcrypt
+                $user_vip->password = password_hash($password, PASSWORD_BCRYPT);
                 $user_vip->save();
             } else {
-                if ($user_vip->password != sha1(sha1($password) . $user_vip->salt)) {
+                // 验证密码（优先 bcrypt，回退到旧 SHA1 并自动升级）
+                $valid = password_verify($password, $user_vip->password);
+                if (!$valid && !empty($user_vip->salt) && $user_vip->password === sha1(sha1($password) . $user_vip->salt)) {
+                    // 旧密码验证成功，自动升级为 bcrypt
+                    $user_vip->password = password_hash($password, PASSWORD_BCRYPT);
+                    $user_vip->save();
+                    $valid = true;
+                }
+                if (!$valid) {
                     return fail($request, 800002);
                 }
             }

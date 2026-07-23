@@ -145,8 +145,7 @@ class UserManagementController extends GeneralMethod
         $user->uid = $uid;
         $user->name = $name;
         if (!is_null($password)) {
-            $user->salt = mt_rand(1000, 9999);
-            $user->password = sha1(sha1($password) . $user->salt);
+            $user->password = password_hash($password, PASSWORD_BCRYPT);
         }
         $user->vip_type = $vip_type;
         $user->save();
