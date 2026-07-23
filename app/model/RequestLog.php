@@ -39,9 +39,4 @@ class RequestLog extends Model
      * @var bool
      */
     public $incrementing = true;
-
-    public static function boot()
-    {
-        parent::boot();
-    }
 }
