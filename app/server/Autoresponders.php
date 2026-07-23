@@ -11,7 +11,6 @@ use app\server\core\KeywordEvaluator;
 use app\server\core\KeywordMatcher;
 use Carbon\Carbon;
 use Hejunjie\Bililive;
-use support\Db;
 use support\Redis;
 use resource\enums\GiftRecordsEnums;
 
@@ -302,11 +301,12 @@ class Autoresponders
      */
     private static function getUserBlindBoxNet(string $uid, int $start_timestamp): string
     {
-        $gift_records = GiftRecords::where('created_at', '>', $start_timestamp)->where('uid', $uid)->where('original', GiftRecordsEnums\Original::No->value)->first([
-            'total_price' => Db::raw('sum(total_price) as total_price'),
-            'original_price' => Db::raw('sum(original_price * num) as original_price'),
-        ]);
-        if (!empty($gift_records)) {
+        $gift_records = GiftRecords::where('created_at', '>', $start_timestamp)
+            ->where('uid', $uid)
+            ->where('original', GiftRecordsEnums\Original::No->value)
+            ->selectRaw('COALESCE(SUM(total_price), 0) as total_price, COALESCE(SUM(original_price * num), 0) as original_price')
+            ->first();
+        if (!empty($gift_records) && ($gift_records->total_price > 0 || $gift_records->original_price > 0)) {
             return number_format(($gift_records->total_price - $gift_records->original_price), 2);
         }
         return '0.00';
@@ -321,11 +321,11 @@ class Autoresponders
      */
     private static function getRoomBlindBoxNet(int $start_timestamp): string
     {
-        $gift_records = GiftRecords::where('created_at', '>', $start_timestamp)->where('original', GiftRecordsEnums\Original::No->value)->first([
-            'total_price' => Db::raw('sum(total_price) as total_price'),
-            'original_price' => Db::raw('sum(original_price * num) as original_price'),
-        ]);
-        if (!empty($gift_records)) {
+        $gift_records = GiftRecords::where('created_at', '>', $start_timestamp)
+            ->where('original', GiftRecordsEnums\Original::No->value)
+            ->selectRaw('COALESCE(SUM(total_price), 0) as total_price, COALESCE(SUM(original_price * num), 0) as original_price')
+            ->first();
+        if (!empty($gift_records) && ($gift_records->total_price > 0 || $gift_records->original_price > 0)) {
             return number_format(($gift_records->total_price - $gift_records->original_price), 2);
         }
         return '0.00';

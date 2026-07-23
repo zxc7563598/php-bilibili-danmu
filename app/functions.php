@@ -187,7 +187,7 @@ function writeLinesToFile($filePath, $line)
 {
     $directory = dirname($filePath);
     if (!is_dir($directory)) {
-        if (!mkdir($directory, 0777, true) && !is_dir($directory)) {
+        if (!mkdir($directory, 0755, true) && !is_dir($directory)) {
             throw new \Exception("无法创建目录: " . $directory);
         }
     }

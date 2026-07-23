@@ -22,7 +22,8 @@ class BasicAuthMiddleware implements MiddlewareInterface
         return $next($request);
     }
 
-    private function validateAuth($authHeader): bool
+    // 验证 Basic Auth 头部信息
+    private function validateAuth(string $authHeader): bool
     {
         if (preg_match('/Basic\s+(.*)$/i', $authHeader, $matches)) {
             list($username, $password) = explode(':', base64_decode($matches[1]), 2);
