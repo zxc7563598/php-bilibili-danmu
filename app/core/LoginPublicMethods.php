@@ -2,7 +2,6 @@
 
 namespace app\core;
 
-use app\controller\GeneralMethod;
 use app\model\UserVips;
 use Carbon\Carbon;
 use resource\enums\UserVipsEnums;
@@ -47,8 +46,8 @@ class LoginPublicMethods
         if (empty($user_vip)) {
             return 800005;
         }
-        // 创建token执行登录
-        $token = md5(mt_rand(1000, 9999) . uniqid(md5(microtime(true)), true));
+        // 创建token执行登录（使用密码学安全的随机字节）
+        $token = bin2hex(random_bytes(32));
         // 删除先前的token信息
         if ($user_vip->token) {
             Cache::delete($user_vip->token);
