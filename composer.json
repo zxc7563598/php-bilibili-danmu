@@ -27,7 +27,6 @@
     "php": ">=8.2",
     "workerman/webman-framework": "~2.1",
     "monolog/monolog": "^2.0",
-    "hejunjie/tools": "^2.0",
     "hejunjie/bililive": "^1.0",
     "vlucas/phpdotenv": "^5.6",
     "nesbot/carbon": "^3.8",
@@ -42,13 +41,9 @@
     "illuminate/pagination": "^11.36",
     "symfony/var-dumper": "^7.2",
     "laravel/serializable-closure": "^2.0",
-    "hejunjie/hardware-monitor": "^1.0",
     "phpmailer/phpmailer": "^6.9",
     "webman/openai": "^2.0",
     "webman/redis-queue": "~2.1",
-    "hejunjie/url-signer": "^1.0",
-    "hejunjie/simple-rule-engine": "^1.0",
-    "hejunjie/google-authenticator": "^1.0",
     "fukuball/jieba-php": "^0.34.0",
     "google/protobuf": "^4.33.6",
     "hejunjie/encrypted-request": "^2.0",
@@ -58,7 +53,8 @@
     "webman/redis": "~2.1",
     "webman/cache": "~2.1",
     "webman/log": "~2.1",
-    "revolt/event-loop": "^1.0"
+    "revolt/event-loop": "^1.0",
+    "hejunjie/utils": "^1.2"
   },
   "suggest": {
     "ext-event": "For better performance. "
