@@ -2,6 +2,7 @@
 
 namespace app\server;
 
+use app\core\ConfigService;
 use app\core\RobotServices;
 use app\queue\SendMessage;
 use support\Redis;
@@ -26,20 +27,17 @@ class Enter
         // 不处理自己发送的消息
         $robot_uid = strval(readFileContent(runtime_path() . '/tmp/uid.cfg'));
         // 获取进房欢迎配置
-        $enter = readFileContent(runtime_path() . '/tmp/enter.cfg');
-        if ($enter) {
-            $enter = json_decode($enter, true);
-        }
+        $enter = ConfigService::get('enter');
         // 开启进房欢迎
-        if (isset($enter['opens']) && $enter['opens'] && $uid != $robot_uid) {
+        if ($enter['opens'] && $uid != $robot_uid) {
             sublog('核心业务/进房欢迎', '入参', [
                 'uid' => $uid,
                 'uname' => $uname,
                 'ruid' => $ruid,
                 'guard_level' => $guard_level
             ]);
-            $enter_type = intval($enter['type']); // 类型
-            $enter_status = intval($enter['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
+            $enter_type = (int)$enter['type']; // 类型
+            $enter_status = (int)$enter['status']; // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
             $enter_content = $enter['content']; // 内容
             // 确认链接直播间的情况
             $cookie = RobotServices::getCookie();

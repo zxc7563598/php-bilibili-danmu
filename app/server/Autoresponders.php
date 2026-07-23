@@ -2,6 +2,7 @@
 
 namespace app\server;
 
+use app\core\ConfigService;
 use app\core\RobotServices;
 use app\model\GiftRecords;
 use app\model\SilentUser;
@@ -35,12 +36,9 @@ class Autoresponders
         // 不处理自己发送的消息
         $robot_uid = strval(readFileContent(runtime_path() . '/tmp/uid.cfg'));
         // 获取自动回复配置
-        $autoresponders = readFileContent(runtime_path() . '/tmp/autoresponders.cfg');
-        if ($autoresponders) {
-            $autoresponders = json_decode($autoresponders, true);
-        }
+        $autoresponders = ConfigService::get('autoresponders');
         // 开启自动回复
-        if (isset($autoresponders['opens']) && $autoresponders['opens'] && $uid != $robot_uid) {
+        if ($autoresponders['opens'] && $uid != $robot_uid) {
             sublog('核心业务/自动回复', '入参', [
                 'msg' => $msg,
                 'uid' => $uid,
@@ -48,8 +46,8 @@ class Autoresponders
                 'ruid' => $ruid,
                 'guard_level' => $guard_level
             ]);
-            $autoresponders_type = intval($autoresponders['type']); // 类型
-            $autoresponders_status = intval($autoresponders['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
+            $autoresponders_type = (int)$autoresponders['type']; // 类型
+            $autoresponders_status = (int)$autoresponders['status']; // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
             $autoresponders_content = $autoresponders['content']; // 内容
             $message = '';
             $keywords = '';
@@ -165,27 +163,27 @@ class Autoresponders
                     'total_blind_box_net' => function () use ($uid): string {
                         return self::getUserBlindBoxNet($uid, 0);
                     },
-                    'daily_room_blind_box_net' => function () use ($uid): string {
+                    'daily_room_blind_box_net' => function (): string {
                         $todayStart = Carbon::today()
                             ->timezone(config('app')['default_timezone'])
                             ->timestamp;
                         return self::getRoomBlindBoxNet($todayStart);
                     },
-                    'weekly_room_blind_box_net' => function () use ($uid): string {
+                    'weekly_room_blind_box_net' => function (): string {
                         $thisWeekStart = Carbon::now()
                             ->timezone(config('app')['default_timezone'])
                             ->startOfWeek()
                             ->timestamp;
                         return self::getRoomBlindBoxNet($thisWeekStart);
                     },
-                    'monthly_room_blind_box_net' => function () use ($uid): string {
+                    'monthly_room_blind_box_net' => function (): string {
                         $thisMonthStart = Carbon::now()
                             ->timezone(config('app')['default_timezone'])
                             ->startOfMonth()
                             ->timestamp;
                         return self::getRoomBlindBoxNet($thisMonthStart);
                     },
-                    'total_room_blind_box_net' => function () use ($uid): string {
+                    'total_room_blind_box_net' => function (): string {
                         return self::getRoomBlindBoxNet(0);
                     },
                 ], $msg, $silent, $silent_minute, $ransom_amount, (string)$uid, $uname);

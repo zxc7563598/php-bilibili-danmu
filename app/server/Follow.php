@@ -2,6 +2,7 @@
 
 namespace app\server;
 
+use app\core\ConfigService;
 use app\core\RobotServices;
 use app\queue\SendMessage;
 use support\Redis;
@@ -26,20 +27,17 @@ class Follow
         // 不处理自己发送的消息
         $robot_uid = strval(readFileContent(runtime_path() . '/tmp/uid.cfg'));
         // 获取感谢关注配置
-        $follow = readFileContent(runtime_path() . '/tmp/follow.cfg');
-        if ($follow) {
-            $follow = json_decode($follow, true);
-        }
+        $follow = ConfigService::get('follow');
         // 开启感谢关注
-        if (isset($follow['opens']) && $follow['opens'] && $uid != $robot_uid) {
+        if ($follow['opens'] && $uid != $robot_uid) {
             sublog('核心业务/感谢关注', '入参', [
                 'uid' => $uid,
                 'uname' => $uname,
                 'ruid' => $ruid,
                 'guard_level' => $guard_level
             ]);
-            $follow_type = intval($follow['type']); // 类型
-            $follow_status = intval($follow['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
+            $follow_type = (int)$follow['type']; // 类型
+            $follow_status = (int)$follow['status']; // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
             $follow_content = $follow['content']; // 内容
             // 确认链接直播间的情况
             $cookie = RobotServices::getCookie();
