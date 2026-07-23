@@ -66,7 +66,7 @@ function restartBilibili()
     $url = getenv('RE_OPEN_HOST') . ':' . getenv('LISTEN') . '/reload-bilibili';
     $timestamp = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
     Utils\HttpClient::sendPostRequest($url, [], [
-        'api_key' => md5(getenv('SECURE_API_KEY') . $timestamp),
+        'api_key' => hash_hmac('sha256', (string)$timestamp, getenv('SECURE_API_KEY')),
         'timestamp' => $timestamp
     ]);
 }
@@ -82,7 +82,7 @@ function restartTiming()
     $url = getenv('RE_OPEN_HOST') . ':' . getenv('LISTEN') . '/reload-timing';
     $timestamp = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
     Utils\HttpClient::sendPostRequest($url, [], [
-        'api_key' => md5(getenv('SECURE_API_KEY') . $timestamp),
+        'api_key' => hash_hmac('sha256', (string)$timestamp, getenv('SECURE_API_KEY')),
         'timestamp' => $timestamp
     ]);
 }

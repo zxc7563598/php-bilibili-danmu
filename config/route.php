@@ -215,16 +215,14 @@ Route::group('/admin-api-v2', function () {
 ]);
 
 Route::post('/reload-bilibili', function (Request $request) {
-    // 预定义的 API 密钥（可以从配置文件或环境变量中读取）
     $validApiKey = getenv('SECURE_API_KEY');
-    // 获取请求中的 API 密钥
     $api_key = $request->post('api_key');
     $timestamp = $request->post('timestamp');
-    // 验证 API 密钥
-    if ($api_key !== md5($validApiKey . $timestamp)) {
+    // 使用 HMAC-SHA256 验证 API 密钥
+    if ($api_key !== hash_hmac('sha256', (string)$timestamp, $validApiKey)) {
         return response('Unauthorized', 401);
     }
-    $socketFile = runtime_path() . '/bilibili.sock'; // 套接字文件路径，确保有权限访问
+    $socketFile = runtime_path() . '/bilibili.sock';
     if (!file_exists($socketFile)) {
         return response('Unix socket not found', 404);
     }
@@ -232,7 +230,6 @@ Route::post('/reload-bilibili', function (Request $request) {
     if (!$socket) {
         return response("Error connecting to Unix socket: $errstr ($errno)", 500);
     }
-    // 发送 reload 命令
     fwrite($socket, 'reload');
     $response = fread($socket, 1024);
     fclose($socket);
@@ -240,16 +237,14 @@ Route::post('/reload-bilibili', function (Request $request) {
 });
 
 Route::post('/reload-timing', function (Request $request) {
-    // 预定义的 API 密钥（可以从配置文件或环境变量中读取）
     $validApiKey = getenv('SECURE_API_KEY');
-    // 获取请求中的 API 密钥
     $api_key = $request->post('api_key');
     $timestamp = $request->post('timestamp');
-    // 验证 API 密钥
-    if ($api_key !== md5($validApiKey . $timestamp)) {
+    // 使用 HMAC-SHA256 验证 API 密钥
+    if ($api_key !== hash_hmac('sha256', (string)$timestamp, $validApiKey)) {
         return response('Unauthorized', 401);
     }
-    $socketFile = runtime_path() . '/timing.sock'; // 套接字文件路径，确保有权限访问
+    $socketFile = runtime_path() . '/timing.sock';
     if (!file_exists($socketFile)) {
         return response('Unix socket not found', 404);
     }
@@ -257,7 +252,6 @@ Route::post('/reload-timing', function (Request $request) {
     if (!$socket) {
         return response("Error connecting to Unix socket: $errstr ($errno)", 500);
     }
-    // 发送 reload 命令
     fwrite($socket, 'reload');
     $response = fread($socket, 1024);
     fclose($socket);
