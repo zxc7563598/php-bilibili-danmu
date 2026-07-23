@@ -125,10 +125,7 @@ class ConfigService
         $filePath = runtime_path() . self::CONFIG_DIR . '/' . str_replace('_', '-', $name) . '.cfg';
         $tmpPath = $filePath . '.tmp.' . getmypid();
         Utils\FileUtils::writeToFile($tmpPath, json_encode($data, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION));
-        // 原子替换（先清理旧临时文件）
-        if (file_exists($filePath)) {
-            unlink($filePath);
-        }
+        // 原子替换（同一文件系统上 rename 直接覆盖，无需先 unlink）
         rename($tmpPath, $filePath);
     }
 
