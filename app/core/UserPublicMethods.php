@@ -104,19 +104,41 @@ class UserPublicMethods extends GeneralMethod
                 'sub_id' => 'sub_id',
                 'created_at' => 'created_at'
             ]);
+            // 批量收集所有涉及的 goods_id 和 sub_id
+            $allGoodsIds = [];
+            $allSubIds = [];
+            foreach ($redemption_records_logs as $_log) {
+                $allGoodsIds[] = $_log->goods_id;
+                foreach (explode(',', $_log->sub_id) as $_sid) {
+                    if (!empty($_sid)) {
+                        $allSubIds[] = $_sid;
+                    }
+                }
+            }
+            // 批量预加载商品和规格
+            $goodsMap = [];
+            $subsMap = [];
+            if (!empty($allGoodsIds)) {
+                $allGoods = Goods::whereIn('goods_id', array_unique($allGoodsIds))->get(['goods_id' => 'goods_id', 'name' => 'name']);
+                foreach ($allGoods as $_g) {
+                    $goodsMap[$_g->goods_id] = $_g->name;
+                }
+            }
+            if (!empty($allSubIds)) {
+                $allSubs = GoodSubs::whereIn('sub_id', array_unique($allSubIds))->get(['sub_id' => 'sub_id', 'name' => 'name']);
+                foreach ($allSubs as $_s) {
+                    $subsMap[$_s->sub_id] = $_s->name;
+                }
+            }
             foreach ($redemption_records_logs as $_redemption_records_logs) {
-                $goods = Goods::where('goods_id', $_redemption_records_logs->goods_id)->first([
-                    'name' => 'name'
-                ]);
-                $subs = GoodSubs::whereIn('sub_id', explode(',', $_redemption_records_logs->sub_id))->get([
-                    'name' => 'name'
-                ]);
                 $subs_name = [];
-                foreach ($subs as $_subs) {
-                    $subs_name[] = $_subs->name;
+                foreach (explode(',', $_redemption_records_logs->sub_id) as $_sid) {
+                    if (isset($subsMap[$_sid])) {
+                        $subs_name[] = $subsMap[$_sid];
+                    }
                 }
                 $history[] = [
-                    'goods_name' => $goods->name,
+                    'goods_name' => $goodsMap[$_redemption_records_logs->goods_id] ?? '',
                     'sub_name' => implode(',', $subs_name),
                     'time' => $_redemption_records_logs->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s')
                 ];
@@ -286,9 +308,9 @@ class UserPublicMethods extends GeneralMethod
                     $danmu_count += 1;
                     if (count($danmu_list) < 10) {
                         $danmu_list[] = [
-                            'uid' => $_getTopSpeakers['uid'],
-                            'name' => $_getTopSpeakers['uname'],
-                            'count' => $_getTopSpeakers['count']
+                            'uid' => $_getTopSpeakers->uid,
+                            'name' => $_getTopSpeakers->uname,
+                            'count' => $_getTopSpeakers->count
                         ];
                     }
                 }
@@ -304,12 +326,12 @@ class UserPublicMethods extends GeneralMethod
                 ]);
                 $gift_total_price = 0;
                 foreach ($getTopSpenders as $_getTopSpenders) {
-                    $gift_total_price += $_getTopSpenders['count'];
+                    $gift_total_price += $_getTopSpenders->count;
                     if (count($gift_list) < 10) {
                         $gift_list[] = [
-                            'uid' => $_getTopSpenders['uid'],
-                            'name' => $_getTopSpenders['uname'],
-                            'count' => $_getTopSpenders['count'],
+                            'uid' => $_getTopSpenders->uid,
+                            'name' => $_getTopSpenders->uname,
+                            'count' => $_getTopSpenders->count,
                         ];
                     }
                 }

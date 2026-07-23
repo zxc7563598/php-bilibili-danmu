@@ -12,218 +12,156 @@ use support\Response;
 
 class ManagementController extends GeneralMethod
 {
+    /**
+     * 获取导航栏共享数据（未发货数量、未读投诉数量）
+     *
+     * @return array{records: int, complaint: int}
+     */
+    private function getNavCounts(): array
+    {
+        return [
+            'records' => RedemptionRecords::where('status', RedemptionRecordsEnums\Status::NoShipment->value)->count(),
+            'complaint' => Complaint::where('read', ComplaintEnums\Read::Unread->value)->count(),
+        ];
+    }
+
+    /**
+     * 渲染后台页面视图，自动注入共享导航数据
+     *
+     * @param string $view 视图名称
+     * @param array $data 额外数据
+     * @return Response
+     */
+    private function renderPage(string $view, array $data = []): Response
+    {
+        return view($view, array_merge([
+            'secretKey' => getenv('SECURE_API_KEY'),
+        ], $this->getNavCounts(), $data));
+    }
 
     /**
      * 不分离后台 - 系统配置页面
-     * 
-     * @return Response 
+     *
+     * @return Response
      */
-    public function pageSystemConfiguration(Request $request)
+    public function pageSystemConfiguration(Request $request): Response
     {
-        // 获取未发货数量
-        $records = RedemptionRecords::where('status', RedemptionRecordsEnums\Status::NoShipment->value)->count();
-        // 获取投诉数量
-        $complaint = Complaint::where('read', ComplaintEnums\Read::Unread->value)->count();
-        return view('shop/system-configuration', [
-            'secretKey' => getenv('SECURE_API_KEY'),
-            'records' => $records,
-            'complaint' => $complaint
-        ]);
+        return $this->renderPage('shop/system-configuration');
     }
 
     /**
      * 不分离后台 - 商城配置页面
-     * 
-     * @return Response 
+     *
+     * @return Response
      */
-    public function pageMallConfiguration(Request $request)
+    public function pageMallConfiguration(Request $request): Response
     {
-        // 获取未发货数量
-        $records = RedemptionRecords::where('status', RedemptionRecordsEnums\Status::NoShipment->value)->count();
-        // 获取投诉数量
-        $complaint = Complaint::where('read', ComplaintEnums\Read::Unread->value)->count();
-        return view('shop/mall-configuration', [
-            'secretKey' => getenv('SECURE_API_KEY'),
-            'records' => $records,
-            'complaint' => $complaint
-        ]);
+        return $this->renderPage('shop/mall-configuration');
     }
 
     /**
      * 不分离后台 - 用户管理页面
-     * 
-     * @return Response 
+     *
+     * @return Response
      */
-    public function pageUserManagement(Request $request, $page = null)
+    public function pageUserManagement(Request $request, $page = null): Response
     {
-        // 获取未发货数量
-        $records = RedemptionRecords::where('status', RedemptionRecordsEnums\Status::NoShipment->value)->count();
-        // 获取投诉数量
-        $complaint = Complaint::where('read', ComplaintEnums\Read::Unread->value)->count();
-        $page = !empty($page) ? $page : 1;
-        return view('shop/user-management', [
-            'secretKey' => getenv('SECURE_API_KEY'),
-            'page' => $page,
-            'records' => $records,
-            'complaint' => $complaint
+        return $this->renderPage('shop/user-management', [
+            'page' => !empty($page) ? $page : 1,
         ]);
     }
 
     /**
      * 不分离后台 - 商品管理页面
-     * 
-     * @return Response 
+     *
+     * @return Response
      */
-    public function pageProductManagement(Request $request, $page = null)
+    public function pageProductManagement(Request $request, $page = null): Response
     {
-        // 获取未发货数量
-        $records = RedemptionRecords::where('status', RedemptionRecordsEnums\Status::NoShipment->value)->count();
-        // 获取投诉数量
-        $complaint = Complaint::where('read', ComplaintEnums\Read::Unread->value)->count();
-        $page = !empty($page) ? $page : 1;
-        return view('shop/product-management', [
-            'secretKey' => getenv('SECURE_API_KEY'),
-            'page' => $page,
-            'records' => $records,
-            'complaint' => $complaint
+        return $this->renderPage('shop/product-management', [
+            'page' => !empty($page) ? $page : 1,
         ]);
     }
 
     /**
      * 不分离后台 - 发货管理页面
-     * 
-     * @return Response 
+     *
+     * @return Response
      */
-    public function pageShippingManagement(Request $request, $page = null)
+    public function pageShippingManagement(Request $request, $page = null): Response
     {
-        // 获取未发货数量
-        $records = RedemptionRecords::where('status', RedemptionRecordsEnums\Status::NoShipment->value)->count();
-        // 获取投诉数量
-        $complaint = Complaint::where('read', ComplaintEnums\Read::Unread->value)->count();
-        $page = !empty($page) ? $page : 1;
-        return view('shop/shipping-management', [
-            'secretKey' => getenv('SECURE_API_KEY'),
-            'page' => $page,
-            'records' => $records,
-            'complaint' => $complaint
+        return $this->renderPage('shop/shipping-management', [
+            'page' => !empty($page) ? $page : 1,
         ]);
     }
 
     /**
-     * 不分离后题 - 投诉管理页面
-     * 
-     * @return Response 
+     * 不分离后台 - 投诉管理页面
+     *
+     * @return Response
      */
-    public function pageComplaintManagement(Request $request, $page = null)
+    public function pageComplaintManagement(Request $request, $page = null): Response
     {
-        // 获取未发货数量
-        $records = RedemptionRecords::where('status', RedemptionRecordsEnums\Status::NoShipment->value)->count();
-        // 获取投诉数量
-        $complaint = Complaint::where('read', ComplaintEnums\Read::Unread->value)->count();
-        $page = !empty($page) ? $page : 1;
-        return view('shop/complaint-management', [
-            'secretKey' => getenv('SECURE_API_KEY'),
-            'page' => $page,
-            'records' => $records,
-            'complaint' => $complaint
+        return $this->renderPage('shop/complaint-management', [
+            'page' => !empty($page) ? $page : 1,
         ]);
     }
 
     /**
      * 不分离后台 - 问题反馈页面
-     * 
-     * @return Response 
+     *
+     * @return Response
      */
-    public function pageFeedback(Request $request)
+    public function pageFeedback(Request $request): Response
     {
-        // 获取未发货数量
-        $records = RedemptionRecords::where('status', RedemptionRecordsEnums\Status::NoShipment->value)->count();
-        // 获取投诉数量
-        $complaint = Complaint::where('read', ComplaintEnums\Read::Unread->value)->count();
-        return view('shop/feedback', [
-            'secretKey' => getenv('SECURE_API_KEY'),
-            'records' => $records,
-            'complaint' => $complaint
-        ]);
+        return $this->renderPage('shop/feedback');
     }
 
     /**
      * 不分离后台 - 礼物记录页面
-     * 
-     * @return Response 
+     *
+     * @return Response
      */
-    public function pageGiftRecords(Request $request, $page = null)
+    public function pageGiftRecords(Request $request, $page = null): Response
     {
-        // 获取未发货数量
-        $records = RedemptionRecords::where('status', RedemptionRecordsEnums\Status::NoShipment->value)->count();
-        // 获取投诉数量
-        $complaint = Complaint::where('read', ComplaintEnums\Read::Unread->value)->count();
-        $page = !empty($page) ? $page : 1;
-        return view('shop/gift-records', [
-            'secretKey' => getenv('SECURE_API_KEY'),
-            'page' => $page,
-            'records' => $records,
-            'complaint' => $complaint
+        return $this->renderPage('shop/gift-records', [
+            'page' => !empty($page) ? $page : 1,
         ]);
     }
 
     /**
      * 不分离后台 - 用户分析页面
-     * 
-     * @return Response 
+     *
+     * @return Response
      */
-    public function pageUserAnalysis(Request $request, $page = null)
+    public function pageUserAnalysis(Request $request, $page = null): Response
     {
-        // 获取未发货数量
-        $records = RedemptionRecords::where('status', RedemptionRecordsEnums\Status::NoShipment->value)->count();
-        // 获取投诉数量
-        $complaint = Complaint::where('read', ComplaintEnums\Read::Unread->value)->count();
-        $page = !empty($page) ? $page : 1;
-        return view('shop/user-analysis', [
-            'secretKey' => getenv('SECURE_API_KEY'),
-            'page' => $page,
-            'records' => $records,
-            'complaint' => $complaint
+        return $this->renderPage('shop/user-analysis', [
+            'page' => !empty($page) ? $page : 1,
         ]);
     }
 
     /**
      * 不分离后台 - 礼物盲盒页面
-     * 
-     * @return Response 
+     *
+     * @return Response
      */
-    public function pageGiftBlindBox(Request $request, $page = null)
+    public function pageGiftBlindBox(Request $request, $page = null): Response
     {
-        // 获取未发货数量
-        $records = RedemptionRecords::where('status', RedemptionRecordsEnums\Status::NoShipment->value)->count();
-        // 获取投诉数量
-        $complaint = Complaint::where('read', ComplaintEnums\Read::Unread->value)->count();
-        $page = !empty($page) ? $page : 1;
-        return view('shop/gift-blind-box', [
-            'secretKey' => getenv('SECURE_API_KEY'),
-            'page' => $page,
-            'records' => $records,
-            'complaint' => $complaint
+        return $this->renderPage('shop/gift-blind-box', [
+            'page' => !empty($page) ? $page : 1,
         ]);
     }
 
     /**
      * 不分离后台 - 弹幕记录页面
-     * 
-     * @return Response 
+     *
+     * @return Response
      */
-    public function pageDanmuRecords(Request $request, $page = null)
+    public function pageDanmuRecords(Request $request, $page = null): Response
     {
-        // 获取未发货数量
-        $records = RedemptionRecords::where('status', RedemptionRecordsEnums\Status::NoShipment->value)->count();
-        // 获取投诉数量
-        $complaint = Complaint::where('read', ComplaintEnums\Read::Unread->value)->count();
-        $page = !empty($page) ? $page : 1;
-        return view('shop/danmu-records', [
-            'secretKey' => getenv('SECURE_API_KEY'),
-            'page' => $page,
-            'records' => $records,
-            'complaint' => $complaint
+        return $this->renderPage('shop/danmu-records', [
+            'page' => !empty($page) ? $page : 1,
         ]);
     }
 }

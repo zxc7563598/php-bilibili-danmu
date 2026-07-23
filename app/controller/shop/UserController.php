@@ -267,12 +267,21 @@ class UserController extends GeneralMethod
                 'created_at' => 'bl_redemption_records.created_at',
                 'name' => 'bl_user_vips.name'
             ]);
-        // 获取商品信息
-        $goods = Goods::get();
-        $good_subs = GoodSubs::get([
-            'sub_id' => 'sub_id',
-            'name' => 'name'
-        ]);
+        // 只加载当前用户兑换记录中涉及的商品和规格
+        $relatedGoodsIds = $redemption_records->pluck('goods_id')->unique()->toArray();
+        $goods = Goods::whereIn('goods_id', $relatedGoodsIds)->get();
+        $relatedSubIds = [];
+        foreach ($redemption_records as $_rr) {
+            foreach (explode(',', $_rr->sub_id) as $_sid) {
+                if (!empty($_sid)) {
+                    $relatedSubIds[] = $_sid;
+                }
+            }
+        }
+        $relatedSubIds = array_unique($relatedSubIds);
+        $good_subs = !empty($relatedSubIds)
+            ? GoodSubs::whereIn('sub_id', $relatedSubIds)->get(['sub_id' => 'sub_id', 'name' => 'name'])
+            : collect();
         $subs = [];
         foreach ($good_subs as $_good_subs) {
             $subs[$_good_subs->sub_id] = $_good_subs->name . '*1  ';
