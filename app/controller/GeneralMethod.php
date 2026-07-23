@@ -14,7 +14,7 @@ class GeneralMethod
      */
     public static function getShopConfig(): array
     {
-        $cacheKey = config('app')['app_name'] . ':config';
+        $cacheKey = config('app.app_name') . ':config';
         $config = Redis::get($cacheKey);
         if (!empty($config)) {
             return json_decode($config, true);

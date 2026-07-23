@@ -64,7 +64,7 @@ function readFileContent(string $path): ?string
 function restartBilibili()
 {
     $url = getenv('RE_OPEN_HOST') . ':' . getenv('LISTEN') . '/reload-bilibili';
-    $timestamp = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
+    $timestamp = Carbon::now()->timezone(config('app.default_timezone'))->timestamp;
     Utils\HttpClient::sendPostRequest($url, [], [
         'api_key' => hash_hmac('sha256', (string)$timestamp, getenv('SECURE_API_KEY')),
         'timestamp' => $timestamp
@@ -80,7 +80,7 @@ function restartBilibili()
 function restartTiming()
 {
     $url = getenv('RE_OPEN_HOST') . ':' . getenv('LISTEN') . '/reload-timing';
-    $timestamp = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
+    $timestamp = Carbon::now()->timezone(config('app.default_timezone'))->timestamp;
     Utils\HttpClient::sendPostRequest($url, [], [
         'api_key' => hash_hmac('sha256', (string)$timestamp, getenv('SECURE_API_KEY')),
         'timestamp' => $timestamp
@@ -151,7 +151,7 @@ function getImageUrl($str): string
         return '';
     }
     if (strpos($str, 'http://') === false && strpos($str, 'https://') === false) {
-        $str = config('app')['image_url'] . '/' . $str;
+        $str = config('app.image_url') . '/' . $str;
     }
     return $str;
 }

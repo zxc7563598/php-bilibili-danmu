@@ -58,7 +58,7 @@ class CheckIn
             // 用户签到
             if (!empty($check_in['keywords']) && $check_in['keywords'] == $msg) {
                 // 确认当天是否签到
-                $today = UserCheckIn::where('uid', $uid)->where('created_at', '>=', Carbon::today()->timezone(config('app')['default_timezone'])->timestamp)->count();
+                $today = UserCheckIn::where('uid', $uid)->where('created_at', '>=', Carbon::today()->timezone(config('app.default_timezone'))->timestamp)->count();
                 if ($today == 0) {
                     // 记录签到
                     $user_check_in = new UserCheckIn();
@@ -79,7 +79,7 @@ class CheckIn
                     $coin = $user_vips->coin;
                     // 查询昨天是否签到
                     $day = UserCheckIn::where('uid', $uid)
-                        ->where('created_at', '>=', Carbon::today()->subDays(1)->timezone(config('app')['default_timezone'])->timestamp)
+                        ->where('created_at', '>=', Carbon::today()->subDays(1)->timezone(config('app.default_timezone'))->timestamp)
                         ->where('created_at', '<', Carbon::today()->timestamp)
                         ->count();
                     // 记录用户签到天数信息

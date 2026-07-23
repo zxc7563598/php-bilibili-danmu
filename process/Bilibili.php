@@ -74,7 +74,7 @@ class Bilibili
             if ($data === 'reload') {
                 // 启动 websocket
                 $this->connectToWebSocket();
-                echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "已重启Bilibili进程" . "\n";
+                echo Carbon::now()->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s') . "已重启Bilibili进程" . "\n";
             }
             $connection->send("已处理Bilibili流程: $data");
         };
@@ -93,7 +93,7 @@ class Bilibili
         $this->roomId = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
         // 如果cookie或roomId无效，则不再尝试连接websocket
         if (empty($this->cookie) || empty($this->roomId)) {
-            echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "未检测到有效的cookie或roomId，WebSocket连接已跳过。\n";
+            echo Carbon::now()->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s') . "未检测到有效的cookie或roomId，WebSocket连接已跳过。\n";
             $this->isConnecting = false;
             $this->isConnected = false;
             return;
@@ -166,7 +166,7 @@ class Bilibili
         // 设置连接关闭回调
         $con->onClose = function () {
             $this->isConnected = false;
-            echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "连接已关闭，正在尝试重新连接...\n";
+            echo Carbon::now()->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s') . "连接已关闭，正在尝试重新连接...\n";
             $this->clearTimers();
             // 设置重连定时器
             $this->scheduleReconnect();
@@ -180,7 +180,7 @@ class Bilibili
                 'msg' => $msg,
                 'room_id' => $this->roomId ?? 'unknown'
             ]);
-            echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . " $errorMsg\n";
+            echo Carbon::now()->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s') . " $errorMsg\n";
             $this->clearTimers();
             // 设置重连定时器
             $this->scheduleReconnect();
@@ -239,17 +239,17 @@ class Bilibili
      */
     private function onConnected(AsyncTcpConnection $con, int $roomId, string $token): void
     {
-        echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "已连接到WebSocket,房间号:" . $roomId . "\n";
+        echo Carbon::now()->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s') . "已连接到WebSocket,房间号:" . $roomId . "\n";
         // 发送认证包
         $con->send(Bililive\WebSocket::buildAuthPayload($roomId, $token, $this->cookie));
-        echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "认证包发送" . "\n";
+        echo Carbon::now()->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s') . "认证包发送" . "\n";
         $con->send(Bililive\WebSocket::buildHeartbeatPayload());
-        echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "首次websocket心跳发送" . "\n";
+        echo Carbon::now()->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s') . "首次websocket心跳发送" . "\n";
         // 启动心跳定时器
         $this->heartbeatTimer = Timer::add(30, function () use ($roomId) {
             if ($this->isConnectionHealthy()) {
                 $this->connection->send(Bililive\WebSocket::buildHeartbeatPayload());
-                echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "连续websocket心跳发送" . "\n";
+                echo Carbon::now()->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s') . "连续websocket心跳发送" . "\n";
             }
         });
         // 启动消息处理定时器
@@ -272,7 +272,7 @@ class Bilibili
     {
         $this->healthCheckTimer = Timer::add(60, function () {
             if (!$this->isConnectionHealthy() && !$this->isConnecting) {
-                echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "健康检查失败，尝试重连...\n";
+                echo Carbon::now()->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s') . "健康检查失败，尝试重连...\n";
                 $this->scheduleReconnect();
             }
         });
@@ -288,7 +288,7 @@ class Bilibili
     private function analysis($payload): void
     {
         try {
-            $dir = base_path() . '/runtime/logs/' . Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d') . '/直播间信息记录/';
+            $dir = base_path() . '/runtime/logs/' . Carbon::now()->timezone(config('app.default_timezone'))->format('Y-m-d') . '/直播间信息记录/';
             if (!is_dir($dir)) {
                 mkdir($dir, 0777, true);
             }
@@ -395,7 +395,7 @@ class Bilibili
     private function handleLiveStart($payload): void
     {
         Redis::set('bilibili_live_key', $payload['payload']['live_key']);
-        Redis::set('bilibili_live_create', Carbon::now()->timezone(config('app')['default_timezone'])->timestamp);
+        Redis::set('bilibili_live_create', Carbon::now()->timezone(config('app.default_timezone'))->timestamp);
         Redis::del('bilibili_send_sequence');
         // 增加记录
         $lives = Lives::where('live_key', $payload['payload']['live_key'])->first();
@@ -424,7 +424,7 @@ class Bilibili
             }
             $lives->danmu_num = 0;
             $lives->gift_num = 0;
-            $lives->end_time = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
+            $lives->end_time = Carbon::now()->timezone(config('app.default_timezone'))->timestamp;
             $lives->save();
             // 发送下播邮件
             UserPublicMethods::aggregateMail($lives->live_id);
@@ -490,7 +490,7 @@ class Bilibili
         $name = $data['username'];
         $guard_level = $data['guard_level'];
         $amount = intval($data['price'] / 10);
-        $payment_at = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
+        $payment_at = Carbon::now()->timezone(config('app.default_timezone'))->timestamp;
         $live_key = Redis::get('bilibili_live_key') ? Redis::get('bilibili_live_key') : null;
         UserPublicMethods::userOpensVip($uid, $name, $guard_level, $amount, $payment_at, $live_key);
         // 记录信息
@@ -577,7 +577,7 @@ class Bilibili
             'badge_name' => isset($info[3][1]) ? $info[3][1] : null,
             'badge_level' => isset($info[3][0]) ? $info[3][0] : null,
             'badge_type' => isset($info[3][10]) ? $info[3][10] : null,
-            'time' => Carbon::now()->timezone(config('app')['default_timezone'])->timestamp,
+            'time' => Carbon::now()->timezone(config('app.default_timezone'))->timestamp,
         ]);
     }
 
@@ -612,7 +612,7 @@ class Bilibili
                     'gift_name' => $data['giftName'] ?? $data['gift_name'],
                     'price' => intval(($data['price'] ?? 0) / 100),
                     'num' => $data['num'],
-                    'time' => Carbon::now()->timezone(config('app')['default_timezone'])->timestamp
+                    'time' => Carbon::now()->timezone(config('app.default_timezone'))->timestamp
                 ], JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION);
                 writeLinesToFile($filePath, $line);
             } catch (\Exception $e) {
@@ -659,7 +659,7 @@ class Bilibili
         $this->roomId = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
         // 如果cookie或roomId无效，则不再尝试连接websocket
         if (empty($this->cookie) || empty($this->roomId)) {
-            echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "未检测到有效的cookie或roomId，WebSocket连接已跳过。\n";
+            echo Carbon::now()->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s') . "未检测到有效的cookie或roomId，WebSocket连接已跳过。\n";
             $this->isConnecting = false;
             $this->isConnected = false;
             return;
@@ -672,18 +672,18 @@ class Bilibili
         // 检查是否超过最大重连次数
         if ($this->reconnectAttempts >= $this->maxReconnectAttempts) {
             $room_id = $this->roomId;
-            echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "已达到最大重连次数，不再尝试连接。\n";
+            echo Carbon::now()->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s') . "已达到最大重连次数，不再尝试连接。\n";
             $this->sendDisconnectNotification($room_id);
             $this->cleanupResources();
             return;
         }
         // 计算指数退避延迟（含随机抖动）
         $delay = $this->calculateExponentialDelay();
-        echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "第 {$this->reconnectAttempts} 次重试，将在 {$delay} 秒后尝试...\n";
+        echo Carbon::now()->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s') . "第 {$this->reconnectAttempts} 次重试，将在 {$delay} 秒后尝试...\n";
         $this->reconnectAttemptsMessage[] = [
             'reconnect_attempts' => $this->reconnectAttempts,
             'delay' => round($delay, 2),
-            'time' => Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
+            'time' => Carbon::now()->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s'),
         ];
         // 设置延迟重连定时器
         $this->reconnectTimer = Timer::add($delay, function () {
@@ -718,8 +718,7 @@ class Bilibili
             if (!empty($shop_config['enable-disconnect-mail']) && $shop_config['enable-disconnect-mail']) {
                 if (!empty($shop_config['email-address']) && !empty($shop_config['address-as'])) {
                     // 发送邮件
-                    $toolsApiUrl = config('app')['tools_api_url'] ?? 'https://tools.api.hejunjie.life';
-                    Utils\HttpClient::sendPostRequest($toolsApiUrl . '/bilibilidanmu-api/live-disconnect-email', [
+                    Utils\HttpClient::sendPostRequest(config('app.tools_api_url') . '/bilibilidanmu-api/live-disconnect-email', [
                         'Content-Type: application/json'
                     ], json_encode([
                         'mail' => $shop_config['email-address'],

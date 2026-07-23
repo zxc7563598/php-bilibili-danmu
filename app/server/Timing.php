@@ -40,7 +40,7 @@ class Timing
         $unixWorker->onMessage = function ($connection, $data) {
             if ($data === 'reload') {
                 $this->startUp();
-                echo Carbon::now()->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') . "已重启定时广告进程" . "\n";
+                echo Carbon::now()->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s') . "已重启定时广告进程" . "\n";
             }
             $connection->send("已重启定时广告进程: $data");
             $connection->close();
@@ -105,7 +105,7 @@ class Timing
             $text = $content[mt_rand(0, (count($content) - 1))];
             if (!empty($text)) {
                 // 加入消息发送队列
-                $lockKey = config('app')['app_name'] . ':send_message_lock';
+                $lockKey = config('app.app_name') . ':send_message_lock';
                 $timing = ConfigService::get('timing');
                 $lockExpiration = (int)($timing['intervals'] ?? 0);
                 if ($lockExpiration <= 0) {

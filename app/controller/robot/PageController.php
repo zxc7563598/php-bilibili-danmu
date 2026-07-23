@@ -20,7 +20,7 @@ class PageController
     {
         // 检查新版后台 (dist) 是否已部署
         $hasNewAdmin = is_dir(public_path('dist'));
-        $path = config('app')['api_url'] . '/dist/index.html';
+        $path = config('app.api_url') . '/dist/index.html';
         return view('main/console', [
             'is_path' => $hasNewAdmin,
             'path' => $path,

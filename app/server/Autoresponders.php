@@ -142,20 +142,20 @@ class Autoresponders
                     'up_name' => $up_name,
                     'daily_blind_box_net' => function () use ($uid): string {
                         $todayStart = Carbon::today()
-                            ->timezone(config('app')['default_timezone'])
+                            ->timezone(config('app.default_timezone'))
                             ->timestamp;
                         return self::getUserBlindBoxNet($uid, $todayStart);
                     },
                     'weekly_blind_box_net' => function () use ($uid): string {
                         $thisWeekStart = Carbon::now()
-                            ->timezone(config('app')['default_timezone'])
+                            ->timezone(config('app.default_timezone'))
                             ->startOfWeek()
                             ->timestamp;
                         return self::getUserBlindBoxNet($uid, $thisWeekStart);
                     },
                     'monthly_blind_box_net' => function () use ($uid): string {
                         $thisMonthStart = Carbon::now()
-                            ->timezone(config('app')['default_timezone'])
+                            ->timezone(config('app.default_timezone'))
                             ->startOfMonth()
                             ->timestamp;
                         return self::getUserBlindBoxNet($uid, $thisMonthStart);
@@ -165,20 +165,20 @@ class Autoresponders
                     },
                     'daily_room_blind_box_net' => function (): string {
                         $todayStart = Carbon::today()
-                            ->timezone(config('app')['default_timezone'])
+                            ->timezone(config('app.default_timezone'))
                             ->timestamp;
                         return self::getRoomBlindBoxNet($todayStart);
                     },
                     'weekly_room_blind_box_net' => function (): string {
                         $thisWeekStart = Carbon::now()
-                            ->timezone(config('app')['default_timezone'])
+                            ->timezone(config('app.default_timezone'))
                             ->startOfWeek()
                             ->timestamp;
                         return self::getRoomBlindBoxNet($thisWeekStart);
                     },
                     'monthly_room_blind_box_net' => function (): string {
                         $thisMonthStart = Carbon::now()
-                            ->timezone(config('app')['default_timezone'])
+                            ->timezone(config('app.default_timezone'))
                             ->startOfMonth()
                             ->timestamp;
                         return self::getRoomBlindBoxNet($thisMonthStart);
@@ -251,7 +251,7 @@ class Autoresponders
                 $silent_user = new SilentUser();
                 $silent_user->tuid = $uid;
                 $silent_user->tname = $uname;
-                $silent_user->silent_minute = $silent_minute > 0 ? Carbon::now()->timezone(config('app')['default_timezone'])->addMinutes($silent_minute)->timestamp : Carbon::now()->timezone(config('app')['default_timezone'])->addYears(1)->timestamp;
+                $silent_user->silent_minute = $silent_minute > 0 ? Carbon::now()->timezone(config('app.default_timezone'))->addMinutes($silent_minute)->timestamp : Carbon::now()->timezone(config('app.default_timezone'))->addYears(1)->timestamp;
                 $silent_user->ransom_amount = $ransom_amount;
                 $silent_user->black_id = $black_id;
                 $silent_user->save();

@@ -23,7 +23,7 @@ class RobotServices
                 list($key, $value) = explode("=", $pair, 2); // 用 = 分割键和值
                 $result[$key] = $value;
             }
-            if (!isset($result['bili_ticket']) || !isset($result['bili_ticket_expires']) || $result['bili_ticket_expires'] < Carbon::now()->timezone(config('app')['default_timezone'])->timestamp) {
+            if (!isset($result['bili_ticket']) || !isset($result['bili_ticket_expires']) || $result['bili_ticket_expires'] < Carbon::now()->timezone(config('app.default_timezone'))->timestamp) {
                 $getBiliTicket = Bililive\Service\Processing::getBiliTicket($cookie);
                 if (isset($getBiliTicket['bili_ticket'])) {
                     $result['bili_ticket'] = $getBiliTicket['bili_ticket'];

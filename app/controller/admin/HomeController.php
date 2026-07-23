@@ -39,7 +39,7 @@ class HomeController
         $data = [];
         foreach ($update_logs as $i => $log) {
             if ($i === 0 || !in_array($log['id'], $log_id)) {
-                $log['meta'] = Carbon::parse($log['meta'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
+                $log['meta'] = Carbon::parse($log['meta'])->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s');
                 $data[] = $log;
             }
         }
@@ -99,7 +99,7 @@ class HomeController
         }
         // 返回数据
         return success($request, [
-            'url' => config('app')['api_url'] . '/' . str_replace(public_path(), '', $file_path)
+            'url' => config('app.api_url') . '/' . str_replace(public_path(), '', $file_path)
         ]);
     }
 }

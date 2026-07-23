@@ -93,11 +93,11 @@ class SystemSettingsController
     public function setData(Request $request): Response
     {
         // 限制请求频率
-        $redis = Redis::get(config('app')['app_name'] . ':system_set_config');
+        $redis = Redis::get(config('app.app_name') . ':system_set_config');
         if (!empty($redis)) {
             return fail($request, 800016);
         }
-        Redis::setEx(config('app')['app_name'] . ':system_set_config', 30, 1);
+        Redis::setEx(config('app.app_name') . ':system_set_config', 30, 1);
         // 获取请求参数
         $configKeys = [
             'shop_name',

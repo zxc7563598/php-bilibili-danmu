@@ -140,12 +140,11 @@ class UserPublicMethods
                 $history[] = [
                     'goods_name' => $goodsMap[$_redemption_records_logs->goods_id] ?? '',
                     'sub_name' => implode(',', $subs_name),
-                    'time' => $_redemption_records_logs->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s')
+                    'time' => $_redemption_records_logs->created_at->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s')
                 ];
             }
             // 发送邮件
-            $toolsApiUrl = config('app')['tools_api_url'] ?? 'https://tools.api.hejunjie.life';
-            Utils\HttpClient::sendPostRequest($toolsApiUrl . '/bilibilidanmu-api/shop-email', [
+            Utils\HttpClient::sendPostRequest(config('app.tools_api_url') . '/bilibilidanmu-api/shop-email', [
                 'Content-Type: application/json'
             ], json_encode([
                 'mail' => $shop_config['email-address'],
@@ -291,15 +290,15 @@ class UserPublicMethods
                         'pre_point' => $_payment_records->pre_point,
                         'point' => $_payment_records->point,
                         'after_point' => $_payment_records->after_point,
-                        'time' => Carbon::parse($_payment_records->time)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
+                        'time' => Carbon::parse($_payment_records->time)->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s'),
                         'type' => PaymentRecordsEnums\VipType::from($_payment_records->type)->label()
                     ];
                 }
                 // 分析弹幕数据
                 $danmu_list = [];
                 $getTopSpeakers = DanmuLogs::whereBetween('send_at', [
-                    $lives->created_at->timezone(config('app')['default_timezone'])->timestamp,
-                    Carbon::parse($lives->end_time)->timezone(config('app')['default_timezone'])->timestamp
+                    $lives->created_at->timezone(config('app.default_timezone'))->timestamp,
+                    Carbon::parse($lives->end_time)->timezone(config('app.default_timezone'))->timestamp
                 ])->groupBy('uid')->orderByRaw('count(*) desc')->get([
                     'uid' => 'uid',
                     'uname' => Db::raw('ANY_VALUE(uname) as uname'),
@@ -319,8 +318,8 @@ class UserPublicMethods
                 // 分析礼物数据
                 $gift_list = [];
                 $getTopSpenders = GiftRecords::whereBetween('created_at', [
-                    $lives->created_at->timezone(config('app')['default_timezone'])->timestamp,
-                    Carbon::parse($lives->end_time)->timezone(config('app')['default_timezone'])->timestamp
+                    $lives->created_at->timezone(config('app.default_timezone'))->timestamp,
+                    Carbon::parse($lives->end_time)->timezone(config('app.default_timezone'))->timestamp
                 ])->groupBy('uid')->orderByRaw('sum(total_price) desc')->get([
                     'uid' => 'uid',
                     'uname' => Db::raw('ANY_VALUE(uname) as uname'),
@@ -338,14 +337,13 @@ class UserPublicMethods
                     }
                 }
                 // 发送邮件
-                $toolsApiUrl = config('app')['tools_api_url'] ?? 'https://tools.api.hejunjie.life';
-                Utils\HttpClient::sendPostRequest($toolsApiUrl . '/bilibilidanmu-api/live-end-email', [
+                Utils\HttpClient::sendPostRequest(config('app.tools_api_url') . '/bilibilidanmu-api/live-end-email', [
                     'Content-Type: application/json'
                 ], json_encode([
                     'mail' => $shop_config['email-address'],
                     'name' => $shop_config['address-as'],
-                    'starting_time' => $lives->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
-                    'end_time' => Carbon::parse($lives->end_time)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
+                    'starting_time' => $lives->created_at->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s'),
+                    'end_time' => Carbon::parse($lives->end_time)->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s'),
                     'listening_open_vip' => $shop_config['listening-open-vip'],
                     'open_list' => $open_list,
                     'danmu_list' => $danmu_list,

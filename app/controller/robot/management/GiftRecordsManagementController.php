@@ -39,12 +39,12 @@ class GiftRecordsManagementController extends GeneralMethod
             $records_total->where('uname', 'like', '%' . $uname . '%');
         }
         if (!is_null($start_time)) {
-            $start_time = Carbon::parse($start_time)->timezone(config('app')['default_timezone'])->timestamp;
+            $start_time = Carbon::parse($start_time)->timezone(config('app.default_timezone'))->timestamp;
             $records->where('created_at', '>=', $start_time);
             $records_total->where('created_at', '>=', $start_time);
         }
         if (!is_null($end_time)) {
-            $end_time = Carbon::parse($end_time)->timezone(config('app')['default_timezone'])->timestamp;
+            $end_time = Carbon::parse($end_time)->timezone(config('app.default_timezone'))->timestamp;
             $records->where('created_at', '<', $end_time);
             $records_total->where('created_at', '<', $end_time);
         }
@@ -66,7 +66,7 @@ class GiftRecordsManagementController extends GeneralMethod
         // 处理数据
         $list = pageToArray($records);
         foreach ($list['data'] as &$_list) {
-            $_list['create_time'] = Carbon::parse($_list['created_at'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
+            $_list['create_time'] = Carbon::parse($_list['created_at'])->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s');
             unset($_list['created_at']);
         }
         // 返回数据

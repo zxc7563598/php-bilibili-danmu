@@ -58,12 +58,12 @@ class LoginController extends GeneralMethod
     {
         $uid = $request->post('uid');
         // 防止连续提提交
-        $redis = Redis::get(config('app')['app_name'] . ':uid-check:' . $uid);
+        $redis = Redis::get(config('app.app_name') . ':uid-check:' . $uid);
         if (!empty($redis)) {
             return fail($request, 800001);
         }
         // 获取配置信息
-        Redis::setEx(config('app')['app_name'] .  ':uid-check:' . $uid, 1, $uid);
+        Redis::setEx(config('app.app_name') .  ':uid-check:' . $uid, 1, $uid);
         // 获取信息
         $user_vip = UserVips::where('uid', $uid)->first([
             'password' => 'password'

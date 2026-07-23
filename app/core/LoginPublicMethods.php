@@ -58,7 +58,7 @@ class LoginPublicMethods
             'user_id' => $user_vip->user_id,
             'uid' => $user_vip->uid,
             'name' => $user_vip->name,
-            'timestamp' => Carbon::now()->timezone(config('app')['default_timezone'])->timestamp
+            'timestamp' => Carbon::now()->timezone(config('app.default_timezone'))->timestamp
         ]), 86400 * 7);
         $user_vip->token = $token;
         $user_vip->save();

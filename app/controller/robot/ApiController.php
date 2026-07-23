@@ -231,7 +231,7 @@ class ApiController
      */
     public function exportConfig(Request $request): Response
     {
-        $path_name = Carbon::now()->timezone(config('app')['default_timezone'])->format('YmdHis') . '.cfg';
+        $path_name = Carbon::now()->timezone(config('app.default_timezone'))->format('YmdHis') . '.cfg';
         $data = ConfigService::export();
         // 写入导出文件
         $exportDir = public_path() . '/config/';
