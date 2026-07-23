@@ -23,7 +23,8 @@ class Handler extends ExceptionHandler
     {
         parent::report($exception);
         $request = request();
-        Logger::reportSync($exception, 'https://error.hejunjie.life/write', 'bilibili-danmu', [
+        $errorReportUrl = config('app')['error_report_url'] ?? 'https://error.hejunjie.life/write';
+        Logger::reportSync($exception, $errorReportUrl, 'bilibili-danmu', [
             'request_url' => $request->fullUrl() ?? '',
             'method'      => $request->method() ?? '',
             'data' => json_encode($request->all(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?? ''

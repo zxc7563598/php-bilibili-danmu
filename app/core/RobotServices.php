@@ -2,18 +2,15 @@
 
 namespace app\core;
 
-use app\controller\GeneralMethod;
 use Carbon\Carbon;
 use Hejunjie\Utils;
 use Hejunjie\Bililive;
 
-class RobotServices extends GeneralMethod
+class RobotServices
 {
     /**
-     * 获取cookie
+     * 获取cookie（自动刷新 bili_ticket）
      *
-     * @param string $token 用户登录凭证
-     * 
      * @return string
      */
     public static function getCookie(): string

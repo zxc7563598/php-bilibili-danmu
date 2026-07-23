@@ -12,7 +12,7 @@ class GeneralMethod
      *
      * @return array
      */
-    protected static function getShopConfig(): array
+    public static function getShopConfig(): array
     {
         $cacheKey = config('app')['app_name'] . ':config';
         $config = Redis::get($cacheKey);

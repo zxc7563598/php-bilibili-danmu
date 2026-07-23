@@ -21,7 +21,7 @@ use resource\enums\RedemptionRecordsEnums;
 use Hejunjie\Utils;
 use support\Db;
 
-class UserPublicMethods extends GeneralMethod
+class UserPublicMethods
 {
     /**
      * 兑换商品
@@ -95,7 +95,7 @@ class UserPublicMethods extends GeneralMethod
         $redemption_records->shipping_email = $email;
         $redemption_records->save();
         // 发送邮件
-        $shop_config = self::getShopConfig();
+        $shop_config = GeneralMethod::getShopConfig();
         if ($shop_config['enable-shop-mail'] && $shop_config['email-address'] && $shop_config['address-as']) {
             // 获取用户历史兑换
             $history = [];
@@ -144,7 +144,8 @@ class UserPublicMethods extends GeneralMethod
                 ];
             }
             // 发送邮件
-            Utils\HttpClient::sendPostRequest('https://tools.api.hejunjie.life/bilibilidanmu-api/shop-email', [
+            $toolsApiUrl = config('app')['tools_api_url'] ?? 'https://tools.api.hejunjie.life';
+            Utils\HttpClient::sendPostRequest($toolsApiUrl . '/bilibilidanmu-api/shop-email', [
                 'Content-Type: application/json'
             ], json_encode([
                 'mail' => $shop_config['email-address'],
@@ -337,7 +338,8 @@ class UserPublicMethods extends GeneralMethod
                     }
                 }
                 // 发送邮件
-                Utils\HttpClient::sendPostRequest('https://tools.api.hejunjie.life/bilibilidanmu-api/live-end-email', [
+                $toolsApiUrl = config('app')['tools_api_url'] ?? 'https://tools.api.hejunjie.life';
+                Utils\HttpClient::sendPostRequest($toolsApiUrl . '/bilibilidanmu-api/live-end-email', [
                     'Content-Type: application/json'
                 ], json_encode([
                     'mail' => $shop_config['email-address'],
