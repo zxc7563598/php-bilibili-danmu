@@ -26,7 +26,7 @@ class PkLiveReport
         $pk = ConfigService::get('pk');
         // 开启PK播报
         if ($pk['opens']) {
-            sublog('核心业务/PK播报', '入参', [
+            sublog('核心业务', 'PK播报', '方法入参', [
                 'uid' => $uid,
                 'uname' => $uname,
                 'room_id' => $room_id
@@ -47,7 +47,7 @@ class PkLiveReport
                 }
                 $online_score += $online_item['score'];
             }
-            sublog('核心业务/PK播报', '数据投递', [
+            sublog('核心业务', 'PK播报', '数据投递', [
                 'message' => $enter_content,
                 'args' => [
                     'uname' => $uname,

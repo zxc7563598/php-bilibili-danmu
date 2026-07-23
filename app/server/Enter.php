@@ -30,7 +30,7 @@ class Enter
         $enter = ConfigService::get('enter');
         // 开启进房欢迎
         if ($enter['opens'] && $uid != $robot_uid) {
-            sublog('核心业务/进房欢迎', '入参', [
+            sublog('核心业务', '进房欢迎', '方法入参', [
                 'uid' => $uid,
                 'uname' => $uname,
                 'ruid' => $ruid,
@@ -89,7 +89,7 @@ class Enter
             };
             $up_name = isset($room_uinfo['uname']) ? $room_uinfo['uname'] : '';
             if ($is_message) {
-                sublog('核心业务/进房欢迎', '数据匹配', [
+                sublog('核心业务', '进房欢迎', '数据匹配成功', [
                     'message' => $enter_content,
                     'args' => [
                         'name' => $uname,
@@ -103,7 +103,7 @@ class Enter
                     'up_name' => $up_name
                 ]);
             } else {
-                sublog('核心业务/进房欢迎', '数据不匹配', "N/A");
+                sublog('核心业务', '进房欢迎', '数据不匹配', "N/A");
             }
         }
     }

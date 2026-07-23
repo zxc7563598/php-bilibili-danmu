@@ -110,14 +110,17 @@ function splitAndFilterLines(string $text): array
  * 日志信息存储
  *
  * @param string $paths 存储路径
- * @param string $title 存储名称
- * @param string|array|object $content 存储内容
+ * @param string $title 日志名称
+ * @param string $message 异常信息
+ * @param mixed $context 详细参数
  * 
  * @return void
  */
-function sublog(string $paths, string $title, mixed $content): void
+function sublog(string $paths, string $title, string $message, mixed $context): void
 {
-    Logger::write(runtime_path("logs"), $paths, $title, $content);
+    $date = Carbon::now()->timezone(config('app.default_timezone'))->format('Y-m-d');
+    // 写本地日志
+    Logger::write(runtime_path("logs/{$date}/{$paths}"), $title, $message, $context);
 }
 
 /**

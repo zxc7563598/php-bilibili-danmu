@@ -301,7 +301,7 @@ class SendMessage
                                 echo "发送优先级为" . $task['score'] . "的弹幕: " . $_message . PHP_EOL;
                                 Bililive\Live::sendMsg($room_id, $cookie, $_message);
                                 Redis::setEx('bilibili_stop_message', 4, 1);
-                                sublog('核心逻辑/机器人信息发送', '连续信息发送', [
+                                sublog('核心业务', '机器人弹幕发送', '连续信息发送', [
                                     'message' => $_message,
                                     'score' => $task['score'],
                                     'timestamp' => Carbon::parse($task['timestamp'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s')
@@ -315,7 +315,7 @@ class SendMessage
                         echo "发送优先级为" . $task['score'] . "的弹幕: " . $task['message'] . PHP_EOL;
                         if ($cookie && $room_id) {
                             Bililive\Live::sendMsg($room_id, $cookie, $task['message']);
-                            sublog('核心逻辑/机器人信息发送', '单条信息发送', [
+                            sublog('核心业务', '机器人弹幕发送', '单条信息发送', [
                                 'message' => $task['message'],
                                 'score' => $task['score'],
                                 'timestamp' => Carbon::parse($task['timestamp'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s')

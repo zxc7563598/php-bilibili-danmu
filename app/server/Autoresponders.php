@@ -39,7 +39,7 @@ class Autoresponders
         $autoresponders = ConfigService::get('autoresponders');
         // 开启自动回复
         if ($autoresponders['opens'] && $uid != $robot_uid) {
-            sublog('核心业务/自动回复', '入参', [
+            sublog('核心业务', '自动回复', '方法入参', [
                 'msg' => $msg,
                 'uid' => $uid,
                 'uname' => $uname,
@@ -133,7 +133,7 @@ class Autoresponders
             };
             $up_name = isset($room_uinfo['uname']) ? $room_uinfo['uname'] : '';
             if ($is_message) {
-                sublog('核心业务/自动回复', '数据匹配', $message);
+                sublog('核心业务', '自动回复', '数据匹配成功', $message);
                 // 无需额外查询的信息，直接进行传递，随时取用，需要进行查询的信息通过闭包进行传递
                 self::sendMessage($message, [
                     'keywords' => $keywords,
@@ -188,7 +188,7 @@ class Autoresponders
                     },
                 ], $msg, $silent, $silent_minute, $ransom_amount, (string)$uid, $uname);
             } else {
-                sublog('核心业务/自动回复', '数据不匹配', "N/A");
+                sublog('核心业务', '自动回复', '数据不匹配', "N/A");
             }
         }
     }

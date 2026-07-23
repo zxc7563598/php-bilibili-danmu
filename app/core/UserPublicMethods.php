@@ -177,7 +177,7 @@ class UserPublicMethods
      */
     public static function userOpensVip($uid, $name, $guard_level, $amount, $payment_at, $live_key): void
     {
-        sublog('核心业务/记录舰长付费', '舰长付费', [
+        sublog('核心业务', '舰长付费', '方法入参', [
             'uid' => $uid,
             'name' => $name,
             'guard_level' => $guard_level,
