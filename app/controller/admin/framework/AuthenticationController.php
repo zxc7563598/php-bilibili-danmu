@@ -89,9 +89,9 @@ class AuthenticationController
     {
         $newPassword = $request->post('newPassword');
         $oldPassword = $request->post('oldPassword');
-        // 验证密码
+        // 验证密码（兼容旧 SHA1 哈希）
         $admins = Admins::where('id', $request->admins['id'])->first();
-        if ($admins->password == sha1(sha1($oldPassword) . $admins->salt)) {
+        if (AdminAuthService::verifyPassword($oldPassword, $admins)) {
             $admins->password = $newPassword;
             $admins->save();
         }
