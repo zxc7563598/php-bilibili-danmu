@@ -207,6 +207,7 @@ class UserPublicMethods extends GeneralMethod
             $user_vips->save();
             // 获取需要增加的积分
             $point = 0;
+            $vip_type = PaymentRecordsEnums\VipType::Lv0->value;
             switch ($guard_level) {
                 case 1: // 总督
                     $point = !empty($shop_config['vip-lv3-bonus-points']) ? $shop_config['vip-lv3-bonus-points'] : 0;
