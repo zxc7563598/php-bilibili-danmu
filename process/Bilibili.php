@@ -718,7 +718,8 @@ class Bilibili
             if (!empty($shop_config['enable-disconnect-mail']) && $shop_config['enable-disconnect-mail']) {
                 if (!empty($shop_config['email-address']) && !empty($shop_config['address-as'])) {
                     // 发送邮件
-                    Utils\HttpClient::sendPostRequest('https://tools.api.hejunjie.life/bilibilidanmu-api/live-disconnect-email', [
+                    $toolsApiUrl = config('app')['tools_api_url'] ?? 'https://tools.api.hejunjie.life';
+                    Utils\HttpClient::sendPostRequest($toolsApiUrl . '/bilibilidanmu-api/live-disconnect-email', [
                         'Content-Type: application/json'
                     ], json_encode([
                         'mail' => $shop_config['email-address'],
@@ -756,9 +757,9 @@ class Bilibili
     }
 
     /**
-     * 清理资源（如配置文件等）
-     * 
-     * @return void 
+     * 清理资源（关闭连接、清除定时器）
+     *
+     * @return void
      */
     private function cleanupResources(): void
     {

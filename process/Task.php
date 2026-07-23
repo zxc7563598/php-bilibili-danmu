@@ -38,7 +38,7 @@ class Task
                 $room_id = $live_info['data']['room_id'] ?? 0;
                 $room_uname = $live_info['data']['uname'] ?? '';
                 if ($uid > 0 && $room_id > 0) {
-                    $url = 'https://tools.api.hejunjie.life/bilibilidanmu-api/active';
+                    $url = (config('app')['tools_api_url'] ?? 'https://tools.api.hejunjie.life') . '/bilibilidanmu-api/active';
                     Utils\HttpClient::sendPostRequest($url, [], [
                         "room_id" => $room_id,
                         "room_uname" => $room_uname,
