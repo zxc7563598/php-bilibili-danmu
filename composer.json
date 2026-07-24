@@ -70,6 +70,9 @@
     },
     "files": [
       "./support/helpers.php"
+    ],
+    "exclude-from-classmap": [
+      "database/migrations/"
     ]
   },
   "scripts": {
