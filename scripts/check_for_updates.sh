@@ -144,9 +144,9 @@ if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
 
     ## 检查并释放端口
     log_step "检查端口占用"
-    if ss -tuln | grep -q ":$PORT "; then
+    if netstat -tuln | grep -q ":$PORT "; then
         log_warn "端口 $PORT 被占用，尝试释放..."
-        PID=$(ss -tulnp 2>/dev/null | grep ":$PORT " | sed -n 's/.*pid=\([0-9]*\).*/\1/p' || true)
+        PID=$(netstat -tulnp 2>/dev/null | grep ":$PORT " | awk '{print $7}' | cut -d'/' -f1 || true)
         if [ -n "$PID" ]; then
             log_info "杀死占用端口 $PORT 的进程 $PID"
             kill -9 "$PID" >> "$LOG_FILE" 2>&1 || true
@@ -155,7 +155,7 @@ if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
 
     RETRY_COUNT=10
     while [ "$RETRY_COUNT" -gt 0 ]; do
-        if ss -tuln | grep -q ":$PORT "; then
+        if netstat -tuln | grep -q ":$PORT "; then
             log_warn "端口 $PORT 仍被占用，等待释放..."
             sleep 2
             RETRY_COUNT=$((RETRY_COUNT - 1))
