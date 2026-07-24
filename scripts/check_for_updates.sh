@@ -70,6 +70,7 @@ send_email() {
 
 ## 单实例运行
 exec {LOCK_FD}>"$LOCK_FILE"
+trap 'rm -f "$LOCK_FILE"' EXIT
 if ! flock -n "$LOCK_FD"; then
     log_warn "脚本已在运行，跳过本次执行"
     exit 0
