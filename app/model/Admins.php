@@ -2,7 +2,6 @@
 
 namespace app\model;
 
-use app\core\AdminAuthService;
 use support\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -48,11 +47,10 @@ class Admins extends Model
         parent::boot();
 
         static::saving(function ($model) {
-            // 密码变更
+            // 密码变更（使用 bcrypt 替代旧的双 SHA1 + 盐）
             if (!empty($model->password)) {
                 if ($model->getOriginal('password') != $model->password) {
-                    $model->salt = mt_rand(1000, 9999);
-                    $model->password = sha1(sha1($model->password) . $model->salt);
+                    $model->password = password_hash($model->password, PASSWORD_BCRYPT);
                 }
             }
             // 如果用户登录，清除缓存信息

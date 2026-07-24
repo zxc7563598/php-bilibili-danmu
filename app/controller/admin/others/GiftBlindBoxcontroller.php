@@ -59,7 +59,7 @@ class GiftBlindBoxcontroller extends GeneralMethod
         // 处理数据
         $data = is_array($records) ? $records : $records->toArray();
         foreach ($data['data'] as &$_data) {
-            $_data['create_time'] = Carbon::parse($_data['created_at'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
+            $_data['create_time'] = Carbon::parse($_data['created_at'])->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s');
             $_data['original_price'] = round(($_data['original_price'] * $_data['num']), 2);
             $_data['profit_price'] = round(($_data['total_price'] - $_data['original_price']), 2);
             unset($_data['created_at']);
@@ -168,7 +168,7 @@ class GiftBlindBoxcontroller extends GeneralMethod
                 $_data->original_gift_name,
                 $original_price,
                 $profit_price,
-                $_data->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s')
+                $_data->created_at->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s')
             ];
         }
         // 拼接 CSV 字符串

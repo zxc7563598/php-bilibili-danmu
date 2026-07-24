@@ -2,18 +2,15 @@
 
 namespace app\core;
 
-use app\controller\GeneralMethod;
 use Carbon\Carbon;
 use Hejunjie\Utils;
 use Hejunjie\Bililive;
 
-class RobotServices extends GeneralMethod
+class RobotServices
 {
     /**
-     * 获取cookie
+     * 获取cookie（自动刷新 bili_ticket）
      *
-     * @param string $token 用户登录凭证
-     * 
      * @return string
      */
     public static function getCookie(): string
@@ -26,7 +23,7 @@ class RobotServices extends GeneralMethod
                 list($key, $value) = explode("=", $pair, 2); // 用 = 分割键和值
                 $result[$key] = $value;
             }
-            if (!isset($result['bili_ticket']) || !isset($result['bili_ticket_expires']) || $result['bili_ticket_expires'] < Carbon::now()->timezone(config('app')['default_timezone'])->timestamp) {
+            if (!isset($result['bili_ticket']) || !isset($result['bili_ticket_expires']) || $result['bili_ticket_expires'] < Carbon::now()->timezone(config('app.default_timezone'))->timestamp) {
                 $getBiliTicket = Bililive\Service\Processing::getBiliTicket($cookie);
                 if (isset($getBiliTicket['bili_ticket'])) {
                     $result['bili_ticket'] = $getBiliTicket['bili_ticket'];

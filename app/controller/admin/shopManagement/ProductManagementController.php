@@ -259,8 +259,8 @@ class ProductManagementController extends GeneralMethod
                 'name' => $_subs['name'],
                 'cover_image' => $_subs['icon']['path'],
                 'status' => GoodSubsEnums\Status::Normal->value,
-                'created_at' => Carbon::now()->timezone(config('app')['default_timezone'])->timestamp,
-                'updated_at' => Carbon::now()->timezone(config('app')['default_timezone'])->timestamp
+                'created_at' => Carbon::now()->timezone(config('app.default_timezone'))->timestamp,
+                'updated_at' => Carbon::now()->timezone(config('app.default_timezone'))->timestamp
             ]);
         }
         // 返回信息

@@ -127,8 +127,8 @@ class AdminRoleController
                 $insert[] = [
                     'role_id' => $roles->id,
                     'menu_id' => $menu_id,
-                    'created_at' => Carbon::now()->timezone(config('app')['default_timezone'])->timestamp,
-                    'updated_at' => Carbon::now()->timezone(config('app')['default_timezone'])->timestamp
+                    'created_at' => Carbon::now()->timezone(config('app.default_timezone'))->timestamp,
+                    'updated_at' => Carbon::now()->timezone(config('app.default_timezone'))->timestamp
                 ];
             }
             RolePermissions::insert($insert);

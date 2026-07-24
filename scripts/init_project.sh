@@ -57,6 +57,9 @@ fi
 if [ ! -f "$ENV_FILE" ]; then
     run_command "复制 .env.example 为 .env" cp "$ENV_EXAMPLE_FILE" "$ENV_FILE"
 
+    # 从环境变量读取 MySQL root 密码（由 docker-compose 传入）
+    MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD:-init0925}"
+
     # 配置信息
     SECURE_API_KEY=$(generate_random_string 32)
     replace_in_env "$ENV_FILE" "^SYSTEM_API_URL=.*" "SYSTEM_API_URL="
@@ -80,7 +83,7 @@ if [ ! -f "$ENV_FILE" ]; then
     done
 
     echo "✅ MySQL 已就绪，开始创建数据库及用户..." >> "$LOG_FILE"
-    mariadb -h danmu-mysql -u root -pinit0925 --skip-ssl <<EOF >> "$LOG_FILE" 2>&1
+    mariadb -h danmu-mysql -u root -p"${MYSQL_ROOT_PASSWORD}" --skip-ssl <<EOF >> "$LOG_FILE" 2>&1
 CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER IF NOT EXISTS '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASSWORD}';
 ALTER USER '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASSWORD}';

@@ -215,7 +215,7 @@ class MallConfigurationController extends GeneralMethod
             }
         }
         // 删除缓存的配置信息
-        Redis::del(config('app')['app_name'] . ':config');
+        Redis::del(config('app.app_name') . ':config');
         // 返回数据
         return success($request, []);
     }

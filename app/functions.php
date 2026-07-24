@@ -16,12 +16,12 @@ use Hejunjie\Lazylog\Logger;
  */
 function success($request, $data = [], $message = ''): Response
 {
-    $request->res = [
+    $res = [
         'code' => 0,
         'message' => !empty($message) ? $message : (trans(config('code')[0]) ?? 'error'),
         'data' => empty($data) ? [] : $data
     ];
-    return json($request->res, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION);
+    return json($res, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION);
 }
 
 /**
@@ -35,12 +35,12 @@ function success($request, $data = [], $message = ''): Response
 function fail($request, $code = 500, $data = [], $message = ''): Response
 {
     // 记录错误信息
-    $request->res = [
+    $res = [
         'code' => $code,
         'message' => !empty($message) ? $message : (trans(config('code')[$code]) ?? 'error'),
         'data' => empty($data) ? [] : $data
     ];
-    return json($request->res, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION);
+    return json($res, JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES + JSON_PRESERVE_ZERO_FRACTION);
 }
 
 /**
@@ -64,9 +64,9 @@ function readFileContent(string $path): ?string
 function restartBilibili()
 {
     $url = getenv('RE_OPEN_HOST') . ':' . getenv('LISTEN') . '/reload-bilibili';
-    $timestamp = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
+    $timestamp = Carbon::now()->timezone(config('app.default_timezone'))->timestamp;
     Utils\HttpClient::sendPostRequest($url, [], [
-        'api_key' => md5(getenv('SECURE_API_KEY') . $timestamp),
+        'api_key' => hash_hmac('sha256', (string)$timestamp, getenv('SECURE_API_KEY')),
         'timestamp' => $timestamp
     ]);
 }
@@ -80,9 +80,9 @@ function restartBilibili()
 function restartTiming()
 {
     $url = getenv('RE_OPEN_HOST') . ':' . getenv('LISTEN') . '/reload-timing';
-    $timestamp = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
+    $timestamp = Carbon::now()->timezone(config('app.default_timezone'))->timestamp;
     Utils\HttpClient::sendPostRequest($url, [], [
-        'api_key' => md5(getenv('SECURE_API_KEY') . $timestamp),
+        'api_key' => hash_hmac('sha256', (string)$timestamp, getenv('SECURE_API_KEY')),
         'timestamp' => $timestamp
     ]);
 }
@@ -94,7 +94,7 @@ function restartTiming()
  * 
  * @return array
  */
-function splitAndFilterLines($text)
+function splitAndFilterLines(string $text): array
 {
     // 使用 preg_split 按照各种换行符切割字符串
     $lines = preg_split('/\r\n|\r|\n/', $text);
@@ -110,14 +110,17 @@ function splitAndFilterLines($text)
  * 日志信息存储
  *
  * @param string $paths 存储路径
- * @param string $title 存储名称
- * @param string|array|object $content 存储内容
+ * @param string $title 日志名称
+ * @param string $message 异常信息
+ * @param mixed $context 详细参数
  * 
  * @return void
  */
-function sublog(string $paths, string $title, mixed $content): void
+function sublog(string $paths, string $title, string $message, mixed $context): void
 {
-    Logger::write(runtime_path("logs"), $paths, $title, $content);
+    $date = Carbon::now()->timezone(config('app.default_timezone'))->format('Y-m-d');
+    // 写本地日志
+    Logger::write(runtime_path("logs/{$date}/{$paths}"), $title, $message, $context);
 }
 
 /**
@@ -148,7 +151,7 @@ function getImageUrl($str): string
         return '';
     }
     if (strpos($str, 'http://') === false && strpos($str, 'https://') === false) {
-        $str = config('app')['image_url'] . '/' . $str;
+        $str = config('app.image_url') . '/' . $str;
     }
     return $str;
 }
@@ -184,7 +187,7 @@ function writeLinesToFile($filePath, $line)
 {
     $directory = dirname($filePath);
     if (!is_dir($directory)) {
-        if (!mkdir($directory, 0777, true) && !is_dir($directory)) {
+        if (!mkdir($directory, 0755, true) && !is_dir($directory)) {
             throw new \Exception("无法创建目录: " . $directory);
         }
     }
@@ -207,14 +210,14 @@ function writeLinesToFile($filePath, $line)
 function getTopSpeakers(string $filePath, int $num): array
 {
     if (!file_exists($filePath)) {
-        throw new Exception("文件不存在: $filePath");
+        throw new \Exception("文件不存在: $filePath");
     }
 
     $userStats = []; // 用户统计数据
     // 打开文件逐行读取
     $file = fopen($filePath, 'r');
     if ($file === false) {
-        throw new Exception("无法打开文件: $filePath");
+        throw new \Exception("无法打开文件: $filePath");
     }
     $count = 0;
     while (($line = fgets($file)) !== false) {
@@ -267,13 +270,13 @@ function getTopSpeakers(string $filePath, int $num): array
 function getTopSpenders(string $filePath, int $num): array
 {
     if (!file_exists($filePath)) {
-        throw new Exception("文件不存在: $filePath");
+        throw new \Exception("文件不存在: $filePath");
     }
     $userStats = []; // 用户统计数据
     // 打开文件逐行读取
     $file = fopen($filePath, 'r');
     if ($file === false) {
-        throw new Exception("无法打开文件: $filePath");
+        throw new \Exception("无法打开文件: $filePath");
     }
     $count = 0;
     while (($line = fgets($file)) !== false) {
@@ -323,24 +326,28 @@ function getTopSpenders(string $filePath, int $num): array
  * 
  * @return integer 
  */
-function countFileLines(string $filePath)
+function countFileLines(string $filePath): int
 {
     if (!file_exists($filePath)) {
-        throw new Exception("文件不存在: $filePath");
+        throw new \Exception("文件不存在: $filePath");
     }
     // 打开文件逐行读取
     $file = fopen($filePath, 'r');
     if ($file === false) {
-        throw new Exception("无法打开文件: $filePath");
+        throw new \Exception("无法打开文件: $filePath");
     }
     $count = 0;
     while (($line = fgets($file)) !== false) {
-        json_decode(trim($line), true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            continue; // 跳过解析失败的行
+        $line = trim($line);
+        if ($line === '') {
+            continue;
         }
-        $count++;
+        json_decode($line, true);
+        if (json_last_error() === JSON_ERROR_NONE) {
+            $count++;
+        }
     }
+    fclose($file);
     return $count;
 }
 

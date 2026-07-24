@@ -58,12 +58,12 @@ class LoginController extends GeneralMethod
     {
         $uid = $request->post('uid');
         // 防止连续提提交
-        $redis = Redis::get(config('app')['app_name'] . ':uid-check:' . $uid);
+        $redis = Redis::get(config('app.app_name') . ':uid-check:' . $uid);
         if (!empty($redis)) {
             return fail($request, 800001);
         }
         // 获取配置信息
-        Redis::setEx(config('app')['app_name'] .  ':uid-check:' . $uid, 1, $uid);
+        Redis::setEx(config('app.app_name') .  ':uid-check:' . $uid, 1, $uid);
         // 获取信息
         $user_vip = UserVips::where('uid', $uid)->first([
             'password' => 'password'
@@ -104,11 +104,19 @@ class LoginController extends GeneralMethod
         }
         if (!$skip) {
             if (empty($user_vip->password)) {
-                $user_vip->salt = mt_rand(1000, 9999);
-                $user_vip->password = sha1(sha1($password) . $user_vip->salt);
+                // 首次设置密码，使用 bcrypt
+                $user_vip->password = password_hash($password, PASSWORD_BCRYPT);
                 $user_vip->save();
             } else {
-                if ($user_vip->password != sha1(sha1($password) . $user_vip->salt)) {
+                // 验证密码（优先 bcrypt，回退到旧 SHA1 并自动升级）
+                $valid = password_verify($password, $user_vip->password);
+                if (!$valid && !empty($user_vip->salt) && $user_vip->password === sha1(sha1($password) . $user_vip->salt)) {
+                    // 旧密码验证成功，自动升级为 bcrypt
+                    $user_vip->password = password_hash($password, PASSWORD_BCRYPT);
+                    $user_vip->save();
+                    $valid = true;
+                }
+                if (!$valid) {
                     return fail($request, 800002);
                 }
             }

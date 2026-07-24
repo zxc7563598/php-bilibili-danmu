@@ -131,8 +131,8 @@ class AdminUserController
             'id' => $admins->id,
             'username' => $admins->username,
             'enable' => $admins->enable == AdminsEnums\Enable::Enable->value,
-            'createTime' => $admins->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
-            'updateTime' => Carbon::parse($admins->updated_at)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
+            'createTime' => $admins->created_at->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s'),
+            'updateTime' => Carbon::parse($admins->updated_at)->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s'),
             'profile' => [
                 'id' => $admins->id,
                 'nickName' => $admins->nickname,
@@ -196,8 +196,8 @@ class AdminUserController
                 $insert[] = [
                     'admin_id' => $admins->id,
                     'role_id' => $_roleIds,
-                    'created_at' => Carbon::now()->timezone(config('app')['default_timezone'])->timestamp,
-                    'updated_at' => Carbon::now()->timezone(config('app')['default_timezone'])->timestamp
+                    'created_at' => Carbon::now()->timezone(config('app.default_timezone'))->timestamp,
+                    'updated_at' => Carbon::now()->timezone(config('app.default_timezone'))->timestamp
                 ];
             }
             if (count($insert)) {

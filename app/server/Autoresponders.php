@@ -2,6 +2,7 @@
 
 namespace app\server;
 
+use app\core\ConfigService;
 use app\core\RobotServices;
 use app\model\GiftRecords;
 use app\model\SilentUser;
@@ -10,7 +11,6 @@ use app\server\core\KeywordEvaluator;
 use app\server\core\KeywordMatcher;
 use Carbon\Carbon;
 use Hejunjie\Bililive;
-use support\Db;
 use support\Redis;
 use resource\enums\GiftRecordsEnums;
 
@@ -35,21 +35,18 @@ class Autoresponders
         // 不处理自己发送的消息
         $robot_uid = strval(readFileContent(runtime_path() . '/tmp/uid.cfg'));
         // 获取自动回复配置
-        $autoresponders = readFileContent(runtime_path() . '/tmp/autoresponders.cfg');
-        if ($autoresponders) {
-            $autoresponders = json_decode($autoresponders, true);
-        }
+        $autoresponders = ConfigService::get('autoresponders');
         // 开启自动回复
-        if (isset($autoresponders['opens']) && $autoresponders['opens'] && $uid != $robot_uid) {
-            sublog('核心业务/自动回复', '入参', [
+        if ($autoresponders['opens'] && $uid != $robot_uid) {
+            sublog('核心业务', '自动回复', '方法入参', [
                 'msg' => $msg,
                 'uid' => $uid,
                 'uname' => $uname,
                 'ruid' => $ruid,
                 'guard_level' => $guard_level
             ]);
-            $autoresponders_type = intval($autoresponders['type']); // 类型
-            $autoresponders_status = intval($autoresponders['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
+            $autoresponders_type = (int)$autoresponders['type']; // 类型
+            $autoresponders_status = (int)$autoresponders['status']; // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
             $autoresponders_content = $autoresponders['content']; // 内容
             $message = '';
             $keywords = '';
@@ -135,7 +132,7 @@ class Autoresponders
             };
             $up_name = isset($room_uinfo['uname']) ? $room_uinfo['uname'] : '';
             if ($is_message) {
-                sublog('核心业务/自动回复', '数据匹配', $message);
+                sublog('核心业务', '自动回复', '数据匹配成功', $message);
                 // 无需额外查询的信息，直接进行传递，随时取用，需要进行查询的信息通过闭包进行传递
                 self::sendMessage($message, [
                     'keywords' => $keywords,
@@ -144,20 +141,20 @@ class Autoresponders
                     'up_name' => $up_name,
                     'daily_blind_box_net' => function () use ($uid): string {
                         $todayStart = Carbon::today()
-                            ->timezone(config('app')['default_timezone'])
+                            ->timezone(config('app.default_timezone'))
                             ->timestamp;
                         return self::getUserBlindBoxNet($uid, $todayStart);
                     },
                     'weekly_blind_box_net' => function () use ($uid): string {
                         $thisWeekStart = Carbon::now()
-                            ->timezone(config('app')['default_timezone'])
+                            ->timezone(config('app.default_timezone'))
                             ->startOfWeek()
                             ->timestamp;
                         return self::getUserBlindBoxNet($uid, $thisWeekStart);
                     },
                     'monthly_blind_box_net' => function () use ($uid): string {
                         $thisMonthStart = Carbon::now()
-                            ->timezone(config('app')['default_timezone'])
+                            ->timezone(config('app.default_timezone'))
                             ->startOfMonth()
                             ->timestamp;
                         return self::getUserBlindBoxNet($uid, $thisMonthStart);
@@ -165,32 +162,32 @@ class Autoresponders
                     'total_blind_box_net' => function () use ($uid): string {
                         return self::getUserBlindBoxNet($uid, 0);
                     },
-                    'daily_room_blind_box_net' => function () use ($uid): string {
+                    'daily_room_blind_box_net' => function (): string {
                         $todayStart = Carbon::today()
-                            ->timezone(config('app')['default_timezone'])
+                            ->timezone(config('app.default_timezone'))
                             ->timestamp;
                         return self::getRoomBlindBoxNet($todayStart);
                     },
-                    'weekly_room_blind_box_net' => function () use ($uid): string {
+                    'weekly_room_blind_box_net' => function (): string {
                         $thisWeekStart = Carbon::now()
-                            ->timezone(config('app')['default_timezone'])
+                            ->timezone(config('app.default_timezone'))
                             ->startOfWeek()
                             ->timestamp;
                         return self::getRoomBlindBoxNet($thisWeekStart);
                     },
-                    'monthly_room_blind_box_net' => function () use ($uid): string {
+                    'monthly_room_blind_box_net' => function (): string {
                         $thisMonthStart = Carbon::now()
-                            ->timezone(config('app')['default_timezone'])
+                            ->timezone(config('app.default_timezone'))
                             ->startOfMonth()
                             ->timestamp;
                         return self::getRoomBlindBoxNet($thisMonthStart);
                     },
-                    'total_room_blind_box_net' => function () use ($uid): string {
+                    'total_room_blind_box_net' => function (): string {
                         return self::getRoomBlindBoxNet(0);
                     },
                 ], $msg, $silent, $silent_minute, $ransom_amount, (string)$uid, $uname);
             } else {
-                sublog('核心业务/自动回复', '数据不匹配', "N/A");
+                sublog('核心业务', '自动回复', '数据不匹配', "N/A");
             }
         }
     }
@@ -253,7 +250,7 @@ class Autoresponders
                 $silent_user = new SilentUser();
                 $silent_user->tuid = $uid;
                 $silent_user->tname = $uname;
-                $silent_user->silent_minute = $silent_minute > 0 ? Carbon::now()->timezone(config('app')['default_timezone'])->addMinutes($silent_minute)->timestamp : Carbon::now()->timezone(config('app')['default_timezone'])->addYears(1)->timestamp;
+                $silent_user->silent_minute = $silent_minute > 0 ? Carbon::now()->timezone(config('app.default_timezone'))->addMinutes($silent_minute)->timestamp : Carbon::now()->timezone(config('app.default_timezone'))->addYears(1)->timestamp;
                 $silent_user->ransom_amount = $ransom_amount;
                 $silent_user->black_id = $black_id;
                 $silent_user->save();
@@ -304,11 +301,12 @@ class Autoresponders
      */
     private static function getUserBlindBoxNet(string $uid, int $start_timestamp): string
     {
-        $gift_records = GiftRecords::where('created_at', '>', $start_timestamp)->where('uid', $uid)->where('original', GiftRecordsEnums\Original::No->value)->first([
-            'total_price' => Db::raw('sum(total_price) as total_price'),
-            'original_price' => Db::raw('sum(original_price * num) as original_price'),
-        ]);
-        if (!empty($gift_records)) {
+        $gift_records = GiftRecords::where('created_at', '>', $start_timestamp)
+            ->where('uid', $uid)
+            ->where('original', GiftRecordsEnums\Original::No->value)
+            ->selectRaw('COALESCE(SUM(total_price), 0) as total_price, COALESCE(SUM(original_price * num), 0) as original_price')
+            ->first();
+        if (!empty($gift_records) && ($gift_records->total_price > 0 || $gift_records->original_price > 0)) {
             return number_format(($gift_records->total_price - $gift_records->original_price), 2);
         }
         return '0.00';
@@ -323,11 +321,11 @@ class Autoresponders
      */
     private static function getRoomBlindBoxNet(int $start_timestamp): string
     {
-        $gift_records = GiftRecords::where('created_at', '>', $start_timestamp)->where('original', GiftRecordsEnums\Original::No->value)->first([
-            'total_price' => Db::raw('sum(total_price) as total_price'),
-            'original_price' => Db::raw('sum(original_price * num) as original_price'),
-        ]);
-        if (!empty($gift_records)) {
+        $gift_records = GiftRecords::where('created_at', '>', $start_timestamp)
+            ->where('original', GiftRecordsEnums\Original::No->value)
+            ->selectRaw('COALESCE(SUM(total_price), 0) as total_price, COALESCE(SUM(original_price * num), 0) as original_price')
+            ->first();
+        if (!empty($gift_records) && ($gift_records->total_price > 0 || $gift_records->original_price > 0)) {
             return number_format(($gift_records->total_price - $gift_records->original_price), 2);
         }
         return '0.00';

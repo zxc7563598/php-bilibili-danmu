@@ -41,11 +41,6 @@ class AdminLogs extends Model
      */
     public $incrementing = true;
 
-    public static function boot()
-    {
-        parent::boot();
-    }
-
     // 定义与 Admin 的从属关系
     public function admin(): BelongsTo
     {

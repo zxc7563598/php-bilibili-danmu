@@ -21,7 +21,7 @@ use resource\enums\RedemptionRecordsEnums;
 use Hejunjie\Utils;
 use support\Db;
 
-class UserPublicMethods extends GeneralMethod
+class UserPublicMethods
 {
     /**
      * 兑换商品
@@ -95,7 +95,7 @@ class UserPublicMethods extends GeneralMethod
         $redemption_records->shipping_email = $email;
         $redemption_records->save();
         // 发送邮件
-        $shop_config = self::getShopConfig();
+        $shop_config = GeneralMethod::getShopConfig();
         if ($shop_config['enable-shop-mail'] && $shop_config['email-address'] && $shop_config['address-as']) {
             // 获取用户历史兑换
             $history = [];
@@ -104,25 +104,47 @@ class UserPublicMethods extends GeneralMethod
                 'sub_id' => 'sub_id',
                 'created_at' => 'created_at'
             ]);
+            // 批量收集所有涉及的 goods_id 和 sub_id
+            $allGoodsIds = [];
+            $allSubIds = [];
+            foreach ($redemption_records_logs as $_log) {
+                $allGoodsIds[] = $_log->goods_id;
+                foreach (explode(',', $_log->sub_id) as $_sid) {
+                    if (!empty($_sid)) {
+                        $allSubIds[] = $_sid;
+                    }
+                }
+            }
+            // 批量预加载商品和规格
+            $goodsMap = [];
+            $subsMap = [];
+            if (!empty($allGoodsIds)) {
+                $allGoods = Goods::whereIn('goods_id', array_unique($allGoodsIds))->get(['goods_id' => 'goods_id', 'name' => 'name']);
+                foreach ($allGoods as $_g) {
+                    $goodsMap[$_g->goods_id] = $_g->name;
+                }
+            }
+            if (!empty($allSubIds)) {
+                $allSubs = GoodSubs::whereIn('sub_id', array_unique($allSubIds))->get(['sub_id' => 'sub_id', 'name' => 'name']);
+                foreach ($allSubs as $_s) {
+                    $subsMap[$_s->sub_id] = $_s->name;
+                }
+            }
             foreach ($redemption_records_logs as $_redemption_records_logs) {
-                $goods = Goods::where('goods_id', $_redemption_records_logs->goods_id)->first([
-                    'name' => 'name'
-                ]);
-                $subs = GoodSubs::whereIn('sub_id', explode(',', $_redemption_records_logs->sub_id))->get([
-                    'name' => 'name'
-                ]);
                 $subs_name = [];
-                foreach ($subs as $_subs) {
-                    $subs_name[] = $_subs->name;
+                foreach (explode(',', $_redemption_records_logs->sub_id) as $_sid) {
+                    if (isset($subsMap[$_sid])) {
+                        $subs_name[] = $subsMap[$_sid];
+                    }
                 }
                 $history[] = [
-                    'goods_name' => $goods->name,
+                    'goods_name' => $goodsMap[$_redemption_records_logs->goods_id] ?? '',
                     'sub_name' => implode(',', $subs_name),
-                    'time' => $_redemption_records_logs->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s')
+                    'time' => $_redemption_records_logs->created_at->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s')
                 ];
             }
             // 发送邮件
-            Utils\HttpClient::sendPostRequest('https://tools.api.hejunjie.life/bilibilidanmu-api/shop-email', [
+            Utils\HttpClient::sendPostRequest(config('app.tools_api_url') . '/bilibilidanmu-api/shop-email', [
                 'Content-Type: application/json'
             ], json_encode([
                 'mail' => $shop_config['email-address'],
@@ -154,7 +176,7 @@ class UserPublicMethods extends GeneralMethod
      */
     public static function userOpensVip($uid, $name, $guard_level, $amount, $payment_at, $live_key): void
     {
-        sublog('核心业务/记录舰长付费', '舰长付费', [
+        sublog('核心业务', '舰长付费', '方法入参', [
             'uid' => $uid,
             'name' => $name,
             'guard_level' => $guard_level,
@@ -185,6 +207,7 @@ class UserPublicMethods extends GeneralMethod
             $user_vips->save();
             // 获取需要增加的积分
             $point = 0;
+            $vip_type = PaymentRecordsEnums\VipType::Lv0->value;
             switch ($guard_level) {
                 case 1: // 总督
                     $point = !empty($shop_config['vip-lv3-bonus-points']) ? $shop_config['vip-lv3-bonus-points'] : 0;
@@ -267,15 +290,15 @@ class UserPublicMethods extends GeneralMethod
                         'pre_point' => $_payment_records->pre_point,
                         'point' => $_payment_records->point,
                         'after_point' => $_payment_records->after_point,
-                        'time' => Carbon::parse($_payment_records->time)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
+                        'time' => Carbon::parse($_payment_records->time)->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s'),
                         'type' => PaymentRecordsEnums\VipType::from($_payment_records->type)->label()
                     ];
                 }
                 // 分析弹幕数据
                 $danmu_list = [];
                 $getTopSpeakers = DanmuLogs::whereBetween('send_at', [
-                    $lives->created_at->timezone(config('app')['default_timezone'])->timestamp,
-                    Carbon::parse($lives->end_time)->timezone(config('app')['default_timezone'])->timestamp
+                    $lives->created_at->timezone(config('app.default_timezone'))->timestamp,
+                    Carbon::parse($lives->end_time)->timezone(config('app.default_timezone'))->timestamp
                 ])->groupBy('uid')->orderByRaw('count(*) desc')->get([
                     'uid' => 'uid',
                     'uname' => Db::raw('ANY_VALUE(uname) as uname'),
@@ -286,17 +309,17 @@ class UserPublicMethods extends GeneralMethod
                     $danmu_count += 1;
                     if (count($danmu_list) < 10) {
                         $danmu_list[] = [
-                            'uid' => $_getTopSpeakers['uid'],
-                            'name' => $_getTopSpeakers['uname'],
-                            'count' => $_getTopSpeakers['count']
+                            'uid' => $_getTopSpeakers->uid,
+                            'name' => $_getTopSpeakers->uname,
+                            'count' => $_getTopSpeakers->count
                         ];
                     }
                 }
                 // 分析礼物数据
                 $gift_list = [];
                 $getTopSpenders = GiftRecords::whereBetween('created_at', [
-                    $lives->created_at->timezone(config('app')['default_timezone'])->timestamp,
-                    Carbon::parse($lives->end_time)->timezone(config('app')['default_timezone'])->timestamp
+                    $lives->created_at->timezone(config('app.default_timezone'))->timestamp,
+                    Carbon::parse($lives->end_time)->timezone(config('app.default_timezone'))->timestamp
                 ])->groupBy('uid')->orderByRaw('sum(total_price) desc')->get([
                     'uid' => 'uid',
                     'uname' => Db::raw('ANY_VALUE(uname) as uname'),
@@ -304,23 +327,23 @@ class UserPublicMethods extends GeneralMethod
                 ]);
                 $gift_total_price = 0;
                 foreach ($getTopSpenders as $_getTopSpenders) {
-                    $gift_total_price += $_getTopSpenders['count'];
+                    $gift_total_price += $_getTopSpenders->count;
                     if (count($gift_list) < 10) {
                         $gift_list[] = [
-                            'uid' => $_getTopSpenders['uid'],
-                            'name' => $_getTopSpenders['uname'],
-                            'count' => $_getTopSpenders['count'],
+                            'uid' => $_getTopSpenders->uid,
+                            'name' => $_getTopSpenders->uname,
+                            'count' => $_getTopSpenders->count,
                         ];
                     }
                 }
                 // 发送邮件
-                Utils\HttpClient::sendPostRequest('https://tools.api.hejunjie.life/bilibilidanmu-api/live-end-email', [
+                Utils\HttpClient::sendPostRequest(config('app.tools_api_url') . '/bilibilidanmu-api/live-end-email', [
                     'Content-Type: application/json'
                 ], json_encode([
                     'mail' => $shop_config['email-address'],
                     'name' => $shop_config['address-as'],
-                    'starting_time' => $lives->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
-                    'end_time' => Carbon::parse($lives->end_time)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
+                    'starting_time' => $lives->created_at->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s'),
+                    'end_time' => Carbon::parse($lives->end_time)->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s'),
                     'listening_open_vip' => $shop_config['listening-open-vip'],
                     'open_list' => $open_list,
                     'danmu_list' => $danmu_list,

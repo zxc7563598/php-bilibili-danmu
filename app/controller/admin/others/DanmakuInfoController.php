@@ -63,7 +63,7 @@ class DanmakuInfoController extends GeneralMethod
         $data = is_array($danmu_logs) ? $danmu_logs : $danmu_logs->toArray();
         foreach ($data['data'] as &$_data) {
             $_data['live'] = DanmuLogsEnums\Live::from($_data['live'])->label();
-            $_data['send_time'] = Carbon::parse((int)$_data['send_at'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
+            $_data['send_time'] = Carbon::parse((int)$_data['send_at'])->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s');
             unset($_data['send_at']);
         }
         // 返回数据
@@ -129,7 +129,7 @@ class DanmakuInfoController extends GeneralMethod
                 $_data->badge_name,
                 DanmuLogsEnums\BadgeType::from($_data->badge_type)->label(),
                 $_data->msg,
-                Carbon::parse($_data->send_at)->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s')
+                Carbon::parse($_data->send_at)->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s')
             ];
         }
         // 拼接 CSV 字符串

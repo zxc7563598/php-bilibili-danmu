@@ -2,6 +2,7 @@
 
 namespace app\server;
 
+use app\core\ConfigService;
 use app\core\RobotServices;
 use app\queue\SendMessage;
 use support\Redis;
@@ -26,20 +27,17 @@ class Share
         // 不处理自己发送的消息
         $robot_uid = strval(readFileContent(runtime_path() . '/tmp/uid.cfg'));
         // 获取感谢分享配置
-        $share = readFileContent(runtime_path() . '/tmp/share.cfg');
-        if ($share) {
-            $share = json_decode($share, true);
-        }
+        $share = ConfigService::get('share');
         // 开启感谢分享
-        if (isset($share['opens']) && $share['opens'] && $uid != $robot_uid) {
-            sublog('核心业务/感谢分享', "入参", [
+        if ($share['opens'] && $uid != $robot_uid) {
+            sublog('核心业务', '感谢分享', '方法入参', [
                 'uid' => $uid,
                 'uname' => $uname,
                 'ruid' => $ruid,
                 'guard_level' => $guard_level
             ]);
-            $share_type = intval($share['type']); // 类型
-            $share_status = intval($share['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
+            $share_type = (int)$share['type']; // 类型
+            $share_status = (int)$share['status']; // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
             $share_content = $share['content']; // 内容
             // 确认链接直播间的情况
             $cookie = RobotServices::getCookie();
@@ -91,7 +89,7 @@ class Share
             };
             $up_name = isset($room_uinfo['uname']) ? $room_uinfo['uname'] : '';
             if ($is_message) {
-                sublog('核心业务/感谢分享', "数据匹配", [
+                sublog('核心业务', '感谢分享', '数据匹配成功', [
                     'message' => $share_content,
                     'args' => [
                         'name' => $uname,
@@ -105,7 +103,7 @@ class Share
                     'up_name' => $up_name
                 ]);
             } else {
-                sublog('核心业务/感谢分享', '数据不匹配', 'N/A');
+                sublog('核心业务', '感谢分享', '数据不匹配', 'N/A');
             }
         }
     }

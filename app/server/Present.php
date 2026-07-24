@@ -2,9 +2,10 @@
 
 namespace app\server;
 
+use app\core\ConfigService;
 use app\core\RobotServices;
+use app\controller\GeneralMethod;
 use app\model\GiftRecords;
-use app\model\ShopConfig;
 use app\model\SilentUser;
 use app\queue\SendMessage;
 use Hejunjie\Bililive;
@@ -41,13 +42,10 @@ class Present
         $room_id = intval(readFileContent(runtime_path() . '/tmp/connect.cfg'));
         if ($cookie && $room_id) {
             // 获取礼物答谢配置
-            $present = readFileContent(runtime_path() . '/tmp/present.cfg');
-            if ($present) {
-                $present = json_decode($present, true);
-            }
+            $present = ConfigService::get('present');
             // 开启礼物答谢
-            if (isset($present['opens']) && $present['opens']) {
-                sublog('核心业务/礼物答谢', "入参", [
+            if ($present['opens']) {
+                sublog('核心业务', '礼物答谢', '方法入参', [
                     'uid' => $uid,
                     'uname' => $uname,
                     'gift_id' => $gift_id,
@@ -59,16 +57,16 @@ class Present
                     'guard_level' => $guard_level,
                     'level' => $level
                 ]);
-                $present_price = $present['price']; // 起始感谢电池数
-                $present_type = intval($present['type']); // 类型
-                $present_status = intval($present['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
+                $present_price = (int)($present['price'] ?? 0); // 起始感谢电池数（null/0 表示无门槛）
+                $present_type = (int)$present['type']; // 类型
+                $present_status = (int)$present['status']; // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
                 $present_content = $present['content']; // 内容
-                $present_merge = $present['merge']; // 是否合并
-                $present_number = $present['number']; // 展示数量
-                $present_name_length = isset($present['name_length']) ? intval($present['name_length']) : 0; // 最大昵称长度
-                $present_blind_box_stats = isset($present['blind_box_stats']) ? intval($present['blind_box_stats']) : 0; // 是否统计盲盒收益
+                $present_merge = (int)$present['merge']; // 是否合并
+                $present_number = (int)$present['number']; // 展示数量
+                $present_name_length = (int)($present['name_length'] ?? 0); // 最大昵称长度
+                $present_blind_box_stats = (int)($present['blind_box_stats'] ?? 0); // 是否统计盲盒收益
                 // 验证是否达到可以感谢的电池数
-                if ($price >= $present_price) {
+                if ($present_price <= 0 || $price >= $present_price) {
                     // 验证牌子
                     $medal = false;
                     switch ($present_type) {
@@ -107,7 +105,7 @@ class Present
                 }
                 // 如果发送的话
                 if ($is_message) {
-                    sublog('核心业务/礼物答谢', '数据匹配', [
+                    sublog('核心业务', '礼物答谢', '数据匹配成功', [
                         'message' => $present_content,
                         'args' => [
                             'giftName' => $gift_name,
@@ -132,7 +130,7 @@ class Present
                         'blind_box_stats' => $present_blind_box_stats,
                     ]);
                 } else {
-                    sublog('核心业务/礼物答谢', '数据不匹配', 'N/A');
+                    sublog('核心业务', '礼物答谢', '数据不匹配', 'N/A');
                 }
             }
             // 检测禁言是否需要解除
@@ -140,18 +138,18 @@ class Present
             if (!empty($silent_user)) {
                 if ($silent_user->ransom_amount > 0) {
                     if ($price >= $silent_user->ransom_amount) {
-                        sublog('核心业务/礼物答谢', "用户解除黑名单", [
+                        sublog('核心业务', '礼物答谢', '用户解除黑名单', [
                             'uid' => $silent_user->tuid
                         ]);
                         Bililive\Live::delSilentUser($room_id, $cookie, $silent_user->black_id);
                         $silent_user->delete();
-                        sublog('核心业务/礼物答谢', "解除成功", 'N/A');
+                        sublog('核心业务', '礼物答谢', '用户解除黑名单成功', 'N/A');
                     }
                 }
             }
         }
         // 记录礼物信息
-        $shop_config = self::getShopConfig();
+        $shop_config = GeneralMethod::getShopConfig();
         if (isset($shop_config['gift-records']) && $shop_config['gift-records'] == 1) {
             $gift_records = new GiftRecords();
             $gift_records->uid = $uid;
@@ -180,7 +178,7 @@ class Present
             }
             $gift_records->save();
         }
-        sublog('核心业务/礼物答谢', '完成答谢', 'N/A');
+        sublog('核心业务', '礼物答谢', '完成答谢', 'N/A');
     }
 
     /**
@@ -205,7 +203,7 @@ class Present
                     // 非合并模式：追加盲盒收益
                     if (
                         isset($extra['blind_box_stats']) && $extra['blind_box_stats'] == 1
-                        && !empty($args['blind_box_original_price']) && !empty($args['blind_box_original_price'])
+                        && !empty($args['blind_box_original_price']) && !empty($args['blind_box_total_price'])
                     ) {
                         $blind_net = $args['blind_box_total_price'] - ($args['blind_box_original_price'] * $args['num']);
                         if ($blind_net > 0) {
@@ -240,26 +238,5 @@ class Present
             }
         }
         return $text;
-    }
-
-    /**
-     * 获取商城配置信息
-     * 
-     * @return array 
-     */
-    private static function getShopConfig(): array
-    {
-        $config = Redis::get(config('app')['app_name'] . ':config');
-        if (empty($config)) {
-            $shop_config = ShopConfig::get();
-            $data = [];
-            foreach ($shop_config as $_shop_config) {
-                $data[$_shop_config->title] = $_shop_config->content;
-            }
-            Redis::set(config('app')['app_name'] . ':config', json_encode($data));
-        } else {
-            $data = json_decode($config, true);
-        }
-        return $data;
     }
 }

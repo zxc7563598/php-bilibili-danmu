@@ -61,7 +61,7 @@ class GiftInfoController extends GeneralMethod
         // 处理数据
         $data = is_array($records) ? $records : $records->toArray();
         foreach ($data['data'] as &$_data) {
-            $_data['create_time'] = Carbon::parse($_data['created_at'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
+            $_data['create_time'] = Carbon::parse($_data['created_at'])->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s');
             unset($_data['created_at']);
         }
         // 返回数据
@@ -171,7 +171,7 @@ class GiftInfoController extends GeneralMethod
                 $_data->num,
                 $_data->price,
                 $_data->total_price,
-                $_data->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s')
+                $_data->created_at->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s')
             ];
         }
         // 拼接 CSV 字符串

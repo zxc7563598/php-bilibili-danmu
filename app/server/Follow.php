@@ -2,6 +2,7 @@
 
 namespace app\server;
 
+use app\core\ConfigService;
 use app\core\RobotServices;
 use app\queue\SendMessage;
 use support\Redis;
@@ -26,20 +27,17 @@ class Follow
         // 不处理自己发送的消息
         $robot_uid = strval(readFileContent(runtime_path() . '/tmp/uid.cfg'));
         // 获取感谢关注配置
-        $follow = readFileContent(runtime_path() . '/tmp/follow.cfg');
-        if ($follow) {
-            $follow = json_decode($follow, true);
-        }
+        $follow = ConfigService::get('follow');
         // 开启感谢关注
-        if (isset($follow['opens']) && $follow['opens'] && $uid != $robot_uid) {
-            sublog('核心业务/感谢关注', '入参', [
+        if ($follow['opens'] && $uid != $robot_uid) {
+            sublog('核心业务', '感谢关注', '方法入参', [
                 'uid' => $uid,
                 'uname' => $uname,
                 'ruid' => $ruid,
                 'guard_level' => $guard_level
             ]);
-            $follow_type = intval($follow['type']); // 类型
-            $follow_status = intval($follow['status']); // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
+            $follow_type = (int)$follow['type']; // 类型
+            $follow_status = (int)$follow['status']; // 状态：0=不论何时，1-仅在直播时，2-仅在非直播时
             $follow_content = $follow['content']; // 内容
             // 确认链接直播间的情况
             $cookie = RobotServices::getCookie();
@@ -91,7 +89,7 @@ class Follow
             };
             $up_name = isset($room_uinfo['uname']) ? $room_uinfo['uname'] : '';
             if ($is_message) {
-                sublog('核心业务/感谢关注', '数据匹配', [
+                sublog('核心业务', '感谢关注', '数据匹配成功', [
                     'message' => $follow_content,
                     'args' => [
                         'name' => $uname,
@@ -105,7 +103,7 @@ class Follow
                     'up_name' => $up_name
                 ]);
             } else {
-                sublog('核心业务/感谢关注', '数据不匹配', "N/A");
+                sublog('核心业务', '感谢关注', '数据不匹配', "N/A");
             }
         }
     }

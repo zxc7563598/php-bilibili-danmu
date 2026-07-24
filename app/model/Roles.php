@@ -41,11 +41,6 @@ class Roles extends Model
      */
     public $incrementing = true;
 
-    public static function boot()
-    {
-        parent::boot();
-    }
-
     // 定义与 RolePermissions 的一对多关系
     public function permissions(): HasMany
     {

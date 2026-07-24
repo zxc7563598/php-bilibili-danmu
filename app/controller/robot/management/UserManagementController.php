@@ -53,8 +53,8 @@ class UserManagementController extends GeneralMethod
         $list = pageToArray($users);
         foreach ($list['data'] as &$_list) {
             $_list['vip_type'] = UserVipsEnums\VipType::from($_list['vip_type'])->label();
-            $_list['last_vip_at'] = $_list['last_vip_at'] ? Carbon::parse($_list['last_vip_at'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') : ' - ';
-            $_list['end_vip_at'] = $_list['end_vip_at'] ? Carbon::parse($_list['end_vip_at'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s') : ' - ';
+            $_list['last_vip_at'] = $_list['last_vip_at'] ? Carbon::parse($_list['last_vip_at'])->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s') : ' - ';
+            $_list['end_vip_at'] = $_list['end_vip_at'] ? Carbon::parse($_list['end_vip_at'])->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s') : ' - ';
         }
         // 返回数据
         return success($request, ['list' => $list]);
@@ -186,7 +186,7 @@ class UserManagementController extends GeneralMethod
                 'name' => UserCurrencyLogsEnums\Source::from($_user_currency_logs->source)->label(),
                 'point' => $type . ' ' . $_user_currency_logs->currency,
                 'after_point' => $_user_currency_logs->after_currency,
-                'date' => $_user_currency_logs->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
+                'date' => $_user_currency_logs->created_at->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s'),
             ];
         }
         // 返回数据
@@ -223,7 +223,7 @@ class UserManagementController extends GeneralMethod
                 'name' => UserCurrencyLogsEnums\Source::from($_user_currency_logs->source)->label(),
                 'point' => $type . ' ' . $_user_currency_logs->currency,
                 'after_point' => $_user_currency_logs->after_currency,
-                'date' => $_user_currency_logs->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s'),
+                'date' => $_user_currency_logs->created_at->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s'),
             ];
         }
         // 返回数据

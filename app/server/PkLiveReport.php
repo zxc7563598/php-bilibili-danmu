@@ -2,6 +2,7 @@
 
 namespace app\server;
 
+use app\core\ConfigService;
 use app\core\RobotServices;
 use app\queue\SendMessage;
 use Hejunjie\Bililive;
@@ -22,13 +23,10 @@ class PkLiveReport
     public static function processing($uid, $uname, $room_id): void
     {
         // 获取PK播报配置
-        $pk = readFileContent(runtime_path() . '/tmp/pk.cfg');
-        if ($pk) {
-            $pk = json_decode($pk, true);
-        }
+        $pk = ConfigService::get('pk');
         // 开启PK播报
-        if (isset($pk['opens']) && $pk['opens']) {
-            sublog('核心业务/PK播报', '入参', [
+        if ($pk['opens']) {
+            sublog('核心业务', 'PK播报', '方法入参', [
                 'uid' => $uid,
                 'uname' => $uname,
                 'room_id' => $room_id
@@ -49,7 +47,7 @@ class PkLiveReport
                 }
                 $online_score += $online_item['score'];
             }
-            sublog('核心业务/PK播报', '数据投递', [
+            sublog('核心业务', 'PK播报', '数据投递', [
                 'message' => $enter_content,
                 'args' => [
                     'uname' => $uname,

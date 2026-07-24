@@ -170,7 +170,7 @@ class UserController extends GeneralMethod
         // 获取配置信息
         $config = self::getShopConfig();
         // 返回信息
-        $sn = $user_vips->created_at->timezone(config('app')['default_timezone'])->format('Ymd') . Utils\Str::padString(0, $user_vips->user_id);
+        $sn = $user_vips->created_at->timezone(config('app.default_timezone'))->format('Ymd') . Utils\Str::padString(0, $user_vips->user_id);
         return success($request, [
             'sn' => $sn,
             'title' => isset($config['protocols-name']) ? $config['protocols-name'] : '',
@@ -182,7 +182,7 @@ class UserController extends GeneralMethod
                 'face' => isset($config['protocols-signature']) ? getImageUrl($config['protocols-signature']) : ''
             ],
             'protocols' => isset($config['protocols-content']) ? $config['protocols-content'] : '',
-            'signing_date' => Carbon::today()->timezone(config('app')['default_timezone'])->format('Y-m-d'),
+            'signing_date' => Carbon::today()->timezone(config('app.default_timezone'))->format('Y-m-d'),
             'signing' => !empty($user_vips->sign_image) ? getImageUrl($user_vips->sign_image) : null
         ]);
     }
@@ -237,7 +237,7 @@ class UserController extends GeneralMethod
             ]);
         // 处理数据
         foreach ($payment_records as &$_payment_records) {
-            $_payment_records->days = Carbon::parse($_payment_records->payment_at)->timezone(config('app')['default_timezone'])->format('Y-m-d');
+            $_payment_records->days = Carbon::parse($_payment_records->payment_at)->timezone(config('app.default_timezone'))->format('Y-m-d');
             unset($_payment_records->payment_at);
         }
         // 返回数据
@@ -267,12 +267,21 @@ class UserController extends GeneralMethod
                 'created_at' => 'bl_redemption_records.created_at',
                 'name' => 'bl_user_vips.name'
             ]);
-        // 获取商品信息
-        $goods = Goods::get();
-        $good_subs = GoodSubs::get([
-            'sub_id' => 'sub_id',
-            'name' => 'name'
-        ]);
+        // 只加载当前用户兑换记录中涉及的商品和规格
+        $relatedGoodsIds = $redemption_records->pluck('goods_id')->unique()->toArray();
+        $goods = Goods::whereIn('goods_id', $relatedGoodsIds)->get();
+        $relatedSubIds = [];
+        foreach ($redemption_records as $_rr) {
+            foreach (explode(',', $_rr->sub_id) as $_sid) {
+                if (!empty($_sid)) {
+                    $relatedSubIds[] = $_sid;
+                }
+            }
+        }
+        $relatedSubIds = array_unique($relatedSubIds);
+        $good_subs = !empty($relatedSubIds)
+            ? GoodSubs::whereIn('sub_id', $relatedSubIds)->get(['sub_id' => 'sub_id', 'name' => 'name'])
+            : collect();
         $subs = [];
         foreach ($good_subs as $_good_subs) {
             $subs[$_good_subs->sub_id] = $_good_subs->name . '*1  ';
@@ -295,7 +304,7 @@ class UserController extends GeneralMethod
                     $commodity_type[] = $subs[$_sub_id];
                 }
             }
-            $created_at = $_redemption_records->created_at->timezone(config('app')['default_timezone'])->format('Y-m-d');
+            $created_at = $_redemption_records->created_at->timezone(config('app.default_timezone'))->format('Y-m-d');
             $order[] = [
                 'id' => $_redemption_records->records_id,
                 'point' => $_redemption_records->point,

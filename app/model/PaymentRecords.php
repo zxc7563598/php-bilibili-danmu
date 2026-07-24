@@ -60,8 +60,8 @@ class PaymentRecords extends Model
             // 会员时间变更
             $user_vips = UserVips::where('user_id', $model->user_id)->first();
             $user_vips->vip_type = $model->vip_type;
-            $user_vips->last_vip_at = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
-            $user_vips->end_vip_at = Carbon::now()->timezone(config('app')['default_timezone'])->addMonths(1)->timestamp;
+            $user_vips->last_vip_at = Carbon::now()->timezone(config('app.default_timezone'))->timestamp;
+            $user_vips->end_vip_at = Carbon::now()->timezone(config('app.default_timezone'))->addMonths(1)->timestamp;
             $user_vips->save();
         });
     }

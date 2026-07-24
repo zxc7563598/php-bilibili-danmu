@@ -167,7 +167,7 @@ class SendMessage
                 Redis::set('bilibili_send_sequence', 1);
             }
             // 设置时间
-            $timestamp = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
+            $timestamp = Carbon::now()->timezone(config('app.default_timezone'))->timestamp;
             // 获取数据是否存在
             $exist = false;
             $tasks = Redis::zRange(self::$queueKey, 0, -1);
@@ -184,7 +184,8 @@ class SendMessage
             // 加入数据
             if (!$exist) {
                 $bilibili_send_sequence = Redis::get('bilibili_send_sequence');
-                $score = $priority - $bilibili_send_sequence * 0.000001;
+                // 使用取模保证浮点精度不因序列号过大而丢失（消息 30 秒过期，100W 足够大）
+                $score = $priority - ($bilibili_send_sequence % 1000000) * 0.000001;
                 $task = json_encode([
                     'message' => $message,
                     'score' => $score,
@@ -233,7 +234,7 @@ class SendMessage
                 Redis::set('bilibili_send_sequence', 1);
             }
             // 设置时间
-            $timestamp = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
+            $timestamp = Carbon::now()->timezone(config('app.default_timezone'))->timestamp;
             // 获取直播间最大发言长度
             $length = self::getBilibiliSpeakLength($room_id, $cookie);
             // 数据追加到队列
@@ -241,7 +242,8 @@ class SendMessage
             // 处理数据
             foreach ($message_list as $item) {
                 $bilibili_send_sequence = Redis::get('bilibili_send_sequence');
-                $score = $priority - $bilibili_send_sequence * 0.000001;
+                // 使用取模保证浮点精度不因序列号过大而丢失（消息 30 秒过期，100W 足够大）
+                $score = $priority - ($bilibili_send_sequence % 1000000) * 0.000001;
                 $task = json_encode([
                     'message' => $item,
                     'score' => $score,
@@ -265,7 +267,7 @@ class SendMessage
      */
     public static function processQueue(): void
     {
-        $currentTimestamp = Carbon::now()->timezone(config('app')['default_timezone'])->timestamp;
+        $currentTimestamp = Carbon::now()->timezone(config('app.default_timezone'))->timestamp;
         if (Redis::get('bilibili_stop_message')) {
             return;
         }
@@ -297,12 +299,12 @@ class SendMessage
                             $message = self::getGiftMessage($task['uid'], $task['name'], $task['message'], $number, $blindBoxStats);
                             foreach ($message as $_message) {
                                 echo "发送优先级为" . $task['score'] . "的弹幕: " . $_message . PHP_EOL;
-                                BiliLive\Live::sendMsg($room_id, $cookie, $_message);
+                                Bililive\Live::sendMsg($room_id, $cookie, $_message);
                                 Redis::setEx('bilibili_stop_message', 4, 1);
-                                sublog('核心逻辑/机器人信息发送', '连续信息发送', [
+                                sublog('核心业务', '机器人弹幕发送', '连续信息发送', [
                                     'message' => $_message,
                                     'score' => $task['score'],
-                                    'timestamp' => Carbon::parse($task['timestamp'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s')
+                                    'timestamp' => Carbon::parse($task['timestamp'])->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s')
                                 ]);
                                 sleep(5);
                             }
@@ -312,11 +314,11 @@ class SendMessage
                         // 直接发送
                         echo "发送优先级为" . $task['score'] . "的弹幕: " . $task['message'] . PHP_EOL;
                         if ($cookie && $room_id) {
-                            BiliLive\Live::sendMsg($room_id, $cookie, $task['message']);
-                            sublog('核心逻辑/机器人信息发送', '单条信息发送', [
+                            Bililive\Live::sendMsg($room_id, $cookie, $task['message']);
+                            sublog('核心业务', '机器人弹幕发送', '单条信息发送', [
                                 'message' => $task['message'],
                                 'score' => $task['score'],
-                                'timestamp' => Carbon::parse($task['timestamp'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s')
+                                'timestamp' => Carbon::parse($task['timestamp'])->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s')
                             ]);
                         }
                         break;

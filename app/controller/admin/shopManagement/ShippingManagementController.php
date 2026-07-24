@@ -88,7 +88,7 @@ class ShippingManagementController extends GeneralMethod
             $_data['goods_sub'] = implode(";", array_map(fn($sub) => $goods_subs[$sub], $subs));
             $_data['status'] = RedemptionRecordsEnums\Status::from($_data['status'])->label();
             $_data['amount_type'] = RedemptionRecordsEnums\AmountType::from($_data['amount_type'])->label();
-            $_data['create_time'] = Carbon::parse($_data['created_at'])->timezone(config('app')['default_timezone'])->format('Y-m-d H:i:s');
+            $_data['create_time'] = Carbon::parse($_data['created_at'])->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s');
             unset($_data['sub_id'], $_data['created_at']);
         }
         // 返回数据
