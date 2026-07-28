@@ -23,6 +23,7 @@ use Workerman\Protocols\Ws;
 use Hejunjie\Utils;
 use support\Redis;
 use Webman\RedisQueue\Client;
+use app\Protobuf\SendGiftV2;
 use app\Protobuf\InteractWordV2;
 
 class Bilibili
@@ -362,6 +363,9 @@ class Bilibili
                 case 'PREPARING': // 下播
                     $this->handleLiveEnd($payload);
                     break;
+                case 'SEND_GIFT_V2': // 赠送礼物V2
+                    $this->handleGiftV2($payload);
+                    break;
                 case 'SEND_GIFT': // 赠送礼物
                     $this->handleGift($payload);
                     break;
@@ -460,6 +464,52 @@ class Bilibili
         );
         // 记录信息
         $this->recordGiftInfo($data);
+    }
+
+    /**
+     * 处理礼物
+     * 
+     * @param array $payload
+     * @return void
+     */
+    public function handleGiftV2($payload)
+    {
+        $pbBinary = base64_decode($payload['payload']['data']['pb']);
+        $interact = new SendGiftV2\SendGiftV2();
+        $interact->mergeFromString($pbBinary);
+        $blind_gift_payload = $interact->getBlindGift();
+        if (!empty($blind_gift_payload)) {
+            $blind_gift['blind_gift_config_id'] = $blind_gift_payload->getBlindGiftConfigId();
+            $blind_gift['from'] = $blind_gift_payload->getFrom();
+            $blind_gift['gift_action'] = $blind_gift_payload->getGiftAction();
+            $blind_gift['gift_tip_price'] = $blind_gift_payload->getGiftTipPrice();
+            $blind_gift['original_gift_id'] = $blind_gift_payload->getOriginalGiftId();
+            $blind_gift['original_gift_name'] = $blind_gift_payload->getOriginalGiftName();
+            $blind_gift['original_gift_price'] = $blind_gift_payload->getOriginalGiftPrice();
+        }
+        Present::processing(
+            $interact->getUid(),
+            $interact->getUname(),
+            $interact->getGiftList()?->getGiftId(),
+            $interact->getGiftList()?->getGiftName(),
+            intval($interact->getGiftList()?->getPrice() / 100),
+            $interact->getGiftList()?->getNum(),
+            $interact->getGiftList()?->getReceiverUinfo()?->getUid(),
+            $interact->getMedalInfo()?->getTargetId(),
+            $interact->getMedalInfo()?->getGuardLevel(),
+            $interact->getMedalInfo()?->getMedalLevel(),
+            $blind_gift_payload ?? null,
+            'gift'
+        );
+        // 记录信息
+        $this->recordGiftInfo([
+            'uid' => $interact->getUid(),
+            'uname' => $interact->getUname(),
+            'giftId' => $interact->getGiftList()?->getGiftId(),
+            'giftName' => $interact->getGiftList()?->getGiftName(),
+            'price' => $interact->getGiftList()?->getPrice(),
+            'num' => $interact->getGiftList()?->getNum()
+        ]);
     }
 
     /**

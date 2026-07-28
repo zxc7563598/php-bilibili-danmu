@@ -1,0 +1,208 @@
+syntax = "proto3";
+
+option php_namespace = "app\\Protobuf\\SendGiftV2";
+
+message SendGiftV2 {
+  int64             uid          = 1;
+  string            uname        = 2;
+  string            face         = 3;
+  string            name_color   = 4;
+  int64             guard_level  = 5;
+  int64             svga_block   = 6;
+  SendMaster        send_master  = 7;
+  MedalInfo         medal_info   = 8;
+  BlindGift         blind_gift   = 9;
+  GiftItem          gift_list    = 10;
+  bool              switch       = 11;
+  int64             test         = 12;
+  WealthInfo        wealth_info  = 13;
+  GroupMedalBrief   group_medal  = 14;
+  UserInfo          sender_uinfo = 15;
+  // bytes    unknown16 = 16;
+  // bytes    unknown17 = 17;
+  // bytes    unknown18 = 18;
+  // bytes    unknown19 = 19;
+  // bytes    unknown20 = 20;
+  // bytes    unknown21 = 21;
+  // bytes    unknown22 = 22;
+  // bytes    unknown23 = 23;
+  // bytes    unknown24 = 24;
+  // bytes    unknown25 = 25;
+  // bytes    unknown26 = 26;
+  // bytes    unknown27 = 27;
+  // bytes    unknown28 = 28;
+  // bytes    unknown29 = 29;
+  // bytes    unknown30 = 30;
+  // bytes    unknown31 = 31;
+  // bytes    unknown32 = 32;
+}
+
+message GiftItem {
+  int64                gift_id               = 1;
+  string               gift_name             = 2;
+  int64                num                   = 3;
+  int64                demarcation           = 4;
+  int64                price                 = 5;
+  int64                discount_price        = 6;
+  int64                total_coin            = 7;
+  string               coin_type             = 8;
+  string               tid                   = 9;
+  int64                timestamp             = 10;
+  int64                super_batch_gift_num  = 11;
+  string               batch_combo_id        = 12;
+  int64                combo_resources_id    = 13;
+  int64                combo_total_coin      = 14;
+  int64                combo_stay_time       = 15;
+  float                magnification         = 16;
+  bool                 show_batch_combo_send = 17;
+  string               action                = 18;
+  int64                effect_block          = 19;
+  int64                is_special_batch      = 20;
+  int64                float_sc_resource_id  = 21;
+  string               tag_image             = 22;
+  int64                crit_prob             = 23;
+  int64                rcost                 = 24;
+  int64                test                  = 25;
+  int64                face_effect_type      = 26;
+  int64                face_effect_id        = 27;
+  bool                 is_naming             = 28;
+  ReceiveUserInfo      receive_user_info     = 29;
+  bool                 is_join_receiver      = 30;
+  BagGiftInfo          bag_gift              = 31;
+  repeated int64       gift_tag              = 32;
+  UserInfo             receiver_uinfo        = 33;
+  FaceEffectV2         face_effect_v2        = 34;
+  GiftMaterialSnapShot gift_info             = 35;
+  int64                gift_tip_price        = 36;
+}
+
+message Base {
+  string       name           = 1;
+  string       face           = 2;
+  int32        name_color     = 3;
+  bool         is_mystery     = 4;
+  RiskCtrlInfo risk_ctrl_info = 5;
+  AccountInfo  origin_info    = 6;
+  OfficialInfo official_info  = 7;
+  string       name_color_str = 8;
+}
+
+message Medal {
+  string        name                  = 1;
+  int64         level                 = 2;
+  int64         color_start           = 3;
+  int64         color_end             = 4;
+  int64         color_border          = 5;
+  int64         color                 = 6;
+  int64         id                    = 7;
+  HaveMedalType typ                   = 8;
+  int64         is_light              = 9;
+  int64         ruid                  = 10;
+  int64         guard_level           = 11;
+  int64         score                 = 12;
+  string        guard_icon            = 13;
+  string        honor_icon            = 14;
+  string        v2_medal_color_start  = 15;
+  string        v2_medal_color_end    = 16;
+  string        v2_medal_color_border = 17;
+  string        v2_medal_color_text   = 18;
+  string        v2_medal_color_level  = 19;
+  //   int64 user_receive_count = 20;
+}
+
+message UserInfo {
+  int64 uid   = 1;
+  Base  base  = 2;
+  Medal medal = 3;
+  //   Wealth wealth = 4;
+}
+
+message ReceiveUserInfo { // 10.29
+  string uname = 1;
+  int64  uid   = 2;
+}
+
+message SendMaster { // 7
+  int64  uid   = 1;
+  string uname = 2;
+}
+
+message BlindGift { // 9
+  int64  blind_gift_config_id = 1;
+  int64  original_gift_id     = 2;
+  string original_gift_name   = 3;
+  int64  from                 = 4;
+  string gift_action          = 5;
+  int64  original_gift_price  = 6;
+  int64  gift_tip_price       = 7;
+}
+
+message MedalInfo { // 8
+  int64  target_id          = 1;
+  string special            = 2;
+  string anchor_uname       = 3;
+  int64  anchor_roomid      = 4;
+  int64  medal_level        = 5;
+  string medal_name         = 6;
+  int64  medal_color        = 7;
+  int64  medal_color_start  = 8;
+  int64  medal_color_end    = 9;
+  int64  medal_color_border = 10;
+  int64  is_lighted         = 11;
+  int64  guard_level        = 12;
+}
+
+message BagGiftInfo { // 10.31
+  int32 show_price     = 1;
+  int64 price_for_show = 2;
+}
+
+message WealthInfo { // 13
+  int64 level = 1;
+}
+
+message FaceEffectV2 { // 10.34
+  int64 id   = 1;
+  int64 type = 2;
+}
+
+message GroupMedalBrief { // 14
+  int64  medal_id   = 1;
+  string name       = 2;
+  int64  is_lighted = 3;
+}
+
+message GiftMaterialSnapShot { // 10.35
+  // JS:GiftMaterialSnapShot, JAVA:BroadCastGiftInfo
+  string img_basic       = 1;
+  string webp            = 2;
+  int64  effect_id       = 3;
+  int64  has_imaged_gift = 4;
+  string img_gif         = 5; //!
+}
+
+enum HaveMedalType {
+  Medal_Common = 0;
+  Medal_Group  = 1;
+}
+
+message RiskCtrlInfo {
+  string name = 1;
+  string face = 2;
+}
+
+message AccountInfo {
+  string name = 1;
+  string face = 2;
+}
+
+message OfficialInfo {
+  int32  role  = 1;
+  string title = 2;
+  string desc  = 3;
+  int32  type  = 4;
+}
+// message Wealth {
+//   int64 level = 1;
+//   string dm_icon_key = 2;
+// }
