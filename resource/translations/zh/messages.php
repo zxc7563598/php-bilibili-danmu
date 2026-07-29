@@ -6,7 +6,6 @@ return [
     "You're making requests too frequently — slow down a bit." => "查询太过频繁嗷～慢一点",
     "Incorrect password. Try again." => "密码不对，再想想",
     "Session expired — please log in again." => "登录过期嗷，重新登录一下吧",
-    "Session expired — please log in again." => "登录过期嗷，重新登录一下吧",
     "UID lookup failed — consider contacting the owner." => "uid查询失败，建议联系主包",
     "Stop looking, the product is off the shelves, check out something else" => "别看了，商品下架了，看点别的",
     "Hold up — you don't have enough points!" => "不是，咋回事啊老弟，你这积分不够啊",
@@ -30,8 +29,8 @@ return [
     "Account login has expired." => "账号登录已过期",
     "Incorrect username or password." => "账号或密码错误",
     "Account has been deactivated." => "账号已停用",
-    "Invalid verification code." => "验证码错误",
-    "Authentication failed." => "身份验证失败",
+    "Identity verification has expired, please refresh and try again" => "身份验证已过期，请刷新重试",
+    "Verification failed, please try again" => "验证失败，请重试",
     "Role does not exist." => "角色不存在",
     "Permission does not exist." => "权限不存在"
 ];

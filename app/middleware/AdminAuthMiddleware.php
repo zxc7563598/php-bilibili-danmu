@@ -49,6 +49,7 @@ class AdminAuthMiddleware implements MiddlewareInterface
         $request->admins = null;
         $whitelisting = [
             '/admin-api-v2/auth/login',
+            '/admin-api-v2/auth/captcha',
             '/admin-api-v2/projects/leave-message/send',
             '/admin-api-v2/projects/record',
             '/admin-api-v2/projects/pdf'

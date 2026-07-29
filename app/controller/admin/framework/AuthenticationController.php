@@ -38,6 +38,18 @@ class AuthenticationController
     }
 
     /**
+     * 认证相关 - 是否启用验证码
+     *
+     * @return Response
+     */
+    public function captcha(Request $request): Response
+    {
+        return success($request, [
+            'isCaptcha' => config('app.altcha_hmac_key') ? true : false
+        ]);
+    }
+
+    /**
      * 认证相关 - 退出登录
      * 
      * @return Response
