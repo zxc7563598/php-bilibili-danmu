@@ -6,7 +6,6 @@ return [
     "You're making requests too frequently — slow down a bit." => "You're making requests too frequently — slow down a bit.",
     "Incorrect password. Try again." => "Incorrect password. Try again.",
     "Session expired — please log in again." => "Session expired — please log in again.",
-    "Session expired — please log in again." => "Session expired — please log in again.",
     "UID lookup failed — consider contacting the owner." => "UID lookup failed — consider contacting the owner.",
     "Stop looking, the product is off the shelves, check out something else" => "Stop looking, the product is off the shelves, check out something else",
     "Hold up — you don't have enough points!" => "Hold up — you don't have enough points!",
@@ -30,8 +29,8 @@ return [
     "Account login has expired." => "Account login has expired.",
     "Incorrect username or password." => "Incorrect username or password.",
     "Account has been deactivated." => "Account has been deactivated.",
-    "Invalid verification code." => "Invalid verification code.",
-    "Authentication failed." => "Authentication failed.",
+    "Identity verification has expired, please refresh and try again" => "Identity verification has expired, please refresh and try again",
+    "Verification failed, please try again" => "Verification failed, please try again",
     "Role does not exist." => "Role does not exist.",
     "Permission does not exist." => "Permission does not exist.",
 ];

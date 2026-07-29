@@ -2,6 +2,9 @@
 
 namespace app\core;
 
+use AltchaOrg\Altcha\Algorithm\Pbkdf2;
+use AltchaOrg\Altcha\Altcha;
+use AltchaOrg\Altcha\VerifySolutionOptions;
 use app\model\Admins;
 use Carbon\Carbon;
 use support\Cache;
@@ -25,6 +28,22 @@ class AdminAuthService
      */
     public static function login(string $username, string $password, string $captcha = ''): string|int
     {
+        $hmacKey = config('app.altcha_hmac_key');
+        if ($hmacKey) {
+            $algorithm = new Pbkdf2();
+            $altcha = new Altcha(hmacSignatureSecret: $hmacKey);
+            $result = $altcha->verifySolution(new VerifySolutionOptions(
+                payload: $captcha,
+                algorithm: $algorithm,
+            ));
+            if (!$result->verified) {
+                if ($result->expired) {
+                    return 900008;
+                } else {
+                    return 900009;
+                }
+            }
+        }
         // 查询账号
         $admins = Admins::where('username', $username)->first();
         if (empty($admins)) {

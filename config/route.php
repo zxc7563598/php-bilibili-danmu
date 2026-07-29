@@ -13,6 +13,9 @@
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
+use AltchaOrg\Altcha\Algorithm\Pbkdf2;
+use AltchaOrg\Altcha\Altcha;
+use AltchaOrg\Altcha\CreateChallengeOptions;
 use Webman\Route;
 use support\Request;
 use support\Response;
@@ -184,6 +187,7 @@ Route::group('/admin-api-v2', function () {
     Route::post('/others/complaint-management/get-data-details', [admin\others\ComplaintManagementController::class, 'getDataDetails'])->name('[其他-投诉管理-获取投诉详情]');
     // 认证相关
     Route::post('/auth/login', [admin\framework\AuthenticationController::class, 'login'])->name('[认证相关-登录]');
+    Route::post('/auth/captcha', [admin\framework\AuthenticationController::class, 'captcha'])->name('[认证相关-是否启用验证码]');
     Route::post('/auth/logout', [admin\framework\AuthenticationController::class, 'logout'])->name('[认证相关-退出登录]');
     Route::post('/auth/switch-role', [admin\framework\AuthenticationController::class, 'switchRole'])->name('[认证相关-切换角色]');
     Route::post('/auth/update-password', [admin\framework\AuthenticationController::class, 'updatePassword'])->name('[认证相关-修改密码]');
@@ -212,6 +216,31 @@ Route::group('/admin-api-v2', function () {
     app\middleware\AccessControl::class,
     app\middleware\LangMiddleware::class,
     app\middleware\AdminAuthMiddleware::class
+]);
+
+Route::any('/api/altcha/challenge', function (Request $request) {
+    $hmacKey = config('app.altcha_hmac_key');
+    $challenge = [];
+    if ($hmacKey) {
+        $algorithm = new Pbkdf2();
+        $altcha = new Altcha(
+            hmacSignatureSecret: $hmacKey,
+        );
+        $options = new CreateChallengeOptions(
+            algorithm: $algorithm,
+            cost: 5000,                                 // 迭代次数，影响计算难度和速度，可以调整
+            counter: random_int(5000, 10000),  // 随机起始计数器
+            expiresAt: time() + 600,                    // 有效期，单位秒（这里设为10分钟）
+        );
+        $challenge = $altcha->createChallenge($options);
+    }
+    return new Response(
+        200,
+        ['Content-Type' => 'application/json'],
+        json_encode($challenge)
+    );
+})->middleware([
+    app\middleware\AccessControl::class,
 ]);
 
 Route::post('/reload-bilibili', function (Request $request) {

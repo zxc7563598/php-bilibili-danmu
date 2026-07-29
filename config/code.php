@@ -37,8 +37,8 @@ return [
     900005 => "Account login has expired.", // 账号登录已过期
     900006 => "Incorrect username or password.", // 账号或密码错误
     900007 => "Account has been deactivated.", // 账号已停用
-    900008 => "Invalid verification code.", // 验证码错误
-    900009 => "Authentication failed.", // 身份验证失败
+    900008 => "Identity verification has expired, please refresh and try again", // 身份验证已过期，请刷新重试
+    900009 => "Verification failed, please try again", // 验证失败，请重试
     900010 => "Role does not exist.", // 角色不存在
     900011 => "Permission does not exist.", // 权限不存在
 ];

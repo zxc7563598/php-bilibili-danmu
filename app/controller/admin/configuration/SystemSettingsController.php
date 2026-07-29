@@ -38,7 +38,8 @@ class SystemSettingsController
             'db_port' => getenv('DB_PORT'),
             'db_name' => getenv('DB_NAME'),
             'db_user' => getenv('DB_USER'),
-            'db_password' => getenv('DB_PASSWORD')
+            'db_password' => getenv('DB_PASSWORD'),
+            'altcha_hmac_key' => getenv('ALTCHA_HMAC_KEY') ? '1' : '0',
         ]);
     }
 
@@ -87,6 +88,7 @@ class SystemSettingsController
      * @param string $db_name 数据库账号 
      * @param string $db_user 数据库名称 
      * @param string $db_password 数据库密码 
+     * @param string $altcha_hmac_key altcha 验证密钥 
      * 
      * @return Response 
      */
@@ -114,7 +116,8 @@ class SystemSettingsController
             'db_port',
             'db_name',
             'db_user',
-            'db_password'
+            'db_password',
+            'altcha_hmac_key'
         ];
         // 组装需要修改的环境变量数据
         $data = array_map(fn($key) => ['key' => strtoupper($key), 'value' => $request->post($key, '')], $configKeys);
@@ -137,6 +140,16 @@ class SystemSettingsController
         }
         // 更新环境变量
         foreach ($data as $_data) {
+            // 处理特殊数据
+            switch ($_data['key']) {
+                case 'ALTCHA_HMAC_KEY': // altcha 验证密钥：通过 openssl rand -base64 32 生成32位随机字符串
+                    if ((string)$_data['value'] === '1') {
+                        $_data['value'] = base64_encode(random_bytes(32));
+                    } else {
+                        $_data['value'] = '';
+                    }
+                    break;
+            }
             // 检查环境变量是否存在并更新
             $env = strpos($env, $_data['key'] . "=") !== false
                 ? preg_replace("/^" . $_data['key'] . "=.*/m", $_data['key'] . "=" . $_data['value'], $env)
