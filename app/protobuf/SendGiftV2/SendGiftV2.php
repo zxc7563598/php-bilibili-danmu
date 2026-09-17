@@ -51,9 +51,9 @@ class SendGiftV2 extends \Google\Protobuf\Internal\Message
      */
     protected $blind_gift = null;
     /**
-     * Generated from protobuf field <code>.GiftItem gift_list = 10;</code>
+     * Generated from protobuf field <code>repeated .GiftItem gift_list = 10;</code>
      */
-    protected $gift_list = null;
+    private $gift_list;
     /**
      * Generated from protobuf field <code>bool switch = 11;</code>
      */
@@ -108,7 +108,7 @@ class SendGiftV2 extends \Google\Protobuf\Internal\Message
      *     @type \app\Protobuf\SendGiftV2\SendMaster $send_master
      *     @type \app\Protobuf\SendGiftV2\MedalInfo $medal_info
      *     @type \app\Protobuf\SendGiftV2\BlindGift $blind_gift
-     *     @type \app\Protobuf\SendGiftV2\GiftItem $gift_list
+     *     @type array<\app\Protobuf\SendGiftV2\GiftItem>|\Google\Protobuf\Internal\RepeatedField $gift_list
      *     @type bool $switch
      *     @type int|string $test
      *     @type \app\Protobuf\SendGiftV2\WealthInfo $wealth_info
@@ -367,33 +367,23 @@ class SendGiftV2 extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Generated from protobuf field <code>.GiftItem gift_list = 10;</code>
-     * @return \app\Protobuf\SendGiftV2\GiftItem|null
+     * Generated from protobuf field <code>repeated .GiftItem gift_list = 10;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
      */
     public function getGiftList()
     {
         return $this->gift_list;
     }
 
-    public function hasGiftList()
-    {
-        return isset($this->gift_list);
-    }
-
-    public function clearGiftList()
-    {
-        unset($this->gift_list);
-    }
-
     /**
-     * Generated from protobuf field <code>.GiftItem gift_list = 10;</code>
-     * @param \app\Protobuf\SendGiftV2\GiftItem $var
+     * Generated from protobuf field <code>repeated .GiftItem gift_list = 10;</code>
+     * @param array<\app\Protobuf\SendGiftV2\GiftItem>|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setGiftList($var)
     {
-        GPBUtil::checkMessage($var, \app\Protobuf\SendGiftV2\GiftItem::class);
-        $this->gift_list = $var;
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \app\Protobuf\SendGiftV2\GiftItem::class);
+        $this->gift_list = $arr;
 
         return $this;
     }

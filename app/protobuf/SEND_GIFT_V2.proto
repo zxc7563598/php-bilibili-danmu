@@ -12,7 +12,7 @@ message SendGiftV2 {
   SendMaster        send_master  = 7;
   MedalInfo         medal_info   = 8;
   BlindGift         blind_gift   = 9;
-  GiftItem          gift_list    = 10;
+  repeated GiftItem gift_list    = 10;
   bool              switch       = 11;
   int64             test         = 12;
   WealthInfo        wealth_info  = 13;
