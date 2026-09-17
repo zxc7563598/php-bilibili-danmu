@@ -67,6 +67,7 @@
       "App\\": "./app",
       "app\\View\\Components\\": "./app/view/components",
       "app\\Protobuf\\InteractWordV2\\": "./app/protobuf/InteractWordV2",
+      "app\\Protobuf\\SendGiftV2\\": "./app/protobuf/SendGiftV2",
       "GPBMetadata\\": "app/protobuf/GPBMetadata"
     },
     "files": [

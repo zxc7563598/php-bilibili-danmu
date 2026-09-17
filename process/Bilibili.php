@@ -477,39 +477,46 @@ class Bilibili
         $pbBinary = base64_decode($payload['payload']['data']['pb']);
         $interact = new SendGiftV2\SendGiftV2();
         $interact->mergeFromString($pbBinary);
+        // 盲盒信息，整条广播共用一份
+        $blind_gift = null;
         $blind_gift_payload = $interact->getBlindGift();
         if (!empty($blind_gift_payload)) {
-            $blind_gift['blind_gift_config_id'] = $blind_gift_payload->getBlindGiftConfigId();
-            $blind_gift['from'] = $blind_gift_payload->getFrom();
-            $blind_gift['gift_action'] = $blind_gift_payload->getGiftAction();
-            $blind_gift['gift_tip_price'] = $blind_gift_payload->getGiftTipPrice();
-            $blind_gift['original_gift_id'] = $blind_gift_payload->getOriginalGiftId();
-            $blind_gift['original_gift_name'] = $blind_gift_payload->getOriginalGiftName();
-            $blind_gift['original_gift_price'] = $blind_gift_payload->getOriginalGiftPrice();
+            $blind_gift = [
+                'blind_gift_config_id' => $blind_gift_payload->getBlindGiftConfigId(),
+                'from' => $blind_gift_payload->getFrom(),
+                'gift_action' => $blind_gift_payload->getGiftAction(),
+                'gift_tip_price' => $blind_gift_payload->getGiftTipPrice(),
+                'original_gift_id' => $blind_gift_payload->getOriginalGiftId(),
+                'original_gift_name' => $blind_gift_payload->getOriginalGiftName(),
+                'original_gift_price' => $blind_gift_payload->getOriginalGiftPrice()
+            ];
         }
-        Present::processing(
-            $interact->getUid(),
-            $interact->getUname(),
-            $interact->getGiftList()?->getGiftId(),
-            $interact->getGiftList()?->getGiftName(),
-            intval($interact->getGiftList()?->getPrice() / 100),
-            $interact->getGiftList()?->getNum(),
-            $interact->getGiftList()?->getReceiverUinfo()?->getUid(),
-            $interact->getMedalInfo()?->getTargetId(),
-            $interact->getMedalInfo()?->getGuardLevel(),
-            $interact->getMedalInfo()?->getMedalLevel(),
-            $blind_gift_payload ?? null,
-            'gift'
-        );
-        // 记录信息
-        $this->recordGiftInfo([
-            'uid' => $interact->getUid(),
-            'uname' => $interact->getUname(),
-            'giftId' => $interact->getGiftList()?->getGiftId(),
-            'giftName' => $interact->getGiftList()?->getGiftName(),
-            'price' => $interact->getGiftList()?->getPrice(),
-            'num' => $interact->getGiftList()?->getNum()
-        ]);
+        // 盲盒爆出时一次广播会携带多份礼物，逐份答谢并记录
+        foreach ($interact->getGiftList() as $gift) {
+            Present::processing(
+                $interact->getUid(),
+                $interact->getUname(),
+                $gift->getGiftId(),
+                $gift->getGiftName(),
+                intval($gift->getPrice() / 100),
+                $gift->getNum(),
+                $gift->getReceiverUinfo()?->getUid(),
+                $interact->getMedalInfo()?->getTargetId(),
+                $interact->getMedalInfo()?->getGuardLevel(),
+                $interact->getMedalInfo()?->getMedalLevel(),
+                $blind_gift,
+                'gift'
+            );
+            // 记录信息
+            $this->recordGiftInfo([
+                'uid' => $interact->getUid(),
+                'uname' => $interact->getUname(),
+                'giftId' => $gift->getGiftId(),
+                'giftName' => $gift->getGiftName(),
+                'price' => $gift->getPrice(),
+                'num' => $gift->getNum()
+            ]);
+        }
     }
 
     /**
