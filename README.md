@@ -37,11 +37,6 @@
 
 **[bilibili-live-assistant](https://github.com/zxc7563598/bilibili-live-assistant)** —— 跑在自己电脑上的 B 站直播机器人，下载安装包双击即可运行，无需服务器、无需环境、无需写代码，所有数据本地存储。
 
-目前支持签到、进房欢迎、感谢关注/分享、礼物答谢、PK 播报、定时广告、关键词自动回复、自动禁言等核心互动功能，积分商城与数据分析将在后续版本加入。
-
-- 想要完整的积分商城和数据看板 → 继续使用本项目
-- 想要开箱即用、本地运行 → 前往 [bilibili-live-assistant](https://github.com/zxc7563598/bilibili-live-assistant)
-
 ## ✨ 部署方案
 
 本项目提供多种部署方式，提供文字/视频教程，请前往[官方文档查看](https://hejunjie.life/danmusuite/introduction/about#%E9%83%A8%E7%BD%B2%E8%AF%B4%E6%98%8E)
