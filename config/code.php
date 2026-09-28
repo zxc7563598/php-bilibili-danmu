@@ -29,6 +29,8 @@ return [
     800017 => "Please upload the image file", // 请上传图片文件
     800018 => "File download failed, please download the source code manually", // 文件下载失败，请自行下载源码
     800019 => "Bilibili has updated its risk control system. Room links are currently experiencing issues and are being fixed", // B站风控更新，房间链接异常，正在修复
+    800020 => "Export task does not exist or has expired, please start a new export", // 导出任务不存在或已过期，请重新发起导出
+    800021 => "Failed to create the export task, please try again later", // 创建导出任务失败，请稍后重试
 
     900001 => "Invalid request parameters.", // 请求参数异常
     900002 => "Signature verification failed.", // 签名验证异常

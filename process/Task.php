@@ -2,6 +2,7 @@
 
 namespace process;
 
+use app\core\ExportService;
 use app\core\RobotServices;
 use app\model\RedemptionRecords;
 use app\model\ShopConfig;
@@ -24,6 +25,8 @@ class Task
             self::logDeletion();
             self::logTransfer();
             self::clearPoints();
+            // 清理过期的数据导出文件
+            ExportService::clearExpiredFiles();
             Redis::del(config('app.app_name') . ':config');
             // 获取配置信息
             $cookie = RobotServices::getCookie();

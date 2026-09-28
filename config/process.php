@@ -17,6 +17,7 @@
 use support\Log;
 use app\process\Http;
 use support\Request;
+use Webman\RedisQueue\Process\Consumer;
 
 global $argv;
 
@@ -45,5 +46,13 @@ return [
     ],
     'task'  => [
         'handler'  => process\Task::class
+    ],
+    // 数据导出队列，独立进程，避免长时间导出阻塞 app/queue/redis 下的其他消费者（如弹幕入库）
+    'export'  => [
+        'handler'  => Consumer::class,
+        'count'  => 1,
+        'constructor' => [
+            'consumer_dir' => app_path() . '/queue/export'
+        ]
     ]
 ];

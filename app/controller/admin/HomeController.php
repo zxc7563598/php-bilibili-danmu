@@ -2,6 +2,7 @@
 
 namespace app\controller\admin;
 
+use app\core\ExportService;
 use app\model\AdminUpdateLogs;
 use app\model\AdminUpdateReads;
 use Carbon\Carbon;
@@ -101,5 +102,54 @@ class HomeController
         return success($request, [
             'url' => config('app.api_url') . '/' . str_replace(public_path(), '', $file_path)
         ]);
+    }
+
+    /**
+     * 创建数据导出任务
+     *
+     * 导出 bl_danmu_logs、bl_gift_records、bl_user_vips 三张表，数据量大，由队列异步执行，
+     * 创建后通过 getExportProgress 轮询进度。
+     *
+     * @return Response
+     */
+    public function createExportTask(Request $request): Response
+    {
+        // 获取管理员id
+        $admin_id = $request->admins['id'];
+        // 创建任务
+        try {
+            $result = ExportService::createTask($admin_id);
+        } catch (\Throwable $e) {
+            sublog('数据导出', '创建任务', '创建失败', [
+                'admin_id' => $admin_id,
+                'error' => $e->getMessage()
+            ]);
+            return fail($request, 800021);
+        }
+        // 返回数据
+        return success($request, [
+            'task_id' => $result['task_id'],
+            'reused' => $result['reused']
+        ]);
+    }
+
+    /**
+     * 获取数据导出进度
+     *
+     * @param string $task_id 导出任务ID
+     *
+     * @return Response
+     */
+    public function getExportProgress(Request $request): Response
+    {
+        // 获取参数
+        $task_id = $request->post('task_id');
+        // 获取进度
+        $progress = ExportService::getProgress((string)$task_id);
+        if (is_null($progress)) {
+            return fail($request, 800020);
+        }
+        // 返回数据
+        return success($request, $progress);
     }
 }
