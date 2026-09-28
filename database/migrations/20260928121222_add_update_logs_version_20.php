@@ -22,7 +22,7 @@ final class AddUpdateLogsVersion20 extends AbstractMigration
         $tableAdd = $this->table('bl_admin_update_logs');
         $tableAdd->insert([
             [
-                "id" => 19,
+                "id" => 20,
                 "title" => "功能更新",
                 "description" => "版本v1.8.3",
                 "version" => "v1.8.3",
