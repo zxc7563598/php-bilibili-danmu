@@ -181,6 +181,48 @@ class Autoresponders
                     'total_room_blind_box_net' => function (): string {
                         return self::getRoomBlindBoxNet(0);
                     },
+                    'daily_blind_box_count' => function () use ($uid): string {
+                        $todayStart = Carbon::today(config('app.default_timezone'))->timestamp;
+                        return self::getUserBlindBoxCount($uid, $todayStart);
+                    },
+                    'weekly_blind_box_count' => function () use ($uid): string {
+                        $thisWeekStart = Carbon::now()
+                            ->timezone(config('app.default_timezone'))
+                            ->startOfWeek()
+                            ->timestamp;
+                        return self::getUserBlindBoxCount($uid, $thisWeekStart);
+                    },
+                    'monthly_blind_box_count' => function () use ($uid): string {
+                        $thisMonthStart = Carbon::now()
+                            ->timezone(config('app.default_timezone'))
+                            ->startOfMonth()
+                            ->timestamp;
+                        return self::getUserBlindBoxCount($uid, $thisMonthStart);
+                    },
+                    'total_blind_box_count' => function () use ($uid): string {
+                        return self::getUserBlindBoxCount($uid, 0);
+                    },
+                    'daily_room_blind_box_count' => function (): string {
+                        $todayStart = Carbon::today(config('app.default_timezone'))->timestamp;
+                        return self::getRoomBlindBoxCount($todayStart);
+                    },
+                    'weekly_room_blind_box_count' => function (): string {
+                        $thisWeekStart = Carbon::now()
+                            ->timezone(config('app.default_timezone'))
+                            ->startOfWeek()
+                            ->timestamp;
+                        return self::getRoomBlindBoxCount($thisWeekStart);
+                    },
+                    'monthly_room_blind_box_count' => function (): string {
+                        $thisMonthStart = Carbon::now()
+                            ->timezone(config('app.default_timezone'))
+                            ->startOfMonth()
+                            ->timestamp;
+                        return self::getRoomBlindBoxCount($thisMonthStart);
+                    },
+                    'total_room_blind_box_count' => function (): string {
+                        return self::getRoomBlindBoxCount(0);
+                    },
                 ], $msg, $silent, $silent_minute, $ransom_amount, (string)$uid, $uname);
             } else {
                 sublog('核心业务', '自动回复', '数据不匹配', "N/A");
@@ -312,7 +354,7 @@ class Autoresponders
      * 获取直播间盲盒盈亏
      *
      * @param integer $start_timestamp 起始时间戳
-     * 
+     *
      * @return string
      */
     private static function getRoomBlindBoxNet(int $start_timestamp): string
@@ -325,5 +367,37 @@ class Autoresponders
             return number_format(($gift_records->total_price - $gift_records->original_price), 2);
         }
         return '0.00';
+    }
+
+    /**
+     * 获取用户盲盒数量
+     *
+     * @param string $uid 用户uid
+     * @param integer $start_timestamp 起始时间戳
+     *
+     * @return string
+     */
+    private static function getUserBlindBoxCount(string $uid, int $start_timestamp): string
+    {
+        $count = GiftRecords::where('created_at', '>', $start_timestamp)
+            ->where('uid', $uid)
+            ->where('original', GiftRecordsEnums\Original::No->value)
+            ->sum('num');
+        return strval($count);
+    }
+
+    /**
+     * 获取直播间盲盒数量
+     *
+     * @param integer $start_timestamp 起始时间戳
+     *
+     * @return string
+     */
+    private static function getRoomBlindBoxCount(int $start_timestamp): string
+    {
+        $count = GiftRecords::where('created_at', '>', $start_timestamp)
+            ->where('original', GiftRecordsEnums\Original::No->value)
+            ->sum('num');
+        return strval($count);
     }
 }
