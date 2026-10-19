@@ -14,6 +14,7 @@ use app\model\ShopConfig;
 use app\model\UserAddress;
 use app\model\UserVips;
 use Carbon\Carbon;
+use resource\enums\GiftRecordsEnums;
 use resource\enums\GoodsEnums;
 use resource\enums\UserAddressEnums;
 use resource\enums\PaymentRecordsEnums;
@@ -336,6 +337,28 @@ class UserPublicMethods
                         ];
                     }
                 }
+                // 分析盲盒数据
+                $blind_box_list = [];
+                $blind_box_net = 0;
+                $getBlindBoxes = GiftRecords::whereBetween('created_at', [
+                    $lives->created_at->timezone(config('app.default_timezone'))->timestamp,
+                    Carbon::parse($lives->end_time)->timezone(config('app.default_timezone'))->timestamp
+                ])->where('original', GiftRecordsEnums\Original::No->value)
+                    ->groupBy('original_gift_name')
+                    ->orderByRaw('sum(total_price) - sum(original_price * num) desc')
+                    ->get([
+                        'original_gift_name' => 'original_gift_name',
+                        'num' => Db::raw('sum(num) as num'),
+                        'profit' => Db::raw('sum(total_price) - sum(original_price * num) as profit')
+                    ]);
+                foreach ($getBlindBoxes as $_getBlindBoxes) {
+                    $blind_box_net += $_getBlindBoxes->profit;
+                    $blind_box_list[] = [
+                        'name' => $_getBlindBoxes->original_gift_name,
+                        'num' => intval($_getBlindBoxes->num),
+                        'profit' => round($_getBlindBoxes->profit, 2)
+                    ];
+                }
                 // 发送邮件
                 Utils\HttpClient::sendPostRequest(config('app.tools_api_url') . '/bilibilidanmu-api/live-end-email', [
                     'Content-Type: application/json'
@@ -349,7 +372,9 @@ class UserPublicMethods
                     'danmu_list' => $danmu_list,
                     'danmu_count' => $danmu_count,
                     'gift_list' => $gift_list,
-                    'gift_count' => round($gift_total_price, 2)
+                    'gift_count' => round($gift_total_price, 2),
+                    'blind_box_list' => $blind_box_list,
+                    'blind_box_net' => round($blind_box_net, 2)
                 ]));
             }
         }
