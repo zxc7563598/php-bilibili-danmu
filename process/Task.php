@@ -170,7 +170,7 @@ class Task
                         ]);
                         if ($records) {
                             $expire_time = $records->created_at->copy()->addDays($shop_config['points-expire-days'])->timezone(config('app.default_timezone'))->startOfDay();
-                            if ($expire_time->lte(Carbon::today()->timezone(config('app.default_timezone')))) {
+                            if ($expire_time->lte(Carbon::today(config('app.default_timezone')))) {
                                 // 清空积分
                                 $user_currency_logs = new UserCurrencyLogs();
                                 $user_currency_logs->user_id = $user->user_id;
@@ -188,7 +188,7 @@ class Task
                 break;
             case '2':
                 // 每月1日清理
-                $today = Carbon::today();
+                $today = Carbon::today(config('app.default_timezone'));
                 if ($today->day === 1) {
                     $users = UserVips::where('point', '>', 0)->get([
                         'user_id' => 'user_id',

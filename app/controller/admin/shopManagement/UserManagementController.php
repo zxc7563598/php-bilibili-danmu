@@ -361,6 +361,7 @@ class UserManagementController extends GeneralMethod
             $_data['name'] = UserCurrencyLogsEnums\Source::from($_data['source'])->label();
             $_data['currency'] = $type . ' ' . $_data['currency'];
             $_data['date'] = Carbon::parse($_data['created_at'])->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s');
+            unset($_data['created_at']);
         }
         // 返回数据
         return success($request, [
@@ -421,6 +422,7 @@ class UserManagementController extends GeneralMethod
             $_data['name'] = UserCurrencyLogsEnums\Source::from($_data['source'])->label();
             $_data['currency'] = $type . ' ' . $_data['currency'];
             $_data['date'] = Carbon::parse($_data['created_at'])->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s');
+            unset($_data['created_at']);
         }
         // 返回数据
         return success($request, [

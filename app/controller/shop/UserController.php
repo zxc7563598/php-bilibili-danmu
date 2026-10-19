@@ -182,7 +182,7 @@ class UserController extends GeneralMethod
                 'face' => isset($config['protocols-signature']) ? getImageUrl($config['protocols-signature']) : ''
             ],
             'protocols' => isset($config['protocols-content']) ? $config['protocols-content'] : '',
-            'signing_date' => Carbon::today()->timezone(config('app.default_timezone'))->format('Y-m-d'),
+            'signing_date' => Carbon::today(config('app.default_timezone'))->format('Y-m-d'),
             'signing' => !empty($user_vips->sign_image) ? getImageUrl($user_vips->sign_image) : null
         ]);
     }

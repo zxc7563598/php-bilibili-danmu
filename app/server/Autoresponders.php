@@ -140,9 +140,7 @@ class Autoresponders
                     'guard' => $guard,
                     'up_name' => $up_name,
                     'daily_blind_box_net' => function () use ($uid): string {
-                        $todayStart = Carbon::today()
-                            ->timezone(config('app.default_timezone'))
-                            ->timestamp;
+                        $todayStart = Carbon::today(config('app.default_timezone'))->timestamp;
                         return self::getUserBlindBoxNet($uid, $todayStart);
                     },
                     'weekly_blind_box_net' => function () use ($uid): string {
@@ -163,9 +161,7 @@ class Autoresponders
                         return self::getUserBlindBoxNet($uid, 0);
                     },
                     'daily_room_blind_box_net' => function (): string {
-                        $todayStart = Carbon::today()
-                            ->timezone(config('app.default_timezone'))
-                            ->timestamp;
+                        $todayStart = Carbon::today(config('app.default_timezone'))->timestamp;
                         return self::getRoomBlindBoxNet($todayStart);
                     },
                     'weekly_room_blind_box_net' => function (): string {

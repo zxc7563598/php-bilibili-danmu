@@ -26,6 +26,7 @@ return [
             'unix_socket' => '',
             'charset'     => 'utf8mb4',
             'collation'   => 'utf8mb4_general_ci',
+            'timezone'    => '+08:00', // 固定会话时区，避免 FROM_UNIXTIME()/NOW() 跟随数据库服务器时区
             'prefix'      => '',
             'strict'      => false,
             'engine'      => null,
