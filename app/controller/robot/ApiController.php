@@ -105,12 +105,15 @@ class ApiController
         $configs = ConfigService::all();
         // 更新说明
         $version_update = true;
-        $update_html = '<p><b>更新日期: 2025-05-17</b></p><br>
+        $update_html = '<p><b>更新日期: 2026-10-19</b></p><br>
             <p>当前你看到的还是旧版后台，功能简单但足够使用。如果你想体验更强大的后台管理系统，我们已经准备好了全新版本！</p><br>
             <p>📦 新版后台支持更多自定义功能，不过需要你自己部署。我们提供了详细的教学地址，也欢迎联系作者协助，作者并不介意在闲暇时间帮大家搭一搭～</p><br>
             <p>如果你对这些部署流程比较熟悉，强烈建议试试，体验会更好；</p>
             <p>当然啦，如果你觉得现在这样也挺好，也可以忽略这条消息，不影响正常使用～</p><br>
-            <p>👉 教学地址：<a href="https://hejunjie.life/danmusuite/start/admin-panel" target="_blank">点击前往</a></p>';
+            <p>👉 教学地址：<a href="https://hejunjie.life/danmusuite/start/admin-panel" target="_blank">点击前往</a></p><br>
+            <p><b>📢 关于新版本</b></p><br>
+            <p>这个项目其实已经是一个老项目了，作者已经完成了完全重构的新版本，部署更简单，体验也更好。</p><br>
+            <p>如果你是新用户，建议直接前往 <a href="https://danmubot.top" target="_blank">https://danmubot.top</a> 了解新版本，会比从旧版开始用更省心～</p>';
         // 返回数据
         return success($request, array_merge($configs, [
             'update' => $version_update,
