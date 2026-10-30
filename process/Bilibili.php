@@ -157,6 +157,7 @@ class Bilibili
             $this->isConnected = true;
             $this->onConnected($con, $roomId, $token);
             $this->reconnectAttempts = 0; // 连接成功后重置重连计数器
+            $this->reconnectAttemptsMessage = []; // 连接成功后清空上一轮的重连记录
         };
         // 设置消息接收回调
         $con->onMessage = function (AsyncTcpConnection $con, $data) {
@@ -739,7 +740,7 @@ class Bilibili
         echo Carbon::now()->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s') . "第 {$this->reconnectAttempts} 次重试，将在 {$delay} 秒后尝试...\n";
         $this->reconnectAttemptsMessage[] = [
             'reconnect_attempts' => $this->reconnectAttempts,
-            'delay' => round($delay, 2),
+            'delay' => round($delay, 2) . 's',
             'time' => Carbon::now()->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s'),
         ];
         // 设置延迟重连定时器
@@ -775,7 +776,7 @@ class Bilibili
             if (!empty($shop_config['enable-disconnect-mail']) && $shop_config['enable-disconnect-mail']) {
                 if (!empty($shop_config['email-address']) && !empty($shop_config['address-as'])) {
                     // 发送邮件
-                    Utils\HttpClient::sendPostRequest(config('app.tools_api_url') . '/bilibilidanmu-api/live-disconnect-email', [
+                    $response = Utils\HttpClient::sendPostRequest(config('app.tools_api_url') . '/api/v1/bilibili/mail/reconnect-failed', [
                         'Content-Type: application/json'
                     ], json_encode([
                         'mail' => $shop_config['email-address'],
@@ -783,6 +784,9 @@ class Bilibili
                         'room_id' => $room_id,
                         'error_queue' => $this->reconnectAttemptsMessage
                     ]));
+                    if ($response['httpStatus'] != 200) {
+                        sublog('Websocket', '连接异常', '发送断开连接通知失败', $response);
+                    }
                 }
             }
         } catch (\Exception $e) {

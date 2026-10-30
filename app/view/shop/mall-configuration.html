@@ -176,14 +176,14 @@
                                     <label class="label">邮箱</label>
                                     <div class="control">
                                         <input class="input" type="text" v-model="form.email_address"
-                                            placeholder="邮箱地址">
+                                            placeholder="邮箱地址" maxlength="255">
                                     </div>
                                     <p class="help">指用于接受邮件的邮箱地址</p>
                                 </div>
                                 <div class="field">
                                     <label class="label">称呼</label>
                                     <div class="control">
-                                        <input class="input" type="text" v-model="form.address_as" placeholder="称呼">
+                                        <input class="input" type="text" v-model="form.address_as" placeholder="称呼" maxlength="50">
                                     </div>
                                     <p class="help">指希望在邮件中如何称呼你</p>
                                 </div>

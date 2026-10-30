@@ -27,7 +27,7 @@ return [
     'app_name' => 'BilibiliDanmuji',
     'api_url' => getenv('SYSTEM_API_URL'), // api链接
     'image_url' => getenv('SYSTEM_API_URL') . '/attachment', // 图片链接
-    'tools_api_url' => getenv('TOOLS_API_URL') ?: 'https://tools.api.hejunjie.life', // 外部工具服务地址
+    'tools_api_url' => getenv('TOOLS_API_URL') ?: 'https://tools.hejunjie.life', // 外部工具服务地址
     'error_report_url' => getenv('ERROR_REPORT_URL') ?: 'https://error.hejunjie.life/write', // 错误上报服务地址
     'altcha_hmac_key' => getenv('ALTCHA_HMAC_KEY'), // altcha 验证密钥
 ];

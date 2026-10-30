@@ -100,11 +100,13 @@ class UserPublicMethods
         if ($shop_config['enable-shop-mail'] && $shop_config['email-address'] && $shop_config['address-as']) {
             // 获取用户历史兑换
             $history = [];
-            $redemption_records_logs = RedemptionRecords::where('user_id', $user_id)->orderBy('created_at', 'desc')->get([
-                'goods_id' => 'goods_id',
-                'sub_id' => 'sub_id',
-                'created_at' => 'created_at'
-            ]);
+            $redemption_records_logs = RedemptionRecords::where('user_id', $user_id)
+                ->where('records_id', '!=', $redemption_records->records_id)
+                ->orderBy('created_at', 'desc')->get([
+                    'goods_id' => 'goods_id',
+                    'sub_id' => 'sub_id',
+                    'created_at' => 'created_at'
+                ]);
             // 批量收集所有涉及的 goods_id 和 sub_id
             $allGoodsIds = [];
             $allSubIds = [];
@@ -139,13 +141,13 @@ class UserPublicMethods
                     }
                 }
                 $history[] = [
-                    'goods_name' => $goodsMap[$_redemption_records_logs->goods_id] ?? '',
+                    'goods_name' => $goodsMap[$_redemption_records_logs->goods_id] ?? '未知商品',
                     'sub_name' => implode(',', $subs_name),
                     'time' => $_redemption_records_logs->created_at->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s')
                 ];
             }
             // 发送邮件
-            Utils\HttpClient::sendPostRequest(config('app.tools_api_url') . '/bilibilidanmu-api/shop-email', [
+            $response = Utils\HttpClient::sendPostRequest(config('app.tools_api_url') . '/api/v1/bilibili/mail/exchange-notice', [
                 'Content-Type: application/json'
             ], json_encode([
                 'mail' => $shop_config['email-address'],
@@ -158,6 +160,9 @@ class UserPublicMethods
                 'point' => $redemption_records->after_point,
                 'history' => $history
             ]));
+            if ($response['httpStatus'] != 200) {
+                sublog('核心业务', '兑换邮件', '发送失败', $response);
+            }
         }
         // 返回成功
         return true;
@@ -360,14 +365,14 @@ class UserPublicMethods
                     ];
                 }
                 // 发送邮件
-                Utils\HttpClient::sendPostRequest(config('app.tools_api_url') . '/bilibilidanmu-api/live-end-email', [
+                $response = Utils\HttpClient::sendPostRequest(config('app.tools_api_url') . '/api/v1/bilibili/mail/live-report', [
                     'Content-Type: application/json'
                 ], json_encode([
                     'mail' => $shop_config['email-address'],
                     'name' => $shop_config['address-as'],
                     'starting_time' => $lives->created_at->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s'),
                     'end_time' => Carbon::parse($lives->end_time)->timezone(config('app.default_timezone'))->format('Y-m-d H:i:s'),
-                    'listening_open_vip' => $shop_config['listening-open-vip'],
+                    'listening_open_vip' => !empty($shop_config['listening-open-vip']) ? 1 : 0,
                     'open_list' => $open_list,
                     'danmu_list' => $danmu_list,
                     'danmu_count' => $danmu_count,
@@ -376,6 +381,9 @@ class UserPublicMethods
                     'blind_box_list' => $blind_box_list,
                     'blind_box_net' => round($blind_box_net, 2)
                 ]));
+                if ($response['httpStatus'] != 200) {
+                    sublog('核心业务', '下播邮件', '发送失败', $response);
+                }
             }
         }
     }
