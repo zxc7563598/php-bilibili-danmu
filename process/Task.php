@@ -4,6 +4,7 @@ namespace process;
 
 use app\core\ExportService;
 use app\core\RobotServices;
+use app\model\AdminUpdateLogs;
 use app\model\RedemptionRecords;
 use app\model\ShopConfig;
 use app\model\SilentUser;
@@ -41,12 +42,15 @@ class Task
                 $room_id = $live_info['data']['room_id'] ?? 0;
                 $room_uname = $live_info['data']['uname'] ?? '';
                 if ($uid > 0 && $room_id > 0) {
+                    // 获取当前版本号
+                    $version = AdminUpdateLogs::orderBy('id', 'desc')->value('version') ?? '';
                     $url = config('app.tools_api_url') . '/bilibilidanmu-api/active';
                     Utils\HttpClient::sendPostRequest($url, [], [
                         "room_id" => $room_id,
                         "room_uname" => $room_uname,
                         "uid" => $uid,
-                        "uname" => $uname
+                        "uname" => $uname,
+                        "version" => "PHP " . $version
                     ]);
                 }
             }
