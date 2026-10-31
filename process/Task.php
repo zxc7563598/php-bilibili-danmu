@@ -44,7 +44,7 @@ class Task
                 if ($uid > 0 && $room_id > 0) {
                     // 获取当前版本号
                     $version = AdminUpdateLogs::orderBy('id', 'desc')->value('version') ?? '';
-                    $url = config('app.tools_api_url') . '/bilibilidanmu-api/active';
+                    $url = config('app.tools_api_url') . '/api/v1/bilibili/bot/report';
                     Utils\HttpClient::sendPostRequest($url, [], [
                         "room_id" => $room_id,
                         "room_uname" => $room_uname,
